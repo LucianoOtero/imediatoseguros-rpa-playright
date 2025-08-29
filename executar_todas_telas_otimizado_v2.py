@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-RPA Tô Segurado - Versão Otimizada V2 com Detecção Inteligente de Estabilização
-================================================================================
+RPA Tô Segurado - Versão Otimizada V2 com Sistema de Logging Integrado
+======================================================================
 
-VERSÃO: 2.2.1 - OTIMIZADA E FOCADA
+VERSÃO: 2.3.0 - COM SISTEMA DE LOGGING
 DATA: 29/08/2025
 AUTOR: Assistente IA - Baseado em tosegurado-completo-tela1-8.py
 
@@ -17,16 +17,26 @@ MELHORIAS IMPLEMENTADAS:
 - ✅ Documentação completa com CHANGELOG e README atualizado
 - 🚀 OTIMIZAÇÃO: Remoção de tentativas que falharam na execução
 - 🎯 FOCO: Apenas seletores que funcionaram em produção
+- 📝 LOGGING: Sistema completo de logging configurável via JSON
+- 🔧 CONFIGURAÇÃO: Parâmetros de log e display configuráveis
 
 ESTRATÉGIA HÍBRIDA:
 1. Detecção inteligente quando possível (0.5-1.5s)
 2. Delays estratégicos quando necessário (5-10s)
 3. Compatibilidade total com o fluxo original
+4. Logging estruturado com rotação automática
 
 TEMPO ESTIMADO POR TELA: 1-5s (vs 15-20s anterior)
 TEMPO TOTAL ESTIMADO: ~20-40s (vs 120-160s anterior)
 TEMPO REAL ALCANÇADO: ~22.2s por tela (48% mais rápido)
 TEMPO TOTAL REAL: ~3 minutos (vs 5-8 minutos anterior)
+
+SISTEMA DE LOGGING:
+- Configurável via parametros.json
+- Rotação automática a cada 90 dias
+- Níveis: DEBUG, INFO, WARNING, ERROR, CRITICAL
+- Códigos de erro padronizados
+- Log em arquivo + console configurável
 """
 
 import time
@@ -43,12 +53,23 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
+# Sistema de logging integrado
+try:
+    from utils.logger_rpa import rpa_logger, log_info, log_error, log_success, log_exception
+    LOGGING_AVAILABLE = True
+except ImportError:
+    LOGGING_AVAILABLE = False
+    print("⚠️ Sistema de logging não disponível. Usando print padrão.")
+
 def configurar_chrome():
     """
     Configura o Chrome com opções otimizadas para RPA
     Usa ChromeDriver local para evitar erros [WinError 193]
     """
-    print("🔧 Configurando Chrome para RPA...")
+    if LOGGING_AVAILABLE:
+        log_info("🔧 Configurando Chrome para RPA...")
+    else:
+        print("🔧 Configurando Chrome para RPA...")
     
     # Criar diretório temporário para dados do Chrome
     temp_dir = tempfile.mkdtemp()
@@ -70,20 +91,36 @@ def configurar_chrome():
     chromedriver_path = os.path.join(os.getcwd(), "chromedriver", "chromedriver-win64", "chromedriver.exe")
     
     if not os.path.exists(chromedriver_path):
-        print(f"❌ ChromeDriver não encontrado em: {chromedriver_path}")
-        print("📥 Baixe o ChromeDriver de: https://chromedriver.chromium.org/")
+        error_msg = f"ChromeDriver não encontrado em: {chromedriver_path}"
+        if LOGGING_AVAILABLE:
+            log_error(error_msg, 1003, {"path": chromedriver_path})
+        else:
+            print(f"❌ {error_msg}")
+            print("📥 Baixe o ChromeDriver de: https://chromedriver.chromium.org/")
         return None, None
     
-    print("✅ Usando ChromeDriver local...")
+    if LOGGING_AVAILABLE:
+        log_info("✅ Usando ChromeDriver local...")
+    else:
+        print("✅ Usando ChromeDriver local...")
+    
     service = Service(chromedriver_path)
     
     try:
         driver = webdriver.Chrome(service=service, options=chrome_options)
         driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
-        print("✅ Chrome configurado com sucesso")
+        
+        if LOGGING_AVAILABLE:
+            log_success("Chrome configurado com sucesso")
+        else:
+            print("✅ Chrome configurado com sucesso")
+        
         return driver, temp_dir
     except Exception as e:
-        print(f"❌ Erro ao configurar Chrome: {e}")
+        if LOGGING_AVAILABLE:
+            log_exception(f"Erro ao configurar Chrome: {e}", 1004, {"error": str(e)})
+        else:
+            print(f"❌ Erro ao configurar Chrome: {e}")
         return None, None
 
 def aguardar_carregamento_pagina(driver, timeout=60):
@@ -873,57 +910,106 @@ def main():
     """
     Função principal - Executa o RPA com detecção inteligente de estabilização
     """
-    print("🚀 **RPA TÔ SEGURADO - VERSÃO 2.2.1 OTIMIZADA E FOCADA**")
-    print("=" * 70)
-    print("🧠 NOVA FUNCIONALIDADE: Detecção inteligente de estabilização")
-    print("⚡ OBJETIVO: Reduzir tempo de execução em 60-70%")
-    print("🎯 MÉTODO: Detecção inteligente + Delays estratégicos quando necessário")
-    print("🔄 ESTRATÉGIA: Híbrida para máxima compatibilidade")
-    print("=" * 70)
+    if LOGGING_AVAILABLE:
+        log_info("🚀 **RPA TÔ SEGURADO - VERSÃO 2.3.0 COM SISTEMA DE LOGGING**")
+        log_info("=" * 70)
+        log_info("🧠 NOVA FUNCIONALIDADE: Detecção inteligente de estabilização")
+        log_info("📝 LOGGING: Sistema completo de logging configurável")
+        log_info("⚡ OBJETIVO: Reduzir tempo de execução em 60-70%")
+        log_info("🎯 MÉTODO: Detecção inteligente + Delays estratégicos quando necessário")
+        log_info("🔄 ESTRATÉGIA: Híbrida para máxima compatibilidade")
+        log_info("=" * 70)
+    else:
+        print("🚀 **RPA TÔ SEGURADO - VERSÃO 2.3.0 COM SISTEMA DE LOGGING**")
+        print("=" * 70)
+        print("🧠 NOVA FUNCIONALIDADE: Detecção inteligente de estabilização")
+        print("📝 LOGGING: Sistema completo de logging configurável")
+        print("⚡ OBJETIVO: Reduzir tempo de execução em 60-70%")
+        print("🎯 MÉTODO: Detecção inteligente + Delays estratégicos quando necessário")
+        print("🔄 ESTRATÉGIA: Híbrida para máxima compatibilidade")
+        print("=" * 70)
     
     inicio = datetime.now()
-    print(f"⏰ Início: {inicio.strftime('%Y-%m-%d %H:%M:%S')}")
+    inicio_str = inicio.strftime('%Y-%m-%d %H:%M:%S')
+    
+    if LOGGING_AVAILABLE:
+        log_info(f"⏰ Início: {inicio_str}")
+    else:
+        print(f"⏰ Início: {inicio_str}")
     
     # Carregar parâmetros
     try:
         with open('parametros.json', 'r', encoding='utf-8') as f:
             parametros = json.load(f)
-        print("✅ Parâmetros carregados")
+        
+        if LOGGING_AVAILABLE:
+            log_success("Parâmetros carregados com sucesso", {"configuracao": parametros.get('configuracao', 'Padrão')})
+        else:
+            print("✅ Parâmetros carregados")
+            
     except Exception as e:
-        print(f"❌ Erro ao carregar parâmetros: {e}")
+        if LOGGING_AVAILABLE:
+            log_exception("Erro ao carregar parâmetros", 1001, {"error": str(e)})
+        else:
+            print(f"❌ Erro ao carregar parâmetros: {e}")
         return
     
     # Configurar Chrome
     driver, temp_dir = configurar_chrome()
     if not driver:
-        print("❌ Falha na configuração do Chrome")
+        if LOGGING_AVAILABLE:
+            log_error("Falha na configuração do Chrome", 1004)
+        else:
+            print("❌ Falha na configuração do Chrome")
         return
     
     try:
         # Executar todas as telas
         if executar_todas_telas(driver, parametros, temp_dir):
-            print("\n🎉 **RPA EXECUTADO COM SUCESSO!**")
+            if LOGGING_AVAILABLE:
+                log_success("RPA EXECUTADO COM SUCESSO!")
+            else:
+                print("\n🎉 **RPA EXECUTADO COM SUCESSO!**")
         else:
-            print("\n❌ **RPA FALHOU**")
+            if LOGGING_AVAILABLE:
+                log_error("RPA FALHOU durante a execução", 4001)
+            else:
+                print("\n❌ **RPA FALHOU**")
     
     except Exception as e:
-        print(f"❌ Erro durante execução: {e}")
-        import traceback
-        traceback.print_exc()
+        if LOGGING_AVAILABLE:
+            log_exception(f"Erro durante execução: {e}", 4001, {"error": str(e)})
+        else:
+            print(f"❌ Erro durante execução: {e}")
+            import traceback
+            traceback.print_exc()
     
     finally:
         # Limpeza
         if driver:
             driver.quit()
-            print("🔒 Chrome fechado")
+            if LOGGING_AVAILABLE:
+                log_info("🔒 Chrome fechado")
+            else:
+                print("🔒 Chrome fechado")
         
         if temp_dir and os.path.exists(temp_dir):
             shutil.rmtree(temp_dir)
-            print(f"🗑️ Diretório temporário removido: {temp_dir}")
+            if LOGGING_AVAILABLE:
+                log_info(f"🗑️ Diretório temporário removido: {temp_dir}")
+            else:
+                print(f"🗑️ Diretório temporário removido: {temp_dir}")
     
     fim = datetime.now()
-    print(f"⏰ Fim: {fim.strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"⏱️ Duração total: {fim - inicio}")
+    fim_str = fim.strftime('%Y-%m-%d %H:%M:%S')
+    duracao = fim - inicio
+    
+    if LOGGING_AVAILABLE:
+        log_info(f"⏰ Fim: {fim_str}")
+        log_info(f"⏱️ Duração total: {duracao}")
+    else:
+        print(f"⏰ Fim: {fim_str}")
+        print(f"⏱️ Duração total: {duracao}")
 
 if __name__ == "__main__":
     main()

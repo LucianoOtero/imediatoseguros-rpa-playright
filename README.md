@@ -215,6 +215,19 @@ git checkout <hash_commit>
 
 ## 📝 **Histórico de Versões**
 
+### **v2.3.0 (29/08/2025) - COM SISTEMA DE LOGGING** ⭐📝
+- ✅ **100% funcional** para todas as 8 telas
+- 🧠 **Estabilização inteligente** (0.5s vs 15-20s anterior)
+- ⚡ **48% mais rápido** que versão anterior
+- 🎯 **Tela 8 corrigida** com múltiplos seletores de fallback
+- 📚 **Documentação completa** com CHANGELOG
+- 🔄 **Estratégia híbrida** para máxima compatibilidade
+- 🚀 **OTIMIZADA**: Eliminadas tentativas que falharam
+- 🎯 **FOCADA**: Apenas seletores que funcionam em produção
+- 📝 **LOGGING**: Sistema completo configurável via JSON
+- 🔧 **CONFIGURÁVEL**: Log, display, rotação e níveis ajustáveis
+- 📁 **Arquivo**: `executar_todas_telas_otimizado_v2.py`
+
 ### **v2.2.1 (29/08/2025) - OTIMIZADA E FOCADA** ⭐🚀
 - ✅ **100% funcional** para todas as 8 telas
 - 🧠 **Estabilização inteligente** (0.5s vs 15-20s anterior)

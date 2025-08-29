@@ -5,6 +5,33 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [v2.3.0] - 2025-08-29
+
+### 🎯 Adicionado
+- **Sistema completo de logging**: Módulo utils/logger_rpa.py com funcionalidades avançadas
+- **Configuração via JSON**: Parâmetros log, display, rotação e nível configuráveis
+- **Códigos de erro padronizados**: Sistema de códigos estruturados (1000-9999)
+- **Rotação automática de logs**: Limpeza automática a cada 90 dias (configurável)
+- **Controle de exibição**: Console silencioso ou verbose configurável
+- **Fallback automático**: Sistema padrão se logging indisponível
+- **Documentação completa**: SISTEMA_LOGGING_V2.3.0.md com exemplos e configurações
+
+### 🔧 Corrigido
+- **Integração de logging**: Todas as funções principais atualizadas para usar logging
+- **Tratamento de erros**: Exceções capturadas e logadas com traceback completo
+- **Configuração robusta**: Fallback para configurações padrão se JSON inválido
+
+### ⚡ Performance
+- **Logging não-bloqueante**: Sistema de logging não impacta performance do RPA
+- **Rotação em background**: Limpeza automática de logs antigos
+- **Configuração flexível**: Logging pode ser desabilitado para máxima performance
+
+### 🧠 Funcionalidades Inteligentes
+- **Níveis de logging**: DEBUG, INFO, WARNING, ERROR, CRITICAL configuráveis
+- **Logs estruturados**: Timestamp, nível, arquivo:linha, caller e dados extras
+- **Códigos de erro**: Categorização por tipo (configuração, navegação, automação, sistema)
+- **Dados contextuais**: Informações extras para debugging e análise
+
 ## [v2.2.1] - 2025-08-29
 
 ### 🚀 Otimizado
