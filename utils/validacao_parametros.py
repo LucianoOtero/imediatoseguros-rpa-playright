@@ -74,7 +74,7 @@ class ValidadorParametros:
             "combustivel": ["Flex", "Gasolina", "Etanol", "Diesel", "Elétrico", "Híbrido"],
             "veiculo_segurado": ["Sim", "Não"],
             "sexo": ["Masculino", "Feminino"],
-            "estado_civil": ["Solteiro", "Casado", "Divorciado", "Viúvo", "União Estável"],
+            "estado_civil": ["Solteiro", "Casado", "Divorciado", "Viúvo", "União Estável", "Casado ou União Estável", "Separado"],
             "uso_veiculo": ["Particular", "Comercial", "Aluguel", "Uber/99", "Taxi"],
             "log_nivel": ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
         }

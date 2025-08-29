@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-RPA Tô Segurado - COMPLETO ATÉ TELA 8
+RPA Tô Segurado - COMPLETO ATÉ TELA 9
 VERSÃO CORRIGIDA baseada EXATAMENTE no script tosegurado-completo-tela1-8.py que funcionou ontem
++ IMPLEMENTAÇÃO DA TELA 9: Dados pessoais do segurado
 
 HISTÓRICO DE CORREÇÕES E IMPLEMENTAÇÕES:
 ===========================================
@@ -63,6 +64,7 @@ HISTÓRICO DE CORREÇÕES E IMPLEMENTAÇÕES:
     - implementar_tela6(): Tipo de combustível + checkboxes
     - implementar_tela7(): Endereço de pernoite (CEP)
     - implementar_tela8(): Finalidade do veículo
+    - implementar_tela9(): Dados pessoais do segurado (NOVA)
 
 11. ESTRATÉGIAS DE CLIQUE:
     - clicar_com_delay_extremo(): Clique com delay extremo
@@ -91,6 +93,12 @@ HISTÓRICO DE CORREÇÕES E IMPLEMENTAÇÕES:
     - Carregados do arquivo parametros.json
     - Validação de parâmetros essenciais
     - Placa hardcoded como KVA-1791 (baseado no script que funcionou)
+
+16. NOVA IMPLEMENTAÇÃO - TELA 9:
+    - Título: "Nessa etapa, precisamos dos seus dados pessoais..."
+    - Campos: Nome, CPF, Data nascimento, Sexo, Estado civil, Email, Celular
+    - Dados de teste: LUCIANO RODRIGUES OTERO, CPF 085.546.07848, etc.
+    - Botão Continuar: <p class="font-semibold font-workSans cursor-pointer text-sm leading-6">Continuar</p>
 
 NOTA IMPORTANTE: Este script está funcionando perfeitamente. 
 NÃO ALTERAR sem testar extensivamente, pois está baseado no que funcionou ontem.
@@ -1079,6 +1087,191 @@ def implementar_tela8(driver):
         print(f"❌ Erro na Tela 8: {e}")
         return False
 
+def implementar_tela9(driver, parametros):
+    """
+    Implementa a Tela 9: Dados pessoais do segurado
+    
+    TELA 9 - DADOS PESSOAIS:
+    ========================
+    Título: "Nessa etapa, precisamos dos seus dados pessoais..."
+    
+    CAMPOS A PREENCHER:
+    ===================
+    1. Nome Completo* - ID: "nomeTelaSegurado"
+    2. CPF* - ID: "cpfTelaSegurado" 
+    3. Data de nascimento* - ID: "dataNascimentoTelaSegurado"
+    4. Sexo* - Opções: "Masculino" e "Feminino"
+    5. Estado civil* - Opções: "Casado ou União Estável", "Divorciado", "Separado", "Solteiro", "Viuvo"
+    6. Email* - Campo de email
+    7. Celular - ID: "celularTelaSegurado"
+    
+    BOTÃO CONTINUAR:
+    - Elemento: <p class="font-semibold font-workSans cursor-pointer text-sm leading-6">Continuar</p>
+    
+    DADOS DE TESTE:
+    ===============
+    - Nome: "LUCIANO RODRIGUES OTERO"
+    - CPF: "085.546.07848"
+    - Data: "09/02/1965"
+    - Sexo: "Masculino"
+    - Estado Civil: "Casado ou União Estável"
+    - Email: "lrotero@gmail.com"
+    - Celular: "11976687668"
+    
+    IMPLEMENTAÇÃO:
+    ==============
+    1. Aguarda elementos da Tela 9 (dados pessoais)
+    2. Preenche todos os campos obrigatórios
+    3. Seleciona sexo e estado civil via JavaScript
+    4. Clica em Continuar para avançar
+    
+    DETECÇÃO:
+    - XPATH: //*[contains(text(), 'dados pessoais') or contains(text(), 'Dados pessoais')]
+    
+    DELAYS:
+    - Estabilização: 15-20 segundos
+    - Carregamento: 30-60 segundos
+    
+    FUNÇÃO DE DEBUG:
+    - salvar_estado_tela() salva estado antes e depois de cada ação
+    
+    RETORNO:
+    - True: Se Tela 9 implementada com sucesso
+    - False: Se falhou na implementação
+    """
+    print("\n👤 **INICIANDO TELA 9: Dados pessoais do segurado**")
+    
+    try:
+        # Aguardar elementos da tela de dados pessoais
+        WebDriverWait(driver, 20).until(
+            EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'dados pessoais') or contains(text(), 'Dados pessoais')]"))
+        )
+        print("✅ Tela 9 carregada - dados pessoais detectados!")
+        
+        salvar_estado_tela(driver, 9, "inicial", None)
+        
+        if not aguardar_carregamento_pagina(driver, 30):
+            print("❌ Erro: Página não carregou completamente")
+            return False
+        
+        salvar_estado_tela(driver, 9, "dados_pessoais_carregada", None)
+        
+        # 1. Preencher Nome Completo
+        print("⏳ Preenchendo Nome Completo...")
+        nome_element = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, "nomeTelaSegurado"))
+        )
+        nome_element.clear()
+        nome_element.send_keys(parametros["nome"])
+        print(f"✅ Nome preenchido: {parametros['nome']}")
+        
+        # 2. Preencher CPF
+        print("⏳ Preenchendo CPF...")
+        cpf_element = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, "cpfTelaSegurado"))
+        )
+        cpf_element.clear()
+        cpf_element.send_keys(parametros["cpf"])
+        print(f"✅ CPF preenchido: {parametros['cpf']}")
+        
+        # 3. Preencher Data de Nascimento
+        print("⏳ Preenchendo Data de Nascimento...")
+        data_element = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, "dataNascimentoTelaSegurado"))
+        )
+        data_element.clear()
+        data_element.send_keys(parametros["data_nascimento"])
+        print(f"✅ Data de nascimento preenchida: {parametros['data_nascimento']}")
+        
+        # 4. Selecionar Sexo
+        print("⏳ Selecionando Sexo...")
+        if not clicar_radio_via_javascript(driver, parametros["sexo"], f"Sexo {parametros['sexo']}"):
+            print(f"⚠️ Radio '{parametros['sexo']}' não encontrado - tentando prosseguir...")
+        
+        # 5. Selecionar Estado Civil
+        print("⏳ Selecionando Estado Civil...")
+        if not clicar_radio_via_javascript(driver, parametros["estado_civil"], f"Estado Civil {parametros['estado_civil']}"):
+            print(f"⚠️ Radio '{parametros['estado_civil']}' não encontrado - tentando prosseguir...")
+        
+        # 6. Preencher Email
+        print("⏳ Preenchendo Email...")
+        # Tentar encontrar campo de email por diferentes seletores
+        email_selectors = [
+            "//input[@type='email']",
+            "//input[contains(@placeholder, 'email') or contains(@placeholder, 'Email')]",
+            "//input[contains(@id, 'email') or contains(@name, 'email')]"
+        ]
+        
+        email_element = None
+        for selector in email_selectors:
+            try:
+                email_element = driver.find_element(By.XPATH, selector)
+                break
+            except NoSuchElementException:
+                continue
+        
+        if email_element:
+            email_element.clear()
+            email_element.send_keys(parametros["email"])
+            print(f"✅ Email preenchido: {parametros['email']}")
+        else:
+            print("⚠️ Campo de email não encontrado - tentando prosseguir...")
+        
+        # 7. Preencher Celular
+        print("⏳ Preenchendo Celular...")
+        celular_element = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, "celularTelaSegurado"))
+        )
+        celular_element.clear()
+        celular_element.send_keys(parametros["celular"])
+        print(f"✅ Celular preenchido: {parametros['celular']}")
+        
+        # Aguardar estabilização antes de continuar
+        time.sleep(5)
+        salvar_estado_tela(driver, 9, "campos_preenchidos", None)
+        
+        # Clicar em Continuar
+        print("⏳ Aguardando botão Continuar aparecer...")
+        
+        # Tentar diferentes seletores para o botão Continuar
+        continuar_selectors = [
+            "//p[contains(@class, 'font-semibold') and contains(@class, 'cursor-pointer') and contains(text(), 'Continuar')]",
+            "//button[contains(text(), 'Continuar')]",
+            "//*[contains(text(), 'Continuar') and contains(@class, 'cursor-pointer')]"
+        ]
+        
+        continuar_clicado = False
+        for selector in continuar_selectors:
+            try:
+                continuar_element = WebDriverWait(driver, 5).until(
+                    EC.element_to_be_clickable((By.XPATH, selector))
+                )
+                driver.execute_script("arguments[0].click();", continuar_element)
+                continuar_clicado = True
+                print("✅ Botão Continuar clicado com sucesso!")
+                break
+            except (TimeoutException, NoSuchElementException):
+                continue
+        
+        if not continuar_clicado:
+            print("❌ Erro: Falha ao clicar Continuar na Tela 9")
+            return False
+        
+        print("⏳ Aguardando carregamento da página...")
+        time.sleep(15)
+        
+        if not aguardar_carregamento_pagina(driver, 60):
+            print("⚠️ Página pode não ter carregado completamente")
+        
+        aguardar_estabilizacao(driver, 20)
+        salvar_estado_tela(driver, 9, "apos_continuar", None)
+        print("✅ **TELA 9 IMPLEMENTADA COM SUCESSO!**")
+        return True
+        
+    except Exception as e:
+        print(f"❌ Erro na Tela 9: {e}")
+        return False
+
 def executar_todas_telas():
     """
     Executa o fluxo principal de cotação (BASEADO EXATAMENTE NO SCRIPT QUE FUNCIONOU)
@@ -1195,10 +1388,15 @@ def executar_todas_telas():
             print("❌ Erro: Falha ao implementar Tela 8")
             return False
         
+        # Implementar Tela 9
+        if not implementar_tela9(driver, parametros):
+            print("❌ Erro: Falha ao implementar Tela 9")
+            return False
+        
         print("\n" + "=" * 80)
-        print("🎉 **RPA EXECUTADO COM SUCESSO TOTAL! TELAS 1-8 IMPLEMENTADAS!**")
+        print("🎉 **RPA EXECUTADO COM SUCESSO TOTAL! TELAS 1-9 IMPLEMENTADAS!**")
         print("=" * 80)
-        print(f"✅ Total de telas executadas: 8")
+        print(f"✅ Total de telas executadas: 9")
         print(f"✅ Tela 1: Seleção Carro")
         print(f"✅ Tela 2: Inserção placa KVA-1791")
         print(f"✅ Tela 3: Confirmação ECOSPORT → Sim")
@@ -1207,6 +1405,7 @@ def executar_todas_telas():
         print(f"✅ Tela 6: Tipo combustível + checkboxes")
         print(f"✅ Tela 7: Endereço pernoite (CEP)")
         print(f"✅ Tela 8: Finalidade veículo → Pessoal")
+        print(f"✅ Tela 9: Dados pessoais do segurado")
         print(f"📁 Todos os arquivos salvos em: temp/")
         
         return True
