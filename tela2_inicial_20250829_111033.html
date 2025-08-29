@@ -1,0 +1,157 @@
+<html lang="pt-BR"><head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <title>Imediato Seguros — Cotação Online</title>
+      <meta name="description" content="Faça sua cotação de seguro auto online com a Imediato Seguros. Atendimento rápido via chat.">
+      <link rel="preconnect" href="https://bpsegurosimediato.com.br">
+      <style>
+          :root {
+              --brand: #0f766e;
+              --text: #1f2937;
+              --muted: #6b7280;
+              --bg: #f9fafb;
+              --card: #ffffff;
+          }
+          * { box-sizing: border-box; }
+          body {
+              margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+              color: var(--text); background: var(--bg);
+          }
+          header {
+              background: var(--brand); color: #fff; padding: 28px 16px; text-align: center;
+          }
+          header h1 { margin: 0 0 6px; font-size: 28px; }
+          header p { margin: 0; opacity: .95; }
+          main { max-width: 960px; margin: 30px auto; padding: 0 16px; }
+          .card {
+              background: var(--card); border-radius: 16px; padding: 28px;
+              box-shadow: 0 10px 30px rgba(0,0,0,.05);
+          }
+          h2 { margin: 0 0 10px; color: var(--brand); }
+          p.lead { margin: 0 0 16px; color: var(--muted); }
+          .cta {
+              margin-top: 10px; display: inline-block; background: var(--brand); color: #fff;
+              padding: 12px 18px; border-radius: 10px; text-decoration: none;
+          }
+          footer { text-align: center; color: var(--muted); padding: 28px 16px; }
+      </style>
+  <style>
+      .bpw-header { background: var(--brand) !important; }
+      .bpw-from-user .bpw-chat-bubble { background: var(--brand) !important; }
+    </style><link rel="stylesheet" href="https://bpsegurosimediato.com.br/assets/modules/channel-web/inject.css"></head>
+  <body>
+      <header>
+          <h1>Imediato Seguros</h1>
+          <p>Cotação de Seguro Online — rápido e sem complicação</p>
+      </header>
+      <main>
+          <div class="card">
+              <h2>Comece sua cotação</h2>
+              <p class="lead">Clique no botão de chat no canto da tela e fale agora com nosso assistente.</p>
+              <a class="cta" href="#" onclick="window.botpressWebChat &amp;&amp; window.botpressWebChat.sendEvent({type:'show'}); return false;">
+                  Abrir chat
+              </a>
+          </div>
+      </main>
+      <footer>
+          © <span id="y">2025</span> Imediato Seguros — Todos os direitos reservados.
+      </footer>
+      <script>document.getElementById('y').textContent = new Date().getFullYear();</script>
+      <!-- Botpress Webchat v12 (self-hosted) -->
+
+<script src="https://bpsegurosimediato.com.br/assets/modules/channel-web/inject.js"></script>
+<script>
+(function () {
+  // --- 1) Captura e persiste o gclid ---
+  const qs = new URLSearchParams(location.search);
+  const fromUrl = (qs.get('gclid') || '').trim();
+  const stored  = localStorage.getItem('gclid') || sessionStorage.getItem('gclid') || '';
+  const gclid   = fromUrl || stored;
+  if (gclid) {
+    localStorage.setItem('gclid', gclid);
+    sessionStorage.setItem('gclid', gclid);
+  }
+
+  // --- 2) Inicializa o WebChat (quando DOM estiver pronto) ---
+  function initWebchat () {
+    if (!window.botpressWebChat || !window.botpressWebChat.init) return;
+    window.botpressWebChat.init({
+      host: "https://bpsegurosimediato.com.br",
+      botId: "imediato-whatsapp",
+      locale: "pt-BR",
+      botName: "Imediato Seguros",
+      composerPlaceholder: "Digite sua mensagem...",
+      showLauncher: true,
+      showCloseButton: true,
+      hideWidget: false,
+      enableTranscriptDownload: false,
+      enableReset: false,
+      startOpen: true,
+      user: { data: { gclid: gclid || '' } } // extra: também manda via user.data
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initWebchat);
+  } else {
+    initWebchat();
+  }
+
+  // --- 3) Envia o gclid quando o WebChat estiver pronto + retry ---
+  function sendCapture () {
+    const val = localStorage.getItem('gclid') || '';
+    if (window.botpressWebChat && typeof window.botpressWebChat.sendEvent === 'function') {
+      window.botpressWebChat.sendEvent({ type: 'capture-gclid', payload: { gclid: val } });
+      return true;
+    }
+    return false;
+  }
+
+  // A. Listener de ready (usando self.addEventListener para evitar sobrescrita)
+  function onMsg (e) {
+    const t = e && e.data && e.data.type;
+    if (t === 'webchat:ready' || t === 'LIFECYCLE.READY') {
+      sendCapture();
+      self.removeEventListener('message', onMsg);
+    }
+  }
+  self.addEventListener('message', onMsg);
+
+  // B. Retry defensivo (10 tentativas a cada 600ms)
+  let tries = 0;
+  const iv = setInterval(() => {
+    if (sendCapture() || ++tries >= 10) clearInterval(iv);
+  }, 600);
+
+  // --- 4) Evento start quando a janela carregar (sem usar window.addEventListener) ---
+  function sendStart () {
+    if (window.botpressWebChat && typeof window.botpressWebChat.sendEvent === 'function') {
+      window.botpressWebChat.sendEvent({ type: 'start' });
+    }
+  }
+  if (document.readyState === 'complete') {
+    sendStart();
+  } else {
+    self.addEventListener('load', sendStart);
+  }
+
+  // --- 5) Estilo (opcional) ---
+  (function () {
+    var css = `
+      .bpw-header { background: var(--brand) !important; }
+      .bpw-from-user .bpw-chat-bubble { background: var(--brand) !important; }
+    `;
+    var s = document.createElement('style');
+    s.appendChild(document.createTextNode(css));
+    document.head.appendChild(s);
+  })();
+})();
+</script>
+
+
+
+
+
+      <!-- /Botpress Webchat -->
+  
+  <div id="bp-web-widget"><iframe id="bp-widget" title="Imediato%20Seguros" frameborder="0" src="https://bpsegurosimediato.com.br/lite/imediato-whatsapp/?m=channel-web&amp;v=Embedded&amp;options=%7B%22config%22%3A%7B%22host%22%3A%22https%3A%2F%2Fbpsegurosimediato.com.br%22%2C%22botId%22%3A%22imediato-whatsapp%22%2C%22locale%22%3A%22pt-BR%22%2C%22botName%22%3A%22Imediato%20Seguros%22%2C%22composerPlaceholder%22%3A%22Digite%20sua%20mensagem...%22%2C%22showLauncher%22%3Atrue%2C%22showCloseButton%22%3Atrue%2C%22hideWidget%22%3Afalse%2C%22enableTranscriptDownload%22%3Afalse%2C%22enableReset%22%3Afalse%2C%22startOpen%22%3Atrue%2C%22user%22%3A%7B%22data%22%3A%7B%22gclid%22%3A%22%22%7D%7D%7D%7D" class="bp-widget-web bp-widget-widget"></iframe></div></body></html>
