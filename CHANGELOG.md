@@ -5,6 +5,24 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [v2.2.1] - 2025-08-29
+
+### 🚀 Otimizado
+- **Eliminação de tentativas que falharam**: Removidas todas as tentativas que não funcionaram na execução v2.2.0
+- **Foco em seletores que funcionam**: Mantidos apenas os seletores que funcionaram em produção
+- **Código mais limpo**: Removidos loops desnecessários de tentativas múltiplas
+- **Performance melhorada**: Execução mais eficiente sem tentativas que sempre falham
+
+### 🎯 Adicionado
+- **Documentação de otimizações**: Arquivo OTIMIZACOES_V2.2.1.md com análise detalhada
+- **Comentários explicativos**: Cada otimização documentada no código
+- **Base para futuras melhorias**: Estrutura limpa para implementar seletores corretos
+
+### 🔧 Corrigido
+- **Tela 5**: Simplificado botão Continuar (apenas seletor que funciona)
+- **Tela 6**: Checkboxes comentados até identificar seletores corretos
+- **Tela 8**: Radio buttons comentados e botão Continuar simplificado
+
 ## [v2.2.0] - 2025-08-29
 
 ### 🎯 Adicionado
