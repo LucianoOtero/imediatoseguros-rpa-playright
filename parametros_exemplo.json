@@ -1,0 +1,51 @@
+{
+  "url_base": "https://www.app.tosegurado.com.br/imediatoseguros",
+  "placa": "KVA1791",
+  "marca": "FORD",
+  "modelo": "ECOSPORT XLS 1.6 1.6 8V",
+  "ano": "2006",
+  "combustivel": "Flex",
+  "veiculo_segurado": "Não",
+  "cep": "03317-000",
+  "endereco_completo": "Rua Serra de Botucatu, 410 APTO 11 - São Paulo, SP",
+  "uso_veiculo": "Particular",
+  "nome": "SEU_NOME_AQUI",
+  "cpf": "00000000000",
+  "data_nascimento": "01/01/1980",
+  "sexo": "Masculino",
+  "estado_civil": "Casado",
+  "email": "seu@email.com",
+  "celular": "(11) 99999-9999"
+}
+
+/*
+INSTRUÇÕES:
+============
+
+1. COPIE este arquivo para "parametros.json"
+2. EDITE com seus dados reais
+3. NÃO versionar parametros.json com dados pessoais
+
+CAMPOS OBRIGATÓRIOS:
+====================
+- url_base: URL base do portal (não alterar)
+- placa: Placa do veículo (formato: ABC1234)
+- marca: Marca do veículo
+- modelo: Modelo completo do veículo
+- email: Email válido para contato
+- celular: Celular para contato
+
+CAMPOS OPCIONAIS:
+=================
+- ano: Ano do veículo
+- combustivel: Tipo de combustível
+- cep: CEP do endereço
+- nome: Nome completo
+- cpf: CPF (formato: 00000000000)
+
+NOTAS:
+======
+- A placa KVA1791 está hardcoded no script principal
+- O CEP 03084-000 está hardcoded para endereço de pernoite
+- Estes valores podem ser alterados no código se necessário
+*/

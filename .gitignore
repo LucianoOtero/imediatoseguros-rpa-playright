@@ -1,0 +1,72 @@
+# RPA Tô Segurado - .gitignore
+# Arquivos e diretórios que NÃO devem ser versionados
+
+# Diretórios temporários e de debug
+temp/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Arquivos de log
+*.log
+logs/
+
+# Arquivos de configuração local
+.env
+config_local.py
+*.local
+
+# Arquivos de dados sensíveis
+*.key
+*.pem
+*.p12
+*.pfx
+
+# Arquivos de cache
+.cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Arquivos de IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Arquivos de backup
+*.bak
+*.backup
+*.old
+
+# Arquivos temporários
+*.tmp
+*.temp
+
+# Screenshots e arquivos de debug (opcional - comentar se quiser versionar)
+# *.png
+# *.html
+# *.txt
+
+# ChromeDriver (não versionar - baixar localmente)
+chromedriver/
+
+# Arquivos de parâmetros com dados sensíveis
+# parametros.json (comentar se quiser versionar)
+
+# Diretórios de output
+output/
+results/
