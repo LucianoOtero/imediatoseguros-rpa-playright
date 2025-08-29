@@ -5,6 +5,38 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [v2.5.0] - 2025-08-29
+
+### 🎯 Adicionado
+- **Sistema de parâmetros via JSON**: Script executar_todas_telas_com_json.py para receber parâmetros na linha de comando
+- **Validação completa de parâmetros**: Módulo utils/validacao_parametros.py com validação robusta
+- **Validação de campos obrigatórios**: Verificação automática de todos os campos necessários
+- **Validação de tipos de dados**: Verificação de tipos corretos para cada campo
+- **Validação de valores permitidos**: Listas de valores válidos para campos específicos
+- **Validação de formatos**: CPF, CEP, email, celular, data de nascimento, ano
+- **Sistema de ajuda integrado**: Comando --help com documentação completa
+- **Tratamento de erros robusto**: Mensagens claras para cada tipo de erro
+- **Módulo de retorno estruturado**: utils/retorno_estruturado.py para APIs
+- **Script de teste completo**: teste_parametros_json.py para validar todas as funcionalidades
+
+### 🔧 Corrigido
+- **Substituição de arquivo parametros.json**: Parâmetros agora recebidos via linha de comando
+- **Validação de entrada**: Sistema robusto de validação antes da execução
+- **Tratamento de erros de validação**: Saída clara e orientação para correção
+- **Encoding de caracteres**: Suporte para caracteres especiais em português
+
+### ⚡ Performance
+- **Validação prévia**: Erros detectados antes da execução do RPA
+- **Feedback imediato**: Usuário informado sobre problemas antes da execução
+- **Sistema não-bloqueante**: Validação não impacta performance do RPA
+
+### 🧠 Funcionalidades Inteligentes
+- **Validação de CPF**: Algoritmo de validação com dígitos verificadores
+- **Validação de data**: Verificação de formato e validade temporal
+- **Validação de ano**: Verificação de range válido (1900-2026)
+- **Validação de formatos**: Regex para placa, CEP, email, celular
+- **Fallback automático**: Sistema funciona mesmo sem módulos opcionais
+
 ## [v2.4.0] - 2025-08-29
 
 ### 🎯 Adicionado

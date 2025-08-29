@@ -215,6 +215,25 @@ git checkout <hash_commit>
 
 ## 📝 **Histórico de Versões**
 
+### **v2.5.0 (29/08/2025) - COM PARÂMETROS VIA JSON NA LINHA DE COMANDO** ⭐📋
+- ✅ **100% funcional** para todas as 8 telas
+- 🧠 **Estabilização inteligente** (0.5s vs 15-20s anterior)
+- ⚡ **48% mais rápido** que versão anterior
+- 🎯 **Tela 8 corrigida** com múltiplos seletores de fallback
+- 📚 **Documentação completa** com CHANGELOG
+- 🔄 **Estratégia híbrida** para máxima compatibilidade
+- 🚀 **OTIMIZADA**: Eliminadas tentativas que falharam
+- 🎯 **FOCADA**: Apenas seletores que funcionam em produção
+- 📝 **LOGGING**: Sistema completo configurável via JSON
+- 🔧 **CONFIGURÁVEL**: Log, display, rotação e níveis ajustáveis
+- 🔄 **RETORNO ESTRUTURADO**: Sistema completo para frontend/API
+- 📊 **CÓDIGOS PADRONIZADOS**: Erros e sucessos categorizados (1000-9999)
+- 🌐 **INTEGRAÇÃO FRONTEND**: JSON estruturado para JavaScript, React, Python
+- 📋 **PARÂMETROS VIA JSON**: Recebimento de parâmetros na linha de comando
+- ✅ **VALIDAÇÃO COMPLETA**: Campos obrigatórios, tipos, valores e formatos
+- 🧠 **VALIDAÇÃO INTELIGENTE**: CPF, data, ano, formatos específicos
+- 📁 **Arquivo**: `executar_todas_telas_com_json.py`
+
 ### **v2.4.0 (29/08/2025) - COM SISTEMA DE RETORNO ESTRUTURADO** ⭐🔄
 - ✅ **100% funcional** para todas as 8 telas
 - 🧠 **Estabilização inteligente** (0.5s vs 15-20s anterior)
