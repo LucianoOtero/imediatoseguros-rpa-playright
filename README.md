@@ -215,6 +215,22 @@ git checkout <hash_commit>
 
 ## 📝 **Histórico de Versões**
 
+### **v2.4.0 (29/08/2025) - COM SISTEMA DE RETORNO ESTRUTURADO** ⭐🔄
+- ✅ **100% funcional** para todas as 8 telas
+- 🧠 **Estabilização inteligente** (0.5s vs 15-20s anterior)
+- ⚡ **48% mais rápido** que versão anterior
+- 🎯 **Tela 8 corrigida** com múltiplos seletores de fallback
+- 📚 **Documentação completa** com CHANGELOG
+- 🔄 **Estratégia híbrida** para máxima compatibilidade
+- 🚀 **OTIMIZADA**: Eliminadas tentativas que falharam
+- 🎯 **FOCADA**: Apenas seletores que funcionam em produção
+- 📝 **LOGGING**: Sistema completo configurável via JSON
+- 🔧 **CONFIGURÁVEL**: Log, display, rotação e níveis ajustáveis
+- 🔄 **RETORNO ESTRUTURADO**: Sistema completo para frontend/API
+- 📊 **CÓDIGOS PADRONIZADOS**: Erros e sucessos categorizados (1000-9999)
+- 🌐 **INTEGRAÇÃO FRONTEND**: JSON estruturado para JavaScript, React, Python
+- 📁 **Arquivo**: `executar_todas_telas_otimizado_v2.py`
+
 ### **v2.3.0 (29/08/2025) - COM SISTEMA DE LOGGING** ⭐📝
 - ✅ **100% funcional** para todas as 8 telas
 - 🧠 **Estabilização inteligente** (0.5s vs 15-20s anterior)

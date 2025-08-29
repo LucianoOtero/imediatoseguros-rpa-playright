@@ -5,6 +5,34 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [v2.4.0] - 2025-08-29
+
+### 🎯 Adicionado
+- **Sistema de retorno estruturado**: Função criar_retorno_estruturado para frontend
+- **Códigos padronizados**: Sistema completo de códigos de erro e sucesso (1000-9999)
+- **Retorno JSON estruturado**: Formato consistente para APIs e frontends
+- **Códigos categorizados**: Erros organizados por tipo (configuração, navegação, automação, sistema, validação)
+- **Mensagens compreensivas**: Erros amigáveis para usuários finais
+- **Integração com logging**: Função obter_logs_recentes para debugging
+- **Documentação completa**: SISTEMA_RETORNO_ESTRUTURADO.md com exemplos práticos
+
+### 🔧 Corrigido
+- **Comunicação frontend-backend**: Retorno estruturado para JavaScript, React, Python
+- **Padronização de erros**: Códigos consistentes para todas as operações
+- **Integração com sistema existente**: Compatível com logging e configurações atuais
+
+### ⚡ Performance
+- **Retorno não-bloqueante**: Sistema de retorno não impacta performance do RPA
+- **JSON otimizado**: Estrutura eficiente para transmissão de dados
+- **Fallback automático**: Sistema funciona mesmo sem logging disponível
+
+### 🧠 Funcionalidades Inteligentes
+- **Códigos de sucesso**: 9001-9004 para operações bem-sucedidas
+- **Códigos de erro**: 1000-5999 categorizados por tipo de problema
+- **Dados contextuais**: Informações extras para debugging e análise
+- **Logs recentes**: Últimas entradas de log incluídas no retorno
+- **Timestamp automático**: Registro automático de data/hora da operação
+
 ## [v2.3.0] - 2025-08-29
 
 ### 🎯 Adicionado
