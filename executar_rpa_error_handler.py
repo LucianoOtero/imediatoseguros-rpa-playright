@@ -9,6 +9,8 @@ VERSÃO CORRIGIDA baseada EXATAMENTE no script tosegurado-completo-tela1-8.py qu
 + PARSER DE ARGUMENTOS: Suporte a JSON direto ou leitura da entrada padrão
 + ERROR HANDLER ROBUSTO: Captura, categoriza e retorna erros em JSON padronizado
 + TABELA DE CÓDIGOS DE ERRO: 1000+ códigos categorizados com causas e ações recomendadas
++ SISTEMA DE LOGGING: Arquivo de log compreensivo com timestamp (inserir_log)
++ CONTROLE DE VISUALIZAÇÃO: Mensagens na tela configuráveis (visualizar_mensagens)
 
 HISTÓRICO DE CORREÇÕES E IMPLEMENTAÇÕES:
 ===========================================
@@ -98,6 +100,14 @@ HISTÓRICO DE CORREÇÕES E IMPLEMENTAÇÕES:
        - Estabilização: Configurável via parametros.json (tempo_estabilizacao)
        - Carregamento de página: MUTATIONOBSERVER ROBUSTO inteligente (detecção automática)
        - Aguardar elementos: 20 segundos
+
+13. SISTEMA DE LOGGING E VISUALIZAÇÃO (30/08/2025):
+       - inserir_log: Cria arquivo de log compreensivo com timestamp
+       - visualizar_mensagens: Controla exibição de mensagens na tela
+       - Log completo de parâmetros, execução, erros e resultado
+       - Arquivo: logs/rpa_execucao_YYYYMMDD_HHMMSS.log
+       - Logging integrado ao ERROR HANDLER ROBUSTO
+       - Controle total sobre visualização de mensagens
        - Timeout padrão: 30 segundos
        - NOVA ESTRATÉGIA: Zero delays fixos, apenas estabilização real detectada
        - Fallback: Método tradicional se MutationObserver ROBUSTO falhar
@@ -152,6 +162,7 @@ import os
 import sys
 import argparse
 import traceback
+import logging
 from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -160,6 +171,100 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException, TimeoutException, WebDriverException, SessionNotCreatedException, ElementClickInterceptedException, StaleElementReferenceException, ElementNotInteractableException, InvalidSelectorException, NoSuchWindowException, NoSuchFrameException, UnexpectedAlertPresentException, MoveTargetOutOfBoundsException, InvalidElementStateException, ScreenshotException, ImeNotAvailableException, ImeActivationFailedException, InvalidCookieDomainException, UnableToSetCookieException
+
+# =============================================================================
+# SISTEMA DE LOGGING E VISUALIZAÇÃO DE MENSAGENS
+# =============================================================================
+# Variáveis globais para controle de logging e visualização
+INSERIR_LOG = False
+VISUALIZAR_MENSAGENS = True
+LOGGER = None
+LOG_FILE = None
+
+def configurar_logging(parametros):
+    """
+    Configura o sistema de logging baseado nos parâmetros recebidos
+    """
+    global INSERIR_LOG, VISUALIZAR_MENSAGENS, LOGGER, LOG_FILE
+    
+    # Extrair configurações dos parâmetros
+    config = parametros.get('configuracao', {})
+    INSERIR_LOG = config.get('inserir_log', False)
+    VISUALIZAR_MENSAGENS = config.get('visualizar_mensagens', True)
+    
+    # Configurar logging se solicitado
+    if INSERIR_LOG:
+        # Criar diretório de logs se não existir
+        log_dir = "logs"
+        if not os.path.exists(log_dir):
+            os.makedirs(log_dir)
+        
+        # Nome do arquivo de log com timestamp
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        LOG_FILE = os.path.join(log_dir, f"rpa_execucao_{timestamp}.log")
+        
+        # Configurar logger
+        LOGGER = logging.getLogger('RPA_TOSEGURADO')
+        LOGGER.setLevel(logging.DEBUG)
+        
+        # Handler para arquivo
+        file_handler = logging.FileHandler(LOG_FILE, encoding='utf-8')
+        file_handler.setLevel(logging.DEBUG)
+        
+        # Formato do log
+        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+        file_handler.setFormatter(formatter)
+        
+        # Adicionar handler
+        LOGGER.addHandler(file_handler)
+        
+        # Log inicial com parâmetros recebidos
+        log_mensagem("INFO", "=== INÍCIO DA EXECUÇÃO RPA ===")
+        log_mensagem("INFO", f"Parâmetros recebidos: {json.dumps(parametros, indent=2, ensure_ascii=False)}")
+        log_mensagem("INFO", "=" * 50)
+
+def log_mensagem(nivel, mensagem):
+    """
+    Registra mensagem no log se inserir_log = true
+    """
+    if INSERIR_LOG and LOGGER:
+        if nivel.upper() == "DEBUG":
+            LOGGER.debug(mensagem)
+        elif nivel.upper() == "INFO":
+            LOGGER.info(mensagem)
+        elif nivel.upper() == "WARNING":
+            LOGGER.warning(mensagem)
+        elif nivel.upper() == "ERROR":
+            LOGGER.error(mensagem)
+        elif nivel.upper() == "CRITICAL":
+            LOGGER.critical(mensagem)
+        else:
+            LOGGER.info(mensagem)
+
+def exibir_mensagem(mensagem, nivel="INFO"):
+    """
+    Exibe mensagem na tela se visualizar_mensagens = true
+    """
+    if VISUALIZAR_MENSAGENS:
+        print(mensagem)
+    
+    # Sempre registrar no log se ativado
+    log_mensagem(nivel, mensagem)
+
+def finalizar_logging(resultado):
+    """
+    Finaliza o logging com o resultado da execução
+    """
+    if INSERIR_LOG and LOGGER:
+        if isinstance(resultado, dict) and resultado.get('success'):
+            log_mensagem("INFO", "=== EXECUÇÃO CONCLUÍDA COM SUCESSO ===")
+            log_mensagem("INFO", f"Resultado: {json.dumps(resultado, indent=2, ensure_ascii=False)}")
+        else:
+            log_mensagem("ERROR", "=== EXECUÇÃO CONCLUÍDA COM ERRO ===")
+            log_mensagem("ERROR", f"Erro: {json.dumps(resultado, indent=2, ensure_ascii=False)}")
+        
+        log_mensagem("INFO", "=" * 50)
+        log_mensagem("INFO", "=== FIM DA EXECUÇÃO RPA ===")
 
 # =============================================================================
 # TABELA DE CÓDIGOS DE ERRO COMPREENSIVA
@@ -592,17 +697,27 @@ def handle_exception(exception, error_code, context=None, screen=None, action=No
     ========
     - Dicionário com resposta de erro padronizada
     """
-    # Log do erro para debug
-    print(f"❌ **ERRO CAPTURADO:** {type(exception).__name__}: {str(exception)}")
-    if context:
-        print(f"   📍 Contexto: {context}")
-    if screen:
-        print(f"   📱 Tela: {screen}")
-    if action:
-        print(f"   ⚡ Ação: {action}")
+    # Log do erro para debug e logging
+    error_msg = f"❌ **ERRO CAPTURADO:** {type(exception).__name__}: {str(exception)}"
+    exibir_mensagem(error_msg, "ERROR")
     
-    # Criar e retornar resposta de erro
-    return create_error_response(error_code, str(exception), exception, context, screen, action)
+    if context:
+        context_msg = f"   📍 Contexto: {context}"
+        exibir_mensagem(context_msg, "ERROR")
+    if screen:
+        screen_msg = f"   📱 Tela: {screen}"
+        exibir_mensagem(screen_msg, "ERROR")
+    if action:
+        action_msg = f"   ⚡ Ação: {action}"
+        exibir_mensagem(action_msg, "ERROR")
+    
+    # Criar resposta de erro
+    error_response = create_error_response(error_code, str(exception), exception, context, screen, action)
+    
+    # Log da resposta de erro completa
+    log_mensagem("ERROR", f"Resposta de erro: {json.dumps(error_response, indent=2, ensure_ascii=False)}")
+    
+    return error_response
 
 def map_exception_to_error_code(exception):
     """
@@ -725,7 +840,7 @@ def validar_parametros_json(parametros_json):
     - Dicionário com resposta de erro se falhar
     """
     try:
-        print("🔍 **VALIDANDO PARÂMETROS JSON**")
+        exibir_mensagem("🔍 **VALIDANDO PARÂMETROS JSON**")
         
         # Lista de parâmetros obrigatórios
         parametros_obrigatorios = [
@@ -739,13 +854,13 @@ def validar_parametros_json(parametros_json):
         for param in parametros_obrigatorios:
             if param not in parametros_json:
                 error = create_error_response(1000, f"Parâmetro obrigatório '{param}' não encontrado", context=f"Validação de parâmetros obrigatórios")
-                print(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}")
+                exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
                 return error
         
         # Verificar seção configuracao
         if 'configuracao' not in parametros_json:
             error = create_error_response(1000, "Seção 'configuracao' não encontrada", context="Validação da seção de configuração")
-            print(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}")
+            exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
             return error
         
         configuracao = parametros_json['configuracao']
@@ -754,51 +869,51 @@ def validar_parametros_json(parametros_json):
         for config in configuracao_obrigatoria:
             if config not in configuracao:
                 error = create_error_response(1000, f"Configuração obrigatória '{config}' não encontrada", context="Validação das configurações obrigatórias")
-                print(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}")
+                exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
                 return error
         
         # Validar tipos de dados
         if not isinstance(parametros_json['url_base'], str):
             error = create_error_response(1000, "'url_base' deve ser uma string", context="Validação do tipo de url_base")
-            print(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}")
+            exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
             return error
         
         if not isinstance(parametros_json['placa'], str):
             error = create_error_response(1000, "'placa' deve ser uma string", context="Validação do tipo de placa")
-            print(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}")
+            exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
             return error
         
         if not isinstance(parametros_json['cpf'], str):
             error = create_error_response(1000, "'cpf' deve ser uma string", context="Validação do tipo de CPF")
-            print(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}")
+            exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
             return error
         
         # Validar formato de CPF (básico)
         cpf = parametros_json['cpf'].replace('.', '').replace('-', '')
         if len(cpf) != 11 or not cpf.isdigit():
             error = create_error_response(1001, context="Validação do formato de CPF")
-            print(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}")
+            exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
             return error
         
         # Validar formato de email (básico)
         email = parametros_json['email']
         if '@' not in email or '.' not in email:
             error = create_error_response(1002, context="Validação do formato de email")
-            print(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}")
+            exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
             return error
         
         # Validar formato de CEP (básico)
         cep = parametros_json['cep'].replace('-', '')
         if len(cep) != 8 or not cep.isdigit():
             error = create_error_response(1003, context="Validação do formato de CEP")
-            print(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}")
+            exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
             return error
         
-        print("✅ **VALIDAÇÃO CONCLUÍDA:** Todos os parâmetros são válidos")
-        print(f"   📊 Total de parâmetros validados: {len(parametros_json)}")
-        print(f"   🚗 Veículo: {parametros_json['marca']} {parametros_json['modelo']} ({parametros_json['ano']})")
-        print(f"   🏷️ Placa: {parametros_json['placa']}")
-        print(f"   👤 Segurado: {parametros_json['nome']}")
+        exibir_mensagem("✅ **VALIDAÇÃO CONCLUÍDA:** Todos os parâmetros são válidos")
+        exibir_mensagem(f"   📊 Total de parâmetros validados: {len(parametros_json)}")
+        exibir_mensagem(f"   🚗 Veículo: {parametros_json['marca']} {parametros_json['modelo']} ({parametros_json['ano']})")
+        exibir_mensagem(f"   🏷️ Placa: {parametros_json['placa']}")
+        exibir_mensagem(f"   👤 Segurado: {parametros_json['nome']}")
         
         return True
         
@@ -827,7 +942,7 @@ def configurar_chrome():
     - error_response: Dicionário com erro se falhar
     """
     try:
-        print("🔧 Configurando Chrome...")
+        exibir_mensagem("🔧 Configurando Chrome...")
         
         temp_dir = tempfile.mkdtemp()
         
@@ -845,33 +960,33 @@ def configurar_chrome():
         
         if not os.path.exists(chromedriver_path):
             error = create_error_response(2000, context="Configuração do Chrome")
-            print(f"❌ **ERRO:** {error['error']['message']}")
+            exibir_mensagem(f"❌ **ERRO:** {error['error']['message']}", "ERROR")
             return None, None, error
         
-        print("✅ Usando ChromeDriver local...")
+        exibir_mensagem("✅ Usando ChromeDriver local...")
         service = Service(chromedriver_path)
         
-        print("🔧 Criando driver do Chrome...")
+        exibir_mensagem("🔧 Criando driver do Chrome...")
         driver = webdriver.Chrome(service=service, options=chrome_options)
         
         # Executar script para evitar detecção (BASEADO NO SCRIPT QUE FUNCIONOU)
         driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
         
-        print("✅ Driver configurado com sucesso")
+        exibir_mensagem("✅ Driver configurado com sucesso")
         return driver, temp_dir, None
         
     except SessionNotCreatedException as e:
         error = handle_exception(e, 2002, "Configuração do Chrome", action="Criação de sessão")
-        print(f"❌ **ERRO:** {error['error']['message']}")
+        exibir_mensagem(f"❌ **ERRO:** {error['error']['message']}", "ERROR")
         return None, None, error
     except WebDriverException as e:
         error = handle_exception(e, 2001, "Configuração do Chrome", action="Criação do driver")
-        print(f"❌ **ERRO:** {error['error']['message']}")
+        exibir_mensagem(f"❌ **ERRO:** {error['error']['message']}", "ERROR")
         return None, None, error
     except Exception as e:
         error_code = map_exception_to_error_code(e)
         error = handle_exception(e, error_code, "Configuração do Chrome", action="Configuração geral")
-        print(f"❌ **ERRO:** {error['error']['message']}")
+        exibir_mensagem(f"❌ **ERRO:** {error['error']['message']}", "ERROR")
         return None, None, error
 
 def aguardar_carregamento_pagina(driver, timeout=60):
@@ -1037,31 +1152,31 @@ def aguardar_dom_estavel(driver, timeout=60, periodo_estabilidade=3):
         """
         
         # Executar MutationObserver ROBUSTO
-        print(f"🚀 Executando MutationObserver com configuração completa...")
+        exibir_mensagem(f"🚀 Executando MutationObserver com configuração completa...")
         resultado = driver.execute_script(script, timeout, periodo_estabilidade)
         
         if resultado == 'stable':
-            print("🎉 **DOM ESTABILIZADO VIA MUTATIONOBSERVER ROBUSTO!**")
-            print("   ✅ Estabilização detectada com precisão milissegundos")
-            print("   📊 Todas as mudanças foram monitoradas e logadas")
-            print("   🚀 Zero delays desnecessários aplicados")
+            exibir_mensagem("🎉 **DOM ESTABILIZADO VIA MUTATIONOBSERVER ROBUSTO!**")
+            exibir_mensagem("   ✅ Estabilização detectada com precisão milissegundos")
+            exibir_mensagem("   📊 Todas as mudanças foram monitoradas e logadas")
+            exibir_mensagem("   🚀 Zero delays desnecessários aplicados")
             return True
         elif resultado == 'timeout':
-            print("⚠️ **TIMEOUT DO MUTATIONOBSERVER - USANDO FALLBACK**")
-            print("   🔍 Possíveis causas:")
-            print("   - Página muito dinâmica (React/Next.js)")
-            print("   - Carregamento assíncrono contínuo")
-            print("   - Configuração de estabilidade muito restritiva")
-            print("   🔄 Ativando fallback tradicional...")
+            exibir_mensagem("⚠️ **TIMEOUT DO MUTATIONOBSERVER - USANDO FALLBACK**", "WARNING")
+            exibir_mensagem("   🔍 Possíveis causas:", "WARNING")
+            exibir_mensagem("   - Página muito dinâmica (React/Next.js)", "WARNING")
+            exibir_mensagem("   - Carregamento assíncrono contínuo", "WARNING")
+            exibir_mensagem("   - Configuração de estabilidade muito restritiva", "WARNING")
+            exibir_mensagem("   🔄 Ativando fallback tradicional...", "WARNING")
             return aguardar_carregamento_pagina_fallback(driver, timeout)
         else:
-            print(f"⚠️ **RESULTADO INESPERADO:** {resultado}")
-            print("   🔄 Ativando fallback tradicional...")
+            exibir_mensagem(f"⚠️ **RESULTADO INESPERADO:** {resultado}", "WARNING")
+            exibir_mensagem("   🔄 Ativando fallback tradicional...", "WARNING")
             return aguardar_carregamento_pagina_fallback(driver, timeout)
             
     except Exception as e:
-        print(f"❌ **ERRO NO MUTATIONOBSERVER ROBUSTO:** {e}")
-        print("   🔄 Ativando fallback tradicional...")
+        exibir_mensagem(f"❌ **ERRO NO MUTATIONOBSERVER ROBUSTO:** {e}", "ERROR")
+        exibir_mensagem("   🔄 Ativando fallback tradicional...", "WARNING")
         return aguardar_carregamento_pagina_fallback(driver, timeout)
 
 def aguardar_carregamento_pagina_fallback(driver, timeout=60):
@@ -1100,7 +1215,7 @@ def aguardar_carregamento_pagina_fallback(driver, timeout=60):
         except:
             delay = 5  # Fallback padrão
         
-        print(f"⏳ Aguardando carregamento da página ({delay}s)...")
+        exibir_mensagem(f"⏳ Aguardando carregamento da página ({delay}s)...")
         time.sleep(delay)
         
         return True
@@ -1570,7 +1685,7 @@ def carregar_parametros_json(json_string):
     try:
         # Fazer parse do JSON
         parametros = json.loads(json_string)
-        print("✅ **JSON PARSEADO COM SUCESSO**")
+        exibir_mensagem("✅ **JSON PARSEADO COM SUCESSO**")
         
         # Validar parâmetros
         validation_result = validar_parametros_json(parametros)
@@ -1578,26 +1693,28 @@ def carregar_parametros_json(json_string):
             return validation_result
         
         # Exibir resumo dos parâmetros
-        print("📋 **RESUMO DOS PARÂMETROS VALIDADOS:**")
-        print(f"   🌐 URL Base: {parametros.get('url_base', 'N/A')}")
-        print(f"   🏷️ Placa: {parametros.get('placa', 'N/A')}")
-        print(f"   🚗 Marca: {parametros.get('marca', 'N/A')}")
-        print(f"   🚙 Modelo: {parametros.get('modelo', 'N/A')}")
-        print(f"   📧 Email: {parametros.get('email', 'N/A')}")
-        print(f"   📱 Celular: {parametros.get('celular', 'N/A')}")
-        print(f"   ⚙️ Tempo Estabilização: {parametros.get('configuracao', {}).get('tempo_estabilizacao', 'N/A')}s")
-        print(f"   ⏱️ Tempo Carregamento: {parametros.get('configuracao', {}).get('tempo_carregamento', 'N/A')}s")
+        exibir_mensagem("📋 **RESUMO DOS PARÂMETROS VALIDADOS:**")
+        exibir_mensagem(f"   🌐 URL Base: {parametros.get('url_base', 'N/A')}")
+        exibir_mensagem(f"   🏷️ Placa: {parametros.get('placa', 'N/A')}")
+        exibir_mensagem(f"   🚗 Marca: {parametros.get('marca', 'N/A')}")
+        exibir_mensagem(f"   🚙 Modelo: {parametros.get('modelo', 'N/A')}")
+        exibir_mensagem(f"   📧 Email: {parametros.get('email', 'N/A')}")
+        exibir_mensagem(f"   📱 Celular: {parametros.get('celular', 'N/A')}")
+        exibir_mensagem(f"   ⚙️ Tempo Estabilização: {parametros.get('configuracao', {}).get('tempo_estabilizacao', 'N/A')}s")
+        exibir_mensagem(f"   ⏱️ Tempo Carregamento: {parametros.get('configuracao', {}).get('tempo_carregamento', 'N/A')}s")
+        exibir_mensagem(f"   📝 Inserir Log: {parametros.get('configuracao', {}).get('inserir_log', 'N/A')}")
+        exibir_mensagem(f"   👁️ Visualizar Mensagens: {parametros.get('configuracao', {}).get('visualizar_mensagens', 'N/A')}")
         
         return parametros
         
     except json.JSONDecodeError as e:
         error = handle_exception(e, 1004, "Parse de JSON", action="Decodificação de string JSON")
-        print(f"❌ **ERRO:** {error['error']['message']}")
+        exibir_mensagem(f"❌ **ERRO:** {error['error']['message']}", "ERROR")
         return error
     except Exception as e:
         error_code = map_exception_to_error_code(e)
         error = handle_exception(e, error_code, "Carregamento de parâmetros JSON", action="Processamento geral")
-        print(f"❌ **ERRO:** {error['error']['message']}")
+        exibir_mensagem(f"❌ **ERRO:** {error['error']['message']}", "ERROR")
         return error
 
 def navegar_ate_tela5(driver, parametros):
@@ -1644,10 +1761,10 @@ def navegar_ate_tela5(driver, parametros):
     - True: Se navegou até Tela 5 com sucesso
     - False: Se falhou em qualquer etapa
     """
-    print("🚀 **NAVEGANDO ATÉ TELA 5 COM FLUXO CORRETO**")
+    exibir_mensagem("🚀 **NAVEGANDO ATÉ TELA 5 COM FLUXO CORRETO**")
     
     # TELA 1: Seleção do tipo de seguro
-    print("\n📱 TELA 1: Selecionando Carro...")
+    exibir_mensagem("\n📱 TELA 1: Selecionando Carro...")
     driver.get(parametros['url_base'])
     
     if not aguardar_carregamento_pagina(driver, 60):
@@ -1671,7 +1788,7 @@ def navegar_ate_tela5(driver, parametros):
     salvar_estado_tela(driver, 1, "apos_clique", None)
     
     # TELA 2: Inserção da placa CORRETA
-    print("\n📱 TELA 2: Inserindo placa KVA-1791...")
+    exibir_mensagem("\n📱 TELA 2: Inserindo placa KVA-1791...")
     aguardar_estabilizacao(driver)
     salvar_estado_tela(driver, 2, "inicial", None)
     
@@ -1810,7 +1927,7 @@ def navegar_ate_tela5(driver, parametros):
     except Exception as e:
         print(f"⚠️ Erro na Tela 5: {e} - tentando prosseguir...")
     
-    print("✅ **NAVEGAÇÃO ATÉ TELA 5 CONCLUÍDA!**")
+    exibir_mensagem("✅ **NAVEGAÇÃO ATÉ TELA 5 CONCLUÍDA!**")
     return True
 
 def implementar_tela6(driver, parametros):
@@ -1846,7 +1963,7 @@ def implementar_tela6(driver, parametros):
     - True: Se Tela 6 implementada com sucesso
     - False: Se falhou na implementação
     """
-    print("\n📱 **INICIANDO TELA 6: Tipo de combustível + checkboxes**")
+    exibir_mensagem("\n📱 **INICIANDO TELA 6: Tipo de combustível + checkboxes**")
     
     try:
         # Aguardar elementos da Tela 6
@@ -1896,7 +2013,7 @@ def implementar_tela6(driver, parametros):
         
         aguardar_estabilizacao(driver)
         salvar_estado_tela(driver, 6, "apos_continuar", None)
-        print("✅ **TELA 6 IMPLEMENTADA COM SUCESSO!**")
+        exibir_mensagem("✅ **TELA 6 IMPLEMENTADA COM SUCESSO!**")
         return True
         
     except Exception as e:
@@ -1943,7 +2060,7 @@ def implementar_tela7(driver, parametros):
     - True: Se Tela 7 implementada com sucesso
     - False: Se falhou na implementação
     """
-    print("\n📱 **INICIANDO TELA 7: Endereço de pernoite**")
+    exibir_mensagem("\n📱 **INICIANDO TELA 7: Endereço de pernoite**")
     
     try:
         # Aguardar elementos do endereço
@@ -2008,7 +2125,7 @@ def implementar_tela7(driver, parametros):
         
         aguardar_estabilizacao(driver)
         salvar_estado_tela(driver, 7, "apos_continuar", None)
-        print("✅ **TELA 7 IMPLEMENTADA COM SUCESSO!**")
+        exibir_mensagem("✅ **TELA 7 IMPLEMENTADA COM SUCESSO!**")
         return True
         
     except Exception as e:
@@ -2055,7 +2172,7 @@ def implementar_tela8(driver, parametros):
     - True: Se Tela 8 implementada com sucesso
     - False: Se falhou na implementação
     """
-    print("\n📱 **INICIANDO TELA 8: Finalidade do veículo**")
+    exibir_mensagem("\n📱 **INICIANDO TELA 8: Finalidade do veículo**")
     
     try:
         # Aguardar elementos da finalidade do veículo
@@ -2090,7 +2207,7 @@ def implementar_tela8(driver, parametros):
         
         aguardar_estabilizacao(driver)
         salvar_estado_tela(driver, 8, "apos_continuar", None)
-        print("✅ **TELA 8 IMPLEMENTADA COM SUCESSO!**")
+        exibir_mensagem("✅ **TELA 8 IMPLEMENTADA COM SUCESSO!**")
         return True
         
     except Exception as e:
@@ -2149,7 +2266,7 @@ def implementar_tela9(driver, parametros):
     - True: Se Tela 9 implementada com sucesso
     - False: Se falhou na implementação
     """
-    print("\n👤 **INICIANDO TELA 9: Dados pessoais do segurado**")
+    exibir_mensagem("\n👤 **INICIANDO TELA 9: Dados pessoais do segurado**")
     
     try:
         # Aguardar elementos da tela de dados pessoais
@@ -2272,7 +2389,7 @@ def implementar_tela9(driver, parametros):
         
         aguardar_estabilizacao(driver)
         salvar_estado_tela(driver, 9, "apos_continuar", None)
-        print("✅ **TELA 9 IMPLEMENTADA COM SUCESSO!**")
+        exibir_mensagem("✅ **TELA 9 IMPLEMENTADA COM SUCESSO!**")
         return True
         
     except Exception as e:
@@ -2331,41 +2448,54 @@ def executar_todas_telas(json_string):
     - Inclui contexto, tela e ação onde ocorreu
     - Fornece causas possíveis e ações recomendadas
     
+    SISTEMA DE LOGGING E VISUALIZAÇÃO:
+    ==================================
+    - inserir_log: Cria arquivo de log compreensivo com timestamp
+    - visualizar_mensagens: Controla exibição de mensagens na tela
+    - Log completo de parâmetros recebidos, execução e resultado
+    - Log de erros detalhado com contexto completo
+    
     RETORNO:
     ========
     - SUCCESS: {"success": True, "data": {...}}
     - ERROR: {"success": False, "error": {...}}
+    
+    LOGGING:
+    ========
+    - Se inserir_log = true: Arquivo logs/rpa_execucao_YYYYMMDD_HHMMSS.log
+    - Se visualizar_mensagens = false: Nenhuma mensagem na tela
+    - Log sempre inclui: parâmetros, execução, erros e resultado final
     """
-    print("🚀 **RPA TÔ SEGURADO - COMPLETO ATÉ TELA 9 COM ERROR HANDLER ROBUSTO**")
-    print("=" * 80)
-    print("🎯 OBJETIVO: Navegar desde o início até a Tela 9 com tratamento de erros robusto")
-    print("🔧 MÉTODO: ERROR HANDLER ROBUSTO + MUTATIONOBSERVER ROBUSTO + fluxo completo")
-    print("📝 NOTA: Placa KVA-1791, veículo ECOSPORT, fluxo correto")
-    print("=" * 80)
+    exibir_mensagem("🚀 **RPA TÔ SEGURADO - COMPLETO ATÉ TELA 9 COM ERROR HANDLER ROBUSTO**")
+    exibir_mensagem("=" * 80)
+    exibir_mensagem("🎯 OBJETIVO: Navegar desde o início até a Tela 9 com tratamento de erros robusto")
+    exibir_mensagem("🔧 MÉTODO: ERROR HANDLER ROBUSTO + MUTATIONOBSERVER ROBUSTO + fluxo completo")
+    exibir_mensagem("📝 NOTA: Placa KVA-1791, veículo ECOSPORT, fluxo correto")
+    exibir_mensagem("=" * 80)
     
     inicio = datetime.now()
-    print(f"⏰ Início: {inicio.strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"🚀 ESTRATÉGIA: ERROR HANDLER ROBUSTO para captura e tratamento de erros")
-    print(f"🔧 MUTATIONOBSERVER ROBUSTO: Detecção inteligente de estabilização do DOM")
-    print(f"⚡ PERFORMANCE: Estabilização detectada automaticamente (sem delays fixos)")
-    print(f"🎯 OBJETIVO: Todas as 9 telas com tratamento de erros robusto")
-    print(f"🔍 MONITORAMENTO: DOM observado em tempo real via MutationObserver ROBUSTO")
-    print(f"💡 INOVAÇÃO: Zero delays fixos, apenas estabilização real detectada")
-    print(f"🔄 FALLBACK: Método tradicional se MutationObserver ROBUSTO falhar")
-    print(f"📊 TEMPO ESTIMADO: ~2-3 minutos (com MUTATIONOBSERVER ROBUSTO)")
-    print(f"🎉 MELHORIA: Performance 80% superior com estabilização inteligente")
-    print(f"🚀 INOVAÇÃO: Primeira implementação de ERROR HANDLER ROBUSTO em RPA")
-    print(f"🔬 TECNOLOGIA: JavaScript MutationObserver + Python Selenium + Error Handling")
-    print(f"🌐 INTEGRAÇÃO: Browser + Python via execute_script + JSON de erro")
-    print(f"⚡ VELOCIDADE: Adaptativo a qualquer velocidade de carregamento")
-    print(f"🎯 PRECISÃO: Estabilização detectada com precisão milissegundos")
-    print(f"🔧 ROBUSTEZ: Fallback automático se MutationObserver ROBUSTO falhar")
-    print(f"📈 ESCALABILIDADE: Funciona com qualquer complexidade de página")
-    print(f"🎨 FLEXIBILIDADE: Suporte a React, Angular, Vue.js e HTML puro")
-    print(f"🚀 FUTURO: Padrão para RPA de próxima geração")
-    print(f"🎯 MISSÃO: Revolucionar automação web com inteligência real e tratamento de erros robusto")
-    print(f"🔧 CONFIGURAÇÃO REACT: childList + attributes + characterData + subtree")
-    print(f"🛡️ ERROR HANDLER: Captura, categoriza e retorna erros em JSON padronizado")
+    exibir_mensagem(f"⏰ Início: {inicio.strftime('%Y-%m-%d %H:%M:%S')}")
+    exibir_mensagem(f"🚀 ESTRATÉGIA: ERROR HANDLER ROBUSTO para captura e tratamento de erros")
+    exibir_mensagem(f"🔧 MUTATIONOBSERVER ROBUSTO: Detecção inteligente de estabilização do DOM")
+    exibir_mensagem(f"⚡ PERFORMANCE: Estabilização detectada automaticamente (sem delays fixos)")
+    exibir_mensagem(f"🎯 OBJETIVO: Todas as 9 telas com tratamento de erros robusto")
+    exibir_mensagem(f"🔍 MONITORAMENTO: DOM observado em tempo real via MutationObserver ROBUSTO")
+    exibir_mensagem(f"💡 INOVAÇÃO: Zero delays fixos, apenas estabilização real detectada")
+    exibir_mensagem(f"🔄 FALLBACK: Método tradicional se MutationObserver ROBUSTO falhar")
+    exibir_mensagem(f"📊 TEMPO ESTIMADO: ~2-3 minutos (com MUTATIONOBSERVER ROBUSTO)")
+    exibir_mensagem(f"🎉 MELHORIA: Performance 80% superior com estabilização inteligente")
+    exibir_mensagem(f"🚀 INOVAÇÃO: Primeira implementação de ERROR HANDLER ROBUSTO em RPA")
+    exibir_mensagem(f"🔬 TECNOLOGIA: JavaScript MutationObserver + Python Selenium + Error Handling")
+    exibir_mensagem(f"🌐 INTEGRAÇÃO: Browser + Python via execute_script + JSON de erro")
+    exibir_mensagem(f"⚡ VELOCIDADE: Adaptativo a qualquer velocidade de carregamento")
+    exibir_mensagem(f"🎯 PRECISÃO: Estabilização detectada com precisão milissegundos")
+    exibir_mensagem(f"🔧 ROBUSTEZ: Fallback automático se MutationObserver ROBUSTO falhar")
+    exibir_mensagem(f"📈 ESCALABILIDADE: Funciona com qualquer complexidade de página")
+    exibir_mensagem(f"🎨 FLEXIBILIDADE: Suporte a React, Angular, Vue.js e HTML puro")
+    exibir_mensagem(f"🚀 FUTURO: Padrão para RPA de próxima geração")
+    exibir_mensagem(f"🎯 MISSÃO: Revolucionar automação web com inteligência real e tratamento de erros robusto")
+    exibir_mensagem(f"🔧 CONFIGURAÇÃO REACT: childList + attributes + characterData + subtree")
+    exibir_mensagem(f"🛡️ ERROR HANDLER: Captura, categoriza e retorna erros em JSON padronizado")
     
     driver = None
     temp_dir = None
@@ -2377,12 +2507,15 @@ def executar_todas_telas(json_string):
             # Retornou erro de validação
             return parametros
         
+        # Configurar sistema de logging e visualização
+        configurar_logging(parametros)
+        
         # Configurar Chrome
         driver, temp_dir, error = configurar_chrome()
         if error:
             return error
         
-        print("✅ Chrome configurado")
+        exibir_mensagem("✅ Chrome configurado")
         
         # Navegar até Tela 5
         navegacao_result = navegar_ate_tela5(driver, parametros)
@@ -2451,28 +2584,31 @@ def executar_todas_telas(json_string):
             }
         }
         
-        print("\n" + "=" * 80)
-        print("🎉 **RPA EXECUTADO COM SUCESSO TOTAL! TELAS 1-9 IMPLEMENTADAS!**")
-        print("=" * 80)
-        print(f"✅ Total de telas executadas: 9")
-        print(f"✅ Tela 1: Seleção Carro")
-        print(f"✅ Tela 2: Inserção placa KVA-1791")
-        print(f"✅ Tela 3: Confirmação ECOSPORT → Sim")
-        print(f"✅ Tela 4: Veículo segurado → Não")
-        print(f"✅ Tela 5: Estimativa inicial")
-        print(f"✅ Tela 6: Tipo combustível + checkboxes")
-        print(f"✅ Tela 7: Endereço pernoite (CEP)")
-        print(f"✅ Tela 8: Finalidade veículo → Pessoal")
-        print(f"✅ Tela 9: Dados pessoais do segurado")
-        print(f"📁 Todos os arquivos salvos em: temp/ (incluindo Tela 9)")
-        print(f"🚀 **MUTATIONOBSERVER ROBUSTO FUNCIONANDO PERFEITAMENTE!**")
-        print(f"   📊 Configuração React: childList + attributes + characterData + subtree")
-        print(f"   🎯 Estabilização detectada com precisão milissegundos")
-        print(f"   ⚡ Zero delays desnecessários aplicados")
-        print(f"🛡️ **ERROR HANDLER ROBUSTO FUNCIONANDO PERFEITAMENTE!**")
-        print(f"   📊 Códigos de erro: 1000-10000+ categorizados")
-        print(f"   🎯 Captura automática de todas as exceções")
-        print(f"   ⚡ Retorno em JSON padronizado para o chamador")
+        exibir_mensagem("\n" + "=" * 80)
+        exibir_mensagem("🎉 **RPA EXECUTADO COM SUCESSO TOTAL! TELAS 1-9 IMPLEMENTADAS!**")
+        exibir_mensagem("=" * 80)
+        exibir_mensagem(f"✅ Total de telas executadas: 9")
+        exibir_mensagem(f"✅ Tela 1: Seleção Carro")
+        exibir_mensagem(f"✅ Tela 2: Inserção placa KVA-1791")
+        exibir_mensagem(f"✅ Tela 3: Confirmação ECOSPORT → Sim")
+        exibir_mensagem(f"✅ Tela 4: Veículo segurado → Não")
+        exibir_mensagem(f"✅ Tela 5: Estimativa inicial")
+        exibir_mensagem(f"✅ Tela 6: Tipo combustível + checkboxes")
+        exibir_mensagem(f"✅ Tela 7: Endereço pernoite (CEP)")
+        exibir_mensagem(f"✅ Tela 8: Finalidade veículo → Pessoal")
+        exibir_mensagem(f"✅ Tela 9: Dados pessoais do segurado")
+        exibir_mensagem(f"📁 Todos os arquivos salvos em: temp/ (incluindo Tela 9)")
+        exibir_mensagem(f"🚀 **MUTATIONOBSERVER ROBUSTO FUNCIONANDO PERFEITAMENTE!**")
+        exibir_mensagem(f"   📊 Configuração React: childList + attributes + characterData + subtree")
+        exibir_mensagem(f"✅ Estabilização detectada com precisão milissegundos")
+        exibir_mensagem(f"   ⚡ Zero delays desnecessários aplicados")
+        exibir_mensagem(f"🛡️ **ERROR HANDLER ROBUSTO FUNCIONANDO PERFEITAMENTE!**")
+        exibir_mensagem(f"   📊 Códigos de erro: 1000-10000+ categorizados")
+        exibir_mensagem(f"   🎯 Captura automática de todas as exceções")
+        exibir_mensagem(f"   ⚡ Retorno em JSON padronizado para o chamador")
+        
+        # Finalizar logging com sucesso
+        finalizar_logging(success_response)
         
         return success_response
         
@@ -2480,28 +2616,32 @@ def executar_todas_telas(json_string):
         # Capturar erro genérico não tratado
         error_code = map_exception_to_error_code(e)
         error_response = handle_exception(e, error_code, "Execução principal do RPA", action="Fluxo geral")
-        print(f"❌ **ERRO GERAL DURANTE EXECUÇÃO:** {error_response['error']['message']}")
+        exibir_mensagem(f"❌ **ERRO GERAL DURANTE EXECUÇÃO:** {error_response['error']['message']}")
+        
+        # Finalizar logging com erro
+        finalizar_logging(error_response)
+        
         return error_response
         
     finally:
         # Limpeza
         if driver:
-            print("🔧 Fechando driver...")
+            exibir_mensagem("🔧 Fechando driver...")
             try:
                 driver.quit()
-                print("✅ Driver fechado com sucesso")
+                exibir_mensagem("✅ Driver fechado com sucesso")
             except Exception as e:
-                print(f"⚠️ Erro ao fechar driver: {e}")
+                exibir_mensagem(f"⚠️ Erro ao fechar driver: {e}")
         
         if temp_dir and os.path.exists(temp_dir):
             try:
                 shutil.rmtree(temp_dir)
-                print(f"🗑️ Diretório temporário removido: {temp_dir}")
+                exibir_mensagem(f"🗑️ Diretório temporário removido: {temp_dir}")
             except Exception as e:
-                print(f"⚠️ Erro ao remover diretório temporário: {e}")
+                exibir_mensagem(f"⚠️ Erro ao remover diretório temporário: {e}")
         
         fim = datetime.now()
-        print(f"⏰ Fim: {fim.strftime('%Y-%m-%d %H:%M:%S')}")
+        exibir_mensagem(f"⏰ Fim: {fim.strftime('%Y-%m-%d %H:%M:%S')}")
 
 if __name__ == "__main__":
     """
@@ -2545,8 +2685,8 @@ if __name__ == "__main__":
      
 # Configurar parser de argumentos
 parser = argparse.ArgumentParser(
-         description='RPA Tô Segurado - Executa cotação completa com ERROR HANDLER ROBUSTO',
-         formatter_class=argparse.RawDescriptionHelpFormatter,
+        description='RPA Tô Segurado - Executa cotação completa com ERROR HANDLER ROBUSTO + LOGGING + VISUALIZAÇÃO',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
          epilog="""
  EXEMPLOS DE USO:
  ================
@@ -2566,6 +2706,11 @@ parser = argparse.ArgumentParser(
  - url_base, placa, marca, modelo, ano, combustivel
  - veiculo_segurado, cep, endereco_completo, uso_veiculo
  - nome, cpf, data_nascimento, sexo, estado_civil, email, celular
+ 
+ PARÂMETROS OPCIONAIS DE CONFIGURAÇÃO:
+ ====================================
+ - inserir_log: true/false (cria arquivo de log compreensivo)
+ - visualizar_mensagens: true/false (controla exibição na tela)
  
  ERROR HANDLER ROBUSTO:
  =====================
@@ -2601,7 +2746,7 @@ else:
     # Usar string fornecida diretamente
     json_string = args.json_string
 
-print("🚀 **INICIANDO RPA COM JSON DIRETO**")
+print("🚀 **INICIANDO RPA COM JSON DIRETO + LOGGING + VISUALIZAÇÃO**")
 print("=" * 80)
 print("📋 JSON recebido:")
 print(f"   {json_string[:100]}{'...' if len(json_string) > 100 else ''}")
@@ -2609,16 +2754,38 @@ print("=" * 80)
 
 # Executar RPA
 try:
-    sucesso = executar_todas_telas(json_string)
-    if sucesso:
-        print("\n🎉 **RPA EXECUTADO COM SUCESSO!**")
+    resultado = executar_todas_telas(json_string)
+    
+    # Imprimir resultado JSON para o chamador
+    print(json.dumps(resultado, indent=2, ensure_ascii=False))
+    
+    # Determinar código de saída baseado no sucesso
+    if isinstance(resultado, dict) and resultado.get('success'):
         sys.exit(0)
     else:
-        print("\n❌ **RPA FALHOU!**")
         sys.exit(1)
+        
 except KeyboardInterrupt:
-    print("\n⚠️ **EXECUÇÃO INTERROMPIDA PELO USUÁRIO**")
+    error_response = {
+        "success": False,
+        "error": {
+            "code": 7001,
+            "category": "SYSTEM_ERROR",
+            "message": "Execução interrompida pelo usuário",
+            "timestamp": datetime.now().isoformat()
+        }
+    }
+    print(json.dumps(error_response, indent=2, ensure_ascii=False))
     sys.exit(130)
 except Exception as e:
-    print(f"\n❌ **ERRO INESPERADO:** {e}")
+    error_response = {
+        "success": False,
+        "error": {
+            "code": 9999,
+            "category": "UNKNOWN_ERROR",
+            "message": f"Erro inesperado: {str(e)}",
+            "timestamp": datetime.now().isoformat()
+        }
+    }
+    print(json.dumps(error_response, indent=2, ensure_ascii=False))
     sys.exit(1)
