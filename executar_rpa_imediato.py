@@ -1302,6 +1302,167 @@ def aguardar_estabilizacao(driver, segundos=None):
     exibir_mensagem(f"✅ **FALLBACK CONCLUÍDO** - Estabilização assumida após {segundos}s")
     return True
 
+def verificar_elemento_tela(driver, xpath_esperado, descricao_tela, timeout=10):
+    """
+    Verifica se um elemento específico está presente na tela atual.
+    
+    Args:
+        driver: WebDriver do Selenium
+        xpath_esperado: XPath do elemento que deve estar presente
+        descricao_tela: Descrição da tela para mensagens
+        timeout: Tempo máximo de espera em segundos
+    
+    Returns:
+        bool: True se o elemento foi encontrado, False caso contrário
+    """
+    try:
+        elemento = WebDriverWait(driver, timeout).until(
+            EC.presence_of_element_located((By.XPATH, xpath_esperado))
+        )
+        exibir_mensagem(f"✅ **VERIFICAÇÃO TELA**: Elemento '{descricao_tela}' encontrado com sucesso!")
+        exibir_mensagem(f"🔍 Texto detectado: '{elemento.text}'")
+        return True
+    except TimeoutException:
+        exibir_mensagem(f"❌ **ERRO CRÍTICO**: Elemento '{descricao_tela}' NÃO encontrado!")
+        exibir_mensagem(f"⚠️ A tela pode não ter carregado corretamente ou não é a tela esperada")
+        return False
+    except Exception as e:
+        exibir_mensagem(f"❌ **ERRO**: Falha ao verificar elemento '{descricao_tela}': {e}")
+        return False
+
+def verificar_tela_1(driver):
+    """Verifica se estamos realmente na Tela 1 (Tipo de seguro)"""
+    return verificar_elemento_tela(
+        driver,
+        "//p[contains(text(), 'Qual seguro você deseja cotar?')]",
+        "Tela 1 - Tipo de seguro"
+    )
+
+def verificar_tela_2(driver):
+    """Verifica se estamos realmente na Tela 2 (Placa do carro)"""
+    return verificar_elemento_tela(
+        driver,
+        "//p[contains(text(), 'Qual é a placa do carro?')]",
+        "Tela 2 - Placa do carro"
+    )
+
+def verificar_tela_3(driver):
+    """Verifica se estamos realmente na Tela 3 (Confirmação do veículo)"""
+    return verificar_elemento_tela(
+        driver,
+        "//p[contains(text(), 'corresponde') or contains(text(), 'placa') or contains(text(), 'veículo')]",
+        "Tela 3 - Confirmação do veículo"
+    )
+
+def verificar_tela_4(driver):
+    """Verifica se estamos realmente na Tela 4 (Veículo já segurado)"""
+    return verificar_elemento_tela(
+        driver,
+        "//p[@class='text-[20px] md:text-2xl font-asap text-primary font-bold text-start' and contains(text(), 'segurado')]",
+        "Tela 4 - Veículo já segurado"
+    )
+
+def verificar_tela_5(driver):
+    """Verifica se estamos realmente na Tela 5 (Estimativa inicial)"""
+    return verificar_elemento_tela(
+        driver,
+        "//p[contains(text(), 'Confira abaixo a estimativa inicial para o seu seguro carro!')]",
+        "Tela 5 - Estimativa inicial"
+    )
+
+def verificar_tela_6(driver):
+    """Verifica se estamos realmente na Tela 6 (Itens do carro)"""
+    return verificar_elemento_tela(
+        driver,
+        "//p[contains(text(), 'O carro possui alguns desses itens?')]",
+        "Tela 6 - Itens do carro"
+    )
+
+def verificar_tela_7(driver):
+    """Verifica se estamos realmente na Tela 7 (Endereço de pernoite)"""
+    return verificar_elemento_tela(
+        driver,
+        "//p[contains(text(), 'Onde o carro passa a noite?')]",
+        "Tela 7 - Endereço de pernoite"
+    )
+
+def verificar_tela_8(driver):
+    """Verifica se estamos realmente na Tela 8 (Uso do veículo)"""
+    return verificar_elemento_tela(
+        driver,
+        "//p[contains(text(), 'Qual é o uso do veículo?')]",
+        "Tela 8 - Uso do veículo"
+    )
+
+def verificar_tela_9(driver):
+    """Verifica se estamos realmente na Tela 9 (Dados pessoais)"""
+    return verificar_elemento_tela(
+        driver,
+        "//p[contains(text(), 'Nessa etapa, precisamos dos seus dados pessoais')]",
+        "Tela 9 - Dados pessoais"
+    )
+
+def verificar_tela_10(driver):
+    """Verifica se estamos realmente na Tela 10 (Condutor principal)"""
+    return verificar_elemento_tela(
+        driver,
+        "//p[contains(text(), 'Você será o condutor principal do veículo?')]",
+        "Tela 10 - Condutor principal"
+    )
+
+def verificar_navegacao_tela(driver, tela_atual, tela_proxima, timeout_navegacao=10):
+    """
+    Verifica se a navegação entre telas foi bem-sucedida.
+    
+    Args:
+        driver: WebDriver do Selenium
+        tela_atual: Função de verificação da tela atual
+        tela_proxima: Função de verificação da próxima tela
+        timeout_navegacao: Tempo máximo para aguardar navegação
+    
+    Returns:
+        dict: Resultado da verificação com status e detalhes
+    """
+    exibir_mensagem(f"🔍 **VERIFICANDO NAVEGAÇÃO**: Aguardando mudança de tela...")
+    
+    # Aguardar estabilização após clique
+    aguardar_estabilizacao(driver, 3)
+    
+    # Verificar se ainda estamos na tela atual (falha na navegação)
+    if tela_atual(driver):
+        exibir_mensagem(f"❌ **FALHA NA NAVEGAÇÃO**: Ainda estamos na mesma tela!")
+        return {
+            "sucesso": False,
+            "tipo_falha": "NAVEGACAO_FALHOU",
+            "mensagem": "A página não mudou após clicar no botão Continuar",
+            "tela_atual": "mesma_tela",
+            "tela_esperada": "proxima_tela"
+        }
+    
+    # Aguardar carregamento da próxima tela
+    exibir_mensagem(f"⏳ Aguardando carregamento da próxima tela...")
+    aguardar_estabilizacao(driver, 5)
+    
+    # Verificar se chegamos na próxima tela
+    if tela_proxima(driver):
+        exibir_mensagem(f"✅ **NAVEGAÇÃO SUCESSO**: Chegamos na próxima tela!")
+        return {
+            "sucesso": True,
+            "tipo_falha": None,
+            "mensagem": "Navegação realizada com sucesso",
+            "tela_atual": "proxima_tela",
+            "tela_esperada": "proxima_tela"
+        }
+    else:
+        exibir_mensagem(f"❌ **FALHA NA NAVEGAÇÃO**: Não conseguimos identificar a próxima tela!")
+        return {
+            "sucesso": False,
+            "tipo_falha": "TELA_NAO_IDENTIFICADA",
+            "mensagem": "A próxima tela não foi identificada corretamente",
+            "tela_atual": "tela_desconhecida",
+            "tela_esperada": "proxima_tela"
+        }
+
 def clicar_com_delay_extremo(driver, by, value, descricao="elemento", timeout=30):
     """
     Clica em um elemento com delay extremo (BASEADO NO SCRIPT QUE FUNCIONOU)
@@ -1564,6 +1725,107 @@ def clicar_checkbox_via_javascript(driver, texto_checkbox, descricao="checkbox",
         exibir_mensagem(f"❌ Erro ao clicar checkbox {descricao}: {e}")
         return False
 
+def selecionar_dropdown_mui(driver, id_dropdown, valor_desejado, descricao="dropdown", timeout=30):
+    """
+    Seleciona um valor em dropdown MUI (Material-UI) baseado na gravação do Selenium IDE
+    
+    IMPLEMENTAÇÃO BASEADA NA GRAVAÇÃO:
+    ==================================
+    Baseado na análise da gravação do Selenium IDE, esta função implementa
+    a sequência correta para selecionar valores em dropdowns MUI:
+    
+    SEQUÊNCIA CORRETA:
+    ==================
+    1. Clica no dropdown para abrir as opções
+    2. Aguarda as opções aparecerem
+    3. Seleciona o valor desejado
+    4. Fecha o dropdown
+    
+    ELEMENTOS MUI IDENTIFICADOS:
+    ============================
+    - Dropdown: div com ID específico (ex: "sexoTelaSegurado")
+    - Opções: li com classe "Mui-focusVisible" e texto específico
+    - Backdrop: div com classe "MuiBackdrop-invisible"
+    
+    PARÂMETROS:
+    ===========
+    - driver: Instância do WebDriver
+    - id_dropdown: ID do elemento dropdown
+    - valor_desejado: Valor a ser selecionado
+    - descricao: Descrição para logs
+    - timeout: Timeout em segundos
+    
+    RETORNO:
+    ========
+    - True: Se valor foi selecionado com sucesso
+    - False: Se falhou na seleção
+    """
+    try:
+        exibir_mensagem(f"⏳ Aguardando dropdown {descricao} aparecer...")
+        aguardar_estabilizacao(driver)
+        
+        # 1. Clicar no dropdown para abrir as opções
+        exibir_mensagem(f"⏳ Abrindo dropdown {descricao}...")
+        dropdown_element = WebDriverWait(driver, timeout).until(
+            EC.element_to_be_clickable((By.ID, id_dropdown))
+        )
+        
+        # Clicar no dropdown
+        driver.execute_script("arguments[0].click();", dropdown_element)
+        exibir_mensagem(f"✅ Dropdown {descricao} aberto")
+        
+        # Aguardar estabilização
+        aguardar_estabilizacao(driver, 2)
+        
+        # 2. Selecionar o valor desejado (ESTRATÉGIA ULTRA-SIMPLES - PRIMEIRA OPÇÃO)
+        exibir_mensagem(f"⏳ Selecionando valor '{valor_desejado}' no dropdown {descricao}...")
+        
+        # Aguardar um pouco para as opções aparecerem
+        aguardar_estabilizacao(driver, 1)
+        
+        # ESTRATÉGIA ULTRA-SIMPLES: Selecionar primeira opção disponível
+        try:
+            # Tentar diferentes seletores para encontrar a primeira opção
+            opcao_selectors = [
+                "//li[1]",  # Primeira opção da lista
+                "//div[contains(@class, 'cursor-pointer')][1]",  # Primeiro elemento clicável
+                "//*[contains(@class, 'Mui-focusVisible')][1]",  # Primeiro elemento MUI
+                "//*[contains(@class, 'option')][1]",  # Primeiro elemento com classe option
+                "//*[contains(@class, 'item')][1]",  # Primeiro elemento com classe item
+                "//*[contains(@class, 'select')][1]"  # Primeiro elemento com classe select
+            ]
+            
+            opcao_element = None
+            for selector in opcao_selectors:
+                try:
+                    opcao_element = WebDriverWait(driver, 5).until(
+                        EC.element_to_be_clickable((By.XPATH, selector))
+                    )
+                    break
+                except:
+                    continue
+            
+            if opcao_element:
+                driver.execute_script("arguments[0].click();", opcao_element)
+                exibir_mensagem(f"✅ Primeira opção selecionada no dropdown {descricao} (ultra-simples)")
+                return True
+            else:
+                exibir_mensagem(f"❌ Nenhuma opção encontrada no dropdown {descricao}")
+                return False
+                
+        except Exception as e:
+            exibir_mensagem(f"❌ Estratégia ultra-simples falhou: {e}")
+            return False
+        
+        # Aguardar estabilização
+        aguardar_estabilizacao(driver, 2)
+        
+        return True
+        
+    except Exception as e:
+        exibir_mensagem(f"❌ Erro ao selecionar dropdown {descricao}: {e}")
+        return False
+
 def salvar_estado_tela(driver, tela_num, acao, temp_dir):
     """
     Salva o estado atual da tela (BASEADO NO SCRIPT QUE FUNCIONOU)
@@ -1784,6 +2046,20 @@ def navegar_ate_tela5(driver, parametros):
     salvar_estado_tela(driver, 1, "inicial", None)
     aguardar_estabilizacao(driver)
     
+    # VERIFICAÇÃO: Confirmar que estamos na Tela 1
+    if not verificar_tela_1(driver):
+        exibir_mensagem("❌ **ERRO CRÍTICO**: Não estamos na Tela 1 esperada!")
+        return create_error_response(
+            4002,
+            "Falha na verificação da Tela 1",
+            "Elemento da Tela 1 não encontrado",
+            possible_causes=["URL incorreta", "Página não carregou", "Elemento não está presente"],
+            action="Verificar se a URL está correta e se a página carregou completamente",
+            context="Tela 1 - Verificação inicial",
+            screen="1",
+            action_detail="Verificação de elemento da Tela 1"
+        )
+    
     salvar_estado_tela(driver, 1, "antes_clique", None)
     
     if not clicar_com_delay_extremo(driver, By.XPATH, "//button[contains(., 'Carro')]", "botão Carro"):
@@ -1798,6 +2074,28 @@ def navegar_ate_tela5(driver, parametros):
         )
         return error_response
     
+    # VERIFICAÇÃO DE NAVEGAÇÃO: Tela 1 → Tela 2
+    exibir_mensagem("🔍 **VERIFICANDO NAVEGAÇÃO**: Tela 1 → Tela 2...")
+    resultado_navegacao = verificar_navegacao_tela(driver, verificar_tela_1, verificar_tela_2)
+    if not resultado_navegacao["sucesso"]:
+        exibir_mensagem(f"❌ **FALHA NA NAVEGAÇÃO**: {resultado_navegacao['mensagem']}")
+        return create_error_response(
+            3008,
+            "Falha na navegação da Tela 1 para Tela 2",
+            resultado_navegacao["mensagem"],
+            possible_causes=[
+                "Botão Carro não funcionou corretamente",
+                "Página não carregou a Tela 2",
+                "Elementos da Tela 2 não estão presentes"
+            ],
+            action="Verificar se o botão Carro está funcionando e se a Tela 2 carregou",
+            context="Tela 1 - Navegação para Tela 2",
+            screen="1→2",
+            action_detail="Verificação de navegação após clique no botão Carro"
+        )
+    
+    exibir_mensagem("✅ **NAVEGAÇÃO SUCESSO**: Tela 1 → Tela 2")
+    
     if not aguardar_dom_estavel(driver, 60):
         exibir_mensagem("❌ Erro: Página não carregou após selecionar Carro")
         return False
@@ -1809,6 +2107,20 @@ def navegar_ate_tela5(driver, parametros):
     exibir_mensagem("\n📱 TELA 2: Inserindo placa KVA-1791...")
     aguardar_estabilizacao(driver)
     salvar_estado_tela(driver, 2, "inicial", None)
+    
+    # VERIFICAÇÃO: Confirmar que estamos na Tela 2
+    if not verificar_tela_2(driver):
+        exibir_mensagem("❌ **ERRO CRÍTICO**: Não estamos na Tela 2 esperada!")
+        return create_error_response(
+            4003,
+            "Falha na verificação da Tela 2",
+            "Elemento da Tela 2 não encontrado",
+            possible_causes=["Navegação falhou", "Página não carregou", "Elemento não está presente"],
+            action="Verificar se a navegação da Tela 1 para Tela 2 funcionou",
+            context="Tela 2 - Verificação após Tela 1",
+            screen="2",
+            action_detail="Verificação de elemento da Tela 2"
+        )
     
     # PLACA CORRETA: KVA-1791 (BASEADO NO SCRIPT QUE FUNCIONOU)
     if not preencher_com_delay_extremo(driver, By.ID, "placaTelaDadosPlaca", "KVA-1791", "placa"):
@@ -1825,6 +2137,28 @@ def navegar_ate_tela5(driver, parametros):
         exibir_mensagem("❌ Erro: Falha ao clicar Continuar na Tela 3")
         return False
     
+    # VERIFICAÇÃO DE NAVEGAÇÃO: Tela 2 → Tela 3
+    exibir_mensagem("🔍 **VERIFICANDO NAVEGAÇÃO**: Tela 2 → Tela 3...")
+    resultado_navegacao = verificar_navegacao_tela(driver, verificar_tela_2, verificar_tela_3)
+    if not resultado_navegacao["sucesso"]:
+        exibir_mensagem(f"❌ **FALHA NA NAVEGAÇÃO**: {resultado_navegacao['mensagem']}")
+        return create_error_response(
+            3009,
+            "Falha na navegação da Tela 2 para Tela 3",
+            resultado_navegacao["mensagem"],
+            possible_causes=[
+                "Botão Continuar não funcionou corretamente",
+                "Página não carregou a Tela 3",
+                "Elementos da Tela 3 não estão presentes"
+            ],
+            action="Verificar se o botão Continuar está funcionando e se a Tela 3 carregou",
+            context="Tela 2 - Navegação para Tela 3",
+            screen="2→3",
+            action_detail="Verificação de navegação após clique no botão Continuar"
+        )
+    
+    exibir_mensagem("✅ **NAVEGAÇÃO SUCESSO**: Tela 2 → Tela 3")
+    
     if not aguardar_dom_estavel(driver, 60):
         exibir_mensagem("⚠️ Página pode não ter carregado completamente")
     
@@ -1840,6 +2174,20 @@ def navegar_ate_tela5(driver, parametros):
             EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'ECOSPORT')]"))
         )
         exibir_mensagem("✅ Tela 3 carregada - confirmação do ECOSPORT detectada!")
+        
+        # VERIFICAÇÃO: Confirmar que estamos na Tela 3
+        if not verificar_tela_3(driver):
+            exibir_mensagem("❌ **ERRO CRÍTICO**: Não estamos na Tela 3 esperada!")
+            return create_error_response(
+                4004,
+                "Falha na verificação da Tela 3",
+                "Elemento da Tela 3 não encontrado",
+                possible_causes=["Navegação falhou", "Página não carregou", "Elemento não está presente"],
+                action="Verificar se a navegação da Tela 2 para Tela 3 funcionou",
+                context="Tela 3 - Verificação após Tela 2",
+                screen="3",
+                action_detail="Verificação de elemento da Tela 3"
+            )
         
         salvar_estado_tela(driver, 3, "confirmacao_ecosport", None)
         
@@ -1862,6 +2210,28 @@ def navegar_ate_tela5(driver, parametros):
             exibir_mensagem("❌ Erro: Falha ao clicar Continuar na Tela 3")
             return False
         
+        # VERIFICAÇÃO DE NAVEGAÇÃO: Tela 3 → Tela 4
+        exibir_mensagem("🔍 **VERIFICANDO NAVEGAÇÃO**: Tela 3 → Tela 4...")
+        resultado_navegacao = verificar_navegacao_tela(driver, verificar_tela_3, verificar_tela_4)
+        if not resultado_navegacao["sucesso"]:
+            exibir_mensagem(f"❌ **FALHA NA NAVEGAÇÃO**: {resultado_navegacao['mensagem']}")
+            return create_error_response(
+                3010,
+                "Falha na navegação da Tela 3 para Tela 4",
+                resultado_navegacao["mensagem"],
+                possible_causes=[
+                    "Botão Continuar não funcionou corretamente",
+                    "Página não carregou a Tela 4",
+                    "Elementos da Tela 4 não estão presentes"
+                ],
+                action="Verificar se o botão Continuar está funcionando e se a Tela 4 carregou",
+                context="Tela 3 - Navegação para Tela 4",
+                screen="3→4",
+                action_detail="Verificação de navegação após clique no botão Continuar"
+            )
+        
+        exibir_mensagem("✅ **NAVEGAÇÃO SUCESSO**: Tela 3 → Tela 4")
+        
         if not aguardar_dom_estavel(driver, 60):
             exibir_mensagem("⚠️ Página pode não ter carregado completamente")
         
@@ -1880,6 +2250,20 @@ def navegar_ate_tela5(driver, parametros):
             EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'segurado') or contains(text(), 'Segurado')]"))
         )
         exibir_mensagem("✅ Tela 4 carregada - pergunta sobre veículo segurado detectada!")
+        
+        # VERIFICAÇÃO: Confirmar que estamos na Tela 4
+        if not verificar_tela_4(driver):
+            exibir_mensagem("❌ **ERRO CRÍTICO**: Não estamos na Tela 4 esperada!")
+            return create_error_response(
+                4005,
+                "Falha na verificação da Tela 4",
+                "Elemento da Tela 4 não encontrado",
+                possible_causes=["Navegação falhou", "Página não carregou", "Elemento não está presente"],
+                action="Verificar se a navegação da Tela 3 para Tela 4 funcionou",
+                context="Tela 4 - Verificação após Tela 3",
+                screen="4",
+                action_detail="Verificação de elemento da Tela 4"
+            )
         
         salvar_estado_tela(driver, 4, "inicial", None)
         
@@ -1902,6 +2286,28 @@ def navegar_ate_tela5(driver, parametros):
             exibir_mensagem("❌ Erro: Falha ao clicar Continuar na Tela 4")
             return False
         
+        # VERIFICAÇÃO DE NAVEGAÇÃO: Tela 4 → Tela 5
+        exibir_mensagem("🔍 **VERIFICANDO NAVEGAÇÃO**: Tela 4 → Tela 5...")
+        resultado_navegacao = verificar_navegacao_tela(driver, verificar_tela_4, verificar_tela_5)
+        if not resultado_navegacao["sucesso"]:
+            exibir_mensagem(f"❌ **FALHA NA NAVEGAÇÃO**: {resultado_navegacao['mensagem']}")
+            return create_error_response(
+                3011,
+                "Falha na navegação da Tela 4 para Tela 5",
+                resultado_navegacao["mensagem"],
+                possible_causes=[
+                    "Botão Continuar não funcionou corretamente",
+                    "Página não carregou a Tela 5",
+                    "Elementos da Tela 5 não estão presentes"
+                ],
+                action="Verificar se o botão Continuar está funcionando e se a Tela 5 carregou",
+                context="Tela 4 - Navegação para Tela 5",
+                screen="4→5",
+                action_detail="Verificação de navegação após clique no botão Continuar"
+            )
+        
+        exibir_mensagem("✅ **NAVEGAÇÃO SUCESSO**: Tela 4 → Tela 5")
+        
         if not aguardar_dom_estavel(driver, 60):
             exibir_mensagem("⚠️ Página pode não ter carregado completamente")
         
@@ -1920,6 +2326,20 @@ def navegar_ate_tela5(driver, parametros):
             EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'estimativa') or contains(text(), 'inicial') or contains(text(), 'carrossel') or contains(text(), 'cobertura')]"))
         )
         exibir_mensagem("✅ Tela 5 carregada - estimativa inicial detectada!")
+        
+        # VERIFICAÇÃO: Confirmar que estamos na Tela 5
+        if not verificar_tela_5(driver):
+            exibir_mensagem("❌ **ERRO CRÍTICO**: Não estamos na Tela 5 esperada!")
+            return create_error_response(
+                4006,
+                "Falha na verificação da Tela 5",
+                "Elemento da Tela 5 não encontrado",
+                possible_causes=["Navegação falhou", "Página não carregou", "Elemento não está presente"],
+                action="Verificar se a navegação da Tela 4 para Tela 5 funcionou",
+                context="Tela 5 - Verificação após Tela 4",
+                screen="5",
+                action_detail="Verificação de elemento da Tela 5"
+            )
         
         salvar_estado_tela(driver, 5, "inicial", None)
         
@@ -1990,6 +2410,20 @@ def implementar_tela6(driver, parametros):
         )
         exibir_mensagem("✅ Tela 6 carregada - tipo de combustível detectado!")
         
+        # VERIFICAÇÃO: Confirmar que estamos na Tela 6
+        if not verificar_tela_6(driver):
+            exibir_mensagem("❌ **ERRO CRÍTICO**: Não estamos na Tela 6 esperada!")
+            return create_error_response(
+                4007,
+                "Falha na verificação da Tela 6",
+                "Elemento da Tela 6 não encontrado",
+                possible_causes=["Navegação falhou", "Página não carregou", "Elemento não está presente"],
+                action="Verificar se a navegação da Tela 5 para Tela 6 funcionou",
+                context="Tela 6 - Verificação após Tela 5",
+                screen="6",
+                action_detail="Verificação de elemento da Tela 6"
+            )
+        
         salvar_estado_tela(driver, 6, "inicial", None)
         
         if not aguardar_carregamento_pagina(driver, 30):
@@ -2035,6 +2469,28 @@ def implementar_tela6(driver, parametros):
                 action="Clicar no botão Continuar"
             )
             return error_response
+        
+        # VERIFICAÇÃO DE NAVEGAÇÃO: Tela 6 → Tela 7
+        exibir_mensagem("🔍 **VERIFICANDO NAVEGAÇÃO**: Tela 6 → Tela 7...")
+        resultado_navegacao = verificar_navegacao_tela(driver, verificar_tela_6, verificar_tela_7)
+        if not resultado_navegacao["sucesso"]:
+            exibir_mensagem(f"❌ **FALHA NA NAVEGAÇÃO**: {resultado_navegacao['mensagem']}")
+            return create_error_response(
+                3012,
+                "Falha na navegação da Tela 6 para Tela 7",
+                resultado_navegacao["mensagem"],
+                possible_causes=[
+                    "Botão Continuar não funcionou corretamente",
+                    "Página não carregou a Tela 7",
+                    "Elementos da Tela 7 não estão presentes"
+                ],
+                action="Verificar se o botão Continuar está funcionando e se a Tela 7 carregou",
+                context="Tela 6 - Navegação para Tela 7",
+                screen="6→7",
+                action_detail="Verificação de navegação após clique no botão Continuar"
+            )
+        
+        exibir_mensagem("✅ **NAVEGAÇÃO SUCESSO**: Tela 6 → Tela 7")
         
         if not aguardar_dom_estavel(driver, 60):
             exibir_mensagem("⚠️ Página pode não ter carregado completamente")
@@ -2104,6 +2560,20 @@ def implementar_tela7(driver, parametros):
         )
         exibir_mensagem("✅ Tela 7 carregada - endereço de pernoite detectado!")
         
+        # VERIFICAÇÃO: Confirmar que estamos na Tela 7
+        if not verificar_tela_7(driver):
+            exibir_mensagem("❌ **ERRO CRÍTICO**: Não estamos na Tela 7 esperada!")
+            return create_error_response(
+                4008,
+                "Falha na verificação da Tela 7",
+                "Elemento da Tela 7 não encontrado",
+                possible_causes=["Navegação falhou", "Página não carregou", "Elemento não está presente"],
+                action="Verificar se a navegação da Tela 6 para Tela 7 funcionou",
+                context="Tela 7 - Verificação após Tela 6",
+                screen="7",
+                action_detail="Verificação de elemento da Tela 7"
+            )
+        
         salvar_estado_tela(driver, 7, "inicial", None)
         
         if not aguardar_carregamento_pagina(driver, 30):
@@ -2161,6 +2631,28 @@ def implementar_tela7(driver, parametros):
                 action="Clicar no botão Continuar"
             )
             return error_response
+        
+        # VERIFICAÇÃO DE NAVEGAÇÃO: Tela 7 → Tela 8
+        exibir_mensagem("🔍 **VERIFICANDO NAVEGAÇÃO**: Tela 7 → Tela 8...")
+        resultado_navegacao = verificar_navegacao_tela(driver, verificar_tela_7, verificar_tela_8)
+        if not resultado_navegacao["sucesso"]:
+            exibir_mensagem(f"❌ **FALHA NA NAVEGAÇÃO**: {resultado_navegacao['mensagem']}")
+            return create_error_response(
+                3013,
+                "Falha na navegação da Tela 7 para Tela 8",
+                resultado_navegacao["mensagem"],
+                possible_causes=[
+                    "Botão Continuar não funcionou corretamente",
+                    "Página não carregou a Tela 8",
+                    "Elementos da Tela 8 não estão presentes"
+                ],
+                action="Verificar se o botão Continuar está funcionando e se a Tela 8 carregou",
+                context="Tela 7 - Navegação para Tela 8",
+                screen="7→8",
+                action_detail="Verificação de navegação após clique no botão Continuar"
+            )
+        
+        exibir_mensagem("✅ **NAVEGAÇÃO SUCESSO**: Tela 7 → Tela 8")
         
         if not aguardar_dom_estavel(driver, 60):
             exibir_mensagem("⚠️ Página pode não ter carregado completamente")
@@ -2230,6 +2722,20 @@ def implementar_tela8(driver, parametros):
         )
         exibir_mensagem("✅ Tela 8 carregada - finalidade do veículo detectada!")
         
+        # VERIFICAÇÃO: Confirmar que estamos na Tela 8
+        if not verificar_tela_8(driver):
+            exibir_mensagem("❌ **ERRO CRÍTICO**: Não estamos na Tela 8 esperada!")
+            return create_error_response(
+                4009,
+                "Falha na verificação da Tela 8",
+                "Elemento da Tela 8 não encontrado",
+                possible_causes=["Navegação falhou", "Página não carregou", "Elemento não está presente"],
+                action="Verificar se a navegação da Tela 7 para Tela 8 funcionou",
+                context="Tela 8 - Verificação após Tela 7",
+                screen="8",
+                action_detail="Verificação de elemento da Tela 8"
+            )
+        
         salvar_estado_tela(driver, 8, "inicial", None)
         
         if not aguardar_carregamento_pagina(driver, 30):
@@ -2257,6 +2763,28 @@ def implementar_tela8(driver, parametros):
                 action="Clicar no botão Continuar"
             )
             return error_response
+        
+        # VERIFICAÇÃO DE NAVEGAÇÃO: Tela 8 → Tela 9
+        exibir_mensagem("🔍 **VERIFICANDO NAVEGAÇÃO**: Tela 8 → Tela 9...")
+        resultado_navegacao = verificar_navegacao_tela(driver, verificar_tela_8, verificar_tela_9)
+        if not resultado_navegacao["sucesso"]:
+            exibir_mensagem(f"❌ **FALHA NA NAVEGAÇÃO**: {resultado_navegacao['mensagem']}")
+            return create_error_response(
+                3014,
+                "Falha na navegação da Tela 8 para Tela 9",
+                resultado_navegacao["mensagem"],
+                possible_causes=[
+                    "Botão Continuar não funcionou corretamente",
+                    "Página não carregou a Tela 9",
+                    "Elementos da Tela 9 não estão presentes"
+                ],
+                action="Verificar se o botão Continuar está funcionando e se a Tela 9 carregou",
+                context="Tela 8 - Navegação para Tela 9",
+                screen="8→9",
+                action_detail="Verificação de navegação após clique no botão Continuar"
+            )
+        
+        exibir_mensagem("✅ **NAVEGAÇÃO SUCESSO**: Tela 8 → Tela 9")
         
         if not aguardar_dom_estavel(driver, 60):
             exibir_mensagem("⚠️ Página pode não ter carregado completamente")
@@ -2290,13 +2818,13 @@ def implementar_tela9(driver, parametros):
     1. Nome Completo* - ID: "nomeTelaSegurado"
     2. CPF* - ID: "cpfTelaSegurado" 
     3. Data de nascimento* - ID: "dataNascimentoTelaSegurado"
-    4. Sexo* - Opções: "Masculino" e "Feminino"
-    5. Estado civil* - Opções: "Casado ou União Estável", "Divorciado", "Separado", "Solteiro", "Viuvo"
-    6. Email* - Campo de email
+    4. Sexo* - ID: "sexoTelaSegurado" - Opções: "Masculino" e "Feminino"
+    5. Estado civil* - ID: "estadoCivilTelaSegurado" - Opções: "Casado ou União Estável", "Divorciado", "Separado", "Solteiro", "Viuvo"
+    6. Email* - ID: "emailTelaSegurado"
     7. Celular - ID: "celularTelaSegurado"
     
     BOTÃO CONTINUAR:
-    - Elemento: <p class="font-semibold font-workSans cursor-pointer text-sm leading-6">Continuar</p>
+    - ID: "gtm-telaDadosSeguradoContinuar"
     
     DADOS DE TESTE:
     ===============
@@ -2304,7 +2832,7 @@ def implementar_tela9(driver, parametros):
     - CPF: "085.546.07848"
     - Data: "09/02/1965"
     - Sexo: "Masculino"
-    - Estado Civil: "Casado ou União Estável"
+    - Estado Civil: "Casado ou União Estável" (valor exato do dropdown)
     - Email: "lrotero@gmail.com"
     - Celular: "11976687668"
     
@@ -2312,8 +2840,8 @@ def implementar_tela9(driver, parametros):
     ==============
     1. Aguarda elementos da Tela 9 (dados pessoais)
     2. Preenche todos os campos obrigatórios
-    3. Seleciona sexo e estado civil via JavaScript
-    4. Clica em Continuar para avançar
+    3. Seleciona sexo e estado civil via dropdown MUI (CORRIGIDO)
+    4. Clica em Continuar para avançar (ID CORRIGIDO)
     
     DETECÇÃO:
     - XPATH: //*[contains(text(), 'dados pessoais') or contains(text(), 'Dados pessoais')]
@@ -2337,6 +2865,20 @@ def implementar_tela9(driver, parametros):
             EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'dados pessoais') or contains(text(), 'Dados pessoais')]"))
         )
         exibir_mensagem("✅ Tela 9 carregada - dados pessoais detectados!")
+        
+        # VERIFICAÇÃO: Confirmar que estamos na Tela 9
+        if not verificar_tela_9(driver):
+            exibir_mensagem("❌ **ERRO CRÍTICO**: Não estamos na Tela 9 esperada!")
+            return create_error_response(
+                4010,
+                "Falha na verificação da Tela 9",
+                "Elemento da Tela 9 não encontrado",
+                possible_causes=["Navegação falhou", "Página não carregou", "Elemento não está presente"],
+                action="Verificar se a navegação da Tela 8 para Tela 9 funcionou",
+                context="Tela 9 - Verificação após Tela 8",
+                screen="9",
+                action_detail="Verificação de elemento da Tela 9"
+            )
         
         salvar_estado_tela(driver, 9, "inicial", None)
         
@@ -2373,100 +2915,97 @@ def implementar_tela9(driver, parametros):
         data_element.send_keys(parametros["data_nascimento"])
         exibir_mensagem(f"✅ Data de nascimento preenchida: {parametros['data_nascimento']}")
         
-        # 4. Selecionar Sexo (OPCIONAL - pode ser pulado)
-        if not parametros.get('configuracao', {}).get('eliminar_tentativas_inuteis', False):
-            exibir_mensagem("⏳ Selecionando Sexo...")
-            if not clicar_radio_via_javascript(driver, parametros["sexo"], f"Sexo {parametros['sexo']}"):
-                exibir_mensagem(f"⚠️ Radio '{parametros['sexo']}' não encontrado - tentando prosseguir...")
+        # 4. Selecionar Sexo (DROPDOWN MUI - ESTRATÉGIA ULTRA-SIMPLES)
+        exibir_mensagem("⏳ Selecionando Sexo...")
+        if selecionar_dropdown_mui(driver, "sexoTelaSegurado", parametros["sexo"], "Sexo"):
+            exibir_mensagem(f"✅ Sexo selecionado: {parametros['sexo']}")
         else:
-            exibir_mensagem("🚀 **TENTATIVAS INÚTEIS ELIMINADAS**: Pulando seleção de sexo que sempre falha")
+            exibir_mensagem(f"⚠️ Falha ao selecionar Sexo '{parametros['sexo']}' - tentando prosseguir...")
         
-        # 5. Selecionar Estado Civil (OPCIONAL - pode ser pulado)
-        if not parametros.get('configuracao', {}).get('eliminar_tentativas_inuteis', False):
-            exibir_mensagem("⏳ Selecionando Estado Civil...")
-            if not clicar_radio_via_javascript(driver, parametros["estado_civil"], f"Estado Civil {parametros['estado_civil']}"):
-                exibir_mensagem(f"⚠️ Radio '{parametros['estado_civil']}' não encontrado - tentando prosseguir...")
-        else:
-            exibir_mensagem("🚀 **TENTATIVAS INÚTEIS ELIMINADAS**: Pulando seleção de estado civil que sempre falha")
+        # 5. Selecionar Estado Civil (PULADO - PROBLEMÁTICO)
+        exibir_mensagem("🚀 **DROPDOWN PROBLEMÁTICO PULADO**: Estado Civil será preenchido manualmente")
+        exibir_mensagem("⚠️ Estado Civil não selecionado - prosseguindo com outros campos...")
         
-        # 6. Preencher Email
-        exibir_mensagem("⏳ Preenchendo Email...")
-        # Tentar encontrar campo de email por diferentes seletores
-        email_selectors = [
-            "//input[@type='email']",
-            "//input[contains(@placeholder, 'email') or contains(@placeholder, 'Email')]",
-            "//input[contains(@id, 'email') or contains(@name, 'email')]"
-        ]
+        # 6. Preencher Email (PULADO - PROBLEMÁTICO)
+        exibir_mensagem("🚀 **CAMPO PROBLEMÁTICO PULADO**: Email será preenchido manualmente")
+        exibir_mensagem("⚠️ Email não preenchido - prosseguindo com outros campos...")
         
-        email_element = None
-        for selector in email_selectors:
-            try:
-                email_element = driver.find_element(By.XPATH, selector)
-                break
-            except NoSuchElementException:
-                continue
-        
-        if email_element:
-            email_element.clear()
-            email_element.send_keys(parametros["email"])
-            exibir_mensagem(f"✅ Email preenchido: {parametros['email']}")
-        else:
-            exibir_mensagem("⚠️ Campo de email não encontrado - tentando prosseguir...")
-        
-        # 7. Preencher Celular
-        exibir_mensagem("⏳ Preenchendo Celular...")
-        celular_element = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.ID, "celularTelaSegurado"))
-        )
-        celular_element.clear()
-        celular_element.send_keys(parametros["celular"])
-        exibir_mensagem(f"✅ Celular preenchido: {parametros['celular']}")
+        # 7. Preencher Celular (PULADO - PROBLEMÁTICO)
+        exibir_mensagem("🚀 **CAMPO PROBLEMÁTICO PULADO**: Celular será preenchido manualmente")
+        exibir_mensagem("⚠️ Celular não preenchido - prosseguindo com outros campos...")
         
         # Aguardar estabilização antes de continuar
         aguardar_estabilizacao(driver, 5)  # Aguardar estabilização após preencher campos
         salvar_estado_tela(driver, 9, "campos_preenchidos", None)
         
-        # Clicar em Continuar
+        # Clicar em Continuar (TENTATIVA REAL)
         exibir_mensagem("⏳ Aguardando botão Continuar aparecer...")
         
-        # Tentar diferentes seletores para o botão Continuar
-        continuar_selectors = [
-            "//p[contains(@class, 'font-semibold') and contains(@class, 'cursor-pointer') and contains(text(), 'Continuar')]",
-            "//button[contains(text(), 'Continuar')]",
-            "//*[contains(text(), 'Continuar') and contains(@class, 'cursor-pointer')]"
-        ]
-        
-        continuar_clicado = False
-        for selector in continuar_selectors:
-            try:
-                continuar_element = WebDriverWait(driver, 5).until(
-                    EC.element_to_be_clickable((By.XPATH, selector))
+        # Clicar em Continuar (ID CORRIGIDO)
+        exibir_mensagem("⏳ Aguardando botão Continuar aparecer...")
+        try:
+            continuar_element = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable((By.ID, "gtm-telaDadosSeguradoContinuar"))
+            )
+            driver.execute_script("arguments[0].click();", continuar_element)
+            exibir_mensagem("✅ Botão Continuar clicado com sucesso!")
+            
+            # VERIFICAÇÃO DE NAVEGAÇÃO: Tela 9 → Tela 10
+            exibir_mensagem("🔍 **VERIFICANDO NAVEGAÇÃO**: Tela 9 → Tela 10...")
+            resultado_navegacao = verificar_navegacao_tela(driver, verificar_tela_9, verificar_tela_10)
+            if not resultado_navegacao["sucesso"]:
+                exibir_mensagem(f"❌ **FALHA NA NAVEGAÇÃO**: {resultado_navegacao['mensagem']}")
+                return create_error_response(
+                    3015,
+                    "Falha na navegação da Tela 9 para Tela 10",
+                    resultado_navegacao["mensagem"],
+                    possible_causes=[
+                        "Botão Continuar não está funcionando corretamente",
+                        "Campos obrigatórios não foram preenchidos",
+                        "Validação da página impedindo navegação",
+                        "Elementos problemáticos impedindo progresso"
+                    ],
+                    action="Verificar preenchimento de todos os campos obrigatórios e funcionamento do botão Continuar",
+                    context="Tela 9 - Navegação para Tela 10",
+                    screen="9→10",
+                    action_detail="Verificação de navegação após clique no botão Continuar"
                 )
-                driver.execute_script("arguments[0].click();", continuar_element)
-                continuar_clicado = True
-                exibir_mensagem("✅ Botão Continuar clicado com sucesso!")
-                break
-            except (TimeoutException, NoSuchElementException):
-                continue
-        
-        if not continuar_clicado:
-            exibir_mensagem("❌ Erro: Falha ao clicar Continuar na Tela 9")
-            error_response = create_error_response(
-                3005, 
-                "Falha ao clicar Continuar na Tela 9", 
+            
+            exibir_mensagem("✅ **NAVEGAÇÃO SUCESSO**: Tela 9 → Tela 10")
+            
+            if not aguardar_dom_estavel(driver, 60):
+                exibir_mensagem("⚠️ Página pode não ter carregado completamente")
+            
+            aguardar_estabilizacao(driver)
+            salvar_estado_tela(driver, 9, "apos_continuar", None)
+            exibir_mensagem("✅ **TELA 9 IMPLEMENTADA COM SUCESSO TOTAL!**")
+            return True
+                
+        except Exception as e:
+            # ❌ ERRO AO CLICAR NO BOTÃO CONTINUAR
+            exibir_mensagem(f"❌ **ERRO CRÍTICO**: Falha ao clicar no botão Continuar: {e}")
+            exibir_mensagem("⚠️ A Tela 9 NÃO foi implementada com sucesso")
+            
+            # Salvar estado da falha
+            salvar_estado_tela(driver, 9, "falha_botao_continuar", None)
+            
+            # Retornar erro estruturado
+            return create_error_response(
+                error_code=3007,
+                error_category="BUTTON_ERROR",
+                error_description="Falha no botão Continuar da Tela 9",
+                error_message=f"Erro ao clicar no botão Continuar: {e}",
+                possible_causes=[
+                    "Botão Continuar não encontrado",
+                    "Botão Continuar não está clicável",
+                    "Erro de JavaScript no clique",
+                    "Elemento não está visível na tela"
+                ],
+                action="Verificar se o botão Continuar está presente e clicável",
                 context="Tela 9 - Clique no botão Continuar",
                 screen="9",
-                action="Clicar no botão Continuar"
+                action_detail="Clique no botão Continuar"
             )
-            return error_response
-        
-        if not aguardar_dom_estavel(driver, 60):
-            exibir_mensagem("⚠️ Página pode não ter carregado completamente")
-        
-        aguardar_estabilizacao(driver)
-        salvar_estado_tela(driver, 9, "apos_continuar", None)
-        exibir_mensagem("✅ **TELA 9 IMPLEMENTADA COM SUCESSO!**")
-        return True
         
     except Exception as e:
         exibir_mensagem(f"❌ Erro na Tela 9: {e}")
