@@ -171,15 +171,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException, TimeoutException, WebDriverException, SessionNotCreatedException, ElementClickInterceptedException, StaleElementReferenceException, ElementNotInteractableException, InvalidSelectorException, NoSuchWindowException, NoSuchFrameException, UnexpectedAlertPresentException, MoveTargetOutOfBoundsException, InvalidElementStateException, ScreenshotException, ImeNotAvailableException, ImeActivationFailedException, InvalidCookieDomainException, UnableToSetCookieException
-
-# =============================================================================
-# EXCEÇÕES CUSTOMIZADAS
-# =============================================================================
-class DropdownSelectionError(Exception):
-    """Exceção customizada para erros de seleção de dropdown"""
-    pass
 
 # =============================================================================
 # SISTEMA DE LOGGING E VISUALIZAÇÃO DE MENSAGENS
@@ -1739,33 +1731,6 @@ def selecionar_dropdown_mui_otimizado(driver, campo_id, valor_desejado):
     Seleção otimizada de dropdown MUI baseada na gravação Selenium IDE.
     Inclui log detalhado para análise e debugging.
     
-    ESTRATÉGIAS TESTADAS E RESULTADOS:
-    ===================================
-    
-    ❌ ESTRATÉGIA 1 (Tentativa 1): Seletor simples ul[id^=':r']
-       - RESULTADO: FALHA - Timeout após 10s
-       - PROBLEMA: Seletor muito específico, não funcionou
-    
-    ❌ ESTRATÉGIA 2 (Tentativa 2): Timeout aumentado para 15s
-       - RESULTADO: FALHA - Mesmo problema
-       - PROBLEMA: Seletor ainda incorreto
-    
-    ❌ ESTRATÉGIA 3 (Tentativa 3): Retry loop + Keys.ESCAPE + validação
-       - RESULTADO: FALHA - Timeout na ETAPA 3
-       - PROBLEMA: Seletor ul[id^=':r'] não funcionou
-    
-    ✅ ESTRATÉGIA 4 (Tentativa 4): Múltiplos seletores + interações alternativas
-       - RESULTADO: SUCESSO TOTAL - 100% taxa de sucesso
-       - SOLUÇÃO: ul[role='listbox'] + send_keys(Keys.ENTER) + Keys.ESCAPE
-    
-    ESTRATÉGIA FINAL IMPLEMENTADA:
-    ==============================
-    - Múltiplos seletores ARIA (10 seletores diferentes)
-    - Interações alternativas (Enter, Space, click)
-    - Timeout aumentado (20s)
-    - Keys.ESCAPE para fechamento
-    - Logging detalhado de 8 etapas
-    
     Args:
         driver: WebDriver do Selenium
         campo_id: ID do campo dropdown
@@ -1886,89 +1851,15 @@ def selecionar_dropdown_mui_otimizado(driver, campo_id, valor_desejado):
             log_detalhado["erros"].append(f"ETAPA 2: {str(e)}")
             raise Exception(f"Falha ao abrir dropdown {campo_id}: {str(e)}")
         
-        # ETAPA 3: AGUARDAR LISTA APARECER (ESTRATÉGIA FINAL - TENTATIVA 4)
+        # ETAPA 3: AGUARDAR LISTA APARECER
         tempo_inicio = time.time()
-        exibir_mensagem(f"⏳ **ETAPA 3**: Aguardando lista de opções aparecer (timeout 20s)...")
-        
-        # ESTRATÉGIAS QUE FALHARAM:
-        # ❌ ESTRATÉGIA 1: Seletor único ul[id^=':r'] - FALHA (timeout 10s)
-        # ❌ ESTRATÉGIA 2: Timeout aumentado para 15s - FALHA (seletor incorreto)
-        # ❌ ESTRATÉGIA 3: Retry loop + Keys.ESCAPE - FALHA (timeout ETAPA 3)
-        # ✅ ESTRATÉGIA 4: Múltiplos seletores + interações alternativas - SUCESSO
-        
-        # ESTRATÉGIA FINAL: MÚLTIPLOS SELETORES PARA ROBUSTEZ (baseado nas sugestões do Grok)
-        seletores_lista = [
-            "ul[role='listbox']",           # ✅ ARIA role padrão MUI - FUNCIONOU
-            "div[role='listbox']",          # ❌ ARIA role alternativo - FALHOU
-            ".MuiMenu-root ul",             # ❌ Menu MUI - FALHOU
-            ".MuiPopover-root ul",          # ❌ Popover MUI - FALHOU
-            "li[role='option']",            # ❌ Opções individuais - FALHOU
-            "[data-value]",                 # ❌ Atributo data-value - FALHOU
-            "ul[id^=':r']",                 # ❌ ID dinâmico original - FALHOU (ESTRATÉGIA 1)
-            "ul.MuiList-root",              # ❌ Lista MUI - FALHOU
-            "ul.MuiMenu-list",              # ❌ Menu list MUI - FALHOU
-            "div.MuiPaper-root ul"         # ❌ Paper com lista - FALHOU
-        ]
-        
-        lista_opcoes = None
-        seletor_usado = None
+        exibir_mensagem(f"⏳ **ETAPA 3**: Aguardando lista de opções aparecer...")
         
         try:
-            # TENTAR CADA SELETOR ATÉ ENCONTRAR A LISTA
-            for seletor in seletores_lista:
-                try:
-                    exibir_mensagem(f"🔍 Tentando seletor: {seletor}")
-                    lista_opcoes = WebDriverWait(driver, 20).until(  # TIMEOUT AUMENTADO PARA 20s
-                        EC.presence_of_element_located((By.CSS_SELECTOR, seletor))
-                    )
-                    seletor_usado = seletor
-                    exibir_mensagem(f"✅ Lista encontrada com seletor: {seletor}")
-                    break
-                except TimeoutException:
-                    exibir_mensagem(f"⏳ Timeout para seletor: {seletor}")
-                    continue
-            
-            if not lista_opcoes:
-                # ESTRATÉGIAS QUE FALHARAM:
-                # ❌ ESTRATÉGIA 1: Apenas mouseDown - FALHA (lista não apareceu)
-                # ❌ ESTRATÉGIA 2: Apenas click() - FALHA (lista não apareceu)
-                # ✅ ESTRATÉGIA 3: Interações alternativas - SUCESSO
-                
-                # ESTRATÉGIA FINAL: TENTAR INTERAÇÕES ALTERNATIVAS SE NENHUM SELETOR FUNCIONOU
-                exibir_mensagem(f"🔄 Tentando interações alternativas...")
-                interacoes_alternativas = [
-                    lambda: campo.send_keys(Keys.ENTER),  # ✅ FUNCIONOU para campo Sexo
-                    lambda: campo.send_keys(Keys.SPACE),   # ❌ FALHOU
-                    lambda: campo.click(),                 # ❌ FALHOU
-                    lambda: ActionChains(driver).move_to_element(campo).click().perform()  # ❌ FALHOU
-                ]
-                
-                for i, interacao in enumerate(interacoes_alternativas):
-                    try:
-                        exibir_mensagem(f"🔄 Tentando interação {i+1}: {interacao.__name__ if hasattr(interacao, '__name__') else 'lambda'}")
-                        interacao()
-                        time.sleep(2)  # Aguardar renderização
-                        
-                        # Tentar novamente com todos os seletores
-                        for seletor in seletores_lista:
-                            try:
-                                lista_opcoes = WebDriverWait(driver, 10).until(
-                                    EC.presence_of_element_located((By.CSS_SELECTOR, seletor))
-                                )
-                                seletor_usado = f"{seletor} (após interação {i+1})"
-                                exibir_mensagem(f"✅ Lista encontrada após interação {i+1}")
-                                break
-                            except TimeoutException:
-                                continue
-                        
-                        if lista_opcoes:
-                            break
-                    except Exception as e:
-                        exibir_mensagem(f"❌ Interação {i+1} falhou: {str(e)}")
-                        continue
-            
-            if not lista_opcoes:
-                raise Exception("Nenhum seletor ou interação funcionou para encontrar a lista")
+            # BUSCAR LISTA COM ID DINÂMICO (:r13:, :r14:, etc.)
+            lista_opcoes = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, "ul[id^=':r']"))
+            )
             
             tempo_etapa = time.time() - tempo_inicio
             
@@ -1980,8 +1871,7 @@ def selecionar_dropdown_mui_otimizado(driver, campo_id, valor_desejado):
                 "visivel": lista_opcoes.is_displayed(),
                 "localizacao": lista_opcoes.location,
                 "tamanho": lista_opcoes.size,
-                "quantidade_opcoes": len(lista_opcoes.find_elements(By.TAG_NAME, "li")),
-                "seletor_usado": seletor_usado
+                "quantidade_opcoes": len(lista_opcoes.find_elements(By.TAG_NAME, "li"))
             }
             
             # CAPTURAR TODAS AS OPÇÕES DISPONÍVEIS
@@ -2006,7 +1896,7 @@ def selecionar_dropdown_mui_otimizado(driver, campo_id, valor_desejado):
             })
             
             exibir_mensagem(f"✅ **ETAPA 3 CONCLUÍDA**: Lista carregada em {tempo_etapa:.3f}s")
-            exibir_mensagem(f"📋 **LISTA ENCONTRADA**: Seletor '{seletor_usado}' com {detalhes_lista['quantidade_opcoes']} opções")
+            exibir_mensagem(f"📋 **LISTA ENCONTRADA**: ID '{detalhes_lista['id_lista']}' com {detalhes_lista['quantidade_opcoes']} opções")
             exibir_mensagem(f"🔍 **OPÇÕES DISPONÍVEIS**: {[op['texto'] for op in opcoes_disponiveis]}")
             
         except Exception as e:
@@ -2016,11 +1906,10 @@ def selecionar_dropdown_mui_otimizado(driver, campo_id, valor_desejado):
                 "acao": "aguardar_lista",
                 "status": "FALHA",
                 "tempo": f"{tempo_etapa:.3f}s",
-                "erro": str(e),
-                "seletores_tentados": seletores_lista
+                "erro": str(e)
             })
             log_detalhado["erros"].append(f"ETAPA 3: {str(e)}")
-            raise Exception(f"Lista de opções não apareceu após tentar {len(seletores_lista)} seletores: {str(e)}")
+            raise Exception(f"Lista de opções não apareceu: {str(e)}")
         
         # ETAPA 4: SELECIONAR OPÇÃO ESPECÍFICA
         tempo_inicio = time.time()
@@ -2080,10 +1969,6 @@ def selecionar_dropdown_mui_otimizado(driver, campo_id, valor_desejado):
         exibir_mensagem(f"🔒 **ETAPA 5**: Fechando dropdown {campo_id}...")
         
         try:
-            # ESTRATÉGIAS QUE FALHARAM:
-            # ❌ ESTRATÉGIA 1: driver.find_element(By.TAG_NAME, "body").click() - FALHA (interações acidentais)
-            # ✅ ESTRATÉGIA 2: Keys.ESCAPE - SUCESSO (correção do Grok)
-            
             # CAPTURAR ESTADO ANTES DO FECHAMENTO
             estado_antes_fechar = {
                 "texto_campo": campo.text,
@@ -2091,8 +1976,8 @@ def selecionar_dropdown_mui_otimizado(driver, campo_id, valor_desejado):
                 "lista_visivel": lista_opcoes.is_displayed()
             }
             
-            # ESTRATÉGIA FINAL: FECHAR DROPDOWN COM Keys.ESCAPE (correção do Grok)
-            driver.find_element(By.TAG_NAME, "body").send_keys(Keys.ESCAPE)
+            # FECHAR DROPDOWN (clique no body como na gravação)
+            driver.find_element(By.TAG_NAME, "body").click()
             
             # AGUARDAR LISTA DESAPARECER
             WebDriverWait(driver, 5).until(
@@ -2108,15 +1993,15 @@ def selecionar_dropdown_mui_otimizado(driver, campo_id, valor_desejado):
                 "status": "SUCESSO",
                 "tempo": f"{tempo_etapa:.3f}s",
                 "detalhes": {
-                    "metodo_fechamento": "Keys.ESCAPE",
+                    "metodo_fechamento": "clique no body",
                     "estado_antes_fechar": estado_antes_fechar,
                     "lista_desapareceu": True,
-                    "comando_executado": "driver.find_element(By.TAG_NAME, 'body').send_keys(Keys.ESCAPE)"
+                    "comando_executado": "driver.find_element(By.TAG_NAME, 'body').click()"
                 }
             })
             
             exibir_mensagem(f"✅ **ETAPA 5 CONCLUÍDA**: Dropdown {campo_id} fechado em {tempo_etapa:.3f}s")
-            exibir_mensagem(f"🔧 **MÉTODO FECHAMENTO**: Keys.ESCAPE (correção do Grok)")
+            exibir_mensagem(f"🔧 **MÉTODO FECHAMENTO**: Clique no body (baseado na gravação Selenium IDE)")
             
         except Exception as e:
             tempo_etapa = time.time() - tempo_inicio
@@ -2235,6 +2120,7 @@ def selecionar_dropdown_mui(driver, id_dropdown, valor_desejado, descricao="drop
     Função antiga mantida para compatibilidade - agora chama a versão otimizada
     """
     return selecionar_dropdown_mui_otimizado(driver, id_dropdown, valor_desejado)
+        return False
 
 def salvar_estado_tela(driver, tela_num, acao, temp_dir):
     """
