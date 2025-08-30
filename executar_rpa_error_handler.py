@@ -1055,10 +1055,10 @@ def aguardar_dom_estavel(driver, timeout=60, periodo_estabilidade=3):
     - False: Se falhou ou timeout excedido
     """
     try:
-        print(f"🔍 **MUTATIONOBSERVER ROBUSTO ATIVADO**")
-        print(f"   ⏱️ Timeout: {timeout}s, Estabilidade: {periodo_estabilidade}s")
-        print(f"   📊 Monitorando: Nós, Atributos, Conteúdo, Texto")
-        print(f"   🎯 Objetivo: Detectar estabilização real em páginas React/Next.js")
+        exibir_mensagem(f"🔍 **MUTATIONOBSERVER ROBUSTO ATIVADO**")
+        exibir_mensagem(f"   ⏱️ Timeout: {timeout}s, Estabilidade: {periodo_estabilidade}s")
+        exibir_mensagem(f"   📊 Monitorando: Nós, Atributos, Conteúdo, Texto")
+        exibir_mensagem(f"   🎯 Objetivo: Detectar estabilização real em páginas React/Next.js")
         
         # Script JavaScript com MutationObserver ROBUSTO
         script = """
@@ -1268,9 +1268,9 @@ def aguardar_estabilizacao(driver, segundos=None):
         except:
             segundos = 15  # Fallback padrão
     
-    print(f"🔍 **AGUARDANDO ESTABILIZAÇÃO - ESTRATÉGIA INTELIGENTE**")
-    print(f"   ⏱️ Tempo configurado: {segundos}s")
-    print(f"   🎯 Objetivo: Detectar estabilização real via MutationObserver")
+    exibir_mensagem(f"🔍 **AGUARDANDO ESTABILIZAÇÃO - ESTRATÉGIA INTELIGENTE**")
+    exibir_mensagem(f"   ⏱️ Tempo configurado: {segundos}s")
+    exibir_mensagem(f"   🎯 Objetivo: Detectar estabilização real via MutationObserver")
     
     # TENTAR MUTATIONOBSERVER ROBUSTO PRIMEIRO (mais rápido)
     try:
@@ -1279,27 +1279,27 @@ def aguardar_estabilizacao(driver, segundos=None):
         timeout_mutation = max(3, segundos)  # Pelo menos 3 segundos para estabilidade real
         periodo_estabilidade = max(2, segundos // 3)  # Período de estabilidade proporcional
         
-        print(f"🚀 **TENTANDO MUTATIONOBSERVER ROBUSTO**")
-        print(f"   ⏱️ Timeout: {timeout_mutation}s, Estabilidade: {periodo_estabilidade}s")
-        print(f"   📊 Configuração: Completa para React/Next.js")
+        exibir_mensagem(f"🚀 **TENTANDO MUTATIONOBSERVER ROBUSTO**")
+        exibir_mensagem(f"   ⏱️ Timeout: {timeout_mutation}s, Estabilidade: {periodo_estabilidade}s")
+        exibir_mensagem(f"   📊 Configuração: Completa para React/Next.js")
         
         if aguardar_dom_estavel(driver, timeout_mutation, periodo_estabilidade):
-            print(f"🎉 **ESTABILIZAÇÃO DETECTADA VIA MUTATIONOBSERVER ROBUSTO!**")
-            print(f"   ✅ Tempo real necessário: {timeout_mutation}s")
-            print(f"   🚀 Zero delays desnecessários aplicados")
+            exibir_mensagem(f"🎉 **ESTABILIZAÇÃO DETECTADA VIA MUTATIONOBSERVER ROBUSTO!**")
+            exibir_mensagem(f"   ✅ Tempo real necessário: {timeout_mutation}s")
+            exibir_mensagem(f"   🚀 Zero delays desnecessários aplicados")
             return True
         else:
-            print(f"⚠️ **MUTATIONOBSERVER FALHOU - ATIVANDO FALLBACK**")
-            print(f"   🔍 Causa provável: Página muito dinâmica (React/Next.js)")
-            print(f"   🔄 Usando fallback tradicional: {segundos}s")
+            exibir_mensagem(f"⚠️ **MUTATIONOBSERVER FALHOU - ATIVANDO FALLBACK**")
+            exibir_mensagem(f"   🔍 Causa provável: Página muito dinâmica (React/Next.js)")
+            exibir_mensagem(f"   🔄 Usando fallback tradicional: {segundos}s")
     except Exception as e:
-        print(f"❌ **ERRO NO MUTATIONOBSERVER ROBUSTO:** {e}")
-        print(f"   🔄 Ativando fallback tradicional: {segundos}s")
+        exibir_mensagem(f"❌ **ERRO NO MUTATIONOBSERVER ROBUSTO:** {e}")
+        exibir_mensagem(f"   🔄 Ativando fallback tradicional: {segundos}s")
     
     # FALLBACK: Método tradicional (configurável)
-    print(f"⏳ **FALLBACK ATIVADO** - Aguardando estabilização fixa ({segundos}s)...")
+    exibir_mensagem(f"⏳ **FALLBACK ATIVADO** - Aguardando estabilização fixa ({segundos}s)...")
     time.sleep(segundos)
-    print(f"✅ **FALLBACK CONCLUÍDO** - Estabilização assumida após {segundos}s")
+    exibir_mensagem(f"✅ **FALLBACK CONCLUÍDO** - Estabilização assumida após {segundos}s")
     return True
 
 def clicar_com_delay_extremo(driver, by, value, descricao="elemento", timeout=30):
@@ -1346,13 +1346,13 @@ def clicar_com_delay_extremo(driver, by, value, descricao="elemento", timeout=30
     - Fallback automático para JavaScript
     """
     try:
-        print(f"⏳ Aguardando {descricao} aparecer...")
+        exibir_mensagem(f"⏳ Aguardando {descricao} aparecer...")
         
         elemento = WebDriverWait(driver, timeout).until(
             EC.presence_of_element_located((by, value))
         )
         
-        print(f"✅ {descricao} encontrado, aguardando estabilização...")
+        exibir_mensagem(f"✅ {descricao} encontrado, aguardando estabilização...")
         aguardar_estabilizacao(driver)
         
         try:
@@ -1360,44 +1360,44 @@ def clicar_com_delay_extremo(driver, by, value, descricao="elemento", timeout=30
                 EC.element_to_be_clickable((by, value))
             )
         except:
-            print(f"⚠️ {descricao} não está mais clicável, tentando JavaScript...")
+            exibir_mensagem(f"⚠️ {descricao} não está mais clicável, tentando JavaScript...")
             if by == By.XPATH:
                 driver.execute_script(f"document.evaluate('{value}', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click();")
             else:
                 driver.execute_script(f"document.querySelector('{by}={value}').click();")
-            print(f"✅ {descricao} clicado via JavaScript")
+            exibir_mensagem(f"✅ {descricao} clicado via JavaScript")
             return True
         
         driver.execute_script("arguments[0].scrollIntoView(true);", elemento)
         aguardar_estabilizacao(driver, 2)  # Aguardar estabilização após scroll
         elemento.click()
-        print(f"✅ {descricao} clicado com sucesso")
+        exibir_mensagem(f"✅ {descricao} clicado com sucesso")
         return True
         
     except Exception as e:
-        print(f"❌ Erro ao clicar em {descricao}: {e}")
+        exibir_mensagem(f"❌ Erro ao clicar em {descricao}: {e}")
         return False
 
 def preencher_com_delay_extremo(driver, by, value, texto, descricao="campo", timeout=30):
     """Preenche um campo com delay extremo (BASEADO NO SCRIPT QUE FUNCIONOU)"""
     try:
-        print(f"⏳ Aguardando {descricao} aparecer...")
+        exibir_mensagem(f"⏳ Aguardando {descricao} aparecer...")
         
         elemento = WebDriverWait(driver, timeout).until(
             EC.presence_of_element_located((by, value))
         )
         
-        print(f"✅ {descricao} encontrado, aguardando estabilização...")
+        exibir_mensagem(f"✅ {descricao} encontrado, aguardando estabilização...")
         aguardar_estabilizacao(driver)
         
         elemento.clear()
         aguardar_estabilizacao(driver, 1)  # Aguardar estabilização após limpar
         elemento.send_keys(texto)
-        print(f"✅ {descricao} preenchido com sucesso: {texto}")
+        exibir_mensagem(f"✅ {descricao} preenchido com sucesso: {texto}")
         return True
         
     except Exception as e:
-        print(f"❌ Erro ao preencher {descricao}: {e}")
+        exibir_mensagem(f"❌ Erro ao preencher {descricao}: {e}")
         return False
 
 def clicar_radio_via_javascript(driver, texto_radio, descricao="radio", timeout=30):
@@ -1465,7 +1465,7 @@ def clicar_radio_via_javascript(driver, texto_radio, descricao="radio", timeout=
     - Retorna HTML do elemento clicado
     """
     try:
-        print(f"⏳ Aguardando radio {descricao} aparecer...")
+        exibir_mensagem(f"⏳ Aguardando radio {descricao} aparecer...")
         aguardar_estabilizacao(driver)
         
         script = f"""
@@ -1500,23 +1500,23 @@ def clicar_radio_via_javascript(driver, texto_radio, descricao="radio", timeout=
         """
         
         resultado = driver.execute_script(script)
-        print(f"🎯 {resultado}")
+        exibir_mensagem(f"🎯 {resultado}")
         
         if "Radio clicado" in resultado:
-            print(f"✅ Radio {descricao} clicado via JavaScript")
+            exibir_mensagem(f"✅ Radio {descricao} clicado via JavaScript")
             return True
         else:
-            print(f"❌ Radio {descricao} não encontrado")
+            exibir_mensagem(f"❌ Radio {descricao} não encontrado")
             return False
             
     except Exception as e:
-        print(f"❌ Erro ao clicar radio {descricao}: {e}")
+        exibir_mensagem(f"❌ Erro ao clicar radio {descricao}: {e}")
         return False
 
 def clicar_checkbox_via_javascript(driver, texto_checkbox, descricao="checkbox", timeout=30):
     """Clica em um checkbox via JavaScript (BASEADO NO SCRIPT QUE FUNCIONOU)"""
     try:
-        print(f"⏳ Aguardando checkbox {descricao} aparecer...")
+        exibir_mensagem(f"⏳ Aguardando checkbox {descricao} aparecer...")
         aguardar_estabilizacao(driver)
         
         script = f"""
@@ -1551,17 +1551,17 @@ def clicar_checkbox_via_javascript(driver, texto_checkbox, descricao="checkbox",
         """
         
         resultado = driver.execute_script(script)
-        print(f"🎯 {resultado}")
+        exibir_mensagem(f"🎯 {resultado}")
         
         if "Checkbox clicado" in resultado:
-            print(f"✅ Checkbox {descricao} clicado via JavaScript")
+            exibir_mensagem(f"✅ Checkbox {descricao} clicado via JavaScript")
             return True
         else:
-            print(f"❌ Checkbox {descricao} não encontrado")
+            exibir_mensagem(f"❌ Checkbox {descricao} não encontrado")
             return False
             
     except Exception as e:
-        print(f"❌ Erro ao clicar checkbox {descricao}: {e}")
+        exibir_mensagem(f"❌ Erro ao clicar checkbox {descricao}: {e}")
         return False
 
 def salvar_estado_tela(driver, tela_num, acao, temp_dir):
@@ -1659,13 +1659,13 @@ def salvar_estado_tela(driver, tela_num, acao, temp_dir):
         f.write(f"Título: {driver.title}\n")
         f.write(f"Arquivos salvos em: {os.path.abspath(tela_dir)}\n")
     
-    print(f"==================================================================================")
-    print(f"📱 **TELA {tela_num:02d}: {acao}** - {timestamp}")
-    print(f"==================================================================================")
-    print(f"🌐 URL: {driver.current_url}")
-    print(f"📄 Título: {driver.title}")
-    print(f" Ação: {acao}")
-    print(f" Arquivos salvos em: {os.path.abspath(tela_dir)}")
+    exibir_mensagem(f"==================================================================================")
+    exibir_mensagem(f"📱 **TELA {tela_num:02d}: {acao}** - {timestamp}")
+    exibir_mensagem(f"==================================================================================")
+    exibir_mensagem(f"🌐 URL: {driver.current_url}")
+    exibir_mensagem(f"📄 Título: {driver.title}")
+    exibir_mensagem(f" Ação: {acao}")
+    exibir_mensagem(f" Arquivos salvos em: {os.path.abspath(tela_dir)}")
     
     return tela_dir
 
@@ -1768,7 +1768,7 @@ def navegar_ate_tela5(driver, parametros):
     driver.get(parametros['url_base'])
     
     if not aguardar_carregamento_pagina(driver, 60):
-        print("❌ Erro: Página não carregou")
+        exibir_mensagem("❌ Erro: Página não carregou")
         return False
     
     salvar_estado_tela(driver, 1, "inicial", None)
@@ -1777,11 +1777,11 @@ def navegar_ate_tela5(driver, parametros):
     salvar_estado_tela(driver, 1, "antes_clique", None)
     
     if not clicar_com_delay_extremo(driver, By.XPATH, "//button[contains(., 'Carro')]", "botão Carro"):
-        print("❌ Erro: Falha ao clicar no botão Carro")
+        exibir_mensagem("❌ Erro: Falha ao clicar no botão Carro")
         return False
     
     if not aguardar_dom_estavel(driver, 60):
-        print("❌ Erro: Página não carregou após selecionar Carro")
+        exibir_mensagem("❌ Erro: Página não carregou após selecionar Carro")
         return False
     
     aguardar_estabilizacao(driver)
@@ -1794,138 +1794,138 @@ def navegar_ate_tela5(driver, parametros):
     
     # PLACA CORRETA: KVA-1791 (BASEADO NO SCRIPT QUE FUNCIONOU)
     if not preencher_com_delay_extremo(driver, By.ID, "placaTelaDadosPlaca", "KVA-1791", "placa"):
-        print("❌ Erro: Falha ao preencher placa")
+        exibir_mensagem("❌ Erro: Falha ao preencher placa")
         return False
     
     aguardar_estabilizacao(driver)
     salvar_estado_tela(driver, 2, "placa_inserida", None)
     
     # TELA 3: Clicar em Continuar
-    print("\n📱 TELA 3: Clicando Continuar...")
+    exibir_mensagem("\n📱 TELA 3: Clicando Continuar...")
     
     if not clicar_com_delay_extremo(driver, By.ID, "gtm-telaDadosAutoCotarComPlacaContinuar", "botão Continuar Tela 3"):
-        print("❌ Erro: Falha ao clicar Continuar na Tela 3")
+        exibir_mensagem("❌ Erro: Falha ao clicar Continuar na Tela 3")
         return False
     
     if not aguardar_dom_estavel(driver, 60):
-        print("⚠️ Página pode não ter carregado completamente")
+        exibir_mensagem("⚠️ Página pode não ter carregado completamente")
     
     aguardar_estabilizacao(driver)
     salvar_estado_tela(driver, 3, "apos_clique", None)
     
     # TELA 3: Confirmação do veículo ECOSPORT
-    print("\n📱 TELA 3: Confirmando veículo ECOSPORT...")
+    exibir_mensagem("\n📱 TELA 3: Confirmando veículo ECOSPORT...")
     
     try:
         # Aguardar elementos da confirmação do ECOSPORT
         WebDriverWait(driver, 20).until(
             EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'ECOSPORT')]"))
         )
-        print("✅ Tela 3 carregada - confirmação do ECOSPORT detectada!")
+        exibir_mensagem("✅ Tela 3 carregada - confirmação do ECOSPORT detectada!")
         
         salvar_estado_tela(driver, 3, "confirmacao_ecosport", None)
         
         if not aguardar_carregamento_pagina(driver, 30):
-            print("❌ Erro: Página não carregou completamente")
+            exibir_mensagem("❌ Erro: Página não carregou completamente")
             return False
         
         salvar_estado_tela(driver, 3, "confirmacao_carregada", None)
         
         # Selecionar "Sim" para confirmação do veículo
-        print("⏳ Selecionando 'Sim' para confirmação do veículo...")
+        exibir_mensagem("⏳ Selecionando 'Sim' para confirmação do veículo...")
         
         if not clicar_radio_via_javascript(driver, "Sim", "Sim para confirmação"):
-            print("⚠️ Radio 'Sim' não encontrado - tentando prosseguir...")
+            exibir_mensagem("⚠️ Radio 'Sim' não encontrado - tentando prosseguir...")
         
         # Clicar em Continuar
-        print("⏳ Aguardando botão Continuar aparecer...")
+        exibir_mensagem("⏳ Aguardando botão Continuar aparecer...")
         
         if not clicar_com_delay_extremo(driver, By.XPATH, "//button[contains(., 'Continuar')]", "botão Continuar Tela 3"):
-            print("❌ Erro: Falha ao clicar Continuar na Tela 3")
+            exibir_mensagem("❌ Erro: Falha ao clicar Continuar na Tela 3")
             return False
         
         if not aguardar_dom_estavel(driver, 60):
-            print("⚠️ Página pode não ter carregado completamente")
+            exibir_mensagem("⚠️ Página pode não ter carregado completamente")
         
         aguardar_estabilizacao(driver)
         salvar_estado_tela(driver, 3, "apos_continuar", None)
         
     except Exception as e:
-        print(f"⚠️ Erro na confirmação Tela 3: {e} - tentando prosseguir...")
+        exibir_mensagem(f"⚠️ Erro na confirmação Tela 3: {e} - tentando prosseguir...")
     
     # TELA 4: Veículo já está segurado?
-    print("\n📱 TELA 4: Veículo já está segurado?")
+    exibir_mensagem("\n📱 TELA 4: Veículo já está segurado?")
     
     try:
         # Aguardar elementos da pergunta sobre veículo segurado
         WebDriverWait(driver, 20).until(
             EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'segurado') or contains(text(), 'Segurado')]"))
         )
-        print("✅ Tela 4 carregada - pergunta sobre veículo segurado detectada!")
+        exibir_mensagem("✅ Tela 4 carregada - pergunta sobre veículo segurado detectada!")
         
         salvar_estado_tela(driver, 4, "inicial", None)
         
         if not aguardar_carregamento_pagina(driver, 30):
-            print("❌ Erro: Página não carregou completamente")
+            exibir_mensagem("❌ Erro: Página não carregou completamente")
             return False
         
         salvar_estado_tela(driver, 4, "pergunta_carregada", None)
         
         # Selecionar "Não" para veículo já segurado
-        print("⏳ Selecionando 'Não' para veículo já segurado...")
+        exibir_mensagem("⏳ Selecionando 'Não' para veículo já segurado...")
         
         if not clicar_radio_via_javascript(driver, "Não", "Não para veículo segurado"):
-            print("⚠️ Radio 'Não' não encontrado - tentando prosseguir...")
+            exibir_mensagem("⚠️ Radio 'Não' não encontrado - tentando prosseguir...")
         
         # Clicar em Continuar
-        print("⏳ Aguardando botão Continuar aparecer...")
+        exibir_mensagem("⏳ Aguardando botão Continuar aparecer...")
         
-        if not clicar_com_delay_extremo(driver, By.XPATH, "//button[contains(., 'Continuar')]", "botão Continuar Tela 4"):
-            print("❌ Erro: Falha ao clicar Continuar na Tela 4")
+        if not clicar_com_delay_extremo(driver, By.XPATH, "//button[contains(., 'Continuar')]", "botão Continuar Tela 5"):
+            exibir_mensagem("❌ Erro: Falha ao clicar Continuar na Tela 4")
             return False
         
         if not aguardar_dom_estavel(driver, 60):
-            print("⚠️ Página pode não ter carregado completamente")
+            exibir_mensagem("⚠️ Página pode não ter carregado completamente")
         
         aguardar_estabilizacao(driver)
         salvar_estado_tela(driver, 4, "apos_continuar", None)
         
     except Exception as e:
-        print(f"⚠️ Erro na Tela 4: {e} - tentando prosseguir...")
+        exibir_mensagem(f"⚠️ Erro na Tela 4: {e} - tentando prosseguir...")
     
     # TELA 5: Estimativa inicial
-    print("\n📱 TELA 5: Estimativa inicial...")
+    exibir_mensagem("\n📱 TELA 5: Estimativa inicial...")
     
     try:
         # Aguardar elementos da estimativa inicial
         WebDriverWait(driver, 20).until(
             EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'estimativa') or contains(text(), 'inicial') or contains(text(), 'carrossel') or contains(text(), 'cobertura')]"))
         )
-        print("✅ Tela 5 carregada - estimativa inicial detectada!")
+        exibir_mensagem("✅ Tela 5 carregada - estimativa inicial detectada!")
         
         salvar_estado_tela(driver, 5, "inicial", None)
         
         if not aguardar_carregamento_pagina(driver, 30):
-            print("❌ Erro: Página não carregou completamente")
+            exibir_mensagem("❌ Erro: Página não carregou completamente")
             return False
         
         salvar_estado_tela(driver, 5, "estimativa_carregada", None)
         
         # Clicar em Continuar
-        print("⏳ Aguardando botão Continuar aparecer...")
+        exibir_mensagem("⏳ Aguardando botão Continuar aparecer...")
         
         if not clicar_com_delay_extremo(driver, By.XPATH, "//button[contains(., 'Continuar')]", "botão Continuar Tela 5"):
-            print("❌ Erro: Falha ao clicar Continuar na Tela 5")
+            exibir_mensagem("❌ Erro: Falha ao clicar Continuar na Tela 5")
             return False
         
         if not aguardar_dom_estavel(driver, 60):
-            print("⚠️ Página pode não ter carregado completamente")
+            exibir_mensagem("⚠️ Página pode não ter carregado completamente")
         
         aguardar_estabilizacao(driver)
         salvar_estado_tela(driver, 5, "apos_continuar", None)
         
     except Exception as e:
-        print(f"⚠️ Erro na Tela 5: {e} - tentando prosseguir...")
+        exibir_mensagem(f"⚠️ Erro na Tela 5: {e} - tentando prosseguir...")
     
     exibir_mensagem("✅ **NAVEGAÇÃO ATÉ TELA 5 CONCLUÍDA!**")
     return True
@@ -1970,46 +1970,46 @@ def implementar_tela6(driver, parametros):
         WebDriverWait(driver, 20).until(
             EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'combustível') or contains(text(), 'Combustível') or contains(text(), 'Flex') or contains(text(), 'Gasolina')]"))
         )
-        print("✅ Tela 6 carregada - tipo de combustível detectado!")
+        exibir_mensagem("✅ Tela 6 carregada - tipo de combustível detectado!")
         
         salvar_estado_tela(driver, 6, "inicial", None)
         
         if not aguardar_carregamento_pagina(driver, 30):
-            print("❌ Erro: Página não carregou completamente")
+            exibir_mensagem("❌ Erro: Página não carregou completamente")
             return False
         
         salvar_estado_tela(driver, 6, "combustivel_carregado", None)
         
         # Selecionar "Flex" como tipo de combustível
-        print("⏳ Selecionando 'Flex' como tipo de combustível...")
+        exibir_mensagem("⏳ Selecionando 'Flex' como tipo de combustível...")
         
         if not clicar_radio_via_javascript(driver, "Flex", "Flex como combustível"):
-            print("⚠️ Radio 'Flex' não encontrado - tentando prosseguir...")
+            exibir_mensagem("⚠️ Radio 'Flex' não encontrado - tentando prosseguir...")
         
         # Selecionar checkboxes se disponíveis
-        print("⏳ Verificando checkboxes disponíveis...")
+        exibir_mensagem("⏳ Verificando checkboxes disponíveis...")
         
         # Kit Gás (se disponível)
         if not clicar_checkbox_via_javascript(driver, "kit gas", "Kit Gás"):
-            print("⚠️ Checkbox Kit Gás não encontrado")
+            exibir_mensagem("⚠️ Checkbox Kit Gás não encontrado")
         
         # Blindado (se disponível)
         if not clicar_checkbox_via_javascript(driver, "blindado", "Blindado"):
-            print("⚠️ Checkbox Blindado não encontrado")
+            exibir_mensagem("⚠️ Checkbox Blindado não encontrado")
         
         # Financiado (se disponível)
         if not clicar_checkbox_via_javascript(driver, "financiado", "Financiado"):
-            print("⚠️ Checkbox Financiado não encontrado")
+            exibir_mensagem("⚠️ Checkbox Financiado não encontrado")
         
         # Clicar em Continuar
-        print("⏳ Aguardando botão Continuar aparecer...")
+        exibir_mensagem("⏳ Aguardando botão Continuar aparecer...")
         
         if not clicar_com_delay_extremo(driver, By.XPATH, "//button[contains(., 'Continuar')]", "botão Continuar Tela 6"):
-            print("❌ Erro: Falha ao clicar Continuar na Tela 6")
+            exibir_mensagem("❌ Erro: Falha ao clicar Continuar na Tela 6")
             return False
         
         if not aguardar_dom_estavel(driver, 60):
-            print("⚠️ Página pode não ter carregado completamente")
+            exibir_mensagem("⚠️ Página pode não ter carregado completamente")
         
         aguardar_estabilizacao(driver)
         salvar_estado_tela(driver, 6, "apos_continuar", None)
@@ -2017,7 +2017,7 @@ def implementar_tela6(driver, parametros):
         return True
         
     except Exception as e:
-        print(f"❌ Erro na Tela 6: {e}")
+        exibir_mensagem(f"❌ Erro na Tela 6: {e}")
         return False
 
 def implementar_tela7(driver, parametros):
@@ -2067,18 +2067,18 @@ def implementar_tela7(driver, parametros):
         WebDriverWait(driver, 20).until(
             EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'endereço') or contains(text(), 'Endereço') or contains(text(), 'CEP') or contains(text(), 'cep')]"))
         )
-        print("✅ Tela 7 carregada - endereço de pernoite detectado!")
+        exibir_mensagem("✅ Tela 7 carregada - endereço de pernoite detectado!")
         
         salvar_estado_tela(driver, 7, "inicial", None)
         
         if not aguardar_carregamento_pagina(driver, 30):
-            print("❌ Erro: Página não carregou completamente")
+            exibir_mensagem("❌ Erro: Página não carregou completamente")
             return False
         
         salvar_estado_tela(driver, 7, "endereco_carregado", None)
         
         # Inserir CEP
-        print("⏳ Inserindo CEP...")
+        exibir_mensagem("⏳ Inserindo CEP...")
         
         # Tentar diferentes seletores para o campo CEP
         cep_campo = None
@@ -2092,16 +2092,16 @@ def implementar_tela7(driver, parametros):
                     EC.presence_of_element_located((By.CSS_SELECTOR, "input[type='text']"))
                 )
             except:
-                print("⚠️ Campo CEP não encontrado - tentando prosseguir...")
+                exibir_mensagem("⚠️ Campo CEP não encontrado - tentando prosseguir...")
         
         if cep_campo:
             cep_campo.clear()
             aguardar_estabilizacao(driver, 1)  # Aguardar estabilização após limpar CEP
             cep_campo.send_keys(parametros["cep"])
-            print(f"✅ CEP preenchido: {parametros['cep']}")
+            exibir_mensagem(f"✅ CEP preenchido: {parametros['cep']}")
         
         # Aguardar sugestão e selecionar
-        print("⏳ Aguardando sugestão de endereço...")
+        exibir_mensagem("⏳ Aguardando sugestão de endereço...")
         aguardar_estabilizacao(driver, 5)  # Aguardar estabilização para sugestão aparecer
         
         # Selecionar sugestão se disponível
@@ -2110,18 +2110,18 @@ def implementar_tela7(driver, parametros):
                 EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'Rua Santa') or contains(text(), 'São Paulo')]"))
             )
             sugestao.click()
-            print("✅ Sugestão de endereço selecionada")
+            exibir_mensagem("✅ Sugestão de endereço selecionada")
         except:
-            print("⚠️ Sugestão não encontrada - tentando prosseguir...")
+            exibir_mensagem("⚠️ Sugestão não encontrada - tentando prosseguir...")
         
         # Clicar em Continuar
-        print("⏳ Aguardando botão Continuar aparecer...")
+        exibir_mensagem("⏳ Aguardando botão Continuar aparecer...")
         if not clicar_com_delay_extremo(driver, By.XPATH, "//button[contains(., 'Continuar')]", "botão Continuar Tela 7"):
-            print("❌ Erro: Falha ao clicar Continuar na Tela 7")
+            exibir_mensagem("❌ Erro: Falha ao clicar Continuar na Tela 7")
             return False
         
         if not aguardar_dom_estavel(driver, 60):
-            print("⚠️ Página pode não ter carregado completamente")
+            exibir_mensagem("⚠️ Página pode não ter carregado completamente")
         
         aguardar_estabilizacao(driver)
         salvar_estado_tela(driver, 7, "apos_continuar", None)
@@ -2129,7 +2129,7 @@ def implementar_tela7(driver, parametros):
         return True
         
     except Exception as e:
-        print(f"❌ Erro na Tela 7: {e}")
+        exibir_mensagem(f"❌ Erro na Tela 7: {e}")
         return False
 
 def implementar_tela8(driver, parametros):
@@ -2179,31 +2179,31 @@ def implementar_tela8(driver, parametros):
         WebDriverWait(driver, 20).until(
             EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'finalidade') or contains(text(), 'Finalidade') or contains(text(), 'uso') or contains(text(), 'Uso') or contains(text(), 'veículo')]"))
         )
-        print("✅ Tela 8 carregada - finalidade do veículo detectada!")
+        exibir_mensagem("✅ Tela 8 carregada - finalidade do veículo detectada!")
         
         salvar_estado_tela(driver, 8, "inicial", None)
         
         if not aguardar_carregamento_pagina(driver, 30):
-            print("❌ Erro: Página não carregou completamente")
+            exibir_mensagem("❌ Erro: Página não carregou completamente")
             return False
         
         salvar_estado_tela(driver, 8, "finalidade_carregada", None)
         
         # Selecionar "Pessoal" como finalidade do veículo
-        print("⏳ Selecionando 'Pessoal' como finalidade do veículo...")
+        exibir_mensagem("⏳ Selecionando 'Pessoal' como finalidade do veículo...")
         
         if not clicar_radio_via_javascript(driver, "Pessoal", "Pessoal como finalidade"):
-            print("⚠️ Radio 'Pessoal' não encontrado - tentando prosseguir...")
+            exibir_mensagem("⚠️ Radio 'Pessoal' não encontrado - tentando prosseguir...")
         
         # Clicar em Continuar (usar ID específico da Tela 8)
-        print("⏳ Aguardando botão Continuar aparecer...")
+        exibir_mensagem("⏳ Aguardando botão Continuar aparecer...")
         
         if not clicar_com_delay_extremo(driver, By.ID, "gtm-telaUsoVeiculoContinuar", "botão Continuar Tela 8"):
-            print("❌ Erro: Falha ao clicar Continuar na Tela 8")
+            exibir_mensagem("❌ Erro: Falha ao clicar Continuar na Tela 8")
             return False
         
         if not aguardar_dom_estavel(driver, 60):
-            print("⚠️ Página pode não ter carregado completamente")
+            exibir_mensagem("⚠️ Página pode não ter carregado completamente")
         
         aguardar_estabilizacao(driver)
         salvar_estado_tela(driver, 8, "apos_continuar", None)
@@ -2211,7 +2211,7 @@ def implementar_tela8(driver, parametros):
         return True
         
     except Exception as e:
-        print(f"❌ Erro na Tela 8: {e}")
+        exibir_mensagem(f"❌ Erro na Tela 8: {e}")
         return False
 
 def implementar_tela9(driver, parametros):
@@ -2273,55 +2273,55 @@ def implementar_tela9(driver, parametros):
         WebDriverWait(driver, 20).until(
             EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'dados pessoais') or contains(text(), 'Dados pessoais')]"))
         )
-        print("✅ Tela 9 carregada - dados pessoais detectados!")
+        exibir_mensagem("✅ Tela 9 carregada - dados pessoais detectados!")
         
         salvar_estado_tela(driver, 9, "inicial", None)
         
         if not aguardar_carregamento_pagina(driver, 30):
-            print("❌ Erro: Página não carregou completamente")
+            exibir_mensagem("❌ Erro: Página não carregou completamente")
             return False
         
         salvar_estado_tela(driver, 9, "dados_pessoais_carregada", None)
         
         # 1. Preencher Nome Completo
-        print("⏳ Preenchendo Nome Completo...")
+        exibir_mensagem("⏳ Preenchendo Nome Completo...")
         nome_element = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.ID, "nomeTelaSegurado"))
         )
         nome_element.clear()
         nome_element.send_keys(parametros["nome"])
-        print(f"✅ Nome preenchido: {parametros['nome']}")
+        exibir_mensagem(f"✅ Nome preenchido: {parametros['nome']}")
         
         # 2. Preencher CPF
-        print("⏳ Preenchendo CPF...")
+        exibir_mensagem("⏳ Preenchendo CPF...")
         cpf_element = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.ID, "cpfTelaSegurado"))
         )
         cpf_element.clear()
         cpf_element.send_keys(parametros["cpf"])
-        print(f"✅ CPF preenchido: {parametros['cpf']}")
+        exibir_mensagem(f"✅ CPF preenchido: {parametros['cpf']}")
         
         # 3. Preencher Data de Nascimento
-        print("⏳ Preenchendo Data de Nascimento...")
+        exibir_mensagem("⏳ Preenchendo Data de Nascimento...")
         data_element = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.ID, "dataNascimentoTelaSegurado"))
         )
         data_element.clear()
         data_element.send_keys(parametros["data_nascimento"])
-        print(f"✅ Data de nascimento preenchida: {parametros['data_nascimento']}")
+        exibir_mensagem(f"✅ Data de nascimento preenchida: {parametros['data_nascimento']}")
         
         # 4. Selecionar Sexo
-        print("⏳ Selecionando Sexo...")
+        exibir_mensagem("⏳ Selecionando Sexo...")
         if not clicar_radio_via_javascript(driver, parametros["sexo"], f"Sexo {parametros['sexo']}"):
-            print(f"⚠️ Radio '{parametros['sexo']}' não encontrado - tentando prosseguir...")
+            exibir_mensagem(f"⚠️ Radio '{parametros['sexo']}' não encontrado - tentando prosseguir...")
         
         # 5. Selecionar Estado Civil
-        print("⏳ Selecionando Estado Civil...")
+        exibir_mensagem("⏳ Selecionando Estado Civil...")
         if not clicar_radio_via_javascript(driver, parametros["estado_civil"], f"Estado Civil {parametros['estado_civil']}"):
-            print(f"⚠️ Radio '{parametros['estado_civil']}' não encontrado - tentando prosseguir...")
+            exibir_mensagem(f"⚠️ Radio '{parametros['estado_civil']}' não encontrado - tentando prosseguir...")
         
         # 6. Preencher Email
-        print("⏳ Preenchendo Email...")
+        exibir_mensagem("⏳ Preenchendo Email...")
         # Tentar encontrar campo de email por diferentes seletores
         email_selectors = [
             "//input[@type='email']",
@@ -2340,25 +2340,25 @@ def implementar_tela9(driver, parametros):
         if email_element:
             email_element.clear()
             email_element.send_keys(parametros["email"])
-            print(f"✅ Email preenchido: {parametros['email']}")
+            exibir_mensagem(f"✅ Email preenchido: {parametros['email']}")
         else:
-            print("⚠️ Campo de email não encontrado - tentando prosseguir...")
+            exibir_mensagem("⚠️ Campo de email não encontrado - tentando prosseguir...")
         
         # 7. Preencher Celular
-        print("⏳ Preenchendo Celular...")
+        exibir_mensagem("⏳ Preenchendo Celular...")
         celular_element = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.ID, "celularTelaSegurado"))
         )
         celular_element.clear()
         celular_element.send_keys(parametros["celular"])
-        print(f"✅ Celular preenchido: {parametros['celular']}")
+        exibir_mensagem(f"✅ Celular preenchido: {parametros['celular']}")
         
         # Aguardar estabilização antes de continuar
         aguardar_estabilizacao(driver, 5)  # Aguardar estabilização após preencher campos
         salvar_estado_tela(driver, 9, "campos_preenchidos", None)
         
         # Clicar em Continuar
-        print("⏳ Aguardando botão Continuar aparecer...")
+        exibir_mensagem("⏳ Aguardando botão Continuar aparecer...")
         
         # Tentar diferentes seletores para o botão Continuar
         continuar_selectors = [
@@ -2375,17 +2375,17 @@ def implementar_tela9(driver, parametros):
                 )
                 driver.execute_script("arguments[0].click();", continuar_element)
                 continuar_clicado = True
-                print("✅ Botão Continuar clicado com sucesso!")
+                exibir_mensagem("✅ Botão Continuar clicado com sucesso!")
                 break
             except (TimeoutException, NoSuchElementException):
                 continue
         
         if not continuar_clicado:
-            print("❌ Erro: Falha ao clicar Continuar na Tela 9")
+            exibir_mensagem("❌ Erro: Falha ao clicar Continuar na Tela 9")
             return False
         
         if not aguardar_dom_estavel(driver, 60):
-            print("⚠️ Página pode não ter carregado completamente")
+            exibir_mensagem("⚠️ Página pode não ter carregado completamente")
         
         aguardar_estabilizacao(driver)
         salvar_estado_tela(driver, 9, "apos_continuar", None)
@@ -2393,7 +2393,7 @@ def implementar_tela9(driver, parametros):
         return True
         
     except Exception as e:
-        print(f"❌ Erro na Tela 9: {e}")
+        exibir_mensagem(f"❌ Erro na Tela 9: {e}")
         return False
 
 def executar_todas_telas(json_string):
