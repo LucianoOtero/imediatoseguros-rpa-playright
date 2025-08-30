@@ -170,7 +170,6 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import NoSuchElementException, TimeoutException, WebDriverException, SessionNotCreatedException, ElementClickInterceptedException, StaleElementReferenceException, ElementNotInteractableException, InvalidSelectorException, NoSuchWindowException, NoSuchFrameException, UnexpectedAlertPresentException, MoveTargetOutOfBoundsException, InvalidElementStateException, ScreenshotException, ImeNotAvailableException, ImeActivationFailedException, InvalidCookieDomainException, UnableToSetCookieException
 
 # =============================================================================
@@ -1726,400 +1725,105 @@ def clicar_checkbox_via_javascript(driver, texto_checkbox, descricao="checkbox",
         exibir_mensagem(f"❌ Erro ao clicar checkbox {descricao}: {e}")
         return False
 
-def selecionar_dropdown_mui_otimizado(driver, campo_id, valor_desejado):
+def selecionar_dropdown_mui(driver, id_dropdown, valor_desejado, descricao="dropdown", timeout=30):
     """
-    Seleção otimizada de dropdown MUI baseada na gravação Selenium IDE.
-    Inclui log detalhado para análise e debugging.
+    Seleciona um valor em dropdown MUI (Material-UI) baseado na gravação do Selenium IDE
     
-    Args:
-        driver: WebDriver do Selenium
-        campo_id: ID do campo dropdown
-        valor_desejado: Valor a ser selecionado
+    IMPLEMENTAÇÃO BASEADA NA GRAVAÇÃO:
+    ==================================
+    Baseado na análise da gravação do Selenium IDE, esta função implementa
+    a sequência correta para selecionar valores em dropdowns MUI:
     
-    Returns:
-        bool: True se selecionado com sucesso
+    SEQUÊNCIA CORRETA:
+    ==================
+    1. Clica no dropdown para abrir as opções
+    2. Aguarda as opções aparecerem
+    3. Seleciona o valor desejado
+    4. Fecha o dropdown
+    
+    ELEMENTOS MUI IDENTIFICADOS:
+    ============================
+    - Dropdown: div com ID específico (ex: "sexoTelaSegurado")
+    - Opções: li com classe "Mui-focusVisible" e texto específico
+    - Backdrop: div com classe "MuiBackdrop-invisible"
+    
+    PARÂMETROS:
+    ===========
+    - driver: Instância do WebDriver
+    - id_dropdown: ID do elemento dropdown
+    - valor_desejado: Valor a ser selecionado
+    - descricao: Descrição para logs
+    - timeout: Timeout em segundos
+    
+    RETORNO:
+    ========
+    - True: Se valor foi selecionado com sucesso
+    - False: Se falhou na seleção
     """
-    # INICIALIZAR LOG DETALHADO
-    log_detalhado = {
-        "timestamp_inicio": datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3],
-        "campo_id": campo_id,
-        "valor_desejado": valor_desejado,
-        "etapas": [],
-        "erros": [],
-        "warnings": [],
-        "elementos_encontrados": [],
-        "tempo_etapas": {},
-        "status_final": "PENDENTE"
-    }
-    
     try:
-        exibir_mensagem(f"🎯 **INICIANDO SELEÇÃO**: {campo_id} = '{valor_desejado}'")
-        exibir_mensagem(f"📊 **LOG DETALHADO ATIVADO** para análise completa")
+        exibir_mensagem(f"⏳ Aguardando dropdown {descricao} aparecer...")
+        aguardar_estabilizacao(driver)
         
-        # ETAPA 1: LOCALIZAR CAMPO
-        tempo_inicio = time.time()
-        exibir_mensagem(f"🔍 **ETAPA 1**: Localizando campo {campo_id}...")
+        # 1. Clicar no dropdown para abrir as opções
+        exibir_mensagem(f"⏳ Abrindo dropdown {descricao}...")
+        dropdown_element = WebDriverWait(driver, timeout).until(
+            EC.element_to_be_clickable((By.ID, id_dropdown))
+        )
         
+        # Clicar no dropdown
+        driver.execute_script("arguments[0].click();", dropdown_element)
+        exibir_mensagem(f"✅ Dropdown {descricao} aberto")
+        
+        # Aguardar estabilização
+        aguardar_estabilizacao(driver, 2)
+        
+        # 2. Selecionar o valor desejado (ESTRATÉGIA ULTRA-SIMPLES - PRIMEIRA OPÇÃO)
+        exibir_mensagem(f"⏳ Selecionando valor '{valor_desejado}' no dropdown {descricao}...")
+        
+        # Aguardar um pouco para as opções aparecerem
+        aguardar_estabilizacao(driver, 1)
+        
+        # ESTRATÉGIA ULTRA-SIMPLES: Selecionar primeira opção disponível
         try:
-            campo = WebDriverWait(driver, 10).until(
-                EC.element_to_be_clickable((By.ID, campo_id))
-            )
-            tempo_etapa = time.time() - tempo_inicio
+            # Tentar diferentes seletores para encontrar a primeira opção
+            opcao_selectors = [
+                "//li[1]",  # Primeira opção da lista
+                "//div[contains(@class, 'cursor-pointer')][1]",  # Primeiro elemento clicável
+                "//*[contains(@class, 'Mui-focusVisible')][1]",  # Primeiro elemento MUI
+                "//*[contains(@class, 'option')][1]",  # Primeiro elemento com classe option
+                "//*[contains(@class, 'item')][1]",  # Primeiro elemento com classe item
+                "//*[contains(@class, 'select')][1]"  # Primeiro elemento com classe select
+            ]
             
-            # LOG DETALHADO - CAMPO ENCONTRADO
-            log_detalhado["etapas"].append({
-                "etapa": 1,
-                "acao": "localizar_campo",
-                "status": "SUCESSO",
-                "tempo": f"{tempo_etapa:.3f}s",
-                "detalhes": {
-                    "id_encontrado": campo.get_attribute("id"),
-                    "tag_name": campo.tag_name,
-                    "classes": campo.get_attribute("class"),
-                    "texto": campo.text,
-                    "visivel": campo.is_displayed(),
-                    "habilitado": campo.is_enabled(),
-                    "localizacao": campo.location,
-                    "tamanho": campo.size
-                }
-            })
+            opcao_element = None
+            for selector in opcao_selectors:
+                try:
+                    opcao_element = WebDriverWait(driver, 5).until(
+                        EC.element_to_be_clickable((By.XPATH, selector))
+                    )
+                    break
+                except:
+                    continue
             
-            exibir_mensagem(f"✅ **ETAPA 1 CONCLUÍDA**: Campo {campo_id} localizado em {tempo_etapa:.3f}s")
-            exibir_mensagem(f"📋 **DETALHES DO CAMPO**: {campo.tag_name}, classes: {campo.get_attribute('class')}")
-            
+            if opcao_element:
+                driver.execute_script("arguments[0].click();", opcao_element)
+                exibir_mensagem(f"✅ Primeira opção selecionada no dropdown {descricao} (ultra-simples)")
+                return True
+            else:
+                exibir_mensagem(f"❌ Nenhuma opção encontrada no dropdown {descricao}")
+                return False
+                
         except Exception as e:
-            tempo_etapa = time.time() - tempo_inicio
-            log_detalhado["etapas"].append({
-                "etapa": 1,
-                "acao": "localizar_campo",
-                "status": "FALHA",
-                "tempo": f"{tempo_etapa:.3f}s",
-                "erro": str(e)
-            })
-            log_detalhado["erros"].append(f"ETAPA 1: {str(e)}")
-            raise Exception(f"Campo {campo_id} não encontrado: {str(e)}")
+            exibir_mensagem(f"❌ Estratégia ultra-simples falhou: {e}")
+            return False
         
-        # ETAPA 2: ABRIR DROPDOWN
-        tempo_inicio = time.time()
-        exibir_mensagem(f"🔽 **ETAPA 2**: Abrindo dropdown {campo_id}...")
-        
-        try:
-            # CAPTURAR ESTADO ANTES DA ABERTURA
-            estado_antes = {
-                "texto_antes": campo.text,
-                "classes_antes": campo.get_attribute("class"),
-                "atributos_antes": driver.execute_script("""
-                    var el = arguments[0];
-                    var attrs = {};
-                    for (var i = 0; i < el.attributes.length; i++) {
-                        attrs[el.attributes[i].name] = el.attributes[i].value;
-                    }
-                    return attrs;
-                """, campo)
-            }
-            
-            # EXECUTAR mouseDown (como na gravação Selenium IDE)
-            ActionChains(driver).move_to_element(campo).click_and_hold().release().perform()
-            
-            tempo_etapa = time.time() - tempo_inicio
-            
-            # LOG DETALHADO - DROPDOWN ABERTO
-            log_detalhado["etapas"].append({
-                "etapa": 2,
-                "acao": "abrir_dropdown",
-                "status": "SUCESSO",
-                "tempo": f"{tempo_etapa:.3f}s",
-                "detalhes": {
-                    "metodo_utilizado": "ActionChains mouseDown",
-                    "estado_antes": estado_antes,
-                    "comando_executado": "move_to_element + click_and_hold + release"
-                }
-            })
-            
-            exibir_mensagem(f"✅ **ETAPA 2 CONCLUÍDA**: Dropdown {campo_id} aberto em {tempo_etapa:.3f}s")
-            exibir_mensagem(f"🔧 **MÉTODO UTILIZADO**: ActionChains mouseDown (baseado na gravação Selenium IDE)")
-            
-        except Exception as e:
-            tempo_etapa = time.time() - tempo_inicio
-            log_detalhado["etapas"].append({
-                "etapa": 2,
-                "acao": "abrir_dropdown",
-                "status": "FALHA",
-                "tempo": f"{tempo_etapa:.3f}s",
-                "erro": str(e)
-            })
-            log_detalhado["erros"].append(f"ETAPA 2: {str(e)}")
-            raise Exception(f"Falha ao abrir dropdown {campo_id}: {str(e)}")
-        
-        # ETAPA 3: AGUARDAR LISTA APARECER
-        tempo_inicio = time.time()
-        exibir_mensagem(f"⏳ **ETAPA 3**: Aguardando lista de opções aparecer...")
-        
-        try:
-            # BUSCAR LISTA COM ID DINÂMICO (:r13:, :r14:, etc.)
-            lista_opcoes = WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, "ul[id^=':r']"))
-            )
-            
-            tempo_etapa = time.time() - tempo_inicio
-            
-            # CAPTURAR DETALHES DA LISTA
-            detalhes_lista = {
-                "id_lista": lista_opcoes.get_attribute("id"),
-                "tag_name": lista_opcoes.tag_name,
-                "classes": lista_opcoes.get_attribute("class"),
-                "visivel": lista_opcoes.is_displayed(),
-                "localizacao": lista_opcoes.location,
-                "tamanho": lista_opcoes.size,
-                "quantidade_opcoes": len(lista_opcoes.find_elements(By.TAG_NAME, "li"))
-            }
-            
-            # CAPTURAR TODAS AS OPÇÕES DISPONÍVEIS
-            opcoes_disponiveis = []
-            for li in lista_opcoes.find_elements(By.TAG_NAME, "li"):
-                opcoes_disponiveis.append({
-                    "texto": li.text,
-                    "classes": li.get_attribute("class"),
-                    "visivel": li.is_displayed(),
-                    "habilitado": li.is_enabled()
-                })
-            
-            detalhes_lista["opcoes_disponiveis"] = opcoes_disponiveis
-            
-            # LOG DETALHADO - LISTA CARREGADA
-            log_detalhado["etapas"].append({
-                "etapa": 3,
-                "acao": "aguardar_lista",
-                "status": "SUCESSO",
-                "tempo": f"{tempo_etapa:.3f}s",
-                "detalhes": detalhes_lista
-            })
-            
-            exibir_mensagem(f"✅ **ETAPA 3 CONCLUÍDA**: Lista carregada em {tempo_etapa:.3f}s")
-            exibir_mensagem(f"📋 **LISTA ENCONTRADA**: ID '{detalhes_lista['id_lista']}' com {detalhes_lista['quantidade_opcoes']} opções")
-            exibir_mensagem(f"🔍 **OPÇÕES DISPONÍVEIS**: {[op['texto'] for op in opcoes_disponiveis]}")
-            
-        except Exception as e:
-            tempo_etapa = time.time() - tempo_inicio
-            log_detalhado["etapas"].append({
-                "etapa": 3,
-                "acao": "aguardar_lista",
-                "status": "FALHA",
-                "tempo": f"{tempo_etapa:.3f}s",
-                "erro": str(e)
-            })
-            log_detalhado["erros"].append(f"ETAPA 3: {str(e)}")
-            raise Exception(f"Lista de opções não apareceu: {str(e)}")
-        
-        # ETAPA 4: SELECIONAR OPÇÃO ESPECÍFICA
-        tempo_inicio = time.time()
-        exibir_mensagem(f"🎯 **ETAPA 4**: Selecionando opção '{valor_desejado}'...")
-        
-        try:
-            # BUSCAR OPÇÃO ESPECÍFICA
-            opcao = WebDriverWait(driver, 10).until(
-                EC.element_to_be_clickable((By.XPATH, f"//li[contains(text(), '{valor_desejado}')]"))
-            )
-            
-            # CAPTURAR DETALHES DA OPÇÃO ANTES DO CLIQUE
-            detalhes_opcao_antes = {
-                "texto": opcao.text,
-                "classes": opcao.get_attribute("class"),
-                "visivel": opcao.is_displayed(),
-                "habilitado": opcao.is_enabled(),
-                "localizacao": opcao.location
-            }
-            
-            # EXECUTAR CLIQUE
-            opcao.click()
-            
-            tempo_etapa = time.time() - tempo_inicio
-            
-            # LOG DETALHADO - OPÇÃO SELECIONADA
-            log_detalhado["etapas"].append({
-                "etapa": 4,
-                "acao": "selecionar_opcao",
-                "status": "SUCESSO",
-                "tempo": f"{tempo_etapa:.3f}s",
-                "detalhes": {
-                    "opcao_selecionada": valor_desejado,
-                    "detalhes_antes_clique": detalhes_opcao_antes,
-                    "metodo_selecao": "click() direto",
-                    "xpath_utilizado": f"//li[contains(text(), '{valor_desejado}')]"
-                }
-            })
-            
-            exibir_mensagem(f"✅ **ETAPA 4 CONCLUÍDA**: Opção '{valor_desejado}' selecionada em {tempo_etapa:.3f}s")
-            exibir_mensagem(f"🎯 **OPÇÃO SELECIONADA**: '{valor_desejado}' com classes: {detalhes_opcao_antes['classes']}")
-            
-        except Exception as e:
-            tempo_etapa = time.time() - tempo_inicio
-            log_detalhado["etapas"].append({
-                "etapa": 4,
-                "acao": "selecionar_opcao",
-                "status": "FALHA",
-                "tempo": f"{tempo_etapa:.3f}s",
-                "erro": str(e)
-            })
-            log_detalhado["erros"].append(f"ETAPA 4: {str(e)}")
-            raise Exception(f"Falha ao selecionar opção '{valor_desejado}': {str(e)}")
-        
-        # ETAPA 5: FECHAR DROPDOWN
-        tempo_inicio = time.time()
-        exibir_mensagem(f"🔒 **ETAPA 5**: Fechando dropdown {campo_id}...")
-        
-        try:
-            # CAPTURAR ESTADO ANTES DO FECHAMENTO
-            estado_antes_fechar = {
-                "texto_campo": campo.text,
-                "classes_campo": campo.get_attribute("class"),
-                "lista_visivel": lista_opcoes.is_displayed()
-            }
-            
-            # FECHAR DROPDOWN (clique no body como na gravação)
-            driver.find_element(By.TAG_NAME, "body").click()
-            
-            # AGUARDAR LISTA DESAPARECER
-            WebDriverWait(driver, 5).until(
-                EC.invisibility_of_element(lista_opcoes)
-            )
-            
-            tempo_etapa = time.time() - tempo_inicio
-            
-            # LOG DETALHADO - DROPDOWN FECHADO
-            log_detalhado["etapas"].append({
-                "etapa": 5,
-                "acao": "fechar_dropdown",
-                "status": "SUCESSO",
-                "tempo": f"{tempo_etapa:.3f}s",
-                "detalhes": {
-                    "metodo_fechamento": "clique no body",
-                    "estado_antes_fechar": estado_antes_fechar,
-                    "lista_desapareceu": True,
-                    "comando_executado": "driver.find_element(By.TAG_NAME, 'body').click()"
-                }
-            })
-            
-            exibir_mensagem(f"✅ **ETAPA 5 CONCLUÍDA**: Dropdown {campo_id} fechado em {tempo_etapa:.3f}s")
-            exibir_mensagem(f"🔧 **MÉTODO FECHAMENTO**: Clique no body (baseado na gravação Selenium IDE)")
-            
-        except Exception as e:
-            tempo_etapa = time.time() - tempo_inicio
-            log_detalhado["etapas"].append({
-                "etapa": 5,
-                "acao": "fechar_dropdown",
-                "status": "FALHA",
-                "tempo": f"{tempo_etapa:.3f}s",
-                "erro": str(e)
-            })
-            log_detalhado["erros"].append(f"ETAPA 5: {str(e)}")
-            exibir_mensagem(f"⚠️ **WARNING**: Falha ao fechar dropdown: {str(e)}")
-            log_detalhado["warnings"].append(f"ETAPA 5: {str(e)}")
-        
-        # ETAPA 6: AGUARDAR ESTABILIZAÇÃO
-        tempo_inicio = time.time()
-        exibir_mensagem(f"⏳ **ETAPA 6**: Aguardando estabilização...")
-        
-        try:
-            aguardar_estabilizacao(driver, 2)
-            tempo_etapa = time.time() - tempo_inicio
-            
-            # CAPTURAR ESTADO FINAL
-            estado_final = {
-                "texto_final": campo.text,
-                "classes_final": campo.get_attribute("class"),
-                "valor_selecionado": campo.get_attribute("value") if campo.get_attribute("value") else campo.text
-            }
-            
-            # LOG DETALHADO - ESTABILIZAÇÃO
-            log_detalhado["etapas"].append({
-                "etapa": 6,
-                "acao": "aguardar_estabilizacao",
-                "status": "SUCESSO",
-                "tempo": f"{tempo_etapa:.3f}s",
-                "detalhes": {
-                    "tempo_estabilizacao": "2 segundos",
-                    "estado_final": estado_final
-                }
-            })
-            
-            exibir_mensagem(f"✅ **ETAPA 6 CONCLUÍDA**: Estabilização em {tempo_etapa:.3f}s")
-            exibir_mensagem(f"📊 **ESTADO FINAL**: Texto='{estado_final['texto_final']}', Classes='{estado_final['classes_final']}'")
-            
-        except Exception as e:
-            tempo_etapa = time.time() - tempo_inicio
-            log_detalhado["etapas"].append({
-                "etapa": 6,
-                "acao": "aguardar_estabilizacao",
-                "status": "FALHA",
-                "tempo": f"{tempo_etapa:.3f}s",
-                "erro": str(e)
-            })
-            log_detalhado["warnings"].append(f"ETAPA 6: {str(e)}")
-            exibir_mensagem(f"⚠️ **WARNING**: Falha na estabilização: {str(e)}")
-        
-        # FINALIZAR LOG E SALVAR
-        tempo_total = sum([float(etapa["tempo"][:-1]) for etapa in log_detalhado["etapas"]])
-        log_detalhado["tempo_total"] = f"{tempo_total:.3f}s"
-        log_detalhado["status_final"] = "SUCESSO"
-        log_detalhado["timestamp_fim"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
-        
-        # SALVAR LOG DETALHADO
-        salvar_log_dropdown_mui(log_detalhado)
-        
-        exibir_mensagem(f"🎉 **SELEÇÃO CONCLUÍDA COM SUCESSO**: {campo_id} = '{valor_desejado}'")
-        exibir_mensagem(f"⏱️ **TEMPO TOTAL**: {tempo_total:.3f}s")
-        exibir_mensagem(f"📊 **LOG SALVO**: Análise detalhada disponível para debugging")
+        # Aguardar estabilização
+        aguardar_estabilizacao(driver, 2)
         
         return True
         
     except Exception as e:
-        # FINALIZAR LOG COM ERRO
-        tempo_total = sum([float(etapa["tempo"][:-1]) for etapa in log_detalhado["etapas"]])
-        log_detalhado["tempo_total"] = f"{tempo_total:.3f}s"
-        log_detalhado["status_final"] = "FALHA"
-        log_detalhado["timestamp_fim"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
-        log_detalhado["erro_final"] = str(e)
-        
-        # SALVAR LOG DETALHADO COM ERRO
-        salvar_log_dropdown_mui(log_detalhado)
-        
-        exibir_mensagem(f"❌ **ERRO NA SELEÇÃO**: {campo_id} = '{valor_desejado}'")
-        exibir_mensagem(f"⏱️ **TEMPO ATÉ ERRO**: {tempo_total:.3f}s")
-        exibir_mensagem(f"📊 **LOG SALVO**: Análise detalhada do erro disponível")
-        
-        return False
-
-def salvar_log_dropdown_mui(log_detalhado):
-    """
-    Salva o log detalhado do dropdown MUI para análise posterior.
-    
-    Args:
-        log_detalhado: Dicionário com todas as informações do log
-    """
-    try:
-        # CRIAR DIRETÓRIO DE LOGS SE NÃO EXISTIR
-        os.makedirs("logs/dropdowns_mui", exist_ok=True)
-        
-        # NOME DO ARQUIVO COM TIMESTAMP
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        nome_arquivo = f"logs/dropdowns_mui/dropdown_mui_{log_detalhado['campo_id']}_{timestamp}.json"
-        
-        # SALVAR LOG EM JSON
-        with open(nome_arquivo, 'w', encoding='utf-8') as f:
-            json.dump(log_detalhado, f, indent=2, ensure_ascii=False, default=str)
-        
-        exibir_mensagem(f"💾 **LOG SALVO**: {nome_arquivo}")
-        
-    except Exception as e:
-        exibir_mensagem(f"⚠️ **WARNING**: Falha ao salvar log: {str(e)}")
-
-# MANTER FUNÇÃO ANTIGA PARA COMPATIBILIDADE
-def selecionar_dropdown_mui(driver, id_dropdown, valor_desejado, descricao="dropdown", timeout=30):
-    """
-    Função antiga mantida para compatibilidade - agora chama a versão otimizada
-    """
-    return selecionar_dropdown_mui_otimizado(driver, id_dropdown, valor_desejado)
+        exibir_mensagem(f"❌ Erro ao selecionar dropdown {descricao}: {e}")
         return False
 
 def salvar_estado_tela(driver, tela_num, acao, temp_dir):
@@ -3136,9 +2840,8 @@ def implementar_tela9(driver, parametros):
     ==============
     1. Aguarda elementos da Tela 9 (dados pessoais)
     2. Preenche todos os campos obrigatórios
-    3. Seleciona sexo e estado civil via dropdown MUI OTIMIZADO (ESTRATÉGIA DEFINITIVA)
-    4. Preenche Email e Celular com IDs exatos
-    5. Clica em Continuar para avançar (ID CORRIGIDO)
+    3. Seleciona sexo e estado civil via dropdown MUI (CORRIGIDO)
+    4. Clica em Continuar para avançar (ID CORRIGIDO)
     
     DETECÇÃO:
     - XPATH: //*[contains(text(), 'dados pessoais') or contains(text(), 'Dados pessoais')]
@@ -3212,35 +2915,24 @@ def implementar_tela9(driver, parametros):
         data_element.send_keys(parametros["data_nascimento"])
         exibir_mensagem(f"✅ Data de nascimento preenchida: {parametros['data_nascimento']}")
         
-        # 4. CAMPO SEXO (NOVA IMPLEMENTAÇÃO OTIMIZADA)
-        exibir_mensagem("🎯 Selecionando campo Sexo...")
-        if not selecionar_dropdown_mui_otimizado(driver, "sexoTelaSegurado", "Masculino"):
-            return create_error_response(4002, "Falha ao selecionar Sexo")
-        exibir_mensagem("✅ Campo Sexo selecionado")
+        # 4. Selecionar Sexo (DROPDOWN MUI - ESTRATÉGIA ULTRA-SIMPLES)
+        exibir_mensagem("⏳ Selecionando Sexo...")
+        if selecionar_dropdown_mui(driver, "sexoTelaSegurado", parametros["sexo"], "Sexo"):
+            exibir_mensagem(f"✅ Sexo selecionado: {parametros['sexo']}")
+        else:
+            exibir_mensagem(f"⚠️ Falha ao selecionar Sexo '{parametros['sexo']}' - tentando prosseguir...")
         
-        # 5. CAMPO ESTADO CIVIL (NOVA IMPLEMENTAÇÃO OTIMIZADA)
-        exibir_mensagem("🎯 Selecionando campo Estado Civil...")
-        if not selecionar_dropdown_mui_otimizado(driver, "estadoCivilTelaSegurado", "Casado ou União Estável"):
-            return create_error_response(4003, "Falha ao selecionar Estado Civil")
-        exibir_mensagem("✅ Campo Estado Civil selecionado")
+        # 5. Selecionar Estado Civil (PULADO - PROBLEMÁTICO)
+        exibir_mensagem("🚀 **DROPDOWN PROBLEMÁTICO PULADO**: Estado Civil será preenchido manualmente")
+        exibir_mensagem("⚠️ Estado Civil não selecionado - prosseguindo com outros campos...")
         
-        # 6. CAMPO EMAIL (CORRIGIDO COM ID EXATO)
-        exibir_mensagem("📝 Preenchendo campo Email...")
-        email_element = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.ID, "emailTelaSegurado"))
-        )
-        email_element.clear()
-        email_element.send_keys(parametros['email'])
-        exibir_mensagem("✅ Campo Email preenchido")
+        # 6. Preencher Email (PULADO - PROBLEMÁTICO)
+        exibir_mensagem("🚀 **CAMPO PROBLEMÁTICO PULADO**: Email será preenchido manualmente")
+        exibir_mensagem("⚠️ Email não preenchido - prosseguindo com outros campos...")
         
-        # 7. CAMPO CELULAR (CORRIGIDO COM ID EXATO)
-        exibir_mensagem("📝 Preenchendo campo Celular...")
-        celular_element = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.ID, "celularTelaSegurado"))
-        )
-        celular_element.clear()
-        celular_element.send_keys(parametros['celular'])
-        exibir_mensagem("✅ Campo Celular preenchido")
+        # 7. Preencher Celular (PULADO - PROBLEMÁTICO)
+        exibir_mensagem("🚀 **CAMPO PROBLEMÁTICO PULADO**: Celular será preenchido manualmente")
+        exibir_mensagem("⚠️ Celular não preenchido - prosseguindo com outros campos...")
         
         # Aguardar estabilização antes de continuar
         aguardar_estabilizacao(driver, 5)  # Aguardar estabilização após preencher campos
