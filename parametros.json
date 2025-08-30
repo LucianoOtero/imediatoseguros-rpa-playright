@@ -4,7 +4,8 @@
     "display": true,
     "log_rotacao_dias": 90,
     "log_nivel": "INFO",
-    "tempo_estabilizacao": 1
+    "tempo_estabilizacao": 1,
+    "tempo_carregamento": 10
   },
   "url_base": "https://www.app.tosegurado.com.br/imediatoseguros",
   "placa": "KVA1791",

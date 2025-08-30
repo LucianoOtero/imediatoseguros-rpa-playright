@@ -175,11 +175,66 @@ def configurar_chrome():
         return None, None
 
 def aguardar_carregamento_pagina(driver, timeout=60):
-    """Aguarda o carregamento completo da página (BASEADO NO SCRIPT QUE FUNCIONOU)"""
+    """
+    Aguarda o carregamento completo da página (BASEADO NO SCRIPT QUE FUNCIONOU)
+    
+    PARÂMETROS:
+    ===========
+    - driver: Instância do WebDriver
+    - timeout: Timeout em segundos (padrão: 60)
+    
+    COMPORTAMENTO:
+    =============
+    - Aguarda document.readyState == "complete"
+    - Timeout configurável via parâmetro
+    """
     try:
         WebDriverWait(driver, timeout).until(
             lambda d: d.execute_script("return document.readyState") == "complete"
         )
+        return True
+    except:
+        return False
+
+def aguardar_carregamento_pagina_com_delay(driver, timeout=60):
+    """
+    Aguarda o carregamento da página com delay configurável via JSON
+    
+    PARÂMETROS:
+    ===========
+    - driver: Instância do WebDriver
+    - timeout: Timeout em segundos (padrão: 60)
+    
+    COMPORTAMENTO:
+    =============
+    - Aguarda document.readyState == "complete"
+    - Aplica delay configurável via parametros.json (tempo_carregamento)
+    - Fallback para 5 segundos se JSON não disponível
+    
+    CONFIGURAÇÃO:
+    =============
+    - Arquivo: parametros.json
+    - Seção: configuracao
+    - Parâmetro: tempo_carregamento
+    - Valor padrão: 5 segundos (configurado)
+    """
+    try:
+        # Aguardar carregamento da página
+        WebDriverWait(driver, timeout).until(
+            lambda d: d.execute_script("return document.readyState") == "complete"
+        )
+        
+        # Aplicar delay configurável
+        try:
+            with open("parametros.json", "r", encoding="utf-8") as f:
+                parametros = json.load(f)
+                delay = parametros.get('configuracao', {}).get('tempo_carregamento', 5)
+        except:
+            delay = 5  # Fallback padrão
+        
+        print(f"⏳ Aguardando carregamento da página ({delay}s)...")
+        time.sleep(delay)
+        
         return True
     except:
         return False
@@ -659,10 +714,7 @@ def navegar_ate_tela5(driver, parametros):
         print("❌ Erro: Falha ao clicar no botão Carro")
         return False
     
-    print("⏳ Aguardando carregamento completo da página...")
-    time.sleep(10)
-    
-    if not aguardar_carregamento_pagina(driver, 60):
+    if not aguardar_carregamento_pagina_com_delay(driver, 60):
         print("❌ Erro: Página não carregou após selecionar Carro")
         return False
     
@@ -689,10 +741,7 @@ def navegar_ate_tela5(driver, parametros):
         print("❌ Erro: Falha ao clicar Continuar na Tela 3")
         return False
     
-    print("⏳ Aguardando carregamento da página...")
-    time.sleep(15)
-    
-    if not aguardar_carregamento_pagina(driver, 60):
+    if not aguardar_carregamento_pagina_com_delay(driver, 60):
         print("⚠️ Página pode não ter carregado completamente")
     
     aguardar_estabilizacao(driver)
@@ -729,10 +778,7 @@ def navegar_ate_tela5(driver, parametros):
             print("❌ Erro: Falha ao clicar Continuar na Tela 3")
             return False
         
-        print("⏳ Aguardando carregamento da página...")
-        time.sleep(15)
-        
-        if not aguardar_carregamento_pagina(driver, 60):
+        if not aguardar_carregamento_pagina_com_delay(driver, 60):
             print("⚠️ Página pode não ter carregado completamente")
         
         aguardar_estabilizacao(driver)
@@ -772,10 +818,7 @@ def navegar_ate_tela5(driver, parametros):
             print("❌ Erro: Falha ao clicar Continuar na Tela 4")
             return False
         
-        print("⏳ Aguardando carregamento da página...")
-        time.sleep(15)
-        
-        if not aguardar_carregamento_pagina(driver, 60):
+        if not aguardar_carregamento_pagina_com_delay(driver, 60):
             print("⚠️ Página pode não ter carregado completamente")
         
         aguardar_estabilizacao(driver)
@@ -809,10 +852,7 @@ def navegar_ate_tela5(driver, parametros):
             print("❌ Erro: Falha ao clicar Continuar na Tela 5")
             return False
         
-        print("⏳ Aguardando carregamento da página...")
-        time.sleep(15)
-        
-        if not aguardar_carregamento_pagina(driver, 60):
+        if not aguardar_carregamento_pagina_com_delay(driver, 60):
             print("⚠️ Página pode não ter carregado completamente")
         
         aguardar_estabilizacao(driver)
@@ -902,10 +942,7 @@ def implementar_tela6(driver, parametros):
             print("❌ Erro: Falha ao clicar Continuar na Tela 6")
             return False
         
-        print("⏳ Aguardando carregamento da página...")
-        time.sleep(15)
-        
-        if not aguardar_carregamento_pagina(driver, 60):
+        if not aguardar_carregamento_pagina_com_delay(driver, 60):
             print("⚠️ Página pode não ter carregado completamente")
         
         aguardar_estabilizacao(driver)
@@ -1017,10 +1054,7 @@ def implementar_tela7(driver, parametros):
             print("❌ Erro: Falha ao clicar Continuar na Tela 7")
             return False
         
-        print("⏳ Aguardando carregamento da página...")
-        time.sleep(15)
-        
-        if not aguardar_carregamento_pagina(driver, 60):
+        if not aguardar_carregamento_pagina_com_delay(driver, 60):
             print("⚠️ Página pode não ter carregado completamente")
         
         aguardar_estabilizacao(driver)
@@ -1102,10 +1136,7 @@ def implementar_tela8(driver, parametros):
             print("❌ Erro: Falha ao clicar Continuar na Tela 8")
             return False
         
-        print("⏳ Aguardando carregamento da página...")
-        time.sleep(15)
-        
-        if not aguardar_carregamento_pagina(driver, 60):
+        if not aguardar_carregamento_pagina_com_delay(driver, 60):
             print("⚠️ Página pode não ter carregado completamente")
         
         aguardar_estabilizacao(driver)
@@ -1287,10 +1318,7 @@ def implementar_tela9(driver, parametros):
             print("❌ Erro: Falha ao clicar Continuar na Tela 9")
             return False
         
-        print("⏳ Aguardando carregamento da página...")
-        time.sleep(15)
-        
-        if not aguardar_carregamento_pagina(driver, 60):
+        if not aguardar_carregamento_pagina_com_delay(driver, 60):
             print("⚠️ Página pode não ter carregado completamente")
         
         aguardar_estabilizacao(driver)
