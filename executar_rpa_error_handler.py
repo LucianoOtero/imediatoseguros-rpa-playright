@@ -1765,11 +1765,21 @@ def navegar_ate_tela5(driver, parametros):
     
     # TELA 1: Seleção do tipo de seguro
     exibir_mensagem("\n📱 TELA 1: Selecionando Carro...")
+    
+    # ✅ CORREÇÃO: Navegar ANTES de aguardar carregamento
+    exibir_mensagem(f"🌐 Navegando para: {parametros['url_base']}")
     driver.get(parametros['url_base'])
     
     if not aguardar_carregamento_pagina(driver, 60):
         exibir_mensagem("❌ Erro: Página não carregou")
-        return False
+        error_response = create_error_response(
+            4001, 
+            "Página não carregou completamente", 
+            context="Tela 1 - Carregamento inicial",
+            screen="1",
+            action="Aguardar carregamento da página"
+        )
+        return error_response
     
     salvar_estado_tela(driver, 1, "inicial", None)
     aguardar_estabilizacao(driver)
@@ -1778,7 +1788,15 @@ def navegar_ate_tela5(driver, parametros):
     
     if not clicar_com_delay_extremo(driver, By.XPATH, "//button[contains(., 'Carro')]", "botão Carro"):
         exibir_mensagem("❌ Erro: Falha ao clicar no botão Carro")
-        return False
+        # Usar error handler para capturar o erro
+        error_response = create_error_response(
+            3001, 
+            "Falha ao clicar no botão Carro", 
+            context="Tela 1 - Seleção do tipo de seguro",
+            screen="1",
+            action="Clicar no botão Carro"
+        )
+        return error_response
     
     if not aguardar_dom_estavel(driver, 60):
         exibir_mensagem("❌ Erro: Página não carregou após selecionar Carro")
@@ -2006,7 +2024,14 @@ def implementar_tela6(driver, parametros):
         
         if not clicar_com_delay_extremo(driver, By.XPATH, "//button[contains(., 'Continuar')]", "botão Continuar Tela 6"):
             exibir_mensagem("❌ Erro: Falha ao clicar Continuar na Tela 6")
-            return False
+            error_response = create_error_response(
+                3002, 
+                "Falha ao clicar Continuar na Tela 6", 
+                context="Tela 6 - Clique no botão Continuar",
+                screen="6",
+                action="Clicar no botão Continuar"
+            )
+            return error_response
         
         if not aguardar_dom_estavel(driver, 60):
             exibir_mensagem("⚠️ Página pode não ter carregado completamente")
@@ -2018,7 +2043,14 @@ def implementar_tela6(driver, parametros):
         
     except Exception as e:
         exibir_mensagem(f"❌ Erro na Tela 6: {e}")
-        return False
+        error_response = create_error_response(
+            3002, 
+            f"Erro na implementação da Tela 6: {str(e)}", 
+            context="Tela 6 - Implementação geral",
+            screen="6",
+            action="Implementação da Tela 6"
+        )
+        return error_response
 
 def implementar_tela7(driver, parametros):
     """
@@ -2118,7 +2150,14 @@ def implementar_tela7(driver, parametros):
         exibir_mensagem("⏳ Aguardando botão Continuar aparecer...")
         if not clicar_com_delay_extremo(driver, By.XPATH, "//button[contains(., 'Continuar')]", "botão Continuar Tela 7"):
             exibir_mensagem("❌ Erro: Falha ao clicar Continuar na Tela 7")
-            return False
+            error_response = create_error_response(
+                3003, 
+                "Falha ao clicar Continuar na Tela 7", 
+                context="Tela 7 - Clique no botão Continuar",
+                screen="7",
+                action="Clicar no botão Continuar"
+            )
+            return error_response
         
         if not aguardar_dom_estavel(driver, 60):
             exibir_mensagem("⚠️ Página pode não ter carregado completamente")
@@ -2130,7 +2169,14 @@ def implementar_tela7(driver, parametros):
         
     except Exception as e:
         exibir_mensagem(f"❌ Erro na Tela 7: {e}")
-        return False
+        error_response = create_error_response(
+            3003, 
+            f"Erro na implementação da Tela 7: {str(e)}", 
+            context="Tela 7 - Implementação geral",
+            screen="7",
+            action="Implementação da Tela 7"
+        )
+        return error_response
 
 def implementar_tela8(driver, parametros):
     """
@@ -2200,7 +2246,14 @@ def implementar_tela8(driver, parametros):
         
         if not clicar_com_delay_extremo(driver, By.ID, "gtm-telaUsoVeiculoContinuar", "botão Continuar Tela 8"):
             exibir_mensagem("❌ Erro: Falha ao clicar Continuar na Tela 8")
-            return False
+            error_response = create_error_response(
+                3004, 
+                "Falha ao clicar Continuar na Tela 8", 
+                context="Tela 8 - Clique no botão Continuar",
+                screen="8",
+                action="Clicar no botão Continuar"
+            )
+            return error_response
         
         if not aguardar_dom_estavel(driver, 60):
             exibir_mensagem("⚠️ Página pode não ter carregado completamente")
@@ -2212,7 +2265,14 @@ def implementar_tela8(driver, parametros):
         
     except Exception as e:
         exibir_mensagem(f"❌ Erro na Tela 8: {e}")
-        return False
+        error_response = create_error_response(
+            3004, 
+            f"Erro na implementação da Tela 8: {str(e)}", 
+            context="Tela 8 - Implementação geral",
+            screen="8",
+            action="Implementação da Tela 8"
+        )
+        return error_response
 
 def implementar_tela9(driver, parametros):
     """
@@ -2382,7 +2442,14 @@ def implementar_tela9(driver, parametros):
         
         if not continuar_clicado:
             exibir_mensagem("❌ Erro: Falha ao clicar Continuar na Tela 9")
-            return False
+            error_response = create_error_response(
+                3005, 
+                "Falha ao clicar Continuar na Tela 9", 
+                context="Tela 9 - Clique no botão Continuar",
+                screen="9",
+                action="Clicar no botão Continuar"
+            )
+            return error_response
         
         if not aguardar_dom_estavel(driver, 60):
             exibir_mensagem("⚠️ Página pode não ter carregado completamente")
@@ -2394,7 +2461,14 @@ def implementar_tela9(driver, parametros):
         
     except Exception as e:
         exibir_mensagem(f"❌ Erro na Tela 9: {e}")
-        return False
+        error_response = create_error_response(
+            3005, 
+            f"Erro na implementação da Tela 9: {str(e)}", 
+            context="Tela 9 - Implementação geral",
+            screen="9",
+            action="Implementação da Tela 9"
+        )
+        return error_response
 
 def executar_todas_telas(json_string):
     """
@@ -2520,26 +2594,31 @@ def executar_todas_telas(json_string):
         # Navegar até Tela 5
         navegacao_result = navegar_ate_tela5(driver, parametros)
         if isinstance(navegacao_result, dict) and not navegacao_result.get('success', True):
+            # Erro na navegação - retornar resposta de erro
             return navegacao_result
         
         # Implementar Tela 6
         tela6_result = implementar_tela6(driver, parametros)
         if isinstance(tela6_result, dict) and not tela6_result.get('success', True):
+            # Erro na Tela 6 - retornar resposta de erro
             return tela6_result
         
         # Implementar Tela 7
         tela7_result = implementar_tela7(driver, parametros)
         if isinstance(tela7_result, dict) and not tela7_result.get('success', True):
+            # Erro na Tela 7 - retornar resposta de erro
             return tela7_result
         
         # Implementar Tela 8
         tela8_result = implementar_tela8(driver, parametros)
         if isinstance(tela8_result, dict) and not tela8_result.get('success', True):
+            # Erro na Tela 8 - retornar resposta de erro
             return tela8_result
         
         # Implementar Tela 9
         tela9_result = implementar_tela9(driver, parametros)
         if isinstance(tela9_result, dict) and not tela9_result.get('success', True):
+            # Erro na Tela 9 - retornar resposta de erro
             return tela9_result
         
         fim = datetime.now()
