@@ -2004,20 +2004,23 @@ def implementar_tela6(driver, parametros):
         if not clicar_radio_via_javascript(driver, "Flex", "Flex como combustível"):
             exibir_mensagem("⚠️ Radio 'Flex' não encontrado - tentando prosseguir...")
         
-        # Selecionar checkboxes se disponíveis
-        exibir_mensagem("⏳ Verificando checkboxes disponíveis...")
-        
-        # Kit Gás (se disponível)
-        if not clicar_checkbox_via_javascript(driver, "kit gas", "Kit Gás"):
-            exibir_mensagem("⚠️ Checkbox Kit Gás não encontrado")
-        
-        # Blindado (se disponível)
-        if not clicar_checkbox_via_javascript(driver, "blindado", "Blindado"):
-            exibir_mensagem("⚠️ Checkbox Blindado não encontrado")
-        
-        # Financiado (se disponível)
-        if not clicar_checkbox_via_javascript(driver, "financiado", "Financiado"):
-            exibir_mensagem("⚠️ Checkbox Financiado não encontrado")
+        # Selecionar checkboxes se disponíveis (OPCIONAL - pode ser pulado)
+        if not parametros.get('configuracao', {}).get('eliminar_tentativas_inuteis', False):
+            exibir_mensagem("⏳ Verificando checkboxes disponíveis...")
+            
+            # Kit Gás (se disponível)
+            if not clicar_checkbox_via_javascript(driver, "kit gas", "Kit Gás"):
+                exibir_mensagem("⚠️ Checkbox Kit Gás não encontrado")
+            
+            # Blindado (se disponível)
+            if not clicar_checkbox_via_javascript(driver, "blindado", "Blindado"):
+                exibir_mensagem("⚠️ Checkbox Blindado não encontrado")
+            
+            # Financiado (se disponível)
+            if not clicar_checkbox_via_javascript(driver, "financiado", "Financiado"):
+                exibir_mensagem("⚠️ Checkbox Financiado não encontrado")
+        else:
+            exibir_mensagem("🚀 **TENTATIVAS INÚTEIS ELIMINADAS**: Pulando checkboxes que sempre falham (Kit Gás, Blindado, Financiado)")
         
         # Clicar em Continuar
         exibir_mensagem("⏳ Aguardando botão Continuar aparecer...")
@@ -2370,15 +2373,21 @@ def implementar_tela9(driver, parametros):
         data_element.send_keys(parametros["data_nascimento"])
         exibir_mensagem(f"✅ Data de nascimento preenchida: {parametros['data_nascimento']}")
         
-        # 4. Selecionar Sexo
-        exibir_mensagem("⏳ Selecionando Sexo...")
-        if not clicar_radio_via_javascript(driver, parametros["sexo"], f"Sexo {parametros['sexo']}"):
-            exibir_mensagem(f"⚠️ Radio '{parametros['sexo']}' não encontrado - tentando prosseguir...")
+        # 4. Selecionar Sexo (OPCIONAL - pode ser pulado)
+        if not parametros.get('configuracao', {}).get('eliminar_tentativas_inuteis', False):
+            exibir_mensagem("⏳ Selecionando Sexo...")
+            if not clicar_radio_via_javascript(driver, parametros["sexo"], f"Sexo {parametros['sexo']}"):
+                exibir_mensagem(f"⚠️ Radio '{parametros['sexo']}' não encontrado - tentando prosseguir...")
+        else:
+            exibir_mensagem("🚀 **TENTATIVAS INÚTEIS ELIMINADAS**: Pulando seleção de sexo que sempre falha")
         
-        # 5. Selecionar Estado Civil
-        exibir_mensagem("⏳ Selecionando Estado Civil...")
-        if not clicar_radio_via_javascript(driver, parametros["estado_civil"], f"Estado Civil {parametros['estado_civil']}"):
-            exibir_mensagem(f"⚠️ Radio '{parametros['estado_civil']}' não encontrado - tentando prosseguir...")
+        # 5. Selecionar Estado Civil (OPCIONAL - pode ser pulado)
+        if not parametros.get('configuracao', {}).get('eliminar_tentativas_inuteis', False):
+            exibir_mensagem("⏳ Selecionando Estado Civil...")
+            if not clicar_radio_via_javascript(driver, parametros["estado_civil"], f"Estado Civil {parametros['estado_civil']}"):
+                exibir_mensagem(f"⚠️ Radio '{parametros['estado_civil']}' não encontrado - tentando prosseguir...")
+        else:
+            exibir_mensagem("🚀 **TENTATIVAS INÚTEIS ELIMINADAS**: Pulando seleção de estado civil que sempre falha")
         
         # 6. Preencher Email
         exibir_mensagem("⏳ Preenchendo Email...")
@@ -2569,6 +2578,20 @@ def executar_todas_telas(json_string):
     exibir_mensagem(f"🚀 FUTURO: Padrão para RPA de próxima geração")
     exibir_mensagem(f"🎯 MISSÃO: Revolucionar automação web com inteligência real e tratamento de erros robusto")
     exibir_mensagem(f"🔧 CONFIGURAÇÃO REACT: childList + attributes + characterData + subtree")
+    
+    # Verificar se eliminar_tentativas_inuteis está ativado
+    try:
+        parametros = json.loads(json_string)
+        if parametros.get('configuracao', {}).get('eliminar_tentativas_inuteis', False):
+            exibir_mensagem(f"🚀 **OTIMIZAÇÃO ATIVADA**: eliminar_tentativas_inuteis = TRUE")
+            exibir_mensagem(f"🎯 **TENTATIVAS INÚTEIS ELIMINADAS**:")
+            exibir_mensagem(f"   • Tela 6: Checkboxes Kit Gás, Blindado, Financiado (sempre falham)")
+            exibir_mensagem(f"   • Tela 9: Radios Sexo e Estado Civil (sempre falham)")
+            exibir_mensagem(f"⚡ **BENEFÍCIOS**: Execução mais rápida e limpa, sem mensagens de erro desnecessárias")
+        else:
+            exibir_mensagem(f"🔍 **MODO COMPLETO**: eliminar_tentativas_inuteis = FALSE (todas as tentativas serão executadas)")
+    except:
+        exibir_mensagem(f"🔍 **MODO PADRÃO**: eliminar_tentativas_inuteis não configurado (todas as tentativas serão executadas)")
     exibir_mensagem(f"🛡️ ERROR HANDLER: Captura, categoriza e retorna erros em JSON padronizado")
     
     driver = None

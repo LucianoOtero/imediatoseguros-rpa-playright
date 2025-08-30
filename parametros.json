@@ -7,7 +7,8 @@
     "tempo_estabilizacao": 1,
     "tempo_carregamento": 10,
     "inserir_log": true,
-    "visualizar_mensagens": true
+    "visualizar_mensagens": true,
+    "eliminar_tentativas_inuteis": true
   },
   "url_base": "https://www.app.tosegurado.com.br/imediatoseguros",
   "placa": "KVA1791",
