@@ -116,6 +116,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 
 def configurar_chrome():
     """
@@ -183,8 +184,37 @@ def aguardar_carregamento_pagina(driver, timeout=60):
     except:
         return False
 
-def aguardar_estabilizacao(driver, segundos=15):
-    """Aguarda a estabilização da página (BASEADO NO SCRIPT QUE FUNCIONOU)"""
+def aguardar_estabilizacao(driver, segundos=None):
+    """
+    Aguarda a estabilização da página (BASEADO NO SCRIPT QUE FUNCIONOU)
+    
+    PARÂMETROS:
+    ===========
+    - driver: Instância do WebDriver
+    - segundos: Tempo de estabilização em segundos (opcional)
+    
+    COMPORTAMENTO:
+    =============
+    - Se segundos=None: Usa valor de parametros.json (tempo_estabilizacao)
+    - Se parametros.json não disponível: Usa fallback de 15 segundos
+    - Se segundos especificado: Usa valor fornecido
+    
+    CONFIGURAÇÃO:
+    =============
+    - Arquivo: parametros.json
+    - Seção: configuracao
+    - Parâmetro: tempo_estabilizacao
+    - Valor padrão: 1 segundo (configurado)
+    """
+    if segundos is None:
+        # Usar parâmetro do JSON se disponível
+        try:
+            with open("parametros.json", "r", encoding="utf-8") as f:
+                parametros = json.load(f)
+                segundos = parametros.get('configuracao', {}).get('tempo_estabilizacao', 15)
+        except:
+            segundos = 15  # Fallback padrão
+    
     print(f"⏳ Aguardando estabilização da página ({segundos}s)...")
     time.sleep(segundos)
 
@@ -216,7 +246,7 @@ def clicar_com_delay_extremo(driver, by, value, descricao="elemento", timeout=30
     
     DELAYS:
     =======
-    - Estabilização: 15 segundos
+    - Estabilização: Configurável via parametros.json (tempo_estabilizacao)
     - Scroll: 2 segundos
     - Timeout padrão: 30 segundos
     
@@ -239,7 +269,7 @@ def clicar_com_delay_extremo(driver, by, value, descricao="elemento", timeout=30
         )
         
         print(f"✅ {descricao} encontrado, aguardando estabilização...")
-        aguardar_estabilizacao(driver, 15)
+        aguardar_estabilizacao(driver)
         
         try:
             elemento = WebDriverWait(driver, 10).until(
@@ -274,7 +304,7 @@ def preencher_com_delay_extremo(driver, by, value, texto, descricao="campo", tim
         )
         
         print(f"✅ {descricao} encontrado, aguardando estabilização...")
-        aguardar_estabilizacao(driver, 15)
+        aguardar_estabilizacao(driver)
         
         elemento.clear()
         time.sleep(1)
@@ -352,7 +382,7 @@ def clicar_radio_via_javascript(driver, texto_radio, descricao="radio", timeout=
     """
     try:
         print(f"⏳ Aguardando radio {descricao} aparecer...")
-        aguardar_estabilizacao(driver, 15)
+        aguardar_estabilizacao(driver)
         
         script = f"""
         var elementos = document.querySelectorAll('input[type="radio"], label, span, div');
@@ -403,7 +433,7 @@ def clicar_checkbox_via_javascript(driver, texto_checkbox, descricao="checkbox",
     """Clica em um checkbox via JavaScript (BASEADO NO SCRIPT QUE FUNCIONOU)"""
     try:
         print(f"⏳ Aguardando checkbox {descricao} aparecer...")
-        aguardar_estabilizacao(driver, 15)
+        aguardar_estabilizacao(driver)
         
         script = f"""
         var elementos = document.querySelectorAll('input[type="checkbox"], label, span, div');
@@ -621,7 +651,7 @@ def navegar_ate_tela5(driver, parametros):
         return False
     
     salvar_estado_tela(driver, 1, "inicial", None)
-    aguardar_estabilizacao(driver, 20)
+    aguardar_estabilizacao(driver)
     
     salvar_estado_tela(driver, 1, "antes_clique", None)
     
@@ -636,12 +666,12 @@ def navegar_ate_tela5(driver, parametros):
         print("❌ Erro: Página não carregou após selecionar Carro")
         return False
     
-    aguardar_estabilizacao(driver, 20)
+    aguardar_estabilizacao(driver)
     salvar_estado_tela(driver, 1, "apos_clique", None)
     
     # TELA 2: Inserção da placa CORRETA
     print("\n📱 TELA 2: Inserindo placa KVA-1791...")
-    aguardar_estabilizacao(driver, 15)
+    aguardar_estabilizacao(driver)
     salvar_estado_tela(driver, 2, "inicial", None)
     
     # PLACA CORRETA: KVA-1791 (BASEADO NO SCRIPT QUE FUNCIONOU)
@@ -649,7 +679,7 @@ def navegar_ate_tela5(driver, parametros):
         print("❌ Erro: Falha ao preencher placa")
         return False
     
-    aguardar_estabilizacao(driver, 15)
+    aguardar_estabilizacao(driver)
     salvar_estado_tela(driver, 2, "placa_inserida", None)
     
     # TELA 3: Clicar em Continuar
@@ -665,7 +695,7 @@ def navegar_ate_tela5(driver, parametros):
     if not aguardar_carregamento_pagina(driver, 60):
         print("⚠️ Página pode não ter carregado completamente")
     
-    aguardar_estabilizacao(driver, 20)
+    aguardar_estabilizacao(driver)
     salvar_estado_tela(driver, 3, "apos_clique", None)
     
     # TELA 3: Confirmação do veículo ECOSPORT
@@ -705,7 +735,7 @@ def navegar_ate_tela5(driver, parametros):
         if not aguardar_carregamento_pagina(driver, 60):
             print("⚠️ Página pode não ter carregado completamente")
         
-        aguardar_estabilizacao(driver, 20)
+        aguardar_estabilizacao(driver)
         salvar_estado_tela(driver, 3, "apos_continuar", None)
         
     except Exception as e:
@@ -748,7 +778,7 @@ def navegar_ate_tela5(driver, parametros):
         if not aguardar_carregamento_pagina(driver, 60):
             print("⚠️ Página pode não ter carregado completamente")
         
-        aguardar_estabilizacao(driver, 20)
+        aguardar_estabilizacao(driver)
         salvar_estado_tela(driver, 4, "apos_continuar", None)
         
     except Exception as e:
@@ -785,7 +815,7 @@ def navegar_ate_tela5(driver, parametros):
         if not aguardar_carregamento_pagina(driver, 60):
             print("⚠️ Página pode não ter carregado completamente")
         
-        aguardar_estabilizacao(driver, 20)
+        aguardar_estabilizacao(driver)
         salvar_estado_tela(driver, 5, "apos_continuar", None)
         
     except Exception as e:
@@ -794,7 +824,7 @@ def navegar_ate_tela5(driver, parametros):
     print("✅ **NAVEGAÇÃO ATÉ TELA 5 CONCLUÍDA!**")
     return True
 
-def implementar_tela6(driver):
+def implementar_tela6(driver, parametros):
     """
     Implementa a Tela 6: Tipo de combustível + checkboxes (BASEADO EXATAMENTE NO SCRIPT QUE FUNCIONOU)
     
@@ -878,7 +908,7 @@ def implementar_tela6(driver):
         if not aguardar_carregamento_pagina(driver, 60):
             print("⚠️ Página pode não ter carregado completamente")
         
-        aguardar_estabilizacao(driver, 20)
+        aguardar_estabilizacao(driver)
         salvar_estado_tela(driver, 6, "apos_continuar", None)
         print("✅ **TELA 6 IMPLEMENTADA COM SUCESSO!**")
         return True
@@ -887,7 +917,7 @@ def implementar_tela6(driver):
         print(f"❌ Erro na Tela 6: {e}")
         return False
 
-def implementar_tela7(driver):
+def implementar_tela7(driver, parametros):
     """
     Implementa a Tela 7: Endereço de pernoite (CEP) (BASEADO EXATAMENTE NO SCRIPT QUE FUNCIONOU)
     
@@ -899,7 +929,7 @@ def implementar_tela7(driver):
     IMPLEMENTAÇÃO:
     ==============
     1. Aguarda elementos da Tela 7 (endereço, CEP)
-    2. Insere CEP hardcoded: "03084-000" (baseado no script que funcionou)
+    2. Insere CEP do parametros.json (sem hardcode!)
     3. Aguarda sugestão de endereço
     4. Seleciona sugestão se disponível (procura por "Rua Santa" ou "São Paulo")
     5. Clica em Continuar para avançar
@@ -964,8 +994,8 @@ def implementar_tela7(driver):
         if cep_campo:
             cep_campo.clear()
             time.sleep(1)
-            cep_campo.send_keys("03084-000")
-            print("✅ CEP preenchido: 03084-000")
+            cep_campo.send_keys(parametros["cep"])
+            print(f"✅ CEP preenchido: {parametros['cep']}")
         
         # Aguardar sugestão e selecionar
         print("⏳ Aguardando sugestão de endereço...")
@@ -993,7 +1023,7 @@ def implementar_tela7(driver):
         if not aguardar_carregamento_pagina(driver, 60):
             print("⚠️ Página pode não ter carregado completamente")
         
-        aguardar_estabilizacao(driver, 20)
+        aguardar_estabilizacao(driver)
         salvar_estado_tela(driver, 7, "apos_continuar", None)
         print("✅ **TELA 7 IMPLEMENTADA COM SUCESSO!**")
         return True
@@ -1002,7 +1032,7 @@ def implementar_tela7(driver):
         print(f"❌ Erro na Tela 7: {e}")
         return False
 
-def implementar_tela8(driver):
+def implementar_tela8(driver, parametros):
     """
     Implementa a Tela 8: Finalidade do veículo (BASEADO EXATAMENTE NO SCRIPT QUE FUNCIONOU)
     
@@ -1078,7 +1108,7 @@ def implementar_tela8(driver):
         if not aguardar_carregamento_pagina(driver, 60):
             print("⚠️ Página pode não ter carregado completamente")
         
-        aguardar_estabilizacao(driver, 20)
+        aguardar_estabilizacao(driver)
         salvar_estado_tela(driver, 8, "apos_continuar", None)
         print("✅ **TELA 8 IMPLEMENTADA COM SUCESSO!**")
         return True
@@ -1263,7 +1293,7 @@ def implementar_tela9(driver, parametros):
         if not aguardar_carregamento_pagina(driver, 60):
             print("⚠️ Página pode não ter carregado completamente")
         
-        aguardar_estabilizacao(driver, 20)
+        aguardar_estabilizacao(driver)
         salvar_estado_tela(driver, 9, "apos_continuar", None)
         print("✅ **TELA 9 IMPLEMENTADA COM SUCESSO!**")
         return True
@@ -1303,7 +1333,7 @@ def executar_todas_telas():
     - Clica em Continuar
     
     TELA 7: Endereço pernoite (CEP)
-    - Insere CEP "03084-000"
+    - Insere CEP do parametros.json
     - Seleciona sugestão de endereço
     - Clica em Continuar
     
@@ -1374,17 +1404,17 @@ def executar_todas_telas():
             return False
         
         # Implementar Tela 6
-        if not implementar_tela6(driver):
+        if not implementar_tela6(driver, parametros):
             print("❌ Erro: Falha ao implementar Tela 6")
             return False
         
         # Implementar Tela 7
-        if not implementar_tela7(driver):
+        if not implementar_tela7(driver, parametros):
             print("❌ Erro: Falha ao implementar Tela 7")
             return False
         
         # Implementar Tela 8
-        if not implementar_tela8(driver):
+        if not implementar_tela8(driver, parametros):
             print("❌ Erro: Falha ao implementar Tela 8")
             return False
         
