@@ -29,7 +29,7 @@
   "email": "lrotero@gmail.com",
   "celular": "(11) 97668-7668",
   "endereco": "Rua Serra de Botucatu, Tatuapé - São Paulo/SP",
-  "condutor_principal": true,
+  "condutor_principal": false,
   "nome_condutor": "SANDRA LOUREIRO",
   "cpf_condutor": "251.517.878-29",
   "data_nascimento_condutor": "28/08/1975",

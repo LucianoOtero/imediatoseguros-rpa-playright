@@ -3614,19 +3614,25 @@ def implementar_tela10(driver, parametros):
     
     ESTRATÉGIA IMPLEMENTADA:
     ========================
-    Baseado na gravação Selenium IDE
+    Baseado na gravação Selenium IDE completa
     Tela aparece após Tela 9 (Dados pessoais)
     
     ELEMENTOS IDENTIFICADOS:
     =======================
+    - Radio Sim/Não: css=.cursor-pointer:nth-child(1/2) > .border .font-workSans
+    - Nome Condutor: id=nomeTelaCondutorPrincipal (quando "Não" selecionado)
+    - CPF Condutor: id=cpfTelaCondutorPrincipal (quando "Não" selecionado)
+    - Data Nascimento: id=dataNascimentoTelaCondutorPrincipal (quando "Não" selecionado)
+    - Sexo Condutor: id=sexoTelaCondutorPrincipal (quando "Não" selecionado)
+    - Estado Civil: id=estadoCivilTelaCondutorPrincipal (quando "Não" selecionado)
     - Botão Continuar: id=gtm-telaCondutorPrincipalContinuar
-    - Radio Sim: Seleção baseada no parâmetro condutor_principal
     
     IMPLEMENTAÇÃO:
     ==============
     1. Aguarda elementos da Tela 10 (condutor principal)
     2. Seleciona opção baseada no parâmetro condutor_principal (true/false)
-    3. Clica em Continuar para avançar para Tela 11
+    3. Se "Não" selecionado, preenche campos adicionais do condutor
+    4. Clica em Continuar para avançar para Tela 11
     
     DETECÇÃO:
     - ID: gtm-telaCondutorPrincipalContinuar (botão continuar)
@@ -3635,7 +3641,7 @@ def implementar_tela10(driver, parametros):
     - True: Se Tela 10 implementada com sucesso
     - False: Se falhou na implementação
     """
-    exibir_mensagem("\n👤 **INICIANDO TELA 10: Condutor principal**")
+    exibir_mensagem("\n👥 **INICIANDO TELA 10: Condutor principal**")
     
     try:
         # Aguardar elementos da Tela 10
@@ -3647,7 +3653,16 @@ def implementar_tela10(driver, parametros):
         # VERIFICAÇÃO: Confirmar que estamos na Tela 10
         if not verificar_tela_10(driver):
             exibir_mensagem("❌ **ERRO CRÍTICO**: Não estamos na Tela 10 esperada!")
-            return False
+            return create_error_response(
+                4010,
+                "Falha na verificação da Tela 10",
+                "Elemento da Tela 10 não encontrado",
+                possible_causes=["Navegação falhou", "Página não carregou", "Elemento não está presente"],
+                action="Verificar se a navegação da Tela 9 para Tela 10 funcionou",
+                context="Tela 10 - Verificação após Tela 9",
+                screen="10",
+                action_detail="Verificação de elemento da Tela 10"
+            )
         
         salvar_estado_tela(driver, 10, "inicial", None)
         
@@ -3662,18 +3677,109 @@ def implementar_tela10(driver, parametros):
         exibir_mensagem(f"⏳ Selecionando opção Condutor Principal: {'Sim' if condutor_principal else 'Não'}...")
         
         if condutor_principal:
-            # Selecionar "Sim" (Condutor Principal)
+            # CENÁRIO 1: Selecionar "Sim" (Condutor Principal)
             exibir_mensagem("⏳ Selecionando 'Sim' para condutor principal...")
             if not clicar_radio_via_javascript(driver, "Sim", "Sim para condutor principal"):
                 exibir_mensagem("⚠️ Radio 'Sim' não encontrado - tentando prosseguir...")
+            
+            # Aguardar estabilização após seleção
+            aguardar_estabilizacao(driver, 2)
+            
         else:
-            # Selecionar "Não" (Não Condutor Principal)
+            # CENÁRIO 2: Selecionar "Não" (Não Condutor Principal)
             exibir_mensagem("⏳ Selecionando 'Não' para não condutor principal...")
             if not clicar_radio_via_javascript(driver, "Não", "Não para condutor principal"):
                 exibir_mensagem("⚠️ Radio 'Não' não encontrado - tentando prosseguir...")
-        
-        # Aguardar estabilização após seleção
-        aguardar_estabilizacao(driver, 2)
+            
+            # Aguardar estabilização após seleção para campos aparecerem
+            aguardar_estabilizacao(driver, 5)
+            
+            # PREENCHER CAMPOS ADICIONAIS DO CONDUTOR (quando "Não" selecionado)
+            exibir_mensagem("📝 Preenchendo dados do condutor (campos condicionais)...")
+            
+            # Aguardar campos condicionais aparecerem
+            exibir_mensagem("⏳ Aguardando campos condicionais aparecerem...")
+            try:
+                WebDriverWait(driver, 15).until(
+                    EC.presence_of_element_located((By.ID, "nomeTelaCondutorPrincipal"))
+                )
+                exibir_mensagem("✅ Campos condicionais detectados!")
+            except:
+                exibir_mensagem("⚠️ Campos condicionais não apareceram - tentando prosseguir...")
+                aguardar_estabilizacao(driver, 3)
+            
+            # 1. Preencher Nome Completo do Condutor
+            exibir_mensagem("⏳ Preenchendo Nome Completo do Condutor...")
+            nome_condutor = parametros.get("nome_condutor", "")
+            if nome_condutor:
+                try:
+                    nome_element = WebDriverWait(driver, 10).until(
+                        EC.presence_of_element_located((By.ID, "nomeTelaCondutorPrincipal"))
+                    )
+                    nome_element.clear()
+                    nome_element.send_keys(nome_condutor)
+                    exibir_mensagem(f"✅ Nome do condutor preenchido: {nome_condutor}")
+                except Exception as e:
+                    exibir_mensagem(f"⚠️ Erro ao preencher nome do condutor: {e}")
+            else:
+                exibir_mensagem("⚠️ Nome do condutor não fornecido no JSON")
+            
+            # 2. Preencher CPF do Condutor
+            exibir_mensagem("⏳ Preenchendo CPF do Condutor...")
+            cpf_condutor = parametros.get("cpf_condutor", "")
+            if cpf_condutor:
+                try:
+                    cpf_element = WebDriverWait(driver, 10).until(
+                        EC.presence_of_element_located((By.ID, "cpfTelaCondutorPrincipal"))
+                    )
+                    cpf_element.clear()
+                    cpf_element.send_keys(cpf_condutor)
+                    exibir_mensagem(f"✅ CPF do condutor preenchido: {cpf_condutor}")
+                except Exception as e:
+                    exibir_mensagem(f"⚠️ Erro ao preencher CPF do condutor: {e}")
+            else:
+                exibir_mensagem("⚠️ CPF do condutor não fornecido no JSON")
+            
+            # 3. Preencher Data de Nascimento do Condutor
+            exibir_mensagem("⏳ Preenchendo Data de Nascimento do Condutor...")
+            data_condutor = parametros.get("data_nascimento_condutor", "")
+            if data_condutor:
+                try:
+                    data_element = WebDriverWait(driver, 10).until(
+                        EC.presence_of_element_located((By.ID, "dataNascimentoTelaCondutorPrincipal"))
+                    )
+                    data_element.clear()
+                    data_element.send_keys(data_condutor)
+                    exibir_mensagem(f"✅ Data de nascimento do condutor preenchida: {data_condutor}")
+                except Exception as e:
+                    exibir_mensagem(f"⚠️ Erro ao preencher data de nascimento do condutor: {e}")
+            else:
+                exibir_mensagem("⚠️ Data de nascimento do condutor não fornecida no JSON")
+            
+            # 4. CAMPO SEXO DO CONDUTOR (reutilizando lógica da Tela 9)
+            exibir_mensagem("🎯 Selecionando campo Sexo do Condutor...")
+            sexo_condutor = parametros.get("sexo_condutor", "Masculino")
+            try:
+                if not selecionar_dropdown_mui_otimizado(driver, "sexoTelaCondutorPrincipal", sexo_condutor):
+                    exibir_mensagem(f"⚠️ Falha ao selecionar Sexo do condutor: {sexo_condutor}")
+                else:
+                    exibir_mensagem(f"✅ Campo Sexo do condutor selecionado: {sexo_condutor}")
+            except Exception as e:
+                exibir_mensagem(f"⚠️ Erro ao selecionar Sexo do condutor: {e}")
+            
+            # 5. CAMPO ESTADO CIVIL DO CONDUTOR (reutilizando lógica da Tela 9)
+            exibir_mensagem("🎯 Selecionando campo Estado Civil do Condutor...")
+            estado_civil_condutor = parametros.get("estado_civil_condutor", "Casado ou União Estável")
+            try:
+                if not selecionar_dropdown_mui_otimizado(driver, "estadoCivilTelaCondutorPrincipal", estado_civil_condutor):
+                    exibir_mensagem(f"⚠️ Falha ao selecionar Estado Civil do condutor: {estado_civil_condutor}")
+                else:
+                    exibir_mensagem(f"✅ Campo Estado Civil do condutor selecionado: {estado_civil_condutor}")
+            except Exception as e:
+                exibir_mensagem(f"⚠️ Erro ao selecionar Estado Civil do condutor: {e}")
+            
+            # Aguardar estabilização após preenchimento dos campos
+            aguardar_estabilizacao(driver, 2)
         
         # Clicar em Continuar
         exibir_mensagem("⏳ Aguardando botão Continuar aparecer...")
