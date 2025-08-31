@@ -1279,13 +1279,20 @@ def aguardar_estabilizacao(driver, segundos=None):
     # O MutationObserver já detectou estabilização ou assumiu como estável
     return True
 
-def verificar_elemento_tela(driver, xpath_esperado, descricao_tela, timeout=10):
+def verificar_elemento_tela(driver, seletor, descricao_tela, timeout=10):
     """
-    Verifica se um elemento específico está presente na tela atual.
+    Verifica se um elemento específico está presente na tela atual - ESTRATÉGIA OTIMIZADA
+    
+    ESTRATÉGIA OTIMIZADA:
+    ====================
+    - Suporte a múltiplos tipos de seletores (ID, CSS, XPath)
+    - Detecção automática do tipo de seletor
+    - Elementos únicos identificados na gravação Selenium IDE
+    - Eliminação de erros críticos falsos positivos
     
     Args:
         driver: WebDriver do Selenium
-        xpath_esperado: XPath do elemento que deve estar presente
+        seletor: Seletor do elemento (ID, CSS ou XPath)
         descricao_tela: Descrição da tela para mensagens
         timeout: Tempo máximo de espera em segundos
     
@@ -1293,14 +1300,40 @@ def verificar_elemento_tela(driver, xpath_esperado, descricao_tela, timeout=10):
         bool: True se o elemento foi encontrado, False caso contrário
     """
     try:
+        # DETECTAR TIPO DE SELETOR AUTOMATICAMENTE
+        if seletor.startswith("id="):
+            by_type = By.ID
+            valor_seletor = seletor[3:]  # Remove "id="
+            tipo_seletor = "ID"
+        elif seletor.startswith("css="):
+            by_type = By.CSS_SELECTOR
+            valor_seletor = seletor[4:]  # Remove "css="
+            tipo_seletor = "CSS"
+        else:
+            by_type = By.XPATH
+            valor_seletor = seletor
+            tipo_seletor = "XPath"
+        
+        # BUSCAR ELEMENTO COM SELETOR OTIMIZADO
         elemento = WebDriverWait(driver, timeout).until(
-            EC.presence_of_element_located((By.XPATH, xpath_esperado))
+            EC.presence_of_element_located((by_type, valor_seletor))
         )
+        
         exibir_mensagem(f"✅ **VERIFICAÇÃO TELA**: Elemento '{descricao_tela}' encontrado com sucesso!")
-        exibir_mensagem(f"🔍 Texto detectado: '{elemento.text}'")
+        exibir_mensagem(f"🔍 Seletor usado: {tipo_seletor} = '{valor_seletor}'")
+        
+        # CAPTURAR TEXTO SE DISPONÍVEL
+        try:
+            texto_elemento = elemento.text if elemento.text else elemento.get_attribute("value") or elemento.get_attribute("alt") or "Sem texto"
+            exibir_mensagem(f"🔍 Texto detectado: '{texto_elemento}'")
+        except:
+            exibir_mensagem(f"🔍 Elemento encontrado (sem texto)")
+        
         return True
+        
     except TimeoutException:
         exibir_mensagem(f"❌ **ERRO CRÍTICO**: Elemento '{descricao_tela}' NÃO encontrado!")
+        exibir_mensagem(f"⚠️ Seletor usado: {tipo_seletor} = '{valor_seletor}'")
         exibir_mensagem(f"⚠️ A tela pode não ter carregado corretamente ou não é a tela esperada")
         return False
     except Exception as e:
@@ -1308,82 +1341,92 @@ def verificar_elemento_tela(driver, xpath_esperado, descricao_tela, timeout=10):
         return False
 
 def verificar_tela_1(driver):
-    """Verifica se estamos realmente na Tela 1 (Tipo de seguro)"""
+    """Verifica se estamos realmente na Tela 1 (Tipo de seguro) - ESTRATÉGIA OTIMIZADA"""
+    # ESTRATÉGIA OTIMIZADA: Elemento único identificado na gravação Selenium IDE
     return verificar_elemento_tela(
         driver,
-        "//p[contains(text(), 'Qual seguro você deseja cotar?')]",
+        "css=.group:nth-child(1) > .w-10",  # Ícone carro único
         "Tela 1 - Tipo de seguro"
     )
 
 def verificar_tela_2(driver):
-    """Verifica se estamos realmente na Tela 2 (Placa do carro)"""
+    """Verifica se estamos realmente na Tela 2 (Placa do carro) - ESTRATÉGIA OTIMIZADA"""
+    # ESTRATÉGIA OTIMIZADA: ID único identificado na gravação Selenium IDE
     return verificar_elemento_tela(
         driver,
-        "//p[contains(text(), 'Qual é a placa do carro?')]",
+        "id=placaTelaDadosPlaca",  # ID único do campo placa
         "Tela 2 - Placa do carro"
     )
 
 def verificar_tela_3(driver):
-    """Verifica se estamos realmente na Tela 3 (Confirmação do veículo)"""
+    """Verifica se estamos realmente na Tela 3 (Confirmação do veículo) - ESTRATÉGIA OTIMIZADA"""
+    # ESTRATÉGIA OTIMIZADA: ID único identificado na gravação Selenium IDE
     return verificar_elemento_tela(
         driver,
-        "//p[contains(text(), 'corresponde') or contains(text(), 'placa') or contains(text(), 'veículo')]",
+        "id=gtm-telaInfosAutoContinuar",  # ID único do botão continuar
         "Tela 3 - Confirmação do veículo"
     )
 
 def verificar_tela_4(driver):
-    """Verifica se estamos realmente na Tela 4 (Veículo já segurado)"""
+    """Verifica se estamos realmente na Tela 4 (Veículo já segurado) - ESTRATÉGIA OTIMIZADA"""
+    # ESTRATÉGIA OTIMIZADA: ID único identificado na gravação Selenium IDE
     return verificar_elemento_tela(
         driver,
-        "//p[@class='text-[20px] md:text-2xl font-asap text-primary font-bold text-start' and contains(text(), 'segurado')]",
+        "id=gtm-telaRenovacaoVeiculoContinuar",  # ID único do botão continuar
         "Tela 4 - Veículo já segurado"
     )
 
 def verificar_tela_5(driver):
-    """Verifica se estamos realmente na Tela 5 (Estimativa inicial)"""
+    """Verifica se estamos realmente na Tela 5 (Estimativa inicial) - ESTRATÉGIA OTIMIZADA"""
+    # ESTRATÉGIA OTIMIZADA: ID único identificado na gravação Selenium IDE
     return verificar_elemento_tela(
         driver,
-        "//p[contains(text(), 'Confira abaixo a estimativa inicial para o seu seguro carro!')]",
+        "id=gtm-telaEstimativaContinuarParaCotacaoFinal",  # ID único do botão continuar
         "Tela 5 - Estimativa inicial"
     )
 
 def verificar_tela_6(driver):
-    """Verifica se estamos realmente na Tela 6 (Itens do carro)"""
+    """Verifica se estamos realmente na Tela 6 (Itens do carro) - ESTRATÉGIA OTIMIZADA"""
+    # ESTRATÉGIA OTIMIZADA: ID único identificado na gravação Selenium IDE
     return verificar_elemento_tela(
         driver,
-        "//p[contains(text(), 'O carro possui alguns desses itens?')]",
+        "id=outrosTelaItens",  # ID único dos checkboxes de itens
         "Tela 6 - Itens do carro"
     )
 
 def verificar_tela_7(driver):
-    """Verifica se estamos realmente na Tela 7 (Endereço de pernoite)"""
+    """Verifica se estamos realmente na Tela 7 (Endereço de pernoite) - ESTRATÉGIA OTIMIZADA"""
+    # ESTRATÉGIA OTIMIZADA: ID único identificado na gravação Selenium IDE
     return verificar_elemento_tela(
         driver,
-        "//p[contains(text(), 'Onde o carro passa a noite?')]",
+        "id=enderecoTelaEndereco",  # ID único do campo endereço
         "Tela 7 - Endereço de pernoite"
     )
 
 def verificar_tela_8(driver):
-    """Verifica se estamos realmente na Tela 8 (Uso do veículo)"""
+    """Verifica se estamos realmente na Tela 8 (Uso do veículo) - ESTRATÉGIA OTIMIZADA"""
+    # ESTRATÉGIA OTIMIZADA: ID único identificado na gravação Selenium IDE
     return verificar_elemento_tela(
         driver,
-        "//p[contains(text(), 'Qual é o uso do veículo?')]",
+        "id=finalidadeVeiculoTelaUsoVeiculo",  # ID único dos radio buttons
         "Tela 8 - Uso do veículo"
     )
 
 def verificar_tela_9(driver):
-    """Verifica se estamos realmente na Tela 9 (Dados pessoais)"""
+    """Verifica se estamos realmente na Tela 9 (Dados pessoais) - ESTRATÉGIA OTIMIZADA"""
+    # ESTRATÉGIA OTIMIZADA: ID único identificado na gravação Selenium IDE
     return verificar_elemento_tela(
         driver,
-        "//p[contains(text(), 'Nessa etapa, precisamos dos seus dados pessoais')]",
+        "id=nomeTelaSegurado",  # ID único do campo nome
         "Tela 9 - Dados pessoais"
     )
 
 def verificar_tela_10(driver):
-    """Verifica se estamos realmente na Tela 10 (Condutor principal)"""
+    """Verifica se estamos realmente na Tela 10 (Condutor principal) - ESTRATÉGIA OTIMIZADA"""
+    # ESTRATÉGIA OTIMIZADA: ID único identificado na gravação Selenium IDE
     return verificar_elemento_tela(
         driver,
-        "//p[contains(text(), 'Você será o condutor principal do veículo?')]",
+        "id=gtm-telaCondutorPrincipalContinuar",  # ID único do botão continuar
         "Tela 10 - Condutor principal"
     )
 
