@@ -3870,11 +3870,11 @@ def implementar_tela10(driver, parametros):
                     
                     # Selecionar opção baseada no valor
                     if sexo_condutor == "Masculino":
-                        opcao = driver.find_element(By.CSS_SELECTOR, "css=.MuiButtonBase-root:nth-child(1)")
+                        opcao = driver.find_element(By.CSS_SELECTOR, ".MuiButtonBase-root:nth-child(1)")
                     elif sexo_condutor == "Feminino":
-                        opcao = driver.find_element(By.CSS_SELECTOR, "css=.MuiButtonBase-root:nth-child(2)")
+                        opcao = driver.find_element(By.CSS_SELECTOR, ".MuiButtonBase-root:nth-child(2)")
                     else:
-                        opcao = driver.find_element(By.CSS_SELECTOR, "css=.MuiButtonBase-root:nth-child(1)")
+                        opcao = driver.find_element(By.CSS_SELECTOR, ".MuiButtonBase-root:nth-child(1)")
                     
                     opcao.click()
                     exibir_mensagem(f"✅ Campo Sexo do condutor selecionado: {sexo_condutor}")
@@ -3905,10 +3905,38 @@ def implementar_tela10(driver, parametros):
                     ActionChains(driver).move_to_element(estado_civil_element).click().perform()
                     aguardar_estabilizacao(driver, 2)
                     
-                    # Selecionar opção baseada no valor (primeira opção na gravação)
-                    opcao = driver.find_element(By.CSS_SELECTOR, "css=.MuiButtonBase-root:nth-child(1)")
-                    opcao.click()
-                    exibir_mensagem(f"✅ Campo Estado Civil do condutor selecionado: {estado_civil_condutor}")
+                    # ESTRATÉGIA ROBUSTA: Tentar múltiplas abordagens para selecionar a opção
+                    opcao_selecionada = False
+                    
+                    # Tentativa 1: CSS Selector direto
+                    try:
+                        opcao = driver.find_element(By.CSS_SELECTOR, ".MuiButtonBase-root:nth-child(1)")
+                        opcao.click()
+                        exibir_mensagem(f"✅ Campo Estado Civil do condutor selecionado via CSS: {estado_civil_condutor}")
+                        opcao_selecionada = True
+                    except Exception as e1:
+                        exibir_mensagem(f"⚠️ Tentativa 1 falhou: {e1}")
+                        
+                        # Tentativa 2: JavaScript click
+                        try:
+                            opcao = driver.find_element(By.CSS_SELECTOR, ".MuiButtonBase-root:nth-child(1)")
+                            driver.execute_script("arguments[0].click();", opcao)
+                            exibir_mensagem(f"✅ Campo Estado Civil do condutor selecionado via JavaScript: {estado_civil_condutor}")
+                            opcao_selecionada = True
+                        except Exception as e2:
+                            exibir_mensagem(f"⚠️ Tentativa 2 falhou: {e2}")
+                            
+                            # Tentativa 3: ActionChains
+                            try:
+                                opcao = driver.find_element(By.CSS_SELECTOR, ".MuiButtonBase-root:nth-child(1)")
+                                ActionChains(driver).move_to_element(opcao).click().perform()
+                                exibir_mensagem(f"✅ Campo Estado Civil do condutor selecionado via ActionChains: {estado_civil_condutor}")
+                                opcao_selecionada = True
+                            except Exception as e3:
+                                exibir_mensagem(f"⚠️ Tentativa 3 falhou: {e3}")
+                    
+                    if not opcao_selecionada:
+                        exibir_mensagem("⚠️ Todas as tentativas de seleção direta falharam")
                 else:
                     exibir_mensagem("⚠️ Elemento estado civil não está visível")
             except Exception as e:
