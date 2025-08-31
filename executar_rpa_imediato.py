@@ -3679,46 +3679,119 @@ def implementar_tela10(driver, parametros):
         if condutor_principal:
             # CENÁRIO 1: Selecionar "Sim" (Condutor Principal)
             exibir_mensagem("⏳ Selecionando 'Sim' para condutor principal...")
-            if not clicar_radio_via_javascript(driver, "Sim", "Sim para condutor principal"):
-                exibir_mensagem("⚠️ Radio 'Sim' não encontrado - tentando prosseguir...")
+            
+            # ESTRATÉGIA MELHORADA: Múltiplos métodos de clique baseados na gravação
+            radio_sim_encontrado = False
+            
+            # Método 1: Clique direto via CSS (padrão da gravação)
+            try:
+                radio_sim = driver.find_element(By.CSS_SELECTOR, ".cursor-pointer:nth-child(1) > .border .font-workSans")
+                radio_sim.click()
+                exibir_mensagem("✅ Radio 'Sim' clicado via CSS direto")
+                radio_sim_encontrado = True
+            except Exception as e:
+                exibir_mensagem(f"⚠️ Método 1 falhou: {e}")
+            
+            # Método 2: Clique via JavaScript (fallback)
+            if not radio_sim_encontrado:
+                if clicar_radio_via_javascript(driver, "Sim", "Sim para condutor principal"):
+                    exibir_mensagem("✅ Radio 'Sim' clicado via JavaScript")
+                    radio_sim_encontrado = True
+                else:
+                    exibir_mensagem("⚠️ Radio 'Sim' não encontrado - tentando prosseguir...")
             
             # Aguardar estabilização após seleção
-            aguardar_estabilizacao(driver, 2)
+            aguardar_estabilizacao(driver, 3)
             
         else:
             # CENÁRIO 2: Selecionar "Não" (Não Condutor Principal)
             exibir_mensagem("⏳ Selecionando 'Não' para não condutor principal...")
-            if not clicar_radio_via_javascript(driver, "Não", "Não para condutor principal"):
-                exibir_mensagem("⚠️ Radio 'Não' não encontrado - tentando prosseguir...")
             
-            # Aguardar estabilização após seleção para campos aparecerem
-            aguardar_estabilizacao(driver, 5)
+            # ESTRATÉGIA MELHORADA: Múltiplos métodos de clique baseados na gravação
+            radio_nao_encontrado = False
+            
+            # Método 1: Clique direto via CSS (padrão da gravação)
+            try:
+                radio_nao = driver.find_element(By.CSS_SELECTOR, ".cursor-pointer:nth-child(2) > .border .font-workSans")
+                radio_nao.click()
+                exibir_mensagem("✅ Radio 'Não' clicado via CSS direto")
+                radio_nao_encontrado = True
+            except Exception as e:
+                exibir_mensagem(f"⚠️ Método 1 falhou: {e}")
+            
+            # Método 2: Clique via JavaScript (fallback)
+            if not radio_nao_encontrado:
+                if clicar_radio_via_javascript(driver, "Não", "Não para condutor principal"):
+                    exibir_mensagem("✅ Radio 'Não' clicado via JavaScript")
+                    radio_nao_encontrado = True
+                else:
+                    exibir_mensagem("⚠️ Radio 'Não' não encontrado - tentando prosseguir...")
+            
+            # ESTRATÉGIA MELHORADA: Aguardar mudanças específicas no DOM
+            exibir_mensagem("⏳ Aguardando campos condicionais aparecerem...")
+            
+            # Aguardar estabilização inicial
+            aguardar_estabilizacao(driver, 3)
+            
+            # ESTRATÉGIA ROBUSTA: Múltiplas tentativas de detecção
+            campos_detectados = False
+            tentativas = 0
+            max_tentativas = 5
+            
+            while not campos_detectados and tentativas < max_tentativas:
+                tentativas += 1
+                exibir_mensagem(f"🔄 Tentativa {tentativas}/{max_tentativas} de detectar campos condicionais...")
+                
+                # Verificar se elementos existem mas estão ocultos
+                elementos_ocultos = driver.find_elements(By.ID, "nomeTelaCondutorPrincipal")
+                if elementos_ocultos:
+                    exibir_mensagem("✅ Elementos condicionais existem no DOM")
+                    campos_detectados = True
+                    break
+                else:
+                    exibir_mensagem("⚠️ Elementos condicionais não encontrados no DOM")
+                
+                # Aguardar por mudanças específicas no DOM
+                try:
+                    WebDriverWait(driver, 10).until(
+                        lambda d: len(d.find_elements(By.ID, "nomeTelaCondutorPrincipal")) > 0
+                    )
+                    exibir_mensagem("✅ Campos condicionais detectados via DOM!")
+                    campos_detectados = True
+                    break
+                except:
+                    exibir_mensagem(f"⚠️ Timeout tentativa {tentativas} - aguardando...")
+                    aguardar_estabilizacao(driver, 3)
+            
+            if not campos_detectados:
+                exibir_mensagem("⚠️ Campos condicionais não apareceram após todas as tentativas")
+                exibir_mensagem("⚠️ Continuando sem preencher campos condicionais...")
             
             # PREENCHER CAMPOS ADICIONAIS DO CONDUTOR (quando "Não" selecionado)
-            exibir_mensagem("📝 Preenchendo dados do condutor (campos condicionais)...")
-            
-            # Aguardar campos condicionais aparecerem
-            exibir_mensagem("⏳ Aguardando campos condicionais aparecerem...")
-            try:
-                WebDriverWait(driver, 15).until(
-                    EC.presence_of_element_located((By.ID, "nomeTelaCondutorPrincipal"))
-                )
-                exibir_mensagem("✅ Campos condicionais detectados!")
-            except:
-                exibir_mensagem("⚠️ Campos condicionais não apareceram - tentando prosseguir...")
-                aguardar_estabilizacao(driver, 3)
-            
-            # 1. Preencher Nome Completo do Condutor
+            if campos_detectados:
+                exibir_mensagem("📝 Preenchendo dados do condutor (campos condicionais)...")
+                
+                # 1. Preencher Nome Completo do Condutor
             exibir_mensagem("⏳ Preenchendo Nome Completo do Condutor...")
             nome_condutor = parametros.get("nome_condutor", "")
             if nome_condutor:
                 try:
-                    nome_element = WebDriverWait(driver, 10).until(
+                    # Aguardar elemento e scroll para garantir visibilidade
+                    nome_element = WebDriverWait(driver, 15).until(
                         EC.presence_of_element_located((By.ID, "nomeTelaCondutorPrincipal"))
                     )
-                    nome_element.clear()
-                    nome_element.send_keys(nome_condutor)
-                    exibir_mensagem(f"✅ Nome do condutor preenchido: {nome_condutor}")
+                    
+                    # Scroll para o elemento garantir que está visível
+                    driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", nome_element)
+                    aguardar_estabilizacao(driver, 1)
+                    
+                    # Verificar se elemento está visível
+                    if nome_element.is_displayed():
+                        nome_element.clear()
+                        nome_element.send_keys(nome_condutor)
+                        exibir_mensagem(f"✅ Nome do condutor preenchido: {nome_condutor}")
+                    else:
+                        exibir_mensagem("⚠️ Elemento nome não está visível")
                 except Exception as e:
                     exibir_mensagem(f"⚠️ Erro ao preencher nome do condutor: {e}")
             else:
@@ -3729,12 +3802,22 @@ def implementar_tela10(driver, parametros):
             cpf_condutor = parametros.get("cpf_condutor", "")
             if cpf_condutor:
                 try:
-                    cpf_element = WebDriverWait(driver, 10).until(
+                    # Aguardar elemento e scroll para garantir visibilidade
+                    cpf_element = WebDriverWait(driver, 15).until(
                         EC.presence_of_element_located((By.ID, "cpfTelaCondutorPrincipal"))
                     )
-                    cpf_element.clear()
-                    cpf_element.send_keys(cpf_condutor)
-                    exibir_mensagem(f"✅ CPF do condutor preenchido: {cpf_condutor}")
+                    
+                    # Scroll para o elemento garantir que está visível
+                    driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", cpf_element)
+                    aguardar_estabilizacao(driver, 1)
+                    
+                    # Verificar se elemento está visível
+                    if cpf_element.is_displayed():
+                        cpf_element.clear()
+                        cpf_element.send_keys(cpf_condutor)
+                        exibir_mensagem(f"✅ CPF do condutor preenchido: {cpf_condutor}")
+                    else:
+                        exibir_mensagem("⚠️ Elemento CPF não está visível")
                 except Exception as e:
                     exibir_mensagem(f"⚠️ Erro ao preencher CPF do condutor: {e}")
             else:
@@ -3745,41 +3828,99 @@ def implementar_tela10(driver, parametros):
             data_condutor = parametros.get("data_nascimento_condutor", "")
             if data_condutor:
                 try:
-                    data_element = WebDriverWait(driver, 10).until(
+                    # Aguardar elemento e scroll para garantir visibilidade
+                    data_element = WebDriverWait(driver, 15).until(
                         EC.presence_of_element_located((By.ID, "dataNascimentoTelaCondutorPrincipal"))
                     )
-                    data_element.clear()
-                    data_element.send_keys(data_condutor)
-                    exibir_mensagem(f"✅ Data de nascimento do condutor preenchida: {data_condutor}")
+                    
+                    # Scroll para o elemento garantir que está visível
+                    driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", data_element)
+                    aguardar_estabilizacao(driver, 1)
+                    
+                    # Verificar se elemento está visível
+                    if data_element.is_displayed():
+                        data_element.clear()
+                        data_element.send_keys(data_condutor)
+                        exibir_mensagem(f"✅ Data de nascimento do condutor preenchida: {data_condutor}")
+                    else:
+                        exibir_mensagem("⚠️ Elemento data não está visível")
                 except Exception as e:
                     exibir_mensagem(f"⚠️ Erro ao preencher data de nascimento do condutor: {e}")
             else:
                 exibir_mensagem("⚠️ Data de nascimento do condutor não fornecida no JSON")
             
-            # 4. CAMPO SEXO DO CONDUTOR (reutilizando lógica da Tela 9)
+            # 4. CAMPO SEXO DO CONDUTOR (estratégia baseada na gravação)
             exibir_mensagem("🎯 Selecionando campo Sexo do Condutor...")
             sexo_condutor = parametros.get("sexo_condutor", "Masculino")
             try:
-                if not selecionar_dropdown_mui_otimizado(driver, "sexoTelaCondutorPrincipal", sexo_condutor):
-                    exibir_mensagem(f"⚠️ Falha ao selecionar Sexo do condutor: {sexo_condutor}")
-                else:
+                # Aguardar elemento e scroll para garantir visibilidade
+                sexo_element = WebDriverWait(driver, 15).until(
+                    EC.presence_of_element_located((By.ID, "sexoTelaCondutorPrincipal"))
+                )
+                
+                # Scroll para o elemento garantir que está visível
+                driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", sexo_element)
+                aguardar_estabilizacao(driver, 1)
+                
+                # Verificar se elemento está visível
+                if sexo_element.is_displayed():
+                    # ESTRATÉGIA MELHORADA: mouseDown + mouseUp + click (padrão da gravação)
+                    ActionChains(driver).move_to_element(sexo_element).click().perform()
+                    aguardar_estabilizacao(driver, 2)
+                    
+                    # Selecionar opção baseada no valor
+                    if sexo_condutor == "Masculino":
+                        opcao = driver.find_element(By.CSS_SELECTOR, "css=.MuiButtonBase-root:nth-child(1)")
+                    elif sexo_condutor == "Feminino":
+                        opcao = driver.find_element(By.CSS_SELECTOR, "css=.MuiButtonBase-root:nth-child(2)")
+                    else:
+                        opcao = driver.find_element(By.CSS_SELECTOR, "css=.MuiButtonBase-root:nth-child(1)")
+                    
+                    opcao.click()
                     exibir_mensagem(f"✅ Campo Sexo do condutor selecionado: {sexo_condutor}")
+                else:
+                    exibir_mensagem("⚠️ Elemento sexo não está visível")
             except Exception as e:
                 exibir_mensagem(f"⚠️ Erro ao selecionar Sexo do condutor: {e}")
+                # Fallback para método anterior
+                if selecionar_dropdown_mui_otimizado(driver, "sexoTelaCondutorPrincipal", sexo_condutor):
+                    exibir_mensagem(f"✅ Campo Sexo do condutor selecionado via fallback: {sexo_condutor}")
             
-            # 5. CAMPO ESTADO CIVIL DO CONDUTOR (reutilizando lógica da Tela 9)
+            # 5. CAMPO ESTADO CIVIL DO CONDUTOR (estratégia baseada na gravação)
             exibir_mensagem("🎯 Selecionando campo Estado Civil do Condutor...")
             estado_civil_condutor = parametros.get("estado_civil_condutor", "Casado ou União Estável")
             try:
-                if not selecionar_dropdown_mui_otimizado(driver, "estadoCivilTelaCondutorPrincipal", estado_civil_condutor):
-                    exibir_mensagem(f"⚠️ Falha ao selecionar Estado Civil do condutor: {estado_civil_condutor}")
-                else:
+                # Aguardar elemento e scroll para garantir visibilidade
+                estado_civil_element = WebDriverWait(driver, 15).until(
+                    EC.presence_of_element_located((By.ID, "estadoCivilTelaCondutorPrincipal"))
+                )
+                
+                # Scroll para o elemento garantir que está visível
+                driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", estado_civil_element)
+                aguardar_estabilizacao(driver, 1)
+                
+                # Verificar se elemento está visível
+                if estado_civil_element.is_displayed():
+                    # ESTRATÉGIA MELHORADA: mouseDown + mouseUp + click (padrão da gravação)
+                    ActionChains(driver).move_to_element(estado_civil_element).click().perform()
+                    aguardar_estabilizacao(driver, 2)
+                    
+                    # Selecionar opção baseada no valor (primeira opção na gravação)
+                    opcao = driver.find_element(By.CSS_SELECTOR, "css=.MuiButtonBase-root:nth-child(1)")
+                    opcao.click()
                     exibir_mensagem(f"✅ Campo Estado Civil do condutor selecionado: {estado_civil_condutor}")
+                else:
+                    exibir_mensagem("⚠️ Elemento estado civil não está visível")
             except Exception as e:
                 exibir_mensagem(f"⚠️ Erro ao selecionar Estado Civil do condutor: {e}")
+                # Fallback para método anterior
+                if selecionar_dropdown_mui_otimizado(driver, "estadoCivilTelaCondutorPrincipal", estado_civil_condutor):
+                    exibir_mensagem(f"✅ Campo Estado Civil do condutor selecionado via fallback: {estado_civil_condutor}")
             
-            # Aguardar estabilização após preenchimento dos campos
-            aguardar_estabilizacao(driver, 2)
+                # Aguardar estabilização após preenchimento dos campos
+                aguardar_estabilizacao(driver, 2)
+            else:
+                exibir_mensagem("⚠️ Pulando preenchimento dos campos condicionais...")
         
         # Clicar em Continuar
         exibir_mensagem("⏳ Aguardando botão Continuar aparecer...")
