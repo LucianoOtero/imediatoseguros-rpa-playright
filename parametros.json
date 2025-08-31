@@ -21,6 +21,8 @@
   "estacionamento_proprio_local_de_trabalho": false,
   "local_de_estudo": false,
   "estacionamento_proprio_local_de_estudo": false,
+  "garagem_residencia": true,
+  "portao_eletronico": "Eletronico",
   "combustivel": "Flex",
   "veiculo_segurado": "Não",
   "cep": "03317-000",

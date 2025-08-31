@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
-RPA Tô Segurado - COMPLETO ATÉ TELA 9
+RPA Tô Segurado - COMPLETO ATÉ TELA 12
 VERSÃO CORRIGIDA baseada EXATAMENTE no script tosegurado-completo-tela1-8.py que funcionou ontem
 + IMPLEMENTAÇÃO DA TELA 9: Dados pessoais do segurado
++ IMPLEMENTAÇÃO DA TELA 10: Condutor principal
++ IMPLEMENTAÇÃO DA TELA 11: Atividade do Veículo
++ IMPLEMENTAÇÃO DA TELA 12: Garagem na Residência
 + IMPLEMENTAÇÃO MUTATIONOBSERVER ROBUSTO: Detecção inteligente de estabilização do DOM para React/Next.js
 + NOVA FUNCIONALIDADE: Recebe JSON diretamente na chamada do Python com validação completa
 + VALIDAÇÃO COMPLETA: Todos os parâmetros obrigatórios são validados automaticamente
@@ -173,6 +177,19 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException, TimeoutException, WebDriverException, SessionNotCreatedException, ElementClickInterceptedException, StaleElementReferenceException, ElementNotInteractableException, InvalidSelectorException, NoSuchWindowException, NoSuchFrameException, UnexpectedAlertPresentException, MoveTargetOutOfBoundsException, InvalidElementStateException, ScreenshotException, ImeNotAvailableException, ImeActivationFailedException, InvalidCookieDomainException, UnableToSetCookieException
+
+# =============================================================================
+# CONFIGURAÇÃO DE CODIFICAÇÃO UTF-8 PARA WINDOWS
+# =============================================================================
+import sys
+import io
+
+# Configurar codificação UTF-8 para Windows
+if sys.platform.startswith('win'):
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
+
+# =============================================================================
 
 
 # =============================================================================
@@ -1445,6 +1462,28 @@ def verificar_tela_11(driver):
     for seletor in seletores_possiveis:
         try:
             if verificar_elemento_tela(driver, seletor, "Tela 11 - Atividade do Veículo"):
+                return True
+        except Exception as e:
+            exibir_mensagem(f"⚠️ Seletor {seletor} falhou: {str(e)[:100]}...")
+            continue
+    
+    return False
+
+def verificar_tela_12(driver):
+    """Verifica se estamos realmente na Tela 12 (Garagem na Residência)"""
+    # ESTRATÉGIA: Baseado na gravação Selenium IDE
+    # Tela 12: Garagem na Residência
+    
+    # Tentar diferentes seletores baseados na gravação real
+    seletores_possiveis = [
+        "id=gtm-telaGaragemResidenciaContinuar",  # ID esperado da gravação
+        "css=button[data-testid*='continuar']",  # CSS genérico
+        "xpath=//button[text()='Continuar']"  # XPath simples
+    ]
+    
+    for seletor in seletores_possiveis:
+        try:
+            if verificar_elemento_tela(driver, seletor, "Tela 12 - Garagem na Residência"):
                 return True
         except Exception as e:
             exibir_mensagem(f"⚠️ Seletor {seletor} falhou: {str(e)[:100]}...")
@@ -3538,6 +3577,13 @@ def implementar_tela9(driver, parametros):
                 exibir_mensagem("❌ **ERRO CRÍTICO**: Falha na implementação da Tela 11!")
                 return False
             
+            # TELA 12: Garagem na Residência
+            exibir_mensagem("\n🏠 **INICIANDO TELA 12: Garagem na Residência**")
+            
+            if not implementar_tela12(driver, parametros):
+                exibir_mensagem("❌ **ERRO CRÍTICO**: Falha na implementação da Tela 12!")
+                return False
+            
             return True
                 
         except Exception as e:
@@ -3744,6 +3790,196 @@ def implementar_tela11(driver, parametros):
         
     except Exception as e:
         exibir_mensagem(f"❌ **ERRO CRÍTICO**: Falha na Tela 11: {e}")
+        return False
+
+def implementar_tela12(driver, parametros):
+    """
+    Implementa a Tela 12: Garagem na Residência
+    
+    ESTRATÉGIA IMPLEMENTADA:
+    ========================
+    Baseado na gravação Selenium IDE
+    Tela aparece após Tela 11 (Atividade do Veículo)
+    
+    ELEMENTOS IDENTIFICADOS:
+    =======================
+    - Botão Continuar: id=gtm-telaGaragemResidenciaContinuar
+    - Radio Garagem: Sim/Não baseado no parâmetro garagem_residencia
+    - Radio Portão: Eletrônico/Manual baseado no parâmetro portao_eletronico (apenas se garagem_residencia=true)
+    
+    IMPLEMENTAÇÃO:
+    ==============
+    1. Aguarda elementos da Tela 12 (Garagem na Residência)
+    2. Seleciona opção de garagem baseada no parâmetro garagem_residencia
+    3. Se garagem_residencia=true, seleciona tipo de portão baseado no parâmetro portao_eletronico
+    4. Clica em Continuar para avançar para próxima tela
+    
+    DETECÇÃO:
+    - ID: gtm-telaGaragemResidenciaContinuar (botão continuar)
+    
+    RETORNO:
+    - True: Se Tela 12 implementada com sucesso
+    - False: Se falhou na implementação
+    """
+    try:
+        # ETAPA 1: Aguardar carregamento da Tela 12
+        exibir_mensagem("⏳ Aguardando carregamento da Tela 12...")
+        aguardar_dom_estavel(driver)
+        
+        # ETAPA 2: Verificar se estamos na Tela 12
+        exibir_mensagem("🔍 Verificando se estamos na Tela 12...")
+        if not verificar_tela_12(driver):
+            exibir_mensagem("❌ **ERRO**: Não conseguimos detectar a Tela 12!")
+            return False
+        
+        exibir_mensagem("✅ **TELA 12 DETECTADA**: Garagem na Residência")
+        
+        # ETAPA 3: Obter parâmetros
+        garagem_residencia = parametros.get('garagem_residencia', True)
+        portao_eletronico = parametros.get('portao_eletronico', 'Eletronico')
+        
+        exibir_mensagem(f"📋 Parâmetros: Garagem={garagem_residencia}, Portão={portao_eletronico}")
+        
+        # ETAPA 4: Selecionar opção de garagem (Sim/Não)
+        exibir_mensagem("🏠 Selecionando opção de garagem na residência...")
+        
+        # Estratégia: Usar JavaScript para clicar no radio button
+        if garagem_residencia:
+            # Selecionar "Sim" para garagem
+            try:
+                # Tentar diferentes seletores para o radio "Sim"
+                seletores_sim = [
+                    "xpath=//input[@type='radio' and @value='true']",
+                    "xpath=//input[@type='radio' and @value='sim']",
+                    "xpath=//input[@type='radio' and @value='Sim']",
+                    "xpath=//input[@type='radio' and @value='1']",
+                    "xpath=//input[@type='radio' and @name='garagem']",
+                    "xpath=//input[@type='radio' and contains(@id, 'sim')]",
+                    "xpath=//input[@type='radio' and contains(@id, 'garagem')]"
+                ]
+                
+                radio_selecionado = False
+                for seletor in seletores_sim:
+                    try:
+                        radio = WebDriverWait(driver, 5).until(
+                            EC.presence_of_element_located((By.XPATH, seletor.split("=", 1)[1]))
+                        )
+                        driver.execute_script("arguments[0].click();", radio)
+                        exibir_mensagem(f"✅ Radio 'Sim' selecionado com sucesso! (Seletor: {seletor})")
+                        radio_selecionado = True
+                        break
+                    except:
+                        continue
+                
+                if not radio_selecionado:
+                    exibir_mensagem("⚠️ Não foi possível selecionar radio 'Sim' automaticamente")
+            except Exception as e:
+                exibir_mensagem(f"⚠️ Erro ao selecionar radio 'Sim': {e}")
+        else:
+            # Selecionar "Não" para garagem
+            try:
+                # Tentar diferentes seletores para o radio "Não"
+                seletores_nao = [
+                    "xpath=//input[@type='radio' and @value='false']",
+                    "xpath=//input[@type='radio' and @value='nao']",
+                    "xpath=//input[@type='radio' and @value='Não']",
+                    "xpath=//input[@type='radio' and @value='0']",
+                    "xpath=//input[@type='radio' and contains(@id, 'nao')]"
+                ]
+                
+                radio_selecionado = False
+                for seletor in seletores_nao:
+                    try:
+                        radio = WebDriverWait(driver, 5).until(
+                            EC.presence_of_element_located((By.XPATH, seletor.split("=", 1)[1]))
+                        )
+                        driver.execute_script("arguments[0].click();", radio)
+                        exibir_mensagem(f"✅ Radio 'Não' selecionado com sucesso! (Seletor: {seletor})")
+                        radio_selecionado = True
+                        break
+                    except:
+                        continue
+                
+                if not radio_selecionado:
+                    exibir_mensagem("⚠️ Não foi possível selecionar radio 'Não' automaticamente")
+            except Exception as e:
+                exibir_mensagem(f"⚠️ Erro ao selecionar radio 'Não': {e}")
+        
+        # ETAPA 5: Se garagem=true, selecionar tipo de portão
+        if garagem_residencia:
+            exibir_mensagem("🚪 Selecionando tipo de portão...")
+            
+            # Aguardar um pouco para o segundo radio aparecer
+            aguardar_dom_estavel(driver)
+            
+            try:
+                # Tentar diferentes seletores para o radio do portão
+                seletores_portao = [
+                    f"xpath=//input[@type='radio' and @value='{portao_eletronico.lower()}']",
+                    f"xpath=//input[@type='radio' and @value='{portao_eletronico}']",
+                    f"xpath=//input[@type='radio' and contains(@id, '{portao_eletronico.lower()}')]",
+                    f"xpath=//input[@type='radio' and contains(@id, 'portao')]",
+                    "xpath=//input[@type='radio' and contains(@name, 'portao')]"
+                ]
+                
+                portao_selecionado = False
+                for seletor in seletores_portao:
+                    try:
+                        radio = WebDriverWait(driver, 5).until(
+                            EC.presence_of_element_located((By.XPATH, seletor.split("=", 1)[1]))
+                        )
+                        driver.execute_script("arguments[0].click();", radio)
+                        exibir_mensagem(f"✅ Portão '{portao_eletronico}' selecionado com sucesso! (Seletor: {seletor})")
+                        portao_selecionado = True
+                        break
+                    except:
+                        continue
+                
+                if not portao_selecionado:
+                    exibir_mensagem("⚠️ Não foi possível selecionar tipo de portão automaticamente")
+            except Exception as e:
+                exibir_mensagem(f"⚠️ Erro ao selecionar tipo de portão: {e}")
+        
+        # ETAPA 6: Clicar no botão Continuar
+        exibir_mensagem("🖱️ Clicando no botão Continuar da Tela 12...")
+        
+        # Tentar diferentes seletores para o botão continuar
+        seletores_botao = [
+            "id=gtm-telaGaragemResidenciaContinuar",  # ID esperado da gravação
+            "xpath=//button[contains(text(), 'Continuar')]",
+            "css=button[data-testid*='continuar']",
+            "xpath=//button[text()='Continuar']",
+            "xpath=//button[@id='gtm-telaGaragemResidenciaContinuar']"
+        ]
+        
+        botao_clicado = False
+        for seletor in seletores_botao:
+            try:
+                botao = WebDriverWait(driver, 10).until(
+                    EC.element_to_be_clickable((By.CSS_SELECTOR if seletor.startswith("css=") else 
+                                              By.XPATH if seletor.startswith("xpath=") else 
+                                              By.ID, seletor.split("=", 1)[1]))
+                )
+                botao.click()
+                exibir_mensagem(f"✅ Botão Continuar clicado com sucesso! (Seletor: {seletor})")
+                botao_clicado = True
+                break
+            except:
+                continue
+        
+        if not botao_clicado:
+            exibir_mensagem("❌ **ERRO**: Não foi possível clicar no botão Continuar!")
+            return False
+        
+        # ETAPA 7: Aguardar navegação
+        exibir_mensagem("⏳ Aguardando navegação para próxima tela...")
+        aguardar_dom_estavel(driver)
+        
+        exibir_mensagem("✅ **TELA 12 IMPLEMENTADA COM SUCESSO!**")
+        return True
+        
+    except Exception as e:
+        exibir_mensagem(f"❌ **ERRO CRÍTICO**: Falha na Tela 12: {e}")
         return False
 
 def executar_todas_telas(json_string):
