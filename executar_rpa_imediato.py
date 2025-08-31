@@ -4074,7 +4074,7 @@ def executar_todas_telas(json_string):
     exibir_mensagem(f"ESTRATEGIA: ERROR HANDLER ROBUSTO para captura e tratamento de erros")
     exibir_mensagem(f">>> MUTATIONOBSERVER ROBUSTO: Deteccao inteligente de estabilizacao do DOM")
     exibir_mensagem(f">>> PERFORMANCE: Estabilizacao detectada automaticamente (sem delays fixos)")
-            exibir_mensagem(f">>> OBJETIVO: Todas as 13 telas com tratamento de erros robusto")
+    exibir_mensagem(f">>> OBJETIVO: Todas as 13 telas com tratamento de erros robusto")
     exibir_mensagem(f"🔍 MONITORAMENTO: DOM observado em tempo real via MutationObserver ROBUSTO")
     exibir_mensagem(f"💡 INOVAÇÃO: Zero delays fixos, apenas estabilização real detectada")
     exibir_mensagem(f"🔄 FALLBACK: Método tradicional se MutationObserver ROBUSTO falhar")

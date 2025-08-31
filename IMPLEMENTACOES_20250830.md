@@ -185,3 +185,168 @@
 
 **📝 Nota:** Todas as implementações foram salvas no GitHub (v1.0.13) para evitar perda de dados em caso de travamento do computador.
 
+---
+
+## 📋 **IMPLEMENTAÇÕES ADICIONAIS - PARÂMETROS JSON TELA 10**
+
+### **Data:** 30/08/2025 (Tarde)
+**Objetivo:** Implementar parâmetros JSON completos para Tela 10 (Condutor Principal)
+
+### **1. Análise da Gravação Selenium IDE**
+- **Arquivo:** Gravação "Gravacao campos sexo e estado civil condutor principal"
+- **Identificados:** Todos os elementos da Tela 10
+- **Locators:** Radio buttons, campos de texto, dropdowns MUI
+- **Valores:** Sexo (Masculino/Feminino), Estado Civil (5 opções)
+
+### **2. Parâmetros JSON Implementados**
+
+#### **Parâmetros Principais:**
+```json
+{
+  "condutor_principal": true,
+  "nome_condutor": "SANDRA LOUREIRO",
+  "cpf_condutor": "251.517.878-29",
+  "data_nascimento_condutor": "28/08/1975",
+  "sexo_condutor": "Feminino",
+  "estado_civil_condutor": "Casado ou União Estável"
+}
+```
+
+#### **Detalhamento dos Parâmetros:**
+
+| Parâmetro | Tipo | Obrigatório | Descrição | Valores Aceitos |
+|-----------|------|-------------|-----------|-----------------|
+| `condutor_principal` | boolean | ✅ | Você será o condutor principal? | `true` / `false` |
+| `nome_condutor` | string | ⚠️ | Nome completo do condutor | Texto livre |
+| `cpf_condutor` | string | ⚠️ | CPF do condutor | XXX.XXX.XXX-XX |
+| `data_nascimento_condutor` | string | ⚠️ | Data de nascimento | DD/MM/AAAA |
+| `sexo_condutor` | string | ⚠️ | Sexo do condutor | `"Masculino"`, `"Feminino"` |
+| `estado_civil_condutor` | string | ⚠️ | Estado civil do condutor | `"Casado ou União Estável"`, `"Divorciado"`, `"Separado"`, `"Solteiro"`, `"Viúvo"` |
+
+**⚠️ Obrigatório apenas quando `condutor_principal = false`**
+
+### **3. Documentação Criada**
+
+#### **Arquivos de Documentação:**
+1. **`PARAMETROS_JSON_COMPLETO.md`** - Documentação completa de todos os 45 parâmetros
+2. **`TIPOS_TELA10_CONDUTOR_PRINCIPAL.md`** - Documentação específica da Tela 10
+
+#### **Conteúdo da Documentação:**
+- ✅ Todos os parâmetros organizados por categoria
+- ✅ Tipos de dados e valores aceitos
+- ✅ Exemplos de uso e cenários
+- ✅ Validações e formatos
+- ✅ Locators Selenium identificados
+- ✅ Fluxo condicional documentado
+
+### **4. Estrutura do JSON Atualizada**
+
+#### **Organização por Categorias:**
+1. **Configuração do Sistema** (9 parâmetros)
+2. **Dados do Veículo** (8 parâmetros)
+3. **Dados de Endereço** (3 parâmetros)
+4. **Uso do Veículo** (1 parâmetro)
+5. **Dados Pessoais do Segurado** (7 parâmetros)
+6. **Dados do Condutor Principal** (6 parâmetros)
+7. **Atividade do Veículo** (4 parâmetros)
+8. **Garagem na Residência** (2 parâmetros)
+9. **Uso por Residentes** (3 parâmetros)
+10. **Itens Opcionais** (3 parâmetros)
+
+**Total: 45 parâmetros configuráveis**
+
+### **5. Cenários de Uso Documentados**
+
+#### **Cenário 1: Condutor Principal (Sim)**
+```json
+{
+  "condutor_principal": true
+}
+```
+- **Comportamento:** Vai direto para próxima tela
+- **Campos do condutor:** Não preenchidos
+
+#### **Cenário 2: Condutor Principal (Não)**
+```json
+{
+  "condutor_principal": false,
+  "nome_condutor": "SANDRA LOUREIRO",
+  "cpf_condutor": "251.517.878-29",
+  "data_nascimento_condutor": "28/08/1975",
+  "sexo_condutor": "Feminino",
+  "estado_civil_condutor": "Casado ou União Estável"
+}
+```
+- **Comportamento:** Aparecem campos adicionais para preenchimento
+- **Campos do condutor:** Todos obrigatórios
+
+### **6. Locators Selenium Identificados**
+
+#### **Radio Buttons:**
+```python
+# Radio "Sim"
+"css=.cursor-pointer:nth-child(1) > .border .font-workSans"
+
+# Radio "Não"  
+"css=.cursor-pointer:nth-child(2) > .border .font-workSans"
+```
+
+#### **Campos de Texto:**
+```python
+# Nome Completo
+"id=nomeTelaCondutorPrincipal"
+
+# CPF
+"id=cpfTelaCondutorPrincipal"
+
+# Data de Nascimento
+"id=dataNascimentoTelaCondutorPrincipal"
+```
+
+#### **Dropdowns MUI:**
+```python
+# Sexo
+"id=sexoTelaCondutorPrincipal"
+
+# Estado Civil
+"id=estadoCivilTelaCondutorPrincipal"
+```
+
+#### **Botão Continuar:**
+```python
+"id=gtm-telaCondutorPrincipalContinuar"
+```
+
+### **7. Validações Implementadas**
+
+#### **Campos Obrigatórios (quando condutor_principal = false):**
+- ✅ nome_condutor
+- ✅ cpf_condutor
+- ✅ data_nascimento_condutor
+- ✅ sexo_condutor
+- ✅ estado_civil_condutor
+
+#### **Formatos Específicos:**
+- **CPF:** XXX.XXX.XXX-XX
+- **Data:** DD/MM/AAAA
+- **Nome:** Texto livre (sem caracteres especiais)
+
+### **8. Próximos Passos**
+
+#### **Para Implementação da Tela 10:**
+1. **Implementar função `implementar_tela10()`** com lógica condicional
+2. **Usar `selecionar_dropdown_mui_otimizado()`** para dropdowns
+3. **Implementar validação de parâmetros obrigatórios**
+4. **Testar ambos os cenários** (Sim/Não)
+
+#### **Para Documentação:**
+1. ✅ **Completo:** Documentação de todos os parâmetros
+2. ✅ **Completo:** Tipos de valores aceitos
+3. ✅ **Completo:** Exemplos de uso
+4. ✅ **Completo:** Cenários de teste
+
+---
+
+**📝 Status:** ✅ PARÂMETROS JSON IMPLEMENTADOS E DOCUMENTADOS  
+**🔧 Próximo:** Implementar função `implementar_tela10()` no código principal
+
