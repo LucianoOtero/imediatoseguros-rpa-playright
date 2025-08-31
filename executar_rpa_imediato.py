@@ -8,6 +8,14 @@ VERSÃO CORRIGIDA baseada EXATAMENTE no script tosegurado-completo-tela1-8.py qu
 + IMPLEMENTAÇÃO DA TELA 12: Garagem na Residência
 + IMPLEMENTAÇÃO DA TELA 13: Uso por Residentes
 + IMPLEMENTAÇÃO MUTATIONOBSERVER ROBUSTO: Detecção inteligente de estabilização do DOM para React/Next.js
+
+PENDÊNCIAS PARA AMANHÃ:
+======================
+1. TELA 14: Tela de apresentação do cálculo (próxima implementação)
+2. TELA DE CONFIRMAÇÃO DO CORRETOR ATUAL: 
+   - Abre quando já existe um cálculo para a placa informada
+   - Precisa verificar comportamento e implementar tratamento
+   - Pode aparecer antes da Tela 14 dependendo do cenário
 + NOVA FUNCIONALIDADE: Recebe JSON diretamente na chamada do Python com validação completa
 + VALIDAÇÃO COMPLETA: Todos os parâmetros obrigatórios são validados automaticamente
 + PARSER DE ARGUMENTOS: Suporte a JSON direto ou leitura da entrada padrão
@@ -2917,10 +2925,10 @@ def implementar_tela6(driver, parametros):
     ==============
     1. Aguarda elementos da Tela 6 (combustível, Flex, Gasolina)
     2. Seleciona "Flex" como tipo de combustível via JavaScript
-    3. Tenta selecionar checkboxes disponíveis:
-       - Kit Gás (se disponível)
-       - Blindado (se disponível) 
-       - Financiado (se disponível)
+    3. Seleciona checkboxes baseado nos parâmetros do JSON:
+       - Kit Gás (se parametros['kit_gas'] = true)
+       - Blindado (se parametros['blindado'] = true) 
+       - Financiado (se parametros['financiado'] = true)
     4. Clica em Continuar para avançar
     
     DETECÇÃO:
@@ -2974,23 +2982,32 @@ def implementar_tela6(driver, parametros):
         if not clicar_radio_via_javascript(driver, "Flex", "Flex como combustível"):
             exibir_mensagem("⚠️ Radio 'Flex' não encontrado - tentando prosseguir...")
         
-        # Selecionar checkboxes se disponíveis (OPCIONAL - pode ser pulado)
-        if not parametros.get('configuracao', {}).get('eliminar_tentativas_inuteis', False):
-            exibir_mensagem("⏳ Verificando checkboxes disponíveis...")
-            
-            # Kit Gás (se disponível)
+        # Selecionar checkboxes baseado nos parâmetros do JSON
+        exibir_mensagem("⏳ Verificando checkboxes disponíveis...")
+        
+        # Kit Gás
+        if parametros.get('kit_gas', False):
+            exibir_mensagem("✅ Selecionando Kit Gás (parâmetro: true)")
             if not clicar_checkbox_via_javascript(driver, "kit gas", "Kit Gás"):
                 exibir_mensagem("⚠️ Checkbox Kit Gás não encontrado")
-            
-            # Blindado (se disponível)
+        else:
+            exibir_mensagem("⏭️ Pulando Kit Gás (parâmetro: false)")
+        
+        # Blindado
+        if parametros.get('blindado', False):
+            exibir_mensagem("✅ Selecionando Blindado (parâmetro: true)")
             if not clicar_checkbox_via_javascript(driver, "blindado", "Blindado"):
                 exibir_mensagem("⚠️ Checkbox Blindado não encontrado")
-            
-            # Financiado (se disponível)
+        else:
+            exibir_mensagem("⏭️ Pulando Blindado (parâmetro: false)")
+        
+        # Financiado
+        if parametros.get('financiado', False):
+            exibir_mensagem("✅ Selecionando Financiado (parâmetro: true)")
             if not clicar_checkbox_via_javascript(driver, "financiado", "Financiado"):
                 exibir_mensagem("⚠️ Checkbox Financiado não encontrado")
         else:
-            exibir_mensagem("🚀 **TENTATIVAS INÚTEIS ELIMINADAS**: Pulando checkboxes que sempre falham (Kit Gás, Blindado, Financiado)")
+            exibir_mensagem("⏭️ Pulando Financiado (parâmetro: false)")
         
         # Clicar em Continuar
         exibir_mensagem("⏳ Aguardando botão Continuar aparecer...")
