@@ -16,6 +16,7 @@
   "modelo": "ECOSPORT XLS 1.6 1.6 8V",
   "ano": "2006",
   "zero_km": false,
+  "condutor_principal": true,
   "combustivel": "Flex",
   "veiculo_segurado": "Não",
   "cep": "03317-000",
