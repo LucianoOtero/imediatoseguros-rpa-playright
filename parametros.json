@@ -46,5 +46,6 @@
   "faixa_etaria_menor_mais_novo": "N/A",
   "kit_gas": false,
   "blindado": false,
-  "financiado": false
+  "financiado": false,
+  "continuar_com_corretor_anterior": true
 }

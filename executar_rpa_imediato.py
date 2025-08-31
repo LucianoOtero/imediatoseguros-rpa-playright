@@ -4154,6 +4154,13 @@ def implementar_tela12(driver, parametros):
             print("❌ Erro: Falha na implementação da Tela 13")
             return False
         
+        # Verificar e implementar Tela de Confirmação do Corretor Atual (condicional)
+        print("\n **VERIFICANDO TELA DE CONFIRMAÇÃO DO CORRETOR ATUAL**")
+        tela_corretor_result = implementar_tela_corretor_anterior(driver, parametros)
+        if not tela_corretor_result:
+            print("❌ Erro: Falha na implementação da Tela de Confirmação do Corretor Atual")
+            return False
+        
         return True
         
     except Exception as e:
@@ -4265,6 +4272,111 @@ def implementar_tela13(driver, parametros):
         
     except Exception as e:
         print(f"❌ Erro na Tela 13: {e}")
+        return False
+
+def implementar_tela_corretor_anterior(driver, parametros):
+    """Implementa a Tela de Confirmação do Corretor Atual (condicional)"""
+    print("\n **VERIFICANDO TELA DE CONFIRMAÇÃO DO CORRETOR ATUAL**")
+    
+    try:
+        # Aguardar estabilização
+        aguardar_estabilizacao(driver, 5)
+        
+        # Verificar se a tela de corretor anterior aparece
+        print("⏳ Verificando se a tela de corretor anterior aparece...")
+        
+        # Tentar encontrar o elemento principal da tela
+        try:
+            elemento_corretor = driver.find_element(By.ID, "corretorAnteriorTelaCorretorAnterior")
+            print("✅ Tela de Confirmação do Corretor Atual detectada!")
+        except:
+            print("ℹ️ Tela de Confirmação do Corretor Atual não aparece - continuando...")
+            return True  # Não é erro, apenas não aparece
+        
+        # Obter parâmetro
+        continuar_com_corretor = parametros.get("continuar_com_corretor_anterior", True)
+        
+        print(f"📋 Parâmetro: continuar_com_corretor_anterior='{continuar_com_corretor}'")
+        
+        # Aguardar estabilização
+        aguardar_estabilizacao(driver, 5)
+        
+        if continuar_com_corretor:
+            # Selecionar "Sim, continuar com meu corretor"
+            print("⏳ Selecionando 'Sim, continuar com meu corretor'...")
+            
+            try:
+                # Tentar clicar na primeira opção (Sim, continuar com meu corretor)
+                opcao_sim = driver.find_element(By.CSS_SELECTOR, ".cursor-pointer:nth-child(1) > .border .font-workSans")
+                opcao_sim.click()
+                print("✅ 'Sim, continuar com meu corretor' selecionado")
+            except Exception as e:
+                print(f"⚠️ Tentativa 1 falhou: {e}")
+                
+                # Tentativa 2: Via JavaScript
+                try:
+                    opcao_sim = driver.find_element(By.CSS_SELECTOR, ".cursor-pointer:nth-child(1) > .border .font-workSans")
+                    driver.execute_script("arguments[0].click();", opcao_sim)
+                    print("✅ 'Sim, continuar com meu corretor' selecionado via JavaScript")
+                except Exception as e2:
+                    print(f"⚠️ Tentativa 2 falhou: {e2}")
+                    
+                    # Tentativa 3: Via texto
+                    if not clicar_radio_via_javascript(driver, "Sim, continuar com meu corretor", "Sim continuar corretor"):
+                        print("❌ Erro: Falha ao selecionar 'Sim, continuar com meu corretor'")
+                        return False
+                    print("✅ 'Sim, continuar com meu corretor' selecionado via texto")
+        else:
+            # Selecionar "Não, quero outro corretor"
+            print("⏳ Selecionando 'Não, quero outro corretor'...")
+            
+            try:
+                # Tentar clicar na segunda opção (Não, quero outro corretor)
+                opcao_nao = driver.find_element(By.CSS_SELECTOR, ".cursor-pointer:nth-child(2) > .border .font-workSans")
+                opcao_nao.click()
+                print("✅ 'Não, quero outro corretor' selecionado")
+            except Exception as e:
+                print(f"⚠️ Tentativa 1 falhou: {e}")
+                
+                # Tentativa 2: Via JavaScript
+                try:
+                    opcao_nao = driver.find_element(By.CSS_SELECTOR, ".cursor-pointer:nth-child(2) > .border .font-workSans")
+                    driver.execute_script("arguments[0].click();", opcao_nao)
+                    print("✅ 'Não, quero outro corretor' selecionado via JavaScript")
+                except Exception as e2:
+                    print(f"⚠️ Tentativa 2 falhou: {e2}")
+                    
+                    # Tentativa 3: Via texto
+                    if not clicar_radio_via_javascript(driver, "Não, quero outro corretor", "Não quero outro corretor"):
+                        print("❌ Erro: Falha ao selecionar 'Não, quero outro corretor'")
+                        return False
+                    print("✅ 'Não, quero outro corretor' selecionado via texto")
+        
+        # Aguardar estabilização
+        aguardar_estabilizacao(driver, 5)
+        
+        # Clicar em Continuar
+        print("⏳ Clicando em Continuar...")
+        if not clicar_com_delay_extremo(driver, By.ID, "gtm-telaCorretorAnteriorContinuar", "botão Continuar Tela Corretor"):
+            print("❌ Erro: Falha ao clicar Continuar na Tela de Corretor")
+            return False
+        
+        print("✅ Continuar clicado")
+        
+        # Aguardar carregamento da próxima tela
+        print("⏳ Aguardando carregamento da próxima tela...")
+        time.sleep(5)
+        
+        if not aguardar_carregamento_pagina(driver, 30):
+            print("⚠️ Página pode não ter carregado completamente")
+        
+        aguardar_estabilizacao(driver, 15)
+        
+        print("✅ **TELA DE CONFIRMAÇÃO DO CORRETOR ATUAL IMPLEMENTADA COM SUCESSO!**")
+        return True
+        
+    except Exception as e:
+        print(f"❌ Erro na Tela de Confirmação do Corretor Atual: {e}")
         return False
 
 def executar_todas_telas(json_string):
@@ -4604,6 +4716,10 @@ parser = argparse.ArgumentParser(
  - url_base, placa, marca, modelo, ano, combustivel
  - veiculo_segurado, cep, endereco_completo, uso_veiculo
  - nome, cpf, data_nascimento, sexo, estado_civil, email, celular
+ - condutor_principal, nome_condutor, cpf_condutor, data_nascimento_condutor, sexo_condutor, estado_civil_condutor
+ - local_de_trabalho, estacionamento_proprio_local_de_trabalho, local_de_estudo, estacionamento_proprio_local_de_estudo
+ - garagem_residencia, portao_eletronico, reside_18_26, sexo_do_menor, faixa_etaria_menor_mais_novo
+ - kit_gas, blindado, financiado, continuar_com_corretor_anterior
  
  PARÂMETROS OPCIONAIS DE CONFIGURAÇÃO:
  ====================================
