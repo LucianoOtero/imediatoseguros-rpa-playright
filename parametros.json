@@ -11,10 +11,11 @@
     "eliminar_tentativas_inuteis": true
   },
   "url_base": "https://www.app.tosegurado.com.br/imediatoseguros",
-  "placa": "KVA1791",
+  "placa": "FUO-9D16",
   "marca": "FORD",
   "modelo": "ECOSPORT XLS 1.6 1.6 8V",
   "ano": "2006",
+  "zero_km": false,
   "combustivel": "Flex",
   "veiculo_segurado": "Não",
   "cep": "03317-000",

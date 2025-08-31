@@ -1430,6 +1430,15 @@ def verificar_tela_10(driver):
         "Tela 10 - Condutor principal"
     )
 
+def verificar_tela_zero_km(driver):
+    """Verifica se estamos realmente na Tela Zero KM - ESTRATÉGIA OTIMIZADA"""
+    # ESTRATÉGIA OTIMIZADA: ID único identificado na gravação Selenium IDE
+    return verificar_elemento_tela(
+        driver,
+        "id=zerokmTelaZeroKm",  # ID único do container Zero KM
+        "Tela Zero KM"
+    )
+
 def verificar_navegacao_tela(driver, tela_atual, tela_proxima, timeout_navegacao=10):
     """
     Verifica se a navegação entre telas foi bem-sucedida.
@@ -2754,7 +2763,116 @@ def navegar_ate_tela5(driver, parametros):
         exibir_mensagem(f"⚠️ Erro na Tela 5: {e} - tentando prosseguir...")
     
     exibir_mensagem("✅ **NAVEGAÇÃO ATÉ TELA 5 CONCLUÍDA!**")
+    
+    # VERIFICAÇÃO CONDICIONAL: Tela Zero KM ou Tela 6
+    exibir_mensagem("🔍 **VERIFICANDO PRÓXIMA TELA**: Zero KM ou Combustível...")
+    
+    # Aguardar estabilização após clique na Tela 5
+    aguardar_estabilizacao(driver, 3)
+    
+    # Verificar se a Tela Zero KM apareceu
+    if verificar_tela_zero_km(driver):
+        exibir_mensagem("🆕 **TELA ZERO KM DETECTADA**: Implementando seleção Zero KM...")
+        if not implementar_tela_zero_km(driver, parametros):
+            exibir_mensagem("❌ **ERRO CRÍTICO**: Falha na implementação da Tela Zero KM!")
+            return False
+    else:
+        exibir_mensagem("📱 **TELA 6 DETECTADA**: Continuando com combustível...")
+    
     return True
+
+def implementar_tela_zero_km(driver, parametros):
+    """
+    Implementa a Tela Zero KM: Seleção de veículo zero km ou não
+    
+    ESTRATÉGIA IMPLEMENTADA:
+    ========================
+    Baseado na gravação Selenium IDE para veículo novo (FUO-9D16)
+    Tela aparece condicionalmente após Tela 5 (Estimativa inicial)
+    
+    ELEMENTOS IDENTIFICADOS:
+    =======================
+    - Container: id=zerokmTelaZeroKm
+    - Opção Sim (Zero KM): css=.cursor-pointer:nth-child(1) > .border
+    - Opção Não (Não Zero KM): css=.cursor-pointer:nth-child(2) > .border
+    - Botão Continuar: id=gtm-telaZeroKmContinuar
+    
+    IMPLEMENTAÇÃO:
+    ==============
+    1. Aguarda elementos da Tela Zero KM
+    2. Seleciona opção baseada no parâmetro zero_km (true/false)
+    3. Clica em Continuar para avançar para Tela 6
+    
+    DETECÇÃO:
+    - ID: zerokmTelaZeroKm (container principal)
+    
+    RETORNO:
+    - True: Se Tela Zero KM implementada com sucesso
+    - False: Se falhou na implementação
+    """
+    exibir_mensagem("\n🆕 **INICIANDO TELA ZERO KM: Seleção de veículo zero km**")
+    
+    try:
+        # Aguardar elementos da Tela Zero KM
+        WebDriverWait(driver, 20).until(
+            EC.presence_of_element_located((By.ID, "zerokmTelaZeroKm"))
+        )
+        exibir_mensagem("✅ Tela Zero KM carregada - seleção zero km detectada!")
+        
+        # VERIFICAÇÃO: Confirmar que estamos na Tela Zero KM
+        if not verificar_tela_zero_km(driver):
+            exibir_mensagem("❌ **ERRO CRÍTICO**: Não estamos na Tela Zero KM esperada!")
+            return False
+        
+        salvar_estado_tela(driver, "zero_km", "inicial", None)
+        
+        if not aguardar_carregamento_pagina(driver, 30):
+            exibir_mensagem("❌ Erro: Página não carregou completamente")
+            return False
+        
+        salvar_estado_tela(driver, "zero_km", "zero_km_carregada", None)
+        
+        # Selecionar opção baseada no parâmetro zero_km
+        zero_km = parametros.get("zero_km", False)
+        exibir_mensagem(f"⏳ Selecionando opção Zero KM: {'Sim' if zero_km else 'Não'}...")
+        
+        if zero_km:
+            # Selecionar "Sim" (Zero KM)
+            opcao_element = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable((By.CSS_SELECTOR, ".cursor-pointer:nth-child(1) > .border"))
+            )
+            opcao_element.click()
+            exibir_mensagem("✅ Opção 'Sim' (Zero KM) selecionada!")
+        else:
+            # Selecionar "Não" (Não Zero KM)
+            opcao_element = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable((By.CSS_SELECTOR, ".cursor-pointer:nth-child(2) > .border"))
+            )
+            opcao_element.click()
+            exibir_mensagem("✅ Opção 'Não' (Não Zero KM) selecionada!")
+        
+        # Aguardar estabilização após seleção
+        aguardar_estabilizacao(driver, 2)
+        
+        # Clicar em Continuar
+        exibir_mensagem("⏳ Aguardando botão Continuar aparecer...")
+        
+        if not clicar_com_delay_extremo(driver, By.ID, "gtm-telaZeroKmContinuar", "botão Continuar Tela Zero KM"):
+            exibir_mensagem("❌ Erro: Falha ao clicar Continuar na Tela Zero KM")
+            return False
+        
+        if not aguardar_dom_estavel(driver, 60):
+            exibir_mensagem("⚠️ Página pode não ter carregado completamente")
+        
+        aguardar_estabilizacao(driver)
+        salvar_estado_tela(driver, "zero_km", "apos_continuar", None)
+        
+        exibir_mensagem("✅ **TELA ZERO KM IMPLEMENTADA COM SUCESSO!**")
+        return True
+        
+    except Exception as e:
+        exibir_mensagem(f"❌ **ERRO CRÍTICO**: Falha na Tela Zero KM: {e}")
+        return False
 
 def implementar_tela6(driver, parametros):
     """
