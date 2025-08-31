@@ -720,14 +720,14 @@ def handle_exception(exception, error_code, context=None, screen=None, action=No
     - Dicionário com resposta de erro padronizada
     """
     # Log do erro para debug e logging
-    error_msg = f"❌ **ERRO CAPTURADO:** {type(exception).__name__}: {str(exception)}"
+    error_msg = f"X **ERRO CAPTURADO:** {type(exception).__name__}: {str(exception)}"
     exibir_mensagem(error_msg, "ERROR")
     
     if context:
         context_msg = f"   📍 Contexto: {context}"
         exibir_mensagem(context_msg, "ERROR")
     if screen:
-        screen_msg = f"   📱 Tela: {screen}"
+        screen_msg = f"   Tela: {screen}"
         exibir_mensagem(screen_msg, "ERROR")
     if action:
         action_msg = f"   ⚡ Ação: {action}"
@@ -861,7 +861,7 @@ def validar_parametros_json(parametros_json):
     - Dicionário com resposta de erro se falhar
     """
     try:
-        exibir_mensagem("🔍 **VALIDANDO PARÂMETROS JSON**")
+        exibir_mensagem("**VALIDANDO PARAMETROS JSON**")
         
         # Lista de parâmetros obrigatórios
         parametros_obrigatorios = [
@@ -963,7 +963,7 @@ def configurar_chrome():
     - error_response: Dicionário com erro se falhar
     """
     try:
-        exibir_mensagem("🔧 Configurando Chrome...")
+        exibir_mensagem("Configurando Chrome...")
         
         temp_dir = tempfile.mkdtemp()
         
@@ -987,7 +987,7 @@ def configurar_chrome():
         exibir_mensagem("✅ Usando ChromeDriver local...")
         service = Service(chromedriver_path)
         
-        exibir_mensagem("🔧 Criando driver do Chrome...")
+        exibir_mensagem("Criando driver do Chrome...")
         driver = webdriver.Chrome(service=service, options=chrome_options)
         
         # Executar script para evitar detecção (BASEADO NO SCRIPT QUE FUNCIONOU)
@@ -1079,7 +1079,7 @@ def aguardar_dom_estavel(driver, timeout=60, periodo_estabilidade=3):
         exibir_mensagem(f"🔍 **MUTATIONOBSERVER ROBUSTO ATIVADO**")
         exibir_mensagem(f"   ⏱️ Timeout: {timeout}s, Estabilidade: {periodo_estabilidade}s")
         exibir_mensagem(f"   📊 Monitorando: Nós, Atributos, Conteúdo, Texto")
-        exibir_mensagem(f"   🎯 Objetivo: Detectar estabilização real em páginas React/Next.js")
+        exibir_mensagem(f"   Objetivo: Detectar estabilizacao real em paginas React/Next.js")
         
         # Script JavaScript com MutationObserver ROBUSTO
         script = """
@@ -1092,7 +1092,7 @@ def aguardar_dom_estavel(driver, timeout=60, periodo_estabilidade=3):
             // Configurar timeout principal
             const timeout = setTimeout(() => {
                 if (!isStable) {
-                    console.log('⏰ Timeout principal atingido - DOM não estabilizou');
+                    console.log('>>> Timeout principal atingido - DOM nao estabilizou');
                     observer.disconnect();
                     resolve('timeout');
                 }
@@ -1128,7 +1128,7 @@ def aguardar_dom_estavel(driver, timeout=60, periodo_estabilidade=3):
                         }
                     } else if (mutation.type === 'attributes') {
                         changeType = 'ATRIBUTOS';
-                        console.log(`🔧 Atributo alterado: ${mutation.attributeName} em ${mutation.target.tagName}`);
+                        console.log(`>>> Atributo alterado: ${mutation.attributeName} em ${mutation.target.tagName}`);
                     } else if (mutation.type === 'characterData') {
                         changeType = 'CONTEÚDO';
                         console.log(`📝 Conteúdo alterado: ${mutation.target.textContent?.substring(0, 50)}...`);
@@ -1164,7 +1164,7 @@ def aguardar_dom_estavel(driver, timeout=60, periodo_estabilidade=3):
             
             // Timer inicial de estabilidade
             timeoutId = setTimeout(() => {
-                console.log('⏰ Timer inicial de estabilidade - DOM pode estar estável');
+                console.log('>>> Timer inicial de estabilidade - DOM pode estar estavel');
                 markStable();
             }, arguments[1] * 1000);
             
@@ -1184,7 +1184,7 @@ def aguardar_dom_estavel(driver, timeout=60, periodo_estabilidade=3):
             return True
         elif resultado == 'timeout':
             # ESTRATÉGIA OTIMIZADA: Em vez de fallback, assumir estabilização
-            exibir_mensagem("🎯 **MUTATIONOBSERVER TIMEOUT - ESTRATÉGIA OTIMIZADA**", "INFO")
+            exibir_mensagem("**MUTATIONOBSERVER TIMEOUT - ESTRATEGIA OTIMIZADA**", "INFO")
             exibir_mensagem("   ✅ Página React/Next.js detectada como estável após timeout")
             exibir_mensagem("   🚀 Eliminando fallback desnecessário - continuando...")
             return True  # Assumir estabilização em vez de fallback
@@ -1926,7 +1926,7 @@ def selecionar_dropdown_mui_otimizado(driver, campo_id, valor_desejado):
             })
             
             exibir_mensagem(f"✅ **ETAPA 2 CONCLUÍDA**: Dropdown {campo_id} aberto em {tempo_etapa:.3f}s")
-            exibir_mensagem(f"🔧 **MÉTODO UTILIZADO**: ActionChains mouseDown (baseado na gravação Selenium IDE)")
+            exibir_mensagem(f">>> **METODO UTILIZADO**: ActionChains mouseDown (baseado na gravacao Selenium IDE)")
             
         except Exception as e:
             tempo_etapa = time.time() - tempo_inicio
@@ -2137,7 +2137,7 @@ def selecionar_dropdown_mui_otimizado(driver, campo_id, valor_desejado):
             })
             
             exibir_mensagem(f"✅ **ETAPA 5 CONCLUÍDA**: Dropdown {campo_id} fechado em {tempo_etapa:.3f}s")
-            exibir_mensagem(f"🔧 **MÉTODO FECHAMENTO**: Keys.ESCAPE (correção do Grok)")
+            exibir_mensagem(f">>> **METODO FECHAMENTO**: Keys.ESCAPE (correcao do Grok)")
             
         except Exception as e:
             tempo_etapa = time.time() - tempo_inicio
@@ -3255,7 +3255,7 @@ def implementar_tela8(driver, parametros):
     IMPLEMENTAÇÃO:
     ==============
     1. Aguarda elementos da Tela 8 (finalidade, uso, veículo)
-    2. Seleciona "Pessoal" como finalidade do veículo via JavaScript
+    2. Seleciona tipo de uso baseado no parâmetro JSON (Pessoal, Profissional, Motorista de aplicativo, Taxi)
     3. Clica em Continuar para avançar (ID específico: "gtm-telaUsoVeiculoContinuar")
     
     DETECÇÃO:
@@ -3283,18 +3283,18 @@ def implementar_tela8(driver, parametros):
     - True: Se Tela 8 implementada com sucesso
     - False: Se falhou na implementação
     """
-    exibir_mensagem("\n📱 **INICIANDO TELA 8: Finalidade do veículo**")
+    exibir_mensagem("\n**INICIANDO TELA 8: Finalidade do veiculo**")
     
     try:
         # Aguardar elementos da finalidade do veículo
         WebDriverWait(driver, 20).until(
             EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'finalidade') or contains(text(), 'Finalidade') or contains(text(), 'uso') or contains(text(), 'Uso') or contains(text(), 'veículo')]"))
         )
-        exibir_mensagem("✅ Tela 8 carregada - finalidade do veículo detectada!")
+        exibir_mensagem("Tela 8 carregada - finalidade do veiculo detectada!")
         
         # VERIFICAÇÃO: Confirmar que estamos na Tela 8
         if not verificar_tela_8(driver):
-            exibir_mensagem("❌ **ERRO CRÍTICO**: Não estamos na Tela 8 esperada!")
+            exibir_mensagem("**ERRO CRITICO**: Nao estamos na Tela 8 esperada!")
             return create_error_response(
                 4009,
                 "Falha na verificação da Tela 8",
@@ -3309,22 +3309,23 @@ def implementar_tela8(driver, parametros):
         salvar_estado_tela(driver, 8, "inicial", None)
         
         if not aguardar_carregamento_pagina(driver, 30):
-            exibir_mensagem("❌ Erro: Página não carregou completamente")
+            exibir_mensagem("Erro: Pagina nao carregou completamente")
             return False
         
         salvar_estado_tela(driver, 8, "finalidade_carregada", None)
         
-        # Selecionar "Pessoal" como finalidade do veículo
-        exibir_mensagem("⏳ Selecionando 'Pessoal' como finalidade do veículo...")
+        # Selecionar tipo de uso baseado no parâmetro JSON
+        uso_veiculo = parametros.get('uso_veiculo', 'Pessoal')
+        exibir_mensagem(f"Selecionando '{uso_veiculo}' como uso do veiculo...")
         
-        if not clicar_radio_via_javascript(driver, "Pessoal", "Pessoal como finalidade"):
-            exibir_mensagem("⚠️ Radio 'Pessoal' não encontrado - tentando prosseguir...")
+        if not clicar_radio_via_javascript(driver, uso_veiculo, f"{uso_veiculo} como uso"):
+            exibir_mensagem(f"Radio '{uso_veiculo}' nao encontrado - tentando prosseguir...")
         
         # Clicar em Continuar (usar ID específico da Tela 8)
-        exibir_mensagem("⏳ Aguardando botão Continuar aparecer...")
+        exibir_mensagem("Aguardando botao Continuar aparecer...")
         
         if not clicar_com_delay_extremo(driver, By.ID, "gtm-telaUsoVeiculoContinuar", "botão Continuar Tela 8"):
-            exibir_mensagem("❌ Erro: Falha ao clicar Continuar na Tela 8")
+            exibir_mensagem("Erro: Falha ao clicar Continuar na Tela 8")
             error_response = create_error_response(
                 3004, 
                 "Falha ao clicar Continuar na Tela 8", 
@@ -3335,10 +3336,10 @@ def implementar_tela8(driver, parametros):
             return error_response
         
         # VERIFICAÇÃO DE NAVEGAÇÃO: Tela 8 → Tela 9
-        exibir_mensagem("🔍 **VERIFICANDO NAVEGAÇÃO**: Tela 8 → Tela 9...")
+        exibir_mensagem("**VERIFICANDO NAVEGACAO**: Tela 8 → Tela 9...")
         resultado_navegacao = verificar_navegacao_tela(driver, verificar_tela_8, verificar_tela_9)
         if not resultado_navegacao["sucesso"]:
-            exibir_mensagem(f"❌ **FALHA NA NAVEGAÇÃO**: {resultado_navegacao['mensagem']}")
+            exibir_mensagem(f"**FALHA NA NAVEGACAO**: {resultado_navegacao['mensagem']}")
             return create_error_response(
                 3014,
                 "Falha na navegação da Tela 8 para Tela 9",
@@ -3354,18 +3355,18 @@ def implementar_tela8(driver, parametros):
                 action_detail="Verificação de navegação após clique no botão Continuar"
             )
         
-        exibir_mensagem("✅ **NAVEGAÇÃO SUCESSO**: Tela 8 → Tela 9")
+        exibir_mensagem("**NAVEGACAO SUCESSO**: Tela 8 → Tela 9")
         
         if not aguardar_dom_estavel(driver, 60):
-            exibir_mensagem("⚠️ Página pode não ter carregado completamente")
+            exibir_mensagem("Pagina pode nao ter carregado completamente")
         
         aguardar_estabilizacao(driver)
         salvar_estado_tela(driver, 8, "apos_continuar", None)
-        exibir_mensagem("✅ **TELA 8 IMPLEMENTADA COM SUCESSO!**")
+        exibir_mensagem("**TELA 8 IMPLEMENTADA COM SUCESSO!**")
         return True
         
     except Exception as e:
-        exibir_mensagem(f"❌ Erro na Tela 8: {e}")
+        exibir_mensagem(f"Erro na Tela 8: {e}")
         error_response = create_error_response(
             3004, 
             f"Erro na implementação da Tela 8: {str(e)}", 
@@ -4064,16 +4065,16 @@ def executar_todas_telas(json_string):
     exibir_mensagem("**RPA TO SEGURADO - COMPLETO ATE TELA 13 COM ERROR HANDLER ROBUSTO**")
     exibir_mensagem("=" * 80)
     exibir_mensagem("OBJETIVO: Navegar desde o inicio ate a Tela 13 com tratamento de erros robusto")
-    exibir_mensagem("🔧 MÉTODO: ERROR HANDLER ROBUSTO + MUTATIONOBSERVER ROBUSTO + fluxo completo")
-    exibir_mensagem("📝 NOTA: Placa KVA-1791, veículo ECOSPORT, fluxo correto")
+    exibir_mensagem(">>> METODO: ERROR HANDLER ROBUSTO + MUTATIONOBSERVER ROBUSTO + fluxo completo")
+    exibir_mensagem("NOTA: Placa KVA-1791, veiculo ECOSPORT, fluxo correto")
     exibir_mensagem("=" * 80)
     
     inicio = datetime.now()
-    exibir_mensagem(f"⏰ Início: {inicio.strftime('%Y-%m-%d %H:%M:%S')}")
+    exibir_mensagem(f">>> Inicio: {inicio.strftime('%Y-%m-%d %H:%M:%S')}")
     exibir_mensagem(f"ESTRATEGIA: ERROR HANDLER ROBUSTO para captura e tratamento de erros")
-    exibir_mensagem(f"🔧 MUTATIONOBSERVER ROBUSTO: Detecção inteligente de estabilização do DOM")
-    exibir_mensagem(f"⚡ PERFORMANCE: Estabilização detectada automaticamente (sem delays fixos)")
-    exibir_mensagem(f"🎯 OBJETIVO: Todas as 13 telas com tratamento de erros robusto")
+    exibir_mensagem(f">>> MUTATIONOBSERVER ROBUSTO: Deteccao inteligente de estabilizacao do DOM")
+    exibir_mensagem(f">>> PERFORMANCE: Estabilizacao detectada automaticamente (sem delays fixos)")
+            exibir_mensagem(f">>> OBJETIVO: Todas as 13 telas com tratamento de erros robusto")
     exibir_mensagem(f"🔍 MONITORAMENTO: DOM observado em tempo real via MutationObserver ROBUSTO")
     exibir_mensagem(f"💡 INOVAÇÃO: Zero delays fixos, apenas estabilização real detectada")
     exibir_mensagem(f"🔄 FALLBACK: Método tradicional se MutationObserver ROBUSTO falhar")
@@ -4083,13 +4084,13 @@ def executar_todas_telas(json_string):
     exibir_mensagem(f"🔬 TECNOLOGIA: JavaScript MutationObserver + Python Selenium + Error Handling")
     exibir_mensagem(f"🌐 INTEGRAÇÃO: Browser + Python via execute_script + JSON de erro")
     exibir_mensagem(f"⚡ VELOCIDADE: Adaptativo a qualquer velocidade de carregamento")
-    exibir_mensagem(f"🎯 PRECISÃO: Estabilização detectada com precisão milissegundos")
-    exibir_mensagem(f"🔧 ROBUSTEZ: Fallback automático se MutationObserver ROBUSTO falhar")
-    exibir_mensagem(f"📈 ESCALABILIDADE: Funciona com qualquer complexidade de página")
+    exibir_mensagem(f">>> PRECISAO: Estabilizacao detectada com precisao milissegundos")
+    exibir_mensagem(f">>> ROBUSTEZ: Fallback automatico se MutationObserver ROBUSTO falhar")
+    exibir_mensagem(f">>> ESCALABILIDADE: Funciona com qualquer complexidade de pagina")
     exibir_mensagem(f"🎨 FLEXIBILIDADE: Suporte a React, Angular, Vue.js e HTML puro")
     exibir_mensagem(f"FUTURO: Padrao para RPA de proxima geracao")
-    exibir_mensagem(f"🎯 MISSÃO: Revolucionar automação web com inteligência real e tratamento de erros robusto")
-    exibir_mensagem(f"🔧 CONFIGURAÇÃO REACT: childList + attributes + characterData + subtree")
+    exibir_mensagem(f">>> MISSAO: Revolucionar automacao web com inteligencia real e tratamento de erros robusto")
+    exibir_mensagem(f">>> CONFIGURACAO REACT: childList + attributes + characterData + subtree")
     
     # Verificar se eliminar_tentativas_inuteis está ativado
     try:
@@ -4248,7 +4249,7 @@ def executar_todas_telas(json_string):
     finally:
         # Limpeza
         if driver:
-            exibir_mensagem("🔧 Fechando driver...")
+            exibir_mensagem(">>> Fechando driver...")
             try:
                 driver.quit()
                 exibir_mensagem("✅ Driver fechado com sucesso")
@@ -4263,7 +4264,7 @@ def executar_todas_telas(json_string):
                 exibir_mensagem(f"⚠️ Erro ao remover diretório temporário: {e}")
         
         fim = datetime.now()
-        exibir_mensagem(f"⏰ Fim: {fim.strftime('%Y-%m-%d %H:%M:%S')}")
+        exibir_mensagem(f">>> Fim: {fim.strftime('%Y-%m-%d %H:%M:%S')}")
 
 if __name__ == "__main__":
     """
