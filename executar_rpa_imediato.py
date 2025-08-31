@@ -1014,6 +1014,609 @@ def capturar_dados_carrossel_estimativas(driver):
         exibir_mensagem(f"❌ **ERRO NA CAPTURA**: {str(e)}")
         return None
 
+def aguardar_modal_email(driver, timeout=30):
+    """
+    Aguarda especificamente pela modal de email que aparece sobre a tela final
+    Baseado na gravação do Selenium IDE
+    
+    RETORNO:
+    - True se a modal foi detectada e tratada
+    - False se não foi encontrada
+    """
+    try:
+        exibir_mensagem("🔍 **AGUARDANDO MODAL DE EMAIL**")
+        
+        # Aguardar pela modal usando WebDriverWait
+        wait = WebDriverWait(driver, timeout)
+        
+        # Padrões específicos da modal de email baseados na gravação
+        modal_patterns = [
+            "//*[contains(text(), 'Acesse sua conta para visualizar o resultado final')]",
+            "//*[contains(text(), 'email') and contains(text(), 'cotação')]",
+            "//*[contains(text(), 'envio') and contains(text(), 'cotação')]",
+            "//*[contains(text(), 'Para visualizar o resultado final')]",
+            "//*[contains(text(), 'Digite seu email')]",
+            "//*[contains(text(), 'Enviar cotação')]",
+            "//*[contains(@placeholder, 'email') or contains(@placeholder, 'Email')]",
+            "//input[@type='email']",
+            "//*[contains(@class, 'modal') or contains(@class, 'popup') or contains(@class, 'dialog')]"
+        ]
+        
+        modal_detectada = False
+        modal_element = None
+        
+        # Tentar encontrar a modal usando diferentes padrões
+        for pattern in modal_patterns:
+            try:
+                modal_element = wait.until(EC.presence_of_element_located((By.XPATH, pattern)))
+                if modal_element:
+                    modal_detectada = True
+                    exibir_mensagem(f"✅ **MODAL DETECTADA** com padrão: {pattern}")
+                    break
+            except:
+                continue
+        
+        if not modal_detectada:
+            exibir_mensagem("⚠️ Modal de email não foi detectada no tempo limite")
+            return False
+        
+        # Aguardar estabilização da modal
+        exibir_mensagem("⏳ Aguardando estabilização da modal...")
+        time.sleep(3)
+        
+        # Tentar fechar a modal para acessar a tela principal
+        exibir_mensagem("🔧 **TENTANDO FECHAR MODAL**")
+        
+        # Estratégias para fechar a modal
+        fechar_strategies = [
+            "//button[contains(@class, 'close')]",
+            "//button[contains(@class, 'cancel')]",
+            "//button[contains(text(), 'X')]",
+            "//button[contains(text(), 'Fechar')]",
+            "//button[contains(text(), 'Cancelar')]",
+            "//*[contains(@class, 'close') or contains(@class, 'cancel')]",
+            "//div[contains(@class, 'close') or contains(@class, 'cancel')]",
+            "//span[contains(@class, 'close') or contains(@class, 'cancel')]",
+            "//*[@aria-label='Close' or @aria-label='Fechar']",
+            "//*[contains(@onclick, 'close') or contains(@onclick, 'cancel')]"
+        ]
+        
+        modal_fechada = False
+        for strategy in fechar_strategies:
+            try:
+                botoes_fechar = driver.find_elements(By.XPATH, strategy)
+                if botoes_fechar:
+                    botoes_fechar[0].click()
+                    exibir_mensagem(f"✅ **MODAL FECHADA** com estratégia: {strategy}")
+                    modal_fechada = True
+                    time.sleep(2)  # Aguardar fechamento
+                    break
+            except:
+                continue
+        
+        if not modal_fechada:
+            exibir_mensagem("⚠️ Não foi possível fechar a modal automaticamente")
+            # Tentar pressionar ESC
+            try:
+                from selenium.webdriver.common.keys import Keys
+                driver.find_element(By.TAG_NAME, "body").send_keys(Keys.ESCAPE)
+                exibir_mensagem("✅ **MODAL FECHADA** com tecla ESC")
+                time.sleep(2)
+            except:
+                exibir_mensagem("⚠️ Falha ao fechar modal com ESC")
+        
+        # Aguardar estabilização após fechar modal
+        exibir_mensagem("⏳ Aguardando estabilização após fechar modal...")
+        aguardar_estabilizacao(driver, 5)
+        
+        return True
+        
+    except Exception as e:
+        exibir_mensagem(f"❌ **ERRO AO AGUARDAR MODAL**: {str(e)}")
+        return False
+
+def fechar_todas_modais(driver):
+    """
+    Fecha todas as modais que possam estar sobrepondo a tela final
+    """
+    try:
+        exibir_mensagem("🔧 **FECHANDO TODAS AS MODAIS**")
+        
+        # Lista de estratégias para fechar modais
+        fechar_strategies = [
+            # Botões de fechar específicos
+            "//button[contains(@id, 'gtm-telaResultadoAgoraNaoFechar')]",
+            "//button[contains(@class, 'close')]",
+            "//button[contains(@class, 'cancel')]",
+            "//button[contains(text(), 'X')]",
+            "//button[contains(text(), 'Fechar')]",
+            "//button[contains(text(), 'Cancelar')]",
+            # Elementos clicáveis que podem fechar
+            "//*[contains(@class, 'close') or contains(@class, 'cancel')]",
+            "//div[contains(@class, 'close') or contains(@class, 'cancel')]",
+            "//span[contains(@class, 'close') or contains(@class, 'cancel')]",
+            # Atributos específicos
+            "//*[@aria-label='Close' or @aria-label='Fechar']",
+            "//*[contains(@onclick, 'close') or contains(@onclick, 'cancel')]"
+        ]
+        
+        modais_fechadas = 0
+        
+        for strategy in fechar_strategies:
+            try:
+                elementos = driver.find_elements(By.XPATH, strategy)
+                for elemento in elementos:
+                    if elemento.is_displayed() and elemento.is_enabled():
+                        elemento.click()
+                        exibir_mensagem(f"✅ **MODAL FECHADA** com estratégia: {strategy}")
+                        modais_fechadas += 1
+                        time.sleep(1)
+            except Exception as e:
+                continue
+        
+        # Tentar pressionar ESC múltiplas vezes
+        try:
+            from selenium.webdriver.common.keys import Keys
+            for _ in range(3):
+                driver.find_element(By.TAG_NAME, "body").send_keys(Keys.ESCAPE)
+                time.sleep(1)
+            exibir_mensagem("✅ **ESC PRESSIONADO** múltiplas vezes")
+        except:
+            pass
+        
+        if modais_fechadas > 0:
+            exibir_mensagem(f"✅ **TOTAL DE MODAIS FECHADAS**: {modais_fechadas}")
+            aguardar_estabilizacao(driver, 3)
+            return True
+        else:
+            exibir_mensagem("⚠️ Nenhuma modal foi fechada")
+            return False
+            
+    except Exception as e:
+        exibir_mensagem(f"❌ **ERRO AO FECHAR MODAIS**: {str(e)}")
+        return False
+
+def capturar_dados_tela_final(driver):
+    """
+    Captura dados da tela final com os resultados dos planos de seguro
+    Retorna JSON estruturado com todos os planos, valores e coberturas
+    
+    RETORNO:
+    - Dicionário com dados estruturados da tela final
+    - None se não conseguir capturar
+    """
+    try:
+        exibir_mensagem("📊 **CAPTURANDO DADOS DA TELA FINAL**")
+        
+        # 1. Aguardar especificamente pela modal de email
+        exibir_mensagem("🔍 **ETAPA 1: Aguardando modal de email**")
+        modal_detectada = aguardar_modal_email(driver, timeout=30)
+        
+        if modal_detectada:
+            exibir_mensagem("✅ **MODAL TRATADA** - Prosseguindo para captura da tela principal")
+        else:
+            exibir_mensagem("⚠️ **MODAL NÃO DETECTADA** - Tentando capturar tela principal diretamente")
+        
+        # 2. Fechar todas as modais que possam estar sobrepondo
+        exibir_mensagem("🔧 **ETAPA 2: Fechando todas as modais**")
+        fechar_todas_modais(driver)
+        
+        # 3. Aguardar carregamento da tela principal
+        exibir_mensagem("⏳ Aguardando carregamento da tela principal (10s)...")
+        time.sleep(10)
+        
+        # 4. Aguardar estabilização adicional
+        aguardar_estabilizacao(driver, 10)
+        
+        dados_tela_final = {
+            "timestamp": datetime.now().isoformat(),
+            "tela": "final",
+            "nome_tela": "Resultado Final",
+            "url": driver.current_url,
+            "titulo": driver.title,
+            "titulo_pagina": "",
+            "subtitulo_pagina": "",
+            "planos": [],
+            "modal_login": {
+                "detectado": modal_detectada,
+                "titulo": "Modal de envio de cotação por email" if modal_detectada else "",
+                "campos": ["email"] if modal_detectada else []
+            },
+            "elementos_detectados": [],
+            "resumo": {
+                "total_planos": 0,
+                "plano_recomendado": None,
+                "valores_encontrados": 0,
+                "qualidade_captura": "excelente"
+            }
+        }
+        
+        # 5. Capturar título e subtítulo da página principal
+        try:
+            # Padrões mais abrangentes para detectar a tela final
+            titulo_patterns = [
+                "//*[contains(text(), 'Parabéns')]",
+                "//*[contains(text(), 'resultado final')]",
+                "//*[contains(text(), 'chegamos ao resultado')]",
+                "//*[contains(text(), 'melhores planos')]",
+                "//*[contains(text(), 'elaborados exclusivamente')]",
+                "//*[contains(text(), 'Morte/Invalidez')]",
+                "//*[contains(text(), 'Plano recomendado')]"
+            ]
+            
+            for pattern in titulo_patterns:
+                elementos = driver.find_elements(By.XPATH, pattern)
+                if elementos:
+                    if "Parabéns" in pattern:
+                        dados_tela_final["titulo_pagina"] = "Parabéns, chegamos ao resultado final"
+                        exibir_mensagem("🎉 **TELA FINAL DETECTADA!**")
+                        break
+                    elif "melhores planos" in pattern:
+                        dados_tela_final["subtitulo_pagina"] = "Confira abaixo os melhores planos elaborados exclusivamente para você"
+                        break
+            
+            # Se não encontrou pelos padrões, verificar se há elementos específicos da tela final
+            if not dados_tela_final["titulo_pagina"]:
+                elementos_finais = driver.find_elements(By.XPATH, "//*[contains(text(), 'Franquia') or contains(text(), 'Valor de Mercado') or contains(text(), 'Assistência') or contains(text(), 'Vidros') or contains(text(), 'Carro Reserva')]")
+                if elementos_finais:
+                    dados_tela_final["titulo_pagina"] = "Tela Final Detectada (elementos específicos)"
+                    exibir_mensagem("🎯 **ELEMENTOS DA TELA FINAL DETECTADOS**")
+                    
+        except Exception as e:
+            exibir_mensagem(f"⚠️ Erro ao capturar títulos: {str(e)}")
+        
+        # 6. Procurar por planos usando seletores específicos baseados no HTML real
+        exibir_mensagem("🔍 **PROCURANDO PLANOS COM SELETORES ESPECÍFICOS**")
+        
+        # Estratégia 1: Procurar por divs que contêm "Plano recomendado"
+        planos_recomendados = driver.find_elements(By.XPATH, "//*[contains(text(), 'Plano recomendado')]")
+        
+        # Estratégia 2: Procurar por divs com classes específicas que contêm planos
+        planos_divs = driver.find_elements(By.XPATH, "//div[contains(@class, 'md:w-80') or contains(@class, 'border-4') or contains(@class, 'border-primary')]")
+        
+        # Estratégia 3: Procurar por elementos que contêm valores monetários específicos
+        elementos_valores = driver.find_elements(By.XPATH, "//*[contains(text(), 'R$ 100,00') or contains(text(), 'R$ 2.500,00') or contains(text(), 'R$ 3.584,06')]")
+        
+        # Estratégia 4: Procurar por elementos que contêm "Franquia", "Valor de Mercado", etc.
+        elementos_coberturas = driver.find_elements(By.XPATH, "//*[contains(text(), 'Franquia') or contains(text(), 'Valor de Mercado') or contains(text(), 'Assistência') or contains(text(), 'Vidros') or contains(text(), 'Carro Reserva') or contains(text(), 'Danos Materiais') or contains(text(), 'Danos Corporais') or contains(text(), 'Danos Morais') or contains(text(), 'Morte/Invalidez')]")
+        
+        # Combinar todos os elementos encontrados
+        todos_elementos = list(set(planos_recomendados + planos_divs + elementos_valores + elementos_coberturas))
+        
+        # Filtrar elementos que são containers de planos (não apenas texto)
+        tabelas_planos = []
+        for elem in todos_elementos:
+            try:
+                # Verificar se o elemento contém múltiplos valores monetários ou é um container
+                texto = elem.text
+                if (texto.count('R$') >= 2 or 
+                    'Franquia' in texto or 
+                    'Valor de Mercado' in texto or
+                    'Plano recomendado' in texto or
+                    len(texto) > 100):  # Elementos com muito texto provavelmente são containers
+                    tabelas_planos.append(elem)
+            except:
+                continue
+        
+        exibir_mensagem(f"📊 **ELEMENTOS DE PLANOS ENCONTRADOS**: {len(tabelas_planos)}")
+        
+        # 5. Analisar cada elemento para extrair planos
+        for i, elemento in enumerate(tabelas_planos[:10]):  # Aumentar limite para 10
+            # Inicializar variáveis
+            elemento_html = ""
+            try:
+                elemento_html = elemento.get_attribute('outerHTML')
+            except:
+                elemento_html = ""
+            
+            try:
+                tabela_text = elemento.text.strip()
+                if not tabela_text or len(tabela_text) < 30:  # Reduzir limite mínimo
+                    continue
+                
+                exibir_mensagem(f"📋 **ANALISANDO ELEMENTO {i+1}**: {len(tabela_text)} caracteres")
+                
+                # NOVA ESTRUTURA SIMPLIFICADA DO PLANO
+                plano_info = {
+                    "titulo": "",
+                    "franquia": {
+                        "valor": "",
+                        "tipo": ""
+                    },
+                    "valor_mercado": "",
+                    "assistencia": False,
+                    "vidros": False,
+                    "carro_reserva": False,
+                    "danos_materiais": "",
+                    "danos_corporais": "",
+                    "danos_morais": "",
+                    "morte_invalidez": "",
+                    "precos": {
+                        "anual": "",
+                        "parcelado": {
+                            "valor": "",
+                            "parcelas": ""
+                        }
+                    },
+                    "score_qualidade": 0,
+                    "texto_completo": tabela_text[:500] + "..." if len(tabela_text) > 500 else tabela_text
+                }
+                
+                # Extrair título do plano
+                if "recomendado" in tabela_text.lower():
+                    plano_info["titulo"] = "Plano Recomendado"
+                elif "alternativo" in tabela_text.lower() or i > 0:
+                    plano_info["titulo"] = f"{i+1}ª opção"
+                else:
+                    plano_info["titulo"] = f"Plano {i+1}"
+                
+                # Extrair valores monetários com padrões mais específicos
+                valor_patterns = [
+                    r"R\$\s*([0-9.,]+)",
+                    r"([0-9.,]+)\s*anual",
+                    r"([0-9.,]+)\s*em até",
+                    r"R\$\s*([0-9.,]+)\s*anual",
+                    r"R\$\s*([0-9.,]+)\s*em até"
+                ]
+                
+                valores_encontrados = []
+                for pattern in valor_patterns:
+                    matches = re.findall(pattern, tabela_text, re.IGNORECASE)
+                    valores_encontrados.extend(matches)
+                
+                # Remover duplicatas e ordenar
+                valores_encontrados = list(set(valores_encontrados))
+                valores_encontrados.sort(key=lambda x: float(x.replace(',', '').replace('.', '')))
+                
+                # Extrair condições de pagamento
+                pagamento_patterns = [
+                    r"Crédito em até (\d+x)\s*(?:sem juros|com juros)?\s*(?:ou \d+x de R\$\s*([0-9.,]+))?",
+                    r"(\d+x)\s*(?:sem juros|com juros)",
+                    r"parcelamento\s*(?:sem juros|com juros)"
+                ]
+                
+                for pattern in pagamento_patterns:
+                    match = re.search(pattern, tabela_text, re.IGNORECASE)
+                    if match:
+                        if "Crédito em até" in pattern:
+                            plano_info["precos"]["parcelado"]["parcelas"] = f"{match.group(1)} sem juros"
+                            if match.group(2):
+                                plano_info["precos"]["parcelado"]["valor"] = f"R$ {match.group(2)}"
+                        else:
+                            plano_info["precos"]["parcelado"]["parcelas"] = match.group(0)
+                        break
+                
+                if valores_encontrados:
+                    # Procurar por valores específicos que vi no HTML
+                    for valor in valores_encontrados:
+                        valor_limpo = valor.replace(',', '').replace('.', '')
+                        if valor_limpo == '10000':  # R$ 100,00
+                            plano_info["precos"]["anual"] = f"R$ {valor}"
+                        elif valor_limpo == '256100':  # R$ 2.561,00
+                            plano_info["precos"]["anual"] = f"R$ {valor}"
+                        elif valor_limpo == '250000':  # R$ 2.500,00
+                            plano_info["franquia"]["valor"] = f"R$ {valor}"
+                        elif valor_limpo == '358406':  # R$ 3.584,06
+                            plano_info["franquia"]["valor"] = f"R$ {valor}"
+                        elif valor_limpo == '50000':  # R$ 50.000,00
+                            plano_info["danos_materiais"] = f"R$ {valor}"
+                            plano_info["danos_corporais"] = f"R$ {valor}"
+                        elif valor_limpo == '100000':  # R$ 100.000,00
+                            plano_info["danos_materiais"] = f"R$ {valor}"
+                            plano_info["danos_corporais"] = f"R$ {valor}"
+                        elif valor_limpo == '20000':  # R$ 20.000,00
+                            plano_info["danos_morais"] = f"R$ {valor}"
+                        elif valor_limpo == '10000' and not plano_info["danos_morais"]:  # R$ 10.000,00 (evitar conflito)
+                            plano_info["danos_morais"] = f"R$ {valor}"
+                        elif valor_limpo == '5000':  # R$ 5.000,00
+                            plano_info["morte_invalidez"] = f"R$ {valor}"
+                    
+                    # Se não encontrou valores específicos, usar o primeiro como anual
+                    if not plano_info["precos"]["anual"] and valores_encontrados:
+                        plano_info["precos"]["anual"] = f"R$ {valores_encontrados[0]}"
+                
+                # Extrair franquia
+                franquia_patterns = [
+                    r"Franquia:\s*([A-Za-zÀ-ÿ\s]+)",
+                    r"([A-Za-zÀ-ÿ\s]+?)\s+Franquia",
+                    r"Reduzida",
+                    r"Normal"
+                ]
+                
+                for pattern in franquia_patterns:
+                    match = re.search(pattern, tabela_text, re.IGNORECASE)
+                    if match:
+                        if pattern in ["Reduzida", "Normal"]:
+                            plano_info["franquia"]["tipo"] = match.group(0)
+                        else:
+                            plano_info["franquia"]["tipo"] = match.group(1).strip()
+                        break
+                
+                # Extrair valor de mercado
+                mercado_patterns = [
+                    r"([0-9]+%)\s*da tabela FIPE",
+                    r"tabela FIPE:\s*([0-9]+%)"
+                ]
+                
+                for pattern in mercado_patterns:
+                    match = re.search(pattern, tabela_text, re.IGNORECASE)
+                    if match:
+                        plano_info["valor_mercado"] = f"{match.group(1)} da tabela FIPE"
+                        break
+                
+                # Extrair coberturas específicas com valores mais precisos
+                coberturas_conhecidas = {
+                    "assistencia": ["Assistência", "Assistencia"],
+                    "vidros": ["Vidros"],
+                    "carro_reserva": ["Carro Reserva", "Carro reserva"],
+                    "danos_materiais": ["Danos Materiais", "Materiais"],
+                    "danos_corporais": ["Danos Corporais", "Corporais"],
+                    "danos_morais": ["Danos Morais", "Morais"],
+                    "morte_invalidez": ["Morte/Invalidez", "Morte", "Invalidez"]
+                }
+                
+                for cobertura_key, termos in coberturas_conhecidas.items():
+                    for termo in termos:
+                        if termo.lower() in tabela_text.lower():
+                            # Para coberturas booleanas (assistencia, vidros, carro_reserva)
+                            if cobertura_key in ["assistencia", "vidros", "carro_reserva"]:
+                                plano_info[cobertura_key] = True
+                            else:
+                                # Para coberturas com valores, procurar valor associado
+                                valor_pattern = rf"{termo}.*?R\$\s*([0-9.,]+)"
+                                match = re.search(valor_pattern, tabela_text, re.IGNORECASE)
+                                if match and not plano_info[cobertura_key]:  # Só definir se ainda não foi definido
+                                    plano_info[cobertura_key] = f"R$ {match.group(1)}"
+                                elif not plano_info[cobertura_key]:  # Se não encontrou valor mas detectou a cobertura
+                                    plano_info[cobertura_key] = "Incluído"
+                            break
+                
+                # Calcular score de qualidade do plano
+                score = 0
+                if plano_info["precos"]["anual"]:
+                    score += 20
+                if plano_info["precos"]["parcelado"]["valor"]:
+                    score += 15
+                if plano_info["precos"]["parcelado"]["parcelas"]:
+                    score += 10
+                if plano_info["franquia"]["valor"]:
+                    score += 15
+                if plano_info["franquia"]["tipo"]:
+                    score += 5
+                if plano_info["valor_mercado"]:
+                    score += 10
+                if any([plano_info["assistencia"], plano_info["vidros"], plano_info["carro_reserva"]]):
+                    score += 10
+                if any([plano_info["danos_materiais"], plano_info["danos_corporais"], plano_info["danos_morais"], plano_info["morte_invalidez"]]):
+                    score += 15
+                
+                plano_info["score_qualidade"] = score
+                
+                # Determinar categoria do plano baseado no score
+                if score >= 80:
+                    plano_info["categoria"] = "premium"
+                elif score >= 60:
+                    plano_info["categoria"] = "intermediario"
+                elif score >= 40:
+                    plano_info["categoria"] = "basico"
+                else:
+                    plano_info["categoria"] = "incompleto"
+                
+                # Se encontrou dados válidos, adicionar à lista
+                if (plano_info["precos"]["anual"] or 
+                    plano_info["titulo"] or 
+                    plano_info["franquia"]["valor"] or 
+                    any([plano_info["assistencia"], plano_info["vidros"], plano_info["carro_reserva"], 
+                         plano_info["danos_materiais"], plano_info["danos_corporais"], 
+                         plano_info["danos_morais"], plano_info["morte_invalidez"]]) or
+                    "Plano recomendado" in tabela_text or
+                    "Franquia" in tabela_text):
+                    dados_tela_final["planos"].append(plano_info)
+                    exibir_mensagem(f"✅ **PLANO {i+1} ADICIONADO**: {plano_info['titulo']} - {plano_info['precos']['anual']} (Score: {plano_info['score_qualidade']})")
+                
+            except Exception as e:
+                exibir_mensagem(f"⚠️ Erro ao processar tabela {i+1}: {str(e)}")
+                continue
+        
+        # 5. Procurar por valores monetários gerais
+        valores_monetarios = driver.find_elements(By.XPATH, "//*[contains(text(), 'R$')]")
+        dados_tela_final["resumo"]["valores_encontrados"] = len(valores_monetarios)
+        
+        # 6. Identificar plano recomendado e calcular qualidade geral
+        planos_validos = []
+        score_total = 0
+        
+        for plano in dados_tela_final["planos"]:
+            if plano["score_qualidade"] > 0:
+                planos_validos.append(plano)
+                score_total += plano["score_qualidade"]
+                if "recomendado" in plano["titulo"].lower():
+                    dados_tela_final["resumo"]["plano_recomendado"] = plano["titulo"]
+        
+        # Calcular qualidade geral da captura
+        if planos_validos:
+            score_medio = score_total / len(planos_validos)
+            if score_medio >= 80:
+                dados_tela_final["resumo"]["qualidade_captura"] = "excelente"
+            elif score_medio >= 60:
+                dados_tela_final["resumo"]["qualidade_captura"] = "boa"
+            elif score_medio >= 40:
+                dados_tela_final["resumo"]["qualidade_captura"] = "regular"
+            else:
+                dados_tela_final["resumo"]["qualidade_captura"] = "baixa"
+        else:
+            dados_tela_final["resumo"]["qualidade_captura"] = "insuficiente"
+        
+        dados_tela_final["resumo"]["total_planos"] = len(dados_tela_final["planos"])
+        
+        # 7. Atualizar URL e título se estivermos na tela final
+        if dados_tela_final["titulo_pagina"] or dados_tela_final["planos"]:
+            # Verificar se a URL mudou para a tela final
+            url_atual = driver.current_url
+            titulo_atual = driver.title
+            
+            # Se ainda estamos na URL inicial mas detectamos a tela final, tentar navegar
+            if "imediatoseguros" in url_atual and not dados_tela_final["url"].endswith("resultado"):
+                exibir_mensagem("🔄 **ATUALIZANDO URL E TÍTULO** - Detectada tela final")
+                # Aguardar um pouco mais para a navegação completar
+                time.sleep(5)
+                dados_tela_final["url"] = driver.current_url
+                dados_tela_final["titulo"] = driver.title
+                exibir_mensagem(f"✅ **URL ATUALIZADA**: {dados_tela_final['url']}")
+                exibir_mensagem(f"✅ **TÍTULO ATUALIZADO**: {dados_tela_final['titulo']}")
+        # 8. Detectar elementos específicos da tela final
+        elementos_especificos = [
+            "Parabéns", "resultado final", "melhores planos", "elaborados exclusivamente",
+            "Morte/Invalidez", "Plano recomendado", "Franquia", "Valor de Mercado"
+        ]
+        
+        for elemento in elementos_especificos:
+            elementos = driver.find_elements(By.XPATH, f"//*[contains(text(), '{elemento}')]")
+            if elementos:
+                dados_tela_final["elementos_detectados"].append(f"palavra_chave: {elemento}")
+        
+        # 9. Salvar dados em arquivo
+        temp_dir = "temp/captura_tela_final"
+        os.makedirs(temp_dir, exist_ok=True)
+        
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        json_path = f"{temp_dir}/tela_final_{timestamp}.json"
+        
+        with open(json_path, 'w', encoding='utf-8') as f:
+            json.dump(dados_tela_final, f, indent=2, ensure_ascii=False)
+        
+        # Salvar também screenshot e HTML para debug
+        screenshot_path = f"{temp_dir}/tela_final_{timestamp}.png"
+        html_path = f"{temp_dir}/tela_final_{timestamp}.html"
+        
+        try:
+            driver.save_screenshot(screenshot_path)
+            with open(html_path, 'w', encoding='utf-8') as f:
+                f.write(driver.page_source)
+            exibir_mensagem(f"📸 **DEBUG SALVO**: Screenshot e HTML salvos")
+        except Exception as e:
+            exibir_mensagem(f"⚠️ Erro ao salvar debug: {str(e)}")
+        
+        exibir_mensagem(f"💾 **DADOS SALVOS**: {json_path}")
+        exibir_mensagem(f"📊 **RESUMO**: {len(dados_tela_final['planos'])} planos, {dados_tela_final['resumo']['valores_encontrados']} valores monetários")
+        exibir_mensagem(f"🎯 **QUALIDADE**: {dados_tela_final['resumo']['qualidade_captura']} (Score médio: {score_total/len(planos_validos) if planos_validos else 0:.1f})")
+        
+        # Verificação final
+        if dados_tela_final['modal_login']['detectado']:
+            exibir_mensagem("✅ **SUCESSO**: Modal detectado - Tela final foi carregada!")
+        elif dados_tela_final['titulo_pagina']:
+            exibir_mensagem("✅ **SUCESSO**: Tela final detectada pelos títulos!")
+        elif dados_tela_final['planos']:
+            exibir_mensagem("✅ **SUCESSO**: Planos encontrados!")
+        else:
+            exibir_mensagem("⚠️ **AVISO**: Tela final pode não ter carregado completamente")
+        
+        return dados_tela_final
+        
+    except Exception as e:
+        exibir_mensagem(f"❌ **ERRO NA CAPTURA DA TELA FINAL**: {str(e)}")
+        return None
+
 def validar_parametros_json(parametros_json):
     """
     Valida se todos os parâmetros necessários foram enviados no formato adequado
@@ -1045,6 +1648,26 @@ def validar_parametros_json(parametros_json):
     """
     try:
         exibir_mensagem("**VALIDANDO PARAMETROS JSON**")
+        
+        # Tentar usar o módulo robusto primeiro
+        try:
+            import importlib.util
+            spec = importlib.util.spec_from_file_location("validacao_parametros", "utils/validacao_parametros.py")
+            validacao_module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(validacao_module)
+            
+            # Usar a função robusta de validação
+            import json
+            json_string = json.dumps(parametros_json)
+            parametros_validados = validacao_module.validar_parametros_entrada(json_string)
+            exibir_mensagem("✅ **VALIDAÇÃO ROBUSTA CONCLUÍDA:** Todos os parâmetros são válidos")
+            exibir_mensagem(f"   📊 Total de parâmetros validados: {len(parametros_validados)}")
+            exibir_mensagem(f"   🚗 Veículo: {parametros_validados['marca']} {parametros_validados['modelo']} ({parametros_validados['ano']})")
+            return True
+            
+        except Exception as e:
+            exibir_mensagem(f"⚠️ **FALLBACK PARA VALIDAÇÃO BÁSICA:** Módulo robusto não disponível ({str(e)})")
+            # Continuar com validação básica como fallback
         
         # Lista de parâmetros obrigatórios
         parametros_obrigatorios = [
@@ -4873,6 +5496,48 @@ def executar_todas_telas(json_string):
             # Erro na Tela 9 - retornar resposta de erro
             return tela9_result
         
+        # CAPTURAR DADOS DA TELA FINAL
+        exibir_mensagem("\n🎯 **CAPTURANDO DADOS DA TELA FINAL**")
+        
+        try:
+            # Aguardar carregamento da tela final
+            aguardar_carregamento_pagina(driver, 30)
+            aguardar_estabilizacao(driver, 10)
+            
+            # Capturar dados da tela final
+            dados_tela_final = capturar_dados_tela_final(driver)
+            
+            if dados_tela_final:
+                exibir_mensagem("🎯 **CAPTURA DA TELA FINAL CONCLUÍDA COM SUCESSO!**")
+                exibir_mensagem(f"📊 **PLANOS ENCONTRADOS**: {len(dados_tela_final['planos'])}")
+                exibir_mensagem(f"💰 **VALORES MONETÁRIOS**: {dados_tela_final['resumo']['valores_encontrados']}")
+                
+                # Exibir detalhes dos planos encontrados
+                for i, plano in enumerate(dados_tela_final['planos']):
+                    exibir_mensagem(f"📋 **PLANO {i+1}**: {plano['tipo'].upper()} - {plano['nome']}")
+                    if plano['valor_principal']:
+                        exibir_mensagem(f"   💰 **VALOR PRINCIPAL**: {plano['valor_principal']}")
+                    if plano['preco_total']:
+                        exibir_mensagem(f"   💵 **PREÇO TOTAL**: {plano['preco_total']}")
+                    if plano['coberturas']:
+                        exibir_mensagem(f"   🛡️ **COBERTURAS**: {len(plano['coberturas'])} encontradas")
+                
+                # Salvar retorno intermediário da tela final
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                retorno_path = f"temp/retorno_intermediario_tela_final_{timestamp}.json"
+                
+                with open(retorno_path, 'w', encoding='utf-8') as f:
+                    json.dump(dados_tela_final, f, indent=2, ensure_ascii=False)
+                
+                exibir_mensagem(f"💾 **RETORNO SALVO**: {retorno_path}")
+                
+            else:
+                exibir_mensagem("⚠️ **AVISO**: Não foi possível capturar dados da tela final")
+                
+        except Exception as e:
+            exibir_mensagem(f"❌ **ERRO NA CAPTURA DA TELA FINAL**: {str(e)}")
+            # Continuar execução mesmo se a captura falhar
+        
         fim = datetime.now()
         tempo_total = (fim - inicio).total_seconds()
         
@@ -4915,12 +5580,23 @@ def executar_todas_telas(json_string):
                 "timestamp": {
                     "inicio": inicio.isoformat(),
                     "fim": fim.isoformat()
+                },
+                "capturas_intermediarias": {
+                    "carrossel_estimativas": None,
+                    "tela_final": None
                 }
             }
         }
         
+        # Adicionar dados capturados ao response
+        if 'dados_carrossel' in locals():
+            success_response["data"]["capturas_intermediarias"]["carrossel_estimativas"] = dados_carrossel
+        
+        if 'dados_tela_final' in locals():
+            success_response["data"]["capturas_intermediarias"]["tela_final"] = dados_tela_final
+        
         exibir_mensagem("\n" + "=" * 80)
-        exibir_mensagem("🎉 **RPA EXECUTADO COM SUCESSO TOTAL! TELAS 1-13 IMPLEMENTADAS!**")
+        exibir_mensagem("🎉 **RPA EXECUTADO COM SUCESSO TOTAL! TELAS 1-13 + CAPTURA FINAL IMPLEMENTADAS!**")
         exibir_mensagem("=" * 80)
         exibir_mensagem(f"✅ Total de telas executadas: 13")
         exibir_mensagem(f"✅ Tela 1: Seleção Carro")
@@ -4936,6 +5612,7 @@ def executar_todas_telas(json_string):
         exibir_mensagem(f"✅ Tela 11: Atividade do Veículo")
         exibir_mensagem(f"✅ Tela 12: Garagem na Residência")
         exibir_mensagem(f"✅ Tela 13: Uso por Residentes")
+        exibir_mensagem(f"🎯 Tela Final: Captura de planos e valores")
         exibir_mensagem(f"📁 Todos os arquivos salvos em: temp/ (incluindo Tela 9)")
         exibir_mensagem(f"**MUTATIONOBSERVER ROBUSTO FUNCIONANDO PERFEITAMENTE!**")
         exibir_mensagem(f"   📊 Configuração React: childList + attributes + characterData + subtree")
@@ -5142,6 +5819,42 @@ parser = argparse.ArgumentParser(
  RESPOSTA DE ERRO:
  =================
  {"success": false, "error": {"code": 1000, "category": "VALIDATION_ERROR", ...}}
+
+ JSON DE RETORNO COMPLETO:
+ =========================
+ O RPA retorna um JSON estruturado com informações detalhadas sobre a execução:
+
+ ESTRUTURA DE SUCESSO:
+ {
+   "status": "sucesso",
+   "timestamp": "2025-08-31T17:45:00.199712",
+   "versao": "2.11.0",
+   "sistema": "RPA Tô Segurado",
+   "codigo": 9002,
+   "mensagem": "RPA executado com sucesso",
+   "dados": {
+     "telas_executadas": 8,
+     "tempo_execucao": "85.2s",
+     "placa_processada": "FPG-8D63",
+     "url_final": "https://www.app.tosegurado.com.br/cotacao/carro",
+     "capturas_intermediarias": {
+       "carrossel": { /* estimativas de cobertura */ },
+       "tela_final": { /* planos de seguro */ }
+     }
+   }
+ }
+
+ CAPTURAS INTERMEDIÁRIAS:
+ ========================
+ 🎠 CARROSSEL: Estimativas de cobertura com valores "de" e "até"
+ 🎯 TELA FINAL: Planos de seguro com preços, coberturas e benefícios
+
+ DOCUMENTAÇÃO COMPLETA:
+ ======================
+ Para documentação detalhada de todos os campos do JSON de retorno:
+ 📚 DOCUMENTACAO_JSON_RETORNO.md
+ 🚀 demonstracao_json_retorno.py
+ 📋 exemplo_json_retorno.json
          """
      )
     

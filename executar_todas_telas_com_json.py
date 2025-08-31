@@ -148,6 +148,12 @@ python executar_todas_telas_com_json.py '{"configuracao": {"log": true, "display
 ⚠️ **NOTA IMPORTANTE:**
 Este script APENAS valida parâmetros. Para executar o RPA real,
 use: python executar_rpa_imediato.py '{"parametros": "aqui"}'
+
+📚 **DOCUMENTAÇÃO DO JSON DE RETORNO:**
+Para documentação completa do JSON de retorno do RPA:
+📖 DOCUMENTACAO_JSON_RETORNO.md
+🚀 demonstracao_json_retorno.py
+📋 exemplo_json_retorno.json
 """
     print(ajuda)
 

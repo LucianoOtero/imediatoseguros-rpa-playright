@@ -303,6 +303,250 @@ git checkout <hash_commit>
 - Implementado sistema de delays extremos
 - Adicionado tratamento de erros robusto
 
+## 📋 **Documentação do JSON de Retorno**
+
+Para uma documentação completa e detalhada de todos os campos do JSON de retorno, consulte o arquivo **[DOCUMENTACAO_JSON_RETORNO.md](DOCUMENTACAO_JSON_RETORNO.md)**.
+
+### **Estrutura Completa do JSON de Retorno**
+
+O RPA retorna um JSON estruturado com informações detalhadas sobre a execução e os dados capturados. A estrutura varia conforme o tipo de execução:
+
+#### **1. Retorno de Sucesso Completo**
+```json
+{
+  "status": "sucesso",
+  "timestamp": "2025-08-31T17:45:00.199712",
+  "versao": "2.11.0",
+  "sistema": "RPA Tô Segurado",
+  "codigo": 9002,
+  "mensagem": "RPA executado com sucesso",
+  "dados": {
+    "telas_executadas": 8,
+    "tempo_execucao": "85.2s",
+    "placa_processada": "FPG-8D63",
+    "url_final": "https://www.app.tosegurado.com.br/cotacao/carro",
+    "capturas_intermediarias": {
+      "carrossel": {
+        "timestamp": "2025-08-31T17:44:30.123456",
+        "tela": "carrossel",
+        "nome_tela": "Estimativas de Cobertura",
+        "url": "https://www.app.tosegurado.com.br/cotacao/carro",
+        "titulo": "Faça agora sua cotação de Seguro Auto",
+        "estimativas": [
+          {
+            "cobertura": "Cobertura Compreensiva",
+            "valores": {
+              "de": "R$ 1.200,00",
+              "ate": "R$ 1.700,00"
+            },
+            "beneficios": [
+              {
+                "nome": "Colisão e Acidentes",
+                "status": "incluido"
+              },
+              {
+                "nome": "Roubo e Furto",
+                "status": "incluido"
+              }
+            ]
+          }
+        ]
+      },
+      "tela_final": {
+        "timestamp": "2025-08-31T17:45:00.199712",
+        "tela": "final",
+        "nome_tela": "Resultado Final",
+        "url": "https://www.app.tosegurado.com.br/cotacao/carro",
+        "titulo": "Faça agora sua cotação de Seguro Auto",
+        "titulo_pagina": "Parabéns, chegamos ao resultado final",
+        "planos": [
+          {
+            "titulo": "Plano Recomendado",
+            "franquia": {
+              "valor": "R$ 2.500,00",
+              "tipo": "Reduzida"
+            },
+            "valor_mercado": "100% da tabela FIPE",
+            "assistencia": true,
+            "vidros": true,
+            "carro_reserva": true,
+            "danos_materiais": "R$ 50.000,00",
+            "danos_corporais": "R$ 50.000,00",
+            "danos_morais": "R$ 10.000,00",
+            "morte_invalidez": "R$ 5.000,00",
+            "precos": {
+              "anual": "R$ 100,00",
+              "parcelado": {
+                "valor": "R$ 218,17",
+                "parcelas": "1x sem juros"
+              }
+            },
+            "score_qualidade": 100,
+            "texto_completo": "Texto completo do plano...",
+            "categoria": "premium"
+          }
+        ],
+        "modal_login": {
+          "detectado": true,
+          "titulo": "Modal de envio de cotação por email",
+          "campos": ["email"]
+        },
+        "elementos_detectados": [
+          "palavra_chave: Parabéns",
+          "palavra_chave: resultado final"
+        ],
+        "resumo": {
+          "total_planos": 2,
+          "plano_recomendado": "Plano Recomendado",
+          "valores_encontrados": 22,
+          "qualidade_captura": "boa"
+        }
+      }
+    }
+  },
+  "logs": [
+    "2025-08-31 17:44:07 | INFO | RPA executado com sucesso",
+    "2025-08-31 17:44:09 | INFO | Chrome fechado"
+  ]
+}
+```
+
+### **Detalhamento de Cada Campo**
+
+#### **Campos Principais do Retorno**
+
+| Campo | Tipo | Descrição | Exemplo |
+|-------|------|-----------|---------|
+| `status` | string | Status da execução | `"sucesso"` ou `"erro"` |
+| `timestamp` | string | Data/hora da execução | `"2025-08-31T17:45:00.199712"` |
+| `versao` | string | Versão do RPA | `"2.11.0"` |
+| `sistema` | string | Nome do sistema | `"RPA Tô Segurado"` |
+| `codigo` | integer | Código de retorno | `9002` (sucesso) ou `2002` (erro) |
+| `mensagem` | string | Mensagem descritiva | `"RPA executado com sucesso"` |
+| `dados` | object | Dados da execução | Objeto com informações detalhadas |
+| `logs` | array | Logs da execução | Array de strings com logs |
+
+#### **Campos do Objeto `dados`**
+
+| Campo | Tipo | Descrição | Exemplo |
+|-------|------|-----------|---------|
+| `telas_executadas` | integer | Número de telas processadas | `8` |
+| `tempo_execucao` | string | Tempo total de execução | `"85.2s"` |
+| `placa_processada` | string | Placa do veículo processado | `"FPG-8D63"` |
+| `url_final` | string | URL da página final | `"https://www.app.tosegurado.com.br/cotacao/carro"` |
+| `capturas_intermediarias` | object | Dados capturados durante a execução | Objeto com carrossel e tela final |
+
+#### **Campos do Carrossel (`capturas_intermediarias.carrossel`)**
+
+| Campo | Tipo | Descrição | Exemplo |
+|-------|------|-----------|---------|
+| `timestamp` | string | Data/hora da captura | `"2025-08-31T17:44:30.123456"` |
+| `tela` | string | Identificador da tela | `"carrossel"` |
+| `nome_tela` | string | Nome descritivo da tela | `"Estimativas de Cobertura"` |
+| `url` | string | URL da página | `"https://www.app.tosegurado.com.br/cotacao/carro"` |
+| `titulo` | string | Título da página | `"Faça agora sua cotação de Seguro Auto"` |
+| `estimativas` | array | Lista de estimativas capturadas | Array de objetos de estimativa |
+
+#### **Campos das Estimativas do Carrossel**
+
+| Campo | Tipo | Descrição | Exemplo |
+|-------|------|-----------|---------|
+| `cobertura` | string | Nome da cobertura | `"Cobertura Compreensiva"` |
+| `valores.de` | string | Valor mínimo | `"R$ 1.200,00"` |
+| `valores.ate` | string | Valor máximo | `"R$ 1.700,00"` |
+| `beneficios` | array | Lista de benefícios | Array de objetos de benefício |
+
+#### **Campos dos Benefícios do Carrossel**
+
+| Campo | Tipo | Descrição | Exemplo |
+|-------|------|-----------|---------|
+| `nome` | string | Nome do benefício | `"Colisão e Acidentes"` |
+| `status` | string | Status do benefício | `"incluido"` |
+
+#### **Campos da Tela Final (`capturas_intermediarias.tela_final`)**
+
+| Campo | Tipo | Descrição | Exemplo |
+|-------|------|-----------|---------|
+| `timestamp` | string | Data/hora da captura | `"2025-08-31T17:45:00.199712"` |
+| `tela` | string | Identificador da tela | `"final"` |
+| `nome_tela` | string | Nome descritivo da tela | `"Resultado Final"` |
+| `url` | string | URL da página | `"https://www.app.tosegurado.com.br/cotacao/carro"` |
+| `titulo` | string | Título da página | `"Faça agora sua cotação de Seguro Auto"` |
+| `titulo_pagina` | string | Título específico da página | `"Parabéns, chegamos ao resultado final"` |
+| `planos` | array | Lista de planos capturados | Array de objetos de plano |
+| `modal_login` | object | Informações sobre modal de login | Objeto com dados do modal |
+| `elementos_detectados` | array | Elementos detectados na página | Array de strings |
+| `resumo` | object | Resumo da captura | Objeto com estatísticas |
+
+#### **Campos dos Planos (`planos[]`)**
+
+| Campo | Tipo | Descrição | Exemplo |
+|-------|------|-----------|---------|
+| `titulo` | string | Título do plano | `"Plano Recomendado"` |
+| `franquia.valor` | string | Valor da franquia | `"R$ 2.500,00"` |
+| `franquia.tipo` | string | Tipo da franquia | `"Reduzida"` |
+| `valor_mercado` | string | Valor de mercado | `"100% da tabela FIPE"` |
+| `assistencia` | boolean | Inclui assistência | `true` |
+| `vidros` | boolean | Inclui cobertura de vidros | `true` |
+| `carro_reserva` | boolean | Inclui carro reserva | `true` |
+| `danos_materiais` | string | Cobertura de danos materiais | `"R$ 50.000,00"` |
+| `danos_corporais` | string | Cobertura de danos corporais | `"R$ 50.000,00"` |
+| `danos_morais` | string | Cobertura de danos morais | `"R$ 10.000,00"` |
+| `morte_invalidez` | string | Cobertura de morte/invalidez | `"R$ 5.000,00"` |
+| `precos.anual` | string | Preço anual | `"R$ 100,00"` |
+| `precos.parcelado.valor` | string | Valor da parcela | `"R$ 218,17"` |
+| `precos.parcelado.parcelas` | string | Condições de parcelamento | `"1x sem juros"` |
+| `score_qualidade` | integer | Score de qualidade (0-100) | `100` |
+| `texto_completo` | string | Texto completo do plano | `"Texto completo..."` |
+| `categoria` | string | Categoria do plano | `"premium"` |
+
+#### **Campos do Modal de Login (`modal_login`)**
+
+| Campo | Tipo | Descrição | Exemplo |
+|-------|------|-----------|---------|
+| `detectado` | boolean | Se o modal foi detectado | `true` |
+| `titulo` | string | Título do modal | `"Modal de envio de cotação por email"` |
+| `campos` | array | Campos do modal | `["email"]` |
+
+#### **Campos do Resumo (`resumo`)**
+
+| Campo | Tipo | Descrição | Exemplo |
+|-------|------|-----------|---------|
+| `total_planos` | integer | Total de planos capturados | `2` |
+| `plano_recomendado` | string | Nome do plano recomendado | `"Plano Recomendado"` |
+| `valores_encontrados` | integer | Total de valores capturados | `22` |
+| `qualidade_captura` | string | Qualidade da captura | `"boa"` |
+
+### **Códigos de Retorno**
+
+#### **Códigos de Sucesso (9001-9999)**
+- `9001`: Tela executada com sucesso
+- `9002`: RPA executado com sucesso
+- `9003`: Elemento encontrado e processado
+- `9004`: Ação realizada com sucesso
+
+#### **Códigos de Erro (1000-8999)**
+- `1001-1999`: Erros de configuração
+- `2001-2999`: Erros de navegação
+- `3001-3999`: Erros de automação
+- `4001-4999`: Erros de sistema
+- `5001-5999`: Erros de validação
+
+### **Qualidade da Captura**
+
+O campo `qualidade_captura` pode ter os seguintes valores:
+- `"excelente"`: Score 90-100
+- `"boa"`: Score 70-89
+- `"regular"`: Score 50-69
+- `"ruim"`: Score 0-49
+
+### **Categorias de Planos**
+
+O campo `categoria` pode ter os seguintes valores:
+- `"premium"`: Plano com mais coberturas
+- `"intermediario"`: Plano com coberturas moderadas
+- `"basico"`: Plano com coberturas básicas
+
 ## 📞 **Suporte**
 
 - **Issues**: Abra uma issue no GitHub

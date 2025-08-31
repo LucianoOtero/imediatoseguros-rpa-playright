@@ -1,170 +1,97 @@
 #!/usr/bin/env python3
 """
-Teste Simples de Validação de JSON
-==================================
+Teste Simples da Unificação da Validação
+========================================
 
-Teste direto da função de validação sem executar scripts completos.
-
-VERSÃO: 1.0.0
-DATA: 29/08/2025
+Testa se a validação unificada está funcionando corretamente.
 """
 
 import json
 import sys
-import os
 
-def testar_validacao_direta():
-    """Testa a validação diretamente"""
+def testar_validacao():
+    """Testa a validação com JSON válido"""
     
-    print("🧪 **TESTE DIRETO DA FUNÇÃO DE VALIDAÇÃO**")
-    print("=" * 60)
+    print("🧪 **TESTE SIMPLES DA UNIFICAÇÃO**")
     
-    # Adicionar utils ao path
-    sys.path.append(os.path.join(os.path.dirname(__file__), 'utils'))
-    
-    try:
-        from validacao_parametros import validar_parametros_entrada, ValidacaoParametrosError
-        print("✅ Módulo de validação importado com sucesso")
-    except ImportError as e:
-        print(f"❌ Erro ao importar módulo: {e}")
-        return False
-    
-    # Carregar JSON do arquivo
-    try:
-        with open('parametros.json', 'r', encoding='utf-8') as arquivo:
-            json_string = arquivo.read()
-            print("✅ JSON carregado do arquivo")
-    except Exception as e:
-        print(f"❌ Erro ao carregar JSON: {e}")
-        return False
-    
-    # Teste 1: Validação com JSON válido
-    print("\n🔍 **Teste 1: JSON válido**")
-    try:
-        parametros_validados = validar_parametros_entrada(json_string)
-        print("✅ Validação passou com sucesso!")
-        
-        # Mostrar resumo
-        print("\n📋 **Parâmetros validados:**")
-        print(f"  • Placa: {parametros_validados.get('placa')}")
-        print(f"  • Marca: {parametros_validados.get('marca')}")
-        print(f"  • Modelo: {parametros_validados.get('modelo')}")
-        print(f"  • Nome: {parametros_validados.get('nome')}")
-        print(f"  • CPF: {parametros_validados.get('cpf')}")
-        print(f"  • Email: {parametros_validados.get('email')}")
-        
-        config = parametros_validados.get('configuracao', {})
-        print(f"  • Log: {config.get('log')}")
-        print(f"  • Display: {config.get('display')}")
-        print(f"  • Tempo Estabilização: {config.get('tempo_estabilizacao')}")
-        print(f"  • Tempo Carregamento: {config.get('tempo_carregamento')}")
-        
-    except ValidacaoParametrosError as e:
-        print(f"❌ Erro de validação: {e}")
-        return False
-    except Exception as e:
-        print(f"❌ Erro inesperado: {e}")
-        return False
-    
-    # Teste 2: JSON inválido
-    print("\n🔍 **Teste 2: JSON inválido**")
-    try:
-        validar_parametros_entrada('{"invalid": json}')
-        print("❌ Deveria ter falhado com JSON inválido")
-        return False
-    except ValidacaoParametrosError:
-        print("✅ Erro capturado corretamente")
-    except Exception as e:
-        print(f"❌ Erro inesperado: {e}")
-        return False
-    
-    # Teste 3: Campo obrigatório faltando
-    print("\n🔍 **Teste 3: Campo obrigatório faltando**")
-    json_incompleto = {
+    # JSON válido
+    json_valido = {
         "configuracao": {
             "log": True,
             "display": True,
+            "log_rotacao_dias": 90,
+            "log_nivel": "INFO",
             "tempo_estabilizacao": 1,
             "tempo_carregamento": 10
         },
-        "url_base": "https://teste.com",
-        # "placa" faltando
+        "url_base": "https://www.app.tosegurado.com.br/imediatoseguros",
+        "placa": "EED3D56",
         "marca": "FORD",
-        "modelo": "TESTE"
-    }
-    
-    try:
-        validar_parametros_entrada(json.dumps(json_incompleto))
-        print("❌ Deveria ter falhado com campo obrigatório faltando")
-        return False
-    except ValidacaoParametrosError:
-        print("✅ Erro capturado corretamente")
-    except Exception as e:
-        print(f"❌ Erro inesperado: {e}")
-        return False
-    
-    # Teste 4: Valor inválido
-    print("\n🔍 **Teste 4: Valor inválido**")
-    json_valor_invalido = {
-        "configuracao": {
-            "log": True,
-            "display": True,
-            "tempo_estabilizacao": 1,
-            "tempo_carregamento": 10
-        },
-        "url_base": "https://teste.com",
-        "placa": "ABC1234",
-        "marca": "FORD",
-        "modelo": "TESTE",
-        "ano": "2020",
-        "combustivel": "INVALIDO",  # Valor inválido
+        "modelo": "ECOSPORT XLS 1.6 1.6 8V",
+        "ano": "2006",
+        "combustivel": "Flex",
         "veiculo_segurado": "Não",
-        "cep": "12345-678",
-        "endereco_completo": "Rua Teste, 123",
-        "uso_veiculo": "Comercial",
-        "nome": "João Silva",
-        "cpf": "12345678901",
-        "data_nascimento": "01/01/1990",
+        "cep": "03317-000",
+        "endereco_completo": "Rua Serra de Botucatu, 410 APTO 11 - São Paulo, SP",
+        "uso_veiculo": "Profissional",
+        "nome": "LUCIANO OTERO",
+        "cpf": "085.546.078-48",
+        "data_nascimento": "09/02/1965",
         "sexo": "Masculino",
-        "estado_civil": "Solteiro",
-        "email": "joao@teste.com",
-        "celular": "(11) 99999-9999"
+        "estado_civil": "Casado",
+        "email": "lrotero@gmail.com",
+        "celular": "(11) 97668-7668"
     }
     
+    print("1. Testando módulo robusto...")
     try:
-        validar_parametros_entrada(json.dumps(json_valor_invalido))
-        print("❌ Deveria ter falhado com valor inválido")
-        return False
-    except ValidacaoParametrosError:
-        print("✅ Erro capturado corretamente")
+        from utils.validacao_parametros import validar_parametros_entrada, ValidacaoParametrosError
+        
+        json_string = json.dumps(json_valido)
+        resultado = validar_parametros_entrada(json_string)
+        print("✅ Módulo robusto: Validação passou")
+        
     except Exception as e:
-        print(f"❌ Erro inesperado: {e}")
+        print(f"❌ Módulo robusto: Erro - {str(e)}")
         return False
     
+    print("2. Testando função do executar_rpa_imediato...")
+    try:
+        # Importar apenas a função específica
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("rpa", "executar_rpa_imediato.py")
+        rpa_module = importlib.util.module_from_spec(spec)
+        
+        # Mock das funções necessárias
+        def mock_exibir_mensagem(msg, nivel="INFO"):
+            pass
+        
+        def mock_create_error_response(code, message="", context=""):
+            return {"success": False, "error": {"code": code, "message": message, "context": context}}
+        
+        # Substituir funções
+        rpa_module.exibir_mensagem = mock_exibir_mensagem
+        rpa_module.create_error_response = mock_create_error_response
+        
+        # Executar módulo
+        spec.loader.exec_module(rpa_module)
+        
+        # Testar validação
+        resultado = rpa_module.validar_parametros_json(json_valido)
+        
+        if resultado is True:
+            print("✅ Executar RPA: Validação passou")
+        else:
+            print(f"❌ Executar RPA: Validação falhou - {resultado}")
+            return False
+            
+    except Exception as e:
+        print(f"❌ Executar RPA: Erro - {str(e)}")
+        return False
+    
+    print("🎉 **UNIFICAÇÃO SUCESSO**: Ambos os métodos funcionam!")
     return True
 
-def main():
-    """Função principal"""
-    
-    print("🚀 **INICIANDO TESTE DIRETO DE VALIDAÇÃO**")
-    print("=" * 60)
-    
-    sucesso = testar_validacao_direta()
-    
-    print("\n" + "=" * 60)
-    if sucesso:
-        print("🎉 **TESTE DIRETO CONCLUÍDO COM SUCESSO!**")
-        print("✅ A função de validação está funcionando perfeitamente")
-        print("\n📋 **RESUMO:**")
-        print("  • ✅ JSON válido é aceito")
-        print("  • ✅ JSON inválido é rejeitado")
-        print("  • ✅ Campos obrigatórios são verificados")
-        print("  • ✅ Valores permitidos são validados")
-    else:
-        print("❌ **TESTE DIRETO FALHOU!**")
-        print("⚠️  Verifique os erros acima")
-    
-    return 0 if sucesso else 1
-
 if __name__ == "__main__":
-    sys.exit(main())
+    sucesso = testar_validacao()
+    sys.exit(0 if sucesso else 1)

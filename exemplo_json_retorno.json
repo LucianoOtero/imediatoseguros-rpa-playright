@@ -1,0 +1,98 @@
+{
+  "status": "sucesso",
+  "timestamp": "2025-08-31T17:45:00.199712",
+  "versao": "2.11.0",
+  "sistema": "RPA Tô Segurado",
+  "codigo": 9002,
+  "mensagem": "RPA executado com sucesso",
+  "dados": {
+    "telas_executadas": 8,
+    "tempo_execucao": "85.2s",
+    "placa_processada": "FPG-8D63",
+    "url_final": "https://www.app.tosegurado.com.br/cotacao/carro",
+    "capturas_intermediarias": {
+      "carrossel": {
+        "timestamp": "2025-08-31T17:44:30.123456",
+        "tela": "carrossel",
+        "nome_tela": "Estimativas de Cobertura",
+        "url": "https://www.app.tosegurado.com.br/cotacao/carro",
+        "titulo": "Faça agora sua cotação de Seguro Auto",
+        "estimativas": [
+          {
+            "cobertura": "Cobertura Compreensiva",
+            "valores": {
+              "de": "R$ 1.200,00",
+              "ate": "R$ 1.700,00"
+            },
+            "beneficios": [
+              {
+                "nome": "Colisão e Acidentes",
+                "status": "incluido"
+              },
+              {
+                "nome": "Roubo e Furto",
+                "status": "incluido"
+              }
+            ]
+          }
+        ]
+      },
+      "tela_final": {
+        "timestamp": "2025-08-31T17:45:00.199712",
+        "tela": "final",
+        "nome_tela": "Resultado Final",
+        "url": "https://www.app.tosegurado.com.br/cotacao/carro",
+        "titulo": "Faça agora sua cotação de Seguro Auto",
+        "titulo_pagina": "Parabéns, chegamos ao resultado final",
+        "planos": [
+          {
+            "titulo": "Plano Recomendado",
+            "franquia": {
+              "valor": "R$ 2.500,00",
+              "tipo": "Reduzida"
+            },
+            "valor_mercado": "100% da tabela FIPE",
+            "assistencia": true,
+            "vidros": true,
+            "carro_reserva": true,
+            "danos_materiais": "R$ 50.000,00",
+            "danos_corporais": "R$ 50.000,00",
+            "danos_morais": "R$ 10.000,00",
+            "morte_invalidez": "R$ 5.000,00",
+            "precos": {
+              "anual": "R$ 100,00",
+              "parcelado": {
+                "valor": "R$ 218,17",
+                "parcelas": "1x sem juros"
+              }
+            },
+            "score_qualidade": 100,
+            "texto_completo": "Texto completo do plano...",
+            "categoria": "premium"
+          }
+        ],
+        "modal_login": {
+          "detectado": true,
+          "titulo": "Modal de envio de cotação por email",
+          "campos": [
+            "email"
+          ]
+        },
+        "elementos_detectados": [
+          "palavra_chave: Parabéns",
+          "palavra_chave: resultado final"
+        ],
+        "resumo": {
+          "total_planos": 2,
+          "plano_recomendado": "Plano Recomendado",
+          "valores_encontrados": 22,
+          "qualidade_captura": "boa"
+        }
+      }
+    }
+  },
+  "logs": [
+    "2025-08-31 17:44:07 | INFO | RPA executado com sucesso",
+    "2025-08-31 17:44:09 | INFO | Chrome fechado"
+  ]
+}
