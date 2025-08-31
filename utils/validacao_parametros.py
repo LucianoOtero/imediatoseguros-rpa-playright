@@ -71,11 +71,11 @@ class ValidadorParametros:
         
         # Valores permitidos para campos específicos
         self.valores_permitidos = {
-            "combustivel": ["Flex", "Gasolina", "Etanol", "Diesel", "Elétrico", "Híbrido"],
+            "combustivel": ["Flex", "Gasolina", "Álcool", "Diesel", "Híbrido", "Hibrido", "Elétrico"],
             "veiculo_segurado": ["Sim", "Não"],
             "sexo": ["Masculino", "Feminino"],
             "estado_civil": ["Solteiro", "Casado", "Divorciado", "Viúvo", "União Estável", "Casado ou União Estável", "Separado"],
-            "uso_veiculo": ["Particular", "Comercial", "Aluguel", "Uber/99", "Taxi"],
+            "uso_veiculo": ["Pessoal", "Profissional", "Motorista de aplicativo", "Taxi"],
             "log_nivel": ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
         }
         

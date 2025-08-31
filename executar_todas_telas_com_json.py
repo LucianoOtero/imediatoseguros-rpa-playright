@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 """
-RPA Tô Segurado - COMPLETO ATÉ TELA 8
-VERSÃO MODIFICADA para receber parâmetros via JSON na linha de comando
+RPA Tô Segurado - VALIDADOR DE PARÂMETROS JSON
+VERSÃO ATUALIZADA para validação precisa de parâmetros via JSON
 
-BASEADO EXATAMENTE no script tosegurado-completo-tela1-8.py que funcionou ontem
+Este script valida parâmetros JSON para o RPA Tô Segurado.
+NÃO executa o RPA real - apenas valida e estrutura parâmetros.
 
 USO:
 python executar_todas_telas_com_json.py '{"configuracao": {"log": true, "display": true}, "placa": "ABC1234", ...}'
 
-VERSÃO: 2.4.0 - COM VALIDAÇÃO DE PARÂMETROS VIA JSON
+VERSÃO: 2.5.0 - VALIDAÇÃO PRECISA DE PARÂMETROS
 DATA: 29/08/2025
 """
 
@@ -43,20 +44,13 @@ except ImportError:
     RETORNO_DISPONIVEL = False
     print("⚠️ Sistema de retorno estruturado não disponível.")
 
-# Imports do Selenium
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.chrome.service import Service
-from selenium.common.exceptions import TimeoutException, NoSuchElementException, ElementClickInterceptedException
-
 def mostrar_ajuda():
     """Mostra ajuda de uso do script"""
     ajuda = """
-🔧 **USO DO SCRIPT COM PARÂMETROS JSON**
+🔧 **VALIDADOR DE PARÂMETROS JSON PARA RPA TÔ SEGURADO**
 
-O script deve ser chamado com um JSON contendo todos os parâmetros necessários.
+Este script valida parâmetros JSON para o RPA Tô Segurado.
+NÃO executa o RPA real - apenas valida e estrutura parâmetros.
 
 📋 **Sintaxe:**
 python executar_todas_telas_com_json.py '{"parametros": "aqui"}'
@@ -65,7 +59,7 @@ python executar_todas_telas_com_json.py '{"parametros": "aqui"}'
 python executar_todas_telas_com_json.py '{"configuracao": {"log": true, "display": true}, "placa": "ABC1234", ...}'
 
 📋 **Campos Obrigatórios:**
-- configuracao: Objeto com log, display, log_rotacao_dias, log_nivel
+- configuracao: Objeto com log, display, log_rotacao_dias, log_nivel, tempo_estabilizacao, tempo_carregamento
 - url_base: URL base do portal
 - placa: Placa do veículo (formato: ABC1234)
 - marca: Marca do veículo
@@ -84,13 +78,35 @@ python executar_todas_telas_com_json.py '{"configuracao": {"log": true, "display
 - email: Email válido
 - celular: Celular (formato: (11) 97668-7668)
 
-📋 **Valores Permitidos:**
-- combustivel: ["Flex", "Gasolina", "Etanol", "Diesel", "Elétrico", "Híbrido"]
+📋 **Valores Permitidos (ATUALIZADOS):**
+- combustivel: ["Flex", "Gasolina", "Álcool", "Diesel", "Híbrido", "Hibrido", "Elétrico"]
 - veiculo_segurado: ["Sim", "Não"]
 - sexo: ["Masculino", "Feminino"]
-- estado_civil: ["Solteiro", "Casado", "Divorciado", "Viúvo", "União Estável"]
-- uso_veiculo: ["Particular", "Comercial", "Aluguel", "Uber/99", "Taxi"]
+- estado_civil: ["Solteiro", "Casado", "Divorciado", "Separado", "Viúvo", "Casado ou União Estável"]
+- uso_veiculo: ["Pessoal", "Profissional", "Motorista de aplicativo", "Taxi"]
 - log_nivel: ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+
+📋 **Parâmetros Opcionais:**
+- zero_km: boolean [true/false]
+- kit_gas: boolean [true/false]
+- blindado: boolean [true/false]
+- financiado: boolean [true/false]
+- condutor_principal: boolean [true/false]
+- nome_condutor: string (obrigatório se condutor_principal = false)
+- cpf_condutor: string (obrigatório se condutor_principal = false)
+- data_nascimento_condutor: string (obrigatório se condutor_principal = false)
+- sexo_condutor: string ["Masculino", "Feminino"] (obrigatório se condutor_principal = false)
+- estado_civil_condutor: string ["Solteiro", "Casado", "Divorciado", "Separado", "Viúvo", "Casado ou União Estável"] (obrigatório se condutor_principal = false)
+- local_de_trabalho: boolean [true/false]
+- estacionamento_proprio_local_de_trabalho: boolean [true/false]
+- local_de_estudo: boolean [true/false]
+- estacionamento_proprio_local_de_estudo: boolean [true/false]
+- garagem_residencia: boolean [true/false]
+- portao_eletronico: string ["Eletronico", "Manual", "Não possui"]
+- reside_18_26: string ["Sim", "Não"]
+- sexo_do_menor: string ["Masculino", "Feminino", "N/A"]
+- faixa_etaria_menor_mais_novo: string ["18-21", "22-26", "N/A"]
+- continuar_com_corretor_anterior: boolean [true/false]
 
 ❌ **Erro se:**
 - JSON não for fornecido
@@ -106,7 +122,9 @@ python executar_todas_telas_com_json.py '{"configuracao": {"log": true, "display
     "log": true,
     "display": true,
     "log_rotacao_dias": 90,
-    "log_nivel": "INFO"
+    "log_nivel": "INFO",
+    "tempo_estabilizacao": 1,
+    "tempo_carregamento": 10
   },
   "url_base": "https://www.app.tosegurado.com.br/imediatoseguros",
   "placa": "ABC1234",
@@ -117,7 +135,7 @@ python executar_todas_telas_com_json.py '{"configuracao": {"log": true, "display
   "veiculo_segurado": "Não",
   "cep": "03317-000",
   "endereco_completo": "Rua Serra de Botucatu, 410 APTO 11 - São Paulo, SP",
-  "uso_veiculo": "Particular",
+  "uso_veiculo": "Profissional",
   "nome": "NOME_EXEMPLO",
   "cpf": "08554607848",
   "data_nascimento": "01/01/1980",
@@ -126,55 +144,46 @@ python executar_todas_telas_com_json.py '{"configuracao": {"log": true, "display
   "email": "exemplo@email.com",
   "celular": "(11) 97668-7668"
 }
+
+⚠️ **NOTA IMPORTANTE:**
+Este script APENAS valida parâmetros. Para executar o RPA real,
+use: python executar_rpa_imediato.py '{"parametros": "aqui"}'
 """
     print(ajuda)
 
 def validar_parametros_basica(parametros):
-    """Validação básica de parâmetros se o módulo não estiver disponível"""
+    """Validação básica dos parâmetros"""
     campos_obrigatorios = [
-        "configuracao", "url_base", "placa", "marca", "modelo", "ano",
-        "combustivel", "veiculo_segurado", "cep", "endereco_completo",
-        "uso_veiculo", "nome", "cpf", "data_nascimento", "sexo",
-        "estado_civil", "email", "celular"
+        'configuracao', 'url_base', 'placa', 'marca', 'modelo', 'ano', 
+        'combustivel', 'veiculo_segurado', 'cep', 'endereco_completo', 
+        'uso_veiculo', 'nome', 'cpf', 'data_nascimento', 'sexo', 
+        'estado_civil', 'email', 'celular'
     ]
     
-    campos_faltando = []
     for campo in campos_obrigatorios:
         if campo not in parametros:
-            campos_faltando.append(campo)
+            raise ValueError(f"Campo obrigatório '{campo}' não encontrado")
     
-    if campos_faltando:
-        raise ValueError(f"Campos obrigatórios faltando: {', '.join(campos_faltando)}")
+    # Verificar configuração
+    if 'configuracao' not in parametros:
+        raise ValueError("Seção 'configuracao' não encontrada")
     
-    # Validar configuração
-    if "configuracao" not in parametros or not isinstance(parametros["configuracao"], dict):
-        raise ValueError("Campo 'configuracao' deve ser um objeto")
+    configuracao = parametros['configuracao']
+    config_obrigatoria = ['tempo_estabilizacao', 'tempo_carregamento']
     
-    campos_config = ["log", "display", "log_rotacao_dias", "log_nivel"]
-    for campo in campos_config:
-        if campo not in parametros["configuracao"]:
-            raise ValueError(f"Campo 'configuracao.{campo}' é obrigatório")
-    
-    return True
+    for config in config_obrigatoria:
+        if config not in configuracao:
+            raise ValueError(f"Configuração obrigatória '{config}' não encontrada")
 
 def carregar_parametros_linha_comando():
     """Carrega e valida parâmetros da linha de comando"""
-    
-    # Verificar se foi fornecido argumento
-    if len(sys.argv) != 2:
-        print("❌ **ERRO: Parâmetros JSON não fornecidos!**")
+    if len(sys.argv) < 2:
+        print("❌ **JSON não fornecido**")
         print("\n📋 **Uso correto:**")
         print("python executar_todas_telas_com_json.py '{\"parametros\": \"aqui\"}'")
-        print("\n📋 **Exemplo:**")
-        print("python executar_todas_telas_com_json.py '{\"configuracao\": {\"log\": true}, \"placa\": \"ABC1234\"}'")
         print("\n📚 **Para ver a ajuda completa:**")
         print("python executar_todas_telas_com_json.py --help")
         sys.exit(1)
-    
-    # Verificar se é pedido de ajuda
-    if sys.argv[1] in ["--help", "-h", "help"]:
-        mostrar_ajuda()
-        sys.exit(0)
     
     json_string = sys.argv[1]
     
@@ -213,7 +222,7 @@ def carregar_parametros_linha_comando():
         sys.exit(1)
     except Exception as e:
         print(f"❌ **Erro inesperado:** {e}")
-        print("\n📚 **Para ver a ajuda completa:**")
+        print("\n�� **Para ver a ajuda completa:**")
         print("python executar_todas_telas_com_json.py --help")
         sys.exit(1)
 
@@ -222,39 +231,46 @@ def mostrar_parametros_carregados(parametros):
     print("\n📋 **PARÂMETROS CARREGADOS:**")
     print("-" * 40)
     print(f"🔧 Configuração:")
-    print(f"   - Log: {parametros['configuracao']['log']}")
-    print(f"   - Display: {parametros['configuracao']['display']}")
-    print(f"   - Rotação logs: {parametros['configuracao']['log_rotacao_dias']} dias")
-    print(f"   - Nível log: {parametros['configuracao']['log_nivel']}")
-    print(f"🌐 URL Base: {parametros['url_base']}")
+    print(f"   - Log: {parametros['configuracao'].get('log', 'N/A')}")
+    print(f"   - Display: {parametros['configuracao'].get('display', 'N/A')}")
+    print(f"   - Rotação logs: {parametros['configuracao'].get('log_rotacao_dias', 'N/A')} dias")
+    print(f"   - Nível log: {parametros['configuracao'].get('log_nivel', 'N/A')}")
+    print(f"   - Tempo estabilização: {parametros['configuracao'].get('tempo_estabilizacao', 'N/A')}")
+    print(f"   - Tempo carregamento: {parametros['configuracao'].get('tempo_carregamento', 'N/A')}")
+    print(f"🌐 URL Base: {parametros.get('url_base', 'N/A')}")
     print(f"🚗 Veículo:")
-    print(f"   - Placa: {parametros['placa']}")
-    print(f"   - Marca: {parametros['marca']}")
-    print(f"   - Modelo: {parametros['modelo']}")
-    print(f"   - Ano: {parametros['ano']}")
-    print(f"   - Combustível: {parametros['combustivel']}")
-    print(f"   - Já segurado: {parametros['veiculo_segurado']}")
+    print(f"   - Placa: {parametros.get('placa', 'N/A')}")
+    print(f"   - Marca: {parametros.get('marca', 'N/A')}")
+    print(f"   - Modelo: {parametros.get('modelo', 'N/A')}")
+    print(f"   - Ano: {parametros.get('ano', 'N/A')}")
+    print(f"   - Combustível: {parametros.get('combustivel', 'N/A')}")
+    print(f"   - Já segurado: {parametros.get('veiculo_segurado', 'N/A')}")
     print(f"📍 Endereço:")
-    print(f"   - CEP: {parametros['cep']}")
-    print(f"   - Endereço: {parametros['endereco_completo']}")
-    print(f"   - Uso: {parametros['uso_veiculo']}")
+    print(f"   - CEP: {parametros.get('cep', 'N/A')}")
+    print(f"   - Endereço: {parametros.get('endereco_completo', 'N/A')}")
+    print(f"   - Uso: {parametros.get('uso_veiculo', 'N/A')}")
     print(f"👤 Dados pessoais:")
-    print(f"   - Nome: {parametros['nome']}")
-    print(f"   - CPF: {parametros['cpf']}")
-    print(f"   - Nascimento: {parametros['data_nascimento']}")
-    print(f"   - Sexo: {parametros['sexo']}")
-    print(f"   - Estado civil: {parametros['estado_civil']}")
-    print(f"   - Email: {parametros['email']}")
-    print(f"   - Celular: {parametros['celular']}")
+    print(f"   - Nome: {parametros.get('nome', 'N/A')}")
+    print(f"   - CPF: {parametros.get('cpf', 'N/A')}")
+    print(f"   - Nascimento: {parametros.get('data_nascimento', 'N/A')}")
+    print(f"   - Sexo: {parametros.get('sexo', 'N/A')}")
+    print(f"   - Estado civil: {parametros.get('estado_civil', 'N/A')}")
+    print(f"   - Email: {parametros.get('email', 'N/A')}")
+    print(f"   - Celular: {parametros.get('celular', 'N/A')}")
     print("-" * 40)
 
 def main():
     """Função principal"""
-    print("🚀 **RPA TÔ SEGURADO - VERSÃO COM PARÂMETROS JSON**")
+    print("🚀 **VALIDADOR DE PARÂMETROS JSON - RPA TÔ SEGURADO**")
     print("=" * 60)
-    print("📋 Versão: 2.4.0 - Com validação de parâmetros")
+    print("📋 Versão: 2.5.0 - Validação precisa de parâmetros")
     print("📋 Data: 29/08/2025")
     print("=" * 60)
+    
+    # Verificar se é comando de ajuda
+    if len(sys.argv) > 1 and sys.argv[1] in ['--help', '-h', 'help']:
+        mostrar_ajuda()
+        return
     
     try:
         # Carregar e validar parâmetros
@@ -264,20 +280,23 @@ def main():
         # Mostrar parâmetros carregados
         mostrar_parametros_carregados(parametros)
         
-        # Aqui você implementaria a lógica do RPA
-        print("\n✅ **Parâmetros carregados com sucesso!**")
-        print("🚀 **RPA pronto para execução!**")
+        # Simular sucesso
+        print("\n✅ **Parâmetros validados com sucesso!**")
+        print("📋 **Total de parâmetros:**", len(parametros))
+        print("🚀 **Parâmetros prontos para uso no RPA!**")
         
-        # Por enquanto, apenas simular sucesso
+        # Retorno estruturado
         if RETORNO_DISPONIVEL:
             retorno = criar_retorno_estruturado(
                 status="sucesso",
                 codigo_erro=9002,
                 dados_extras={
                     "parametros_validados": len(parametros),
-                    "configuracao": parametros["configuracao"],
-                    "placa": parametros["placa"],
-                    "marca": parametros["marca"]
+                    "configuracao": parametros.get("configuracao", {}),
+                    "placa": parametros.get("placa", "N/A"),
+                    "marca": parametros.get("marca", "N/A"),
+                    "tipo_script": "validador_parametros",
+                    "observacao": "Este script apenas valida parâmetros. Para executar o RPA real, use: python executar_rpa_imediato.py"
                 }
             )
             print("\n📤 **Retorno estruturado:**")
@@ -286,6 +305,9 @@ def main():
             print("\n📤 **Retorno básico:**")
             print("Status: sucesso")
             print("Parâmetros validados com sucesso")
+            print("Total de parâmetros:", len(parametros))
+            print("\n⚠️ **NOTA:** Este script apenas valida parâmetros.")
+            print("Para executar o RPA real, use: python executar_rpa_imediato.py")
         
     except KeyboardInterrupt:
         print("\n\n⚠️ **Execução interrompida pelo usuário**")
