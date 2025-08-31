@@ -184,3 +184,4 @@
 ---
 
 **📝 Nota:** Todas as implementações foram salvas no GitHub (v1.0.13) para evitar perda de dados em caso de travamento do computador.
+

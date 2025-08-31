@@ -3571,20 +3571,12 @@ def implementar_tela9(driver, parametros):
             
             # Retornar erro estruturado
             return create_error_response(
-                error_code=3007,
-                error_category="BUTTON_ERROR",
-                error_description="Falha no botão Continuar da Tela 9",
-                error_message=f"Erro ao clicar no botão Continuar: {e}",
-                possible_causes=[
-                    "Botão Continuar não encontrado",
-                    "Botão Continuar não está clicável",
-                    "Erro de JavaScript no clique",
-                    "Elemento não está visível na tela"
-                ],
-                action="Verificar se o botão Continuar está presente e clicável",
-                context="Tela 9 - Clique no botão Continuar",
-                screen="9",
-                action_detail="Clique no botão Continuar"
+                3007,
+                f"Erro ao clicar no botão Continuar: {e}",
+                e,
+                "Tela 9 - Clique no botão Continuar",
+                "9",
+                "Clique no botão Continuar"
             )
         
     except Exception as e:
