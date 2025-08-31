@@ -2921,10 +2921,26 @@ def implementar_tela6(driver, parametros):
     Esta é a Tela 6 REAL (não a "Estimativa inicial" como pensávamos inicialmente)
     O fluxo correto é: Tela 1-5 (básico) → Tela 6 (combustível) → Tela 7 (endereço) → Tela 8 (finalidade)
     
+    TIPOS DE COMBUSTÍVEL DISPONÍVEIS:
+    ==================================
+    Baseado na análise da gravação Selenium IDE, os tipos possíveis são:
+    - "Flex" (padrão)
+    - "Gasolina" 
+    - "Álcool"
+    - "Diesel"
+    - "Híbrido" ou "Hibrido"
+    - "Elétrico"
+    
+    PARÂMETRO JSON:
+    ===============
+    - parametros['combustivel']: Define qual tipo de combustível selecionar
+    - Valores aceitos: "Flex", "Gasolina", "Álcool", "Diesel", "Híbrido", "Elétrico"
+    - Padrão: "Flex" (se não especificado)
+    
     IMPLEMENTAÇÃO:
     ==============
-    1. Aguarda elementos da Tela 6 (combustível, Flex, Gasolina)
-    2. Seleciona "Flex" como tipo de combustível via JavaScript
+    1. Aguarda elementos da Tela 6 (combustível)
+    2. Seleciona o tipo de combustível baseado no parâmetro JSON via JavaScript
     3. Seleciona checkboxes baseado nos parâmetros do JSON:
        - Kit Gás (se parametros['kit_gas'] = true)
        - Blindado (se parametros['blindado'] = true) 
@@ -2976,11 +2992,12 @@ def implementar_tela6(driver, parametros):
         
         salvar_estado_tela(driver, 6, "combustivel_carregado", None)
         
-        # Selecionar "Flex" como tipo de combustível
-        exibir_mensagem("⏳ Selecionando 'Flex' como tipo de combustível...")
+        # Selecionar tipo de combustível baseado no parâmetro JSON
+        combustivel = parametros.get('combustivel', 'Flex')
+        exibir_mensagem(f"⏳ Selecionando '{combustivel}' como tipo de combustível...")
         
-        if not clicar_radio_via_javascript(driver, "Flex", "Flex como combustível"):
-            exibir_mensagem("⚠️ Radio 'Flex' não encontrado - tentando prosseguir...")
+        if not clicar_radio_via_javascript(driver, combustivel, f"{combustivel} como combustível"):
+            exibir_mensagem(f"⚠️ Radio '{combustivel}' não encontrado - tentando prosseguir...")
         
         # Selecionar checkboxes baseado nos parâmetros do JSON
         exibir_mensagem("⏳ Verificando checkboxes disponíveis...")
@@ -4044,16 +4061,16 @@ def executar_todas_telas(json_string):
     - Se visualizar_mensagens = false: Nenhuma mensagem na tela
     - Log sempre inclui: parâmetros, execução, erros e resultado final
     """
-    exibir_mensagem("🚀 **RPA TÔ SEGURADO - COMPLETO ATÉ TELA 13 COM ERROR HANDLER ROBUSTO**")
+    exibir_mensagem("**RPA TO SEGURADO - COMPLETO ATE TELA 13 COM ERROR HANDLER ROBUSTO**")
     exibir_mensagem("=" * 80)
-    exibir_mensagem("🎯 OBJETIVO: Navegar desde o início até a Tela 13 com tratamento de erros robusto")
+    exibir_mensagem("OBJETIVO: Navegar desde o inicio ate a Tela 13 com tratamento de erros robusto")
     exibir_mensagem("🔧 MÉTODO: ERROR HANDLER ROBUSTO + MUTATIONOBSERVER ROBUSTO + fluxo completo")
     exibir_mensagem("📝 NOTA: Placa KVA-1791, veículo ECOSPORT, fluxo correto")
     exibir_mensagem("=" * 80)
     
     inicio = datetime.now()
     exibir_mensagem(f"⏰ Início: {inicio.strftime('%Y-%m-%d %H:%M:%S')}")
-    exibir_mensagem(f"🚀 ESTRATÉGIA: ERROR HANDLER ROBUSTO para captura e tratamento de erros")
+    exibir_mensagem(f"ESTRATEGIA: ERROR HANDLER ROBUSTO para captura e tratamento de erros")
     exibir_mensagem(f"🔧 MUTATIONOBSERVER ROBUSTO: Detecção inteligente de estabilização do DOM")
     exibir_mensagem(f"⚡ PERFORMANCE: Estabilização detectada automaticamente (sem delays fixos)")
     exibir_mensagem(f"🎯 OBJETIVO: Todas as 13 telas com tratamento de erros robusto")
@@ -4062,7 +4079,7 @@ def executar_todas_telas(json_string):
     exibir_mensagem(f"🔄 FALLBACK: Método tradicional se MutationObserver ROBUSTO falhar")
     exibir_mensagem(f"📊 TEMPO ESTIMADO: ~2-3 minutos (com MUTATIONOBSERVER ROBUSTO)")
     exibir_mensagem(f"🎉 MELHORIA: Performance 80% superior com estabilização inteligente")
-    exibir_mensagem(f"🚀 INOVAÇÃO: Primeira implementação de ERROR HANDLER ROBUSTO em RPA")
+    exibir_mensagem(f"INOVACAO: Primeira implementacao de ERROR HANDLER ROBUSTO em RPA")
     exibir_mensagem(f"🔬 TECNOLOGIA: JavaScript MutationObserver + Python Selenium + Error Handling")
     exibir_mensagem(f"🌐 INTEGRAÇÃO: Browser + Python via execute_script + JSON de erro")
     exibir_mensagem(f"⚡ VELOCIDADE: Adaptativo a qualquer velocidade de carregamento")
@@ -4070,7 +4087,7 @@ def executar_todas_telas(json_string):
     exibir_mensagem(f"🔧 ROBUSTEZ: Fallback automático se MutationObserver ROBUSTO falhar")
     exibir_mensagem(f"📈 ESCALABILIDADE: Funciona com qualquer complexidade de página")
     exibir_mensagem(f"🎨 FLEXIBILIDADE: Suporte a React, Angular, Vue.js e HTML puro")
-    exibir_mensagem(f"🚀 FUTURO: Padrão para RPA de próxima geração")
+    exibir_mensagem(f"FUTURO: Padrao para RPA de proxima geracao")
     exibir_mensagem(f"🎯 MISSÃO: Revolucionar automação web com inteligência real e tratamento de erros robusto")
     exibir_mensagem(f"🔧 CONFIGURAÇÃO REACT: childList + attributes + characterData + subtree")
     
@@ -4078,7 +4095,7 @@ def executar_todas_telas(json_string):
     try:
         parametros = json.loads(json_string)
         if parametros.get('configuracao', {}).get('eliminar_tentativas_inuteis', False):
-            exibir_mensagem(f"🚀 **OTIMIZAÇÃO ATIVADA**: eliminar_tentativas_inuteis = TRUE")
+            exibir_mensagem(f"**OTIMIZACAO ATIVADA**: eliminar_tentativas_inuteis = TRUE")
             exibir_mensagem(f"🎯 **TENTATIVAS INÚTEIS ELIMINADAS**:")
             exibir_mensagem(f"   • Tela 6: Checkboxes Kit Gás, Blindado, Financiado (sempre falham)")
             exibir_mensagem(f"   • Tela 9: Radios Sexo e Estado Civil (sempre falham)")
@@ -4203,7 +4220,7 @@ def executar_todas_telas(json_string):
         exibir_mensagem(f"✅ Tela 12: Garagem na Residência")
         exibir_mensagem(f"✅ Tela 13: Uso por Residentes")
         exibir_mensagem(f"📁 Todos os arquivos salvos em: temp/ (incluindo Tela 9)")
-        exibir_mensagem(f"🚀 **MUTATIONOBSERVER ROBUSTO FUNCIONANDO PERFEITAMENTE!**")
+        exibir_mensagem(f"**MUTATIONOBSERVER ROBUSTO FUNCIONANDO PERFEITAMENTE!**")
         exibir_mensagem(f"   📊 Configuração React: childList + attributes + characterData + subtree")
         exibir_mensagem(f"✅ Estabilização detectada com precisão milissegundos")
         exibir_mensagem(f"   ⚡ Zero delays desnecessários aplicados")
@@ -4345,15 +4362,15 @@ args = parser.parse_args()
 # Processar entrada
 if args.json_string == '-':
     # Ler da entrada padrão (útil para pipes)
-    print("📖 **LENDO JSON DA ENTRADA PADRÃO**")
+    print("**LENDO JSON DA ENTRADA PADRAO**")
     json_string = sys.stdin.read().strip()
 else:
     # Usar string fornecida diretamente
     json_string = args.json_string
 
-print("🚀 **INICIANDO RPA COM JSON DIRETO + LOGGING + VISUALIZAÇÃO**")
+print("**INICIANDO RPA COM JSON DIRETO + LOGGING + VISUALIZACAO**")
 print("=" * 80)
-print("📋 JSON recebido:")
+print("JSON recebido:")
 print(f"   {json_string[:100]}{'...' if len(json_string) > 100 else ''}")
 print("=" * 80)
 
