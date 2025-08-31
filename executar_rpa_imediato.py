@@ -175,6 +175,7 @@ import sys
 import argparse
 import traceback
 import logging
+import re
 from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -831,10 +832,191 @@ def validate_and_return_error(validation_result, error_code, context=None):
         return create_error_response(error_code, context=context)
     return None
 
+def capturar_dados_carrossel_estimativas(driver):
+    """
+    Captura dados do carrossel de estimativas da Tela 5
+    Retorna JSON com valores "de" e "até" e benefícios estruturados
+    
+    RETORNO:
+    - Dicionário com dados estruturados do carrossel
+    - None se não conseguir capturar
+    """
+    try:
+        exibir_mensagem("📊 **CAPTURANDO DADOS DO CARROSSEL DE ESTIMATIVAS**")
+        
+        # Aguardar carregamento do carrossel
+        time.sleep(3)
+        
+        dados_carrossel = {
+            "timestamp": datetime.now().isoformat(),
+            "tela": 5,
+            "nome_tela": "Estimativa Inicial",
+            "url": driver.current_url,
+            "titulo": driver.title,
+            "coberturas_detalhadas": [],
+            "beneficios_gerais": [],
+            "valores_encontrados": 0,
+            "seguradoras": [],
+            "elementos_detectados": []
+        }
+        
+        # 1. Procurar por cards/containers de cobertura para análise estruturada
+        cards_cobertura = driver.find_elements(By.XPATH, "//*[contains(@class, 'card') or contains(@class, 'cobertura') or contains(@class, 'plano') or contains(@class, 'item')]")
+        if not cards_cobertura:
+            # Fallback: procurar por divs que possam conter coberturas
+            cards_cobertura = driver.find_elements(By.XPATH, "//div[contains(@class, 'container') or contains(@class, 'wrapper')]")
+        
+        # 2. Analisar cada card para extrair dados estruturados
+        for i, card in enumerate(cards_cobertura[:5]):  # Limitar a 5 cards
+            try:
+                card_text = card.text.strip()
+                if not card_text or len(card_text) < 10:
+                    continue
+                
+                cobertura_info = {
+                    "indice": i + 1,
+                    "nome_cobertura": "",
+                    "valores": {
+                        "de": "",
+                        "ate": ""
+                    },
+                    "beneficios": [],
+                    "texto_completo": card_text
+                }
+                
+                # Extrair nome da cobertura
+                cobertura_patterns = [
+                    r"Cobertura\s+([A-Za-zÀ-ÿ\s]+?)(?:\s|$)",
+                    r"([A-Za-zÀ-ÿ\s]+?)\s+Cobertura",
+                    r"([A-Za-zÀ-ÿ\s]+?)\s+Compreensiva",
+                    r"([A-Za-zÀ-ÿ\s]+?)\s+Roubo",
+                    r"([A-Za-zÀ-ÿ\s]+?)\s+RCF"
+                ]
+                
+                for pattern in cobertura_patterns:
+                    match = re.search(pattern, card_text, re.IGNORECASE)
+                    if match:
+                        cobertura_info["nome_cobertura"] = match.group(1).strip()
+                        break
+                
+                # Extrair valores "de" e "até"
+                valor_patterns = [
+                    r"De\s*R\$\s*([0-9.,]+)\s*até\s*R\$\s*([0-9.,]+)",
+                    r"R\$\s*([0-9.,]+)\s*até\s*R\$\s*([0-9.,]+)",
+                    r"([0-9.,]+)\s*até\s*([0-9.,]+)"
+                ]
+                
+                for pattern in valor_patterns:
+                    match = re.search(pattern, card_text, re.IGNORECASE)
+                    if match:
+                        cobertura_info["valores"]["de"] = f"R$ {match.group(1)}"
+                        cobertura_info["valores"]["ate"] = f"R$ {match.group(2)}"
+                        break
+                
+                # Extrair benefícios
+                beneficios_patterns = [
+                    r"Principais\s+Benefícios?",
+                    r"Benefícios?",
+                    r"Coberturas?"
+                ]
+                
+                # Lista de benefícios conhecidos
+                beneficios_conhecidos = [
+                    "Colisão e Acidentes", "Roubo e Furto", "Incêndio", "Danos a terceiros",
+                    "Assistência 24h", "Carro Reserva", "Vidros", "Roubo", "Furto",
+                    "Danos parciais em tentativas de roubo", "Danos materiais a terceiros",
+                    "Danos corporais a terceiro", "Assistência", "Carro reserva",
+                    "Vidros", "Acidentes", "Colisão", "Terceiros", "Materiais", "Corporais"
+                ]
+                
+                # Procurar por benefícios no texto do card
+                for beneficio in beneficios_conhecidos:
+                    if beneficio.lower() in card_text.lower():
+                        cobertura_info["beneficios"].append(beneficio)
+                
+                # Se encontrou dados válidos, adicionar à lista
+                if cobertura_info["nome_cobertura"] or cobertura_info["valores"]["de"]:
+                    dados_carrossel["coberturas_detalhadas"].append(cobertura_info)
+                
+            except Exception as e:
+                exibir_mensagem(f"⚠️ Erro ao processar card {i+1}: {str(e)}")
+                continue
+        
+        # 3. Procurar por valores monetários gerais (fallback)
+        valores_monetarios = driver.find_elements(By.XPATH, "//*[contains(text(), 'R$')]")
+        dados_carrossel["valores_encontrados"] = len(valores_monetarios)
+        
+        # 4. Procurar por benefícios gerais na página
+        beneficios_gerais = [
+            "Colisão e Acidentes", "Roubo e Furto", "Incêndio", "Danos a terceiros",
+            "Assistência 24h", "Carro Reserva", "Vidros", "Roubo", "Furto",
+            "Danos parciais em tentativas de roubo", "Danos materiais a terceiros",
+            "Danos corporais a terceiro"
+        ]
+        
+        for beneficio in beneficios_gerais:
+            elementos = driver.find_elements(By.XPATH, f"//*[contains(text(), '{beneficio}')]")
+            if elementos:
+                dados_carrossel["beneficios_gerais"].append({
+                    "nome": beneficio,
+                    "encontrado": True,
+                    "quantidade_elementos": len(elementos)
+                })
+        
+        # 5. Procurar por seguradoras
+        seguradoras_texto = [
+            "Seguradora", "seguradora", "Seguro", "seguro",
+            "Allianz", "allianz", "Porto", "porto", "SulAmérica", "sulamerica",
+            "Bradesco", "bradesco", "Itaú", "itau", "Santander", "santander"
+        ]
+        
+        for seguradora in seguradoras_texto:
+            elementos = driver.find_elements(By.XPATH, f"//*[contains(text(), '{seguradora}')]")
+            if elementos:
+                for elemento in elementos:
+                    texto = elemento.text.strip()
+                    if texto and len(texto) > 2:
+                        dados_carrossel["seguradoras"].append({
+                            "nome": texto,
+                            "seletor": "texto_contido"
+                        })
+        
+        # 6. Procurar por elementos específicos do carrossel
+        elementos_carrossel = driver.find_elements(By.XPATH, "//*[contains(@class, 'carousel') or contains(@class, 'slider') or contains(@class, 'swiper')]")
+        if elementos_carrossel:
+            dados_carrossel["elementos_detectados"].append("carrossel_detectado")
+        
+        # 7. Capturar texto completo da página para análise
+        page_text = driver.page_source.lower()
+        
+        # Verificar presença de palavras-chave
+        palavras_chave = ["estimativa", "carrossel", "cobertura", "preço", "valor", "plano"]
+        for palavra in palavras_chave:
+            if palavra in page_text:
+                dados_carrossel["elementos_detectados"].append(f"palavra_chave: {palavra}")
+        
+        # Salvar dados em arquivo temporário
+        temp_dir = "temp/captura_carrossel"
+        os.makedirs(temp_dir, exist_ok=True)
+        
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        json_path = f"{temp_dir}/carrossel_estimativas_{timestamp}.json"
+        
+        with open(json_path, 'w', encoding='utf-8') as f:
+            json.dump(dados_carrossel, f, indent=2, ensure_ascii=False)
+        
+        exibir_mensagem(f"💾 **DADOS SALVOS**: {json_path}")
+        exibir_mensagem(f"📊 **RESUMO**: {len(dados_carrossel['coberturas_detalhadas'])} coberturas detalhadas, {len(dados_carrossel['beneficios_gerais'])} benefícios gerais")
+        
+        return dados_carrossel
+        
+    except Exception as e:
+        exibir_mensagem(f"❌ **ERRO NA CAPTURA**: {str(e)}")
+        return None
+
 def validar_parametros_json(parametros_json):
     """
     Valida se todos os parâmetros necessários foram enviados no formato adequado
-    USANDO O MÓDULO ROBUSTO DE VALIDAÇÃO
     
     PARÂMETROS OBRIGATÓRIOS:
     =========================
@@ -862,170 +1044,146 @@ def validar_parametros_json(parametros_json):
     - Dicionário com resposta de erro se falhar
     """
     try:
-        exibir_mensagem("**VALIDANDO PARAMETROS JSON COM MÓDULO ROBUSTO**")
+        exibir_mensagem("**VALIDANDO PARAMETROS JSON**")
         
-        # Importar módulo de validação robusto
-        try:
-            from utils.validacao_parametros import validar_parametros_entrada, ValidacaoParametrosError
-            VALIDACAO_DISPONIVEL = True
-        except ImportError:
-            VALIDACAO_DISPONIVEL = False
-            exibir_mensagem("⚠️ Módulo de validação não disponível. Usando validação básica.", "WARNING")
+        # Lista de parâmetros obrigatórios
+        parametros_obrigatorios = [
+            'configuracao', 'url_base', 'placa', 'marca', 'modelo', 'ano', 
+            'combustivel', 'veiculo_segurado', 'cep', 'endereco_completo', 
+            'uso_veiculo', 'nome', 'cpf', 'data_nascimento', 'sexo', 
+            'estado_civil', 'email', 'celular'
+        ]
         
-        if VALIDACAO_DISPONIVEL:
-            # Usar validação robusta
-            try:
-                # Converter para string JSON para usar o módulo de validação
-                json_string = json.dumps(parametros_json)
-                parametros_validados = validar_parametros_entrada(json_string)
-                exibir_mensagem("✅ **VALIDAÇÃO ROBUSTA CONCLUÍDA COM SUCESSO**")
-                return True
-            except ValidacaoParametrosError as e:
-                error = create_error_response(1000, f"❌ Erro de validação avançada: {str(e)}", context="Validação robusta de parâmetros")
-                exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO ROBUSTA:** {error['error']['message']}", "ERROR")
+        # Verificar se todos os parâmetros obrigatórios existem
+        for param in parametros_obrigatorios:
+            if param not in parametros_json:
+                error = create_error_response(1000, f"Parâmetro obrigatório '{param}' não encontrado", context=f"Validação de parâmetros obrigatórios")
+                exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
                 return error
-        else:
-            # Fallback para validação básica (código original)
-            exibir_mensagem("🔍 **USANDO VALIDAÇÃO BÁSICA** (módulo robusto não disponível)")
-            
-            # Lista de parâmetros obrigatórios
-            parametros_obrigatorios = [
-                'configuracao', 'url_base', 'placa', 'marca', 'modelo', 'ano', 
-                'combustivel', 'veiculo_segurado', 'cep', 'endereco_completo', 
-                'uso_veiculo', 'nome', 'cpf', 'data_nascimento', 'sexo', 
-                'estado_civil', 'email', 'celular'
-            ]
-            
-            # Verificar se todos os parâmetros obrigatórios existem
-            for param in parametros_obrigatorios:
-                if param not in parametros_json:
-                    error = create_error_response(1000, f"Parâmetro obrigatório '{param}' não encontrado", context=f"Validação de parâmetros obrigatórios")
+        
+        # Verificar seção configuracao
+        if 'configuracao' not in parametros_json:
+            error = create_error_response(1000, "Seção 'configuracao' não encontrada", context="Validação da seção de configuração")
+            exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
+            return error
+        
+        configuracao = parametros_json['configuracao']
+        configuracao_obrigatoria = ['tempo_estabilizacao', 'tempo_carregamento']
+        
+        for config in configuracao_obrigatoria:
+            if config not in configuracao:
+                error = create_error_response(1000, f"Configuração obrigatória '{config}' não encontrada", context="Validação das configurações obrigatórias")
+                exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
+                return error
+        
+        # Validar tipos de dados básicos
+        if not isinstance(parametros_json['url_base'], str):
+            error = create_error_response(1000, "'url_base' deve ser uma string", context="Validação do tipo de url_base")
+            exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
+            return error
+        
+        if not isinstance(parametros_json['placa'], str):
+            error = create_error_response(1000, "'placa' deve ser uma string", context="Validação do tipo de placa")
+            exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
+            return error
+        
+        if not isinstance(parametros_json['cpf'], str):
+            error = create_error_response(1000, "'cpf' deve ser uma string", context="Validação do tipo de CPF")
+            exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
+            return error
+        
+        # Validar formato de CPF (básico)
+        cpf = parametros_json['cpf'].replace('.', '').replace('-', '')
+        if len(cpf) != 11 or not cpf.isdigit():
+            error = create_error_response(1001, context="Validação do formato de CPF")
+            exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
+            return error
+        
+        # Validar formato de email (básico)
+        email = parametros_json['email']
+        if '@' not in email or '.' not in email:
+            error = create_error_response(1002, context="Validação do formato de email")
+            exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
+            return error
+        
+        # Validar formato de CEP (básico)
+        cep = parametros_json['cep'].replace('-', '')
+        if len(cep) != 8 or not cep.isdigit():
+            error = create_error_response(1003, context="Validação do formato de CEP")
+            exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
+            return error
+        
+        # Validar valores aceitos para combustivel
+        combustiveis_validos = ["Flex", "Gasolina", "Álcool", "Diesel", "Híbrido", "Hibrido", "Elétrico"]
+        if parametros_json.get('combustivel') not in combustiveis_validos:
+            error = create_error_response(1004, f"Valor inválido para 'combustivel'. Valores aceitos: {combustiveis_validos}", context="Validação do tipo de combustível")
+            exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
+            return error
+        
+        # Validar valores aceitos para uso_veiculo
+        usos_validos = ["Pessoal", "Profissional", "Motorista de aplicativo", "Taxi"]
+        if parametros_json.get('uso_veiculo') not in usos_validos:
+            error = create_error_response(1005, f"Valor inválido para 'uso_veiculo'. Valores aceitos: {usos_validos}", context="Validação do uso do veículo")
+            exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
+            return error
+        
+        # Validar valores aceitos para sexo
+        sexos_validos = ["Masculino", "Feminino"]
+        if parametros_json.get('sexo') not in sexos_validos:
+            error = create_error_response(1006, f"Valor inválido para 'sexo'. Valores aceitos: {sexos_validos}", context="Validação do sexo")
+            exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
+            return error
+        
+        # Validar valores aceitos para estado_civil
+        estados_civis_validos = ["Solteiro", "Casado", "Divorciado", "Separado", "Viúvo", "Casado ou União Estável"]
+        if parametros_json.get('estado_civil') not in estados_civis_validos:
+            error = create_error_response(1007, f"Valor inválido para 'estado_civil'. Valores aceitos: {estados_civis_validos}", context="Validação do estado civil")
+            exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
+            return error
+        
+        # Validar valores aceitos para veiculo_segurado
+        veiculo_segurado_validos = ["Sim", "Não"]
+        if parametros_json.get('veiculo_segurado') not in veiculo_segurado_validos:
+            error = create_error_response(1008, f"Valor inválido para 'veiculo_segurado'. Valores aceitos: {veiculo_segurado_validos}", context="Validação do veículo segurado")
+            exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
+            return error
+        
+        # Validar parâmetros condicionais do condutor
+        if parametros_json.get('condutor_principal') == False:
+            # Se condutor_principal = false, validar campos obrigatórios do condutor
+            campos_condutor_obrigatorios = ['nome_condutor', 'cpf_condutor', 'data_nascimento_condutor', 'sexo_condutor', 'estado_civil_condutor']
+            for campo in campos_condutor_obrigatorios:
+                if campo not in parametros_json:
+                    error = create_error_response(1009, f"Campo obrigatório '{campo}' não encontrado quando condutor_principal = false", context="Validação dos campos do condutor")
                     exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
                     return error
             
-            # Verificar seção configuracao
-            if 'configuracao' not in parametros_json:
-                error = create_error_response(1000, "Seção 'configuracao' não encontrada", context="Validação da seção de configuração")
+            # Validar CPF do condutor
+            cpf_condutor = parametros_json['cpf_condutor'].replace('.', '').replace('-', '')
+            if len(cpf_condutor) != 11 or not cpf_condutor.isdigit():
+                error = create_error_response(1010, "Formato inválido para CPF do condutor", context="Validação do CPF do condutor")
                 exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
                 return error
             
-            configuracao = parametros_json['configuracao']
-            configuracao_obrigatoria = ['tempo_estabilizacao', 'tempo_carregamento']
-            
-            for config in configuracao_obrigatoria:
-                if config not in configuracao:
-                    error = create_error_response(1000, f"Configuração obrigatória '{config}' não encontrada", context="Validação das configurações obrigatórias")
-                    exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
-                    return error
-            
-            # Validar tipos de dados básicos
-            if not isinstance(parametros_json['url_base'], str):
-                error = create_error_response(1000, "'url_base' deve ser uma string", context="Validação do tipo de url_base")
+            # Validar sexo do condutor
+            if parametros_json.get('sexo_condutor') not in sexos_validos:
+                error = create_error_response(1011, f"Valor inválido para 'sexo_condutor'. Valores aceitos: {sexos_validos}", context="Validação do sexo do condutor")
                 exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
                 return error
             
-            if not isinstance(parametros_json['placa'], str):
-                error = create_error_response(1000, "'placa' deve ser uma string", context="Validação do tipo de placa")
+            # Validar estado civil do condutor
+            if parametros_json.get('estado_civil_condutor') not in estados_civis_validos:
+                error = create_error_response(1012, f"Valor inválido para 'estado_civil_condutor'. Valores aceitos: {estados_civis_validos}", context="Validação do estado civil do condutor")
                 exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
                 return error
-            
-            if not isinstance(parametros_json['cpf'], str):
-                error = create_error_response(1000, "'cpf' deve ser uma string", context="Validação do tipo de CPF")
+        
+        # Validar valores aceitos para portao_eletronico (apenas se presente)
+        if 'portao_eletronico' in parametros_json:
+            portao_validos = ["Eletronico", "Manual", "Não possui"]
+            if parametros_json.get('portao_eletronico') not in portao_validos:
+                error = create_error_response(1013, f"Valor inválido para 'portao_eletronico'. Valores aceitos: {portao_validos}", context="Validação do portão eletrônico")
                 exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
                 return error
-            
-            # Validar formato de CPF (básico)
-            cpf = parametros_json['cpf'].replace('.', '').replace('-', '')
-            if len(cpf) != 11 or not cpf.isdigit():
-                error = create_error_response(1001, context="Validação do formato de CPF")
-                exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
-                return error
-            
-            # Validar formato de email (básico)
-            email = parametros_json['email']
-            if '@' not in email or '.' not in email:
-                error = create_error_response(1002, context="Validação do formato de email")
-                exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
-                return error
-            
-            # Validar formato de CEP (básico)
-            cep = parametros_json['cep'].replace('-', '')
-            if len(cep) != 8 or not cep.isdigit():
-                error = create_error_response(1003, context="Validação do formato de CEP")
-                exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
-                return error
-            
-            # Validar valores aceitos para combustivel
-            combustiveis_validos = ["Flex", "Gasolina", "Álcool", "Diesel", "Híbrido", "Hibrido", "Elétrico"]
-            if parametros_json.get('combustivel') not in combustiveis_validos:
-                error = create_error_response(1004, f"Valor inválido para 'combustivel'. Valores aceitos: {combustiveis_validos}", context="Validação do tipo de combustível")
-                exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
-                return error
-            
-            # Validar valores aceitos para uso_veiculo
-            usos_validos = ["Pessoal", "Profissional", "Motorista de aplicativo", "Taxi"]
-            if parametros_json.get('uso_veiculo') not in usos_validos:
-                error = create_error_response(1005, f"Valor inválido para 'uso_veiculo'. Valores aceitos: {usos_validos}", context="Validação do uso do veículo")
-                exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
-                return error
-            
-            # Validar valores aceitos para sexo
-            sexos_validos = ["Masculino", "Feminino"]
-            if parametros_json.get('sexo') not in sexos_validos:
-                error = create_error_response(1006, f"Valor inválido para 'sexo'. Valores aceitos: {sexos_validos}", context="Validação do sexo")
-                exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
-                return error
-            
-            # Validar valores aceitos para estado_civil
-            estados_civis_validos = ["Solteiro", "Casado", "Divorciado", "Separado", "Viúvo", "Casado ou União Estável"]
-            if parametros_json.get('estado_civil') not in estados_civis_validos:
-                error = create_error_response(1007, f"Valor inválido para 'estado_civil'. Valores aceitos: {estados_civis_validos}", context="Validação do estado civil")
-                exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
-                return error
-            
-            # Validar valores aceitos para veiculo_segurado
-            veiculo_segurado_validos = ["Sim", "Não"]
-            if parametros_json.get('veiculo_segurado') not in veiculo_segurado_validos:
-                error = create_error_response(1008, f"Valor inválido para 'veiculo_segurado'. Valores aceitos: {veiculo_segurado_validos}", context="Validação do veículo segurado")
-                exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
-                return error
-            
-            # Validar parâmetros condicionais do condutor
-            if parametros_json.get('condutor_principal') == False:
-                # Se condutor_principal = false, validar campos obrigatórios do condutor
-                campos_condutor_obrigatorios = ['nome_condutor', 'cpf_condutor', 'data_nascimento_condutor', 'sexo_condutor', 'estado_civil_condutor']
-                for campo in campos_condutor_obrigatorios:
-                    if campo not in parametros_json:
-                        error = create_error_response(1009, f"Campo obrigatório '{campo}' não encontrado quando condutor_principal = false", context="Validação dos campos do condutor")
-                        exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
-                        return error
-                
-                # Validar CPF do condutor
-                cpf_condutor = parametros_json['cpf_condutor'].replace('.', '').replace('-', '')
-                if len(cpf_condutor) != 11 or not cpf_condutor.isdigit():
-                    error = create_error_response(1010, "Formato inválido para CPF do condutor", context="Validação do CPF do condutor")
-                    exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
-                    return error
-                
-                # Validar sexo do condutor
-                if parametros_json.get('sexo_condutor') not in sexos_validos:
-                    error = create_error_response(1011, f"Valor inválido para 'sexo_condutor'. Valores aceitos: {sexos_validos}", context="Validação do sexo do condutor")
-                    exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
-                    return error
-                
-                # Validar estado civil do condutor
-                if parametros_json.get('estado_civil_condutor') not in estados_civis_validos:
-                    error = create_error_response(1012, f"Valor inválido para 'estado_civil_condutor'. Valores aceitos: {estados_civis_validos}", context="Validação do estado civil do condutor")
-                    exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
-                    return error
-            
-            # Validar valores aceitos para portao_eletronico (apenas se presente)
-            if 'portao_eletronico' in parametros_json:
-                portao_validos = ["Eletronico", "Manual", "Não possui"]
-                if parametros_json.get('portao_eletronico') not in portao_validos:
-                    error = create_error_response(1013, f"Valor inválido para 'portao_eletronico'. Valores aceitos: {portao_validos}", context="Validação do portão eletrônico")
-                    exibir_mensagem(f"❌ **ERRO DE VALIDAÇÃO:** {error['error']['message']}", "ERROR")
-                    return error
         
         # Validar valores aceitos para reside_18_26 (apenas se presente)
         if 'reside_18_26' in parametros_json:
@@ -2925,6 +3083,35 @@ def navegar_ate_tela5(driver, parametros):
             return False
         
         salvar_estado_tela(driver, 5, "estimativa_carregada", None)
+        
+        # CAPTURAR DADOS DO CARROSSEL DE ESTIMATIVAS
+        dados_carrossel = capturar_dados_carrossel_estimativas(driver)
+        
+        # RETORNO INTERMEDIÁRIO DOS DADOS DO CARROSSEL
+        if dados_carrossel:
+            exibir_mensagem("🎯 **RETORNO INTERMEDIÁRIO**: Dados do carrossel capturados com sucesso!")
+            exibir_mensagem(f"📊 **COBERTURAS DETALHADAS**: {len(dados_carrossel['coberturas_detalhadas'])}")
+            exibir_mensagem(f"🎁 **BENEFÍCIOS GERAIS**: {len(dados_carrossel['beneficios_gerais'])}")
+            exibir_mensagem(f"💰 **VALORES MONETÁRIOS**: {dados_carrossel['valores_encontrados']}")
+            
+            # Exibir detalhes das coberturas encontradas
+            for i, cobertura in enumerate(dados_carrossel['coberturas_detalhadas']):
+                exibir_mensagem(f"📋 **COBERTURA {i+1}**: {cobertura['nome_cobertura']}")
+                if cobertura['valores']['de'] and cobertura['valores']['ate']:
+                    exibir_mensagem(f"   💰 **VALORES**: {cobertura['valores']['de']} até {cobertura['valores']['ate']}")
+                if cobertura['beneficios']:
+                    exibir_mensagem(f"   🎁 **BENEFÍCIOS**: {', '.join(cobertura['beneficios'])}")
+            
+            # Salvar retorno intermediário em arquivo específico
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            retorno_path = f"temp/retorno_intermediario_carrossel_{timestamp}.json"
+            
+            with open(retorno_path, 'w', encoding='utf-8') as f:
+                json.dump(dados_carrossel, f, indent=2, ensure_ascii=False)
+            
+            exibir_mensagem(f"💾 **RETORNO SALVO**: {retorno_path}")
+        else:
+            exibir_mensagem("⚠️ **AVISO**: Não foi possível capturar dados do carrossel")
         
         # Clicar em Continuar
         exibir_mensagem("⏳ Aguardando botão Continuar aparecer...")
