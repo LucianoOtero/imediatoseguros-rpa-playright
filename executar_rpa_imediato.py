@@ -1,4 +1,15 @@
 #!/usr/bin/env python3
+# CONVERSOR UNICODE → ASCII ROBUSTO - ATIVAR ANTES DE QUALQUER SAÍDA
+import converter_unicode_ascii_robusto
+
+# EXCEPTION HANDLER - SISTEMA DE CAPTURA E FORMATAÇÃO DE EXCEÇÕES SELENIUM
+from exception_handler import (
+    handle_selenium_exception,
+    handle_retry_attempt,
+    format_success_message,
+    set_session_info
+)
+
 """
 RPA Tô Segurado - COMPLETO ATÉ TELA 13
 VERSÃO CORRIGIDA baseada EXATAMENTE no script tosegurado-completo-tela1-8.py que funcionou ontem
@@ -4860,32 +4871,45 @@ def implementar_tela10(driver, parametros):
                     # ESTRATÉGIA ROBUSTA: Tentar múltiplas abordagens para selecionar a opção
                     opcao_selecionada = False
                     
+                    # Configurar contexto para logging
+                    set_session_info({
+                        "tela": "Estado Civil Condutor",
+                        "elemento": "estadoCivilTelaCondutorPrincipal",
+                        "valor": estado_civil_condutor
+                    })
+                    
                     # Tentativa 1: CSS Selector direto
                     try:
                         opcao = driver.find_element(By.CSS_SELECTOR, ".MuiButtonBase-root:nth-child(1)")
                         opcao.click()
-                        exibir_mensagem(f"✅ Campo Estado Civil do condutor selecionado via CSS: {estado_civil_condutor}")
+                        message = format_success_message("Campo Estado Civil do condutor selecionado", "CSS Selector")
+                        exibir_mensagem(message)
                         opcao_selecionada = True
                     except Exception as e1:
-                        exibir_mensagem(f"⚠️ Tentativa 1 falhou: {e1}")
+                        message = handle_retry_attempt(1, 3, e1, "Campo Estado Civil")
+                        exibir_mensagem(message)
                         
                         # Tentativa 2: JavaScript click
                         try:
                             opcao = driver.find_element(By.CSS_SELECTOR, ".MuiButtonBase-root:nth-child(1)")
                             driver.execute_script("arguments[0].click();", opcao)
-                            exibir_mensagem(f"✅ Campo Estado Civil do condutor selecionado via JavaScript: {estado_civil_condutor}")
+                            message = format_success_message("Campo Estado Civil do condutor selecionado", "JavaScript")
+                            exibir_mensagem(message)
                             opcao_selecionada = True
                         except Exception as e2:
-                            exibir_mensagem(f"⚠️ Tentativa 2 falhou: {e2}")
+                            message = handle_retry_attempt(2, 3, e2, "Campo Estado Civil")
+                            exibir_mensagem(message)
                             
                             # Tentativa 3: ActionChains
                             try:
                                 opcao = driver.find_element(By.CSS_SELECTOR, ".MuiButtonBase-root:nth-child(1)")
                                 ActionChains(driver).move_to_element(opcao).click().perform()
-                                exibir_mensagem(f"✅ Campo Estado Civil do condutor selecionado via ActionChains: {estado_civil_condutor}")
+                                message = format_success_message("Campo Estado Civil do condutor selecionado", "ActionChains")
+                                exibir_mensagem(message)
                                 opcao_selecionada = True
                             except Exception as e3:
-                                exibir_mensagem(f"⚠️ Tentativa 3 falhou: {e3}")
+                                message = handle_retry_attempt(3, 3, e3, "Campo Estado Civil")
+                                exibir_mensagem(message)
                     
                     if not opcao_selecionada:
                         exibir_mensagem("⚠️ Todas as tentativas de seleção direta falharam")
@@ -5257,52 +5281,76 @@ def implementar_tela_corretor_anterior(driver, parametros):
             # Selecionar "Sim, continuar com meu corretor"
             print("⏳ Selecionando 'Sim, continuar com meu corretor'...")
             
+            # Configurar contexto para logging
+            set_session_info({
+                "tela": "Confirmação Corretor",
+                "elemento": "sim_continuar_corretor",
+                "valor": "Sim, continuar com meu corretor"
+            })
+            
             try:
                 # Tentar clicar na primeira opção (Sim, continuar com meu corretor)
                 opcao_sim = driver.find_element(By.CSS_SELECTOR, ".cursor-pointer:nth-child(1) > .border .font-workSans")
                 opcao_sim.click()
-                print("✅ 'Sim, continuar com meu corretor' selecionado")
+                message = format_success_message("'Sim, continuar com meu corretor' selecionado")
+                print(message)
             except Exception as e:
-                print(f"⚠️ Tentativa 1 falhou: {e}")
+                message = handle_retry_attempt(1, 3, e, "Seleção 'Sim, continuar com meu corretor'")
+                print(message)
                 
                 # Tentativa 2: Via JavaScript
                 try:
                     opcao_sim = driver.find_element(By.CSS_SELECTOR, ".cursor-pointer:nth-child(1) > .border .font-workSans")
                     driver.execute_script("arguments[0].click();", opcao_sim)
-                    print("✅ 'Sim, continuar com meu corretor' selecionado via JavaScript")
+                    message = format_success_message("'Sim, continuar com meu corretor' selecionado", "JavaScript")
+                    print(message)
                 except Exception as e2:
-                    print(f"⚠️ Tentativa 2 falhou: {e2}")
+                    message = handle_retry_attempt(2, 3, e2, "Seleção 'Sim, continuar com meu corretor'")
+                    print(message)
                     
                     # Tentativa 3: Via texto
                     if not clicar_radio_via_javascript(driver, "Sim, continuar com meu corretor", "Sim continuar corretor"):
                         print("❌ Erro: Falha ao selecionar 'Sim, continuar com meu corretor'")
                         return False
-                    print("✅ 'Sim, continuar com meu corretor' selecionado via texto")
+                    message = format_success_message("'Sim, continuar com meu corretor' selecionado", "Texto")
+                    print(message)
         else:
             # Selecionar "Não, quero outro corretor"
             print("⏳ Selecionando 'Não, quero outro corretor'...")
+            
+            # Configurar contexto para logging
+            set_session_info({
+                "tela": "Confirmação Corretor",
+                "elemento": "nao_quero_outro_corretor",
+                "valor": "Não, quero outro corretor"
+            })
             
             try:
                 # Tentar clicar na segunda opção (Não, quero outro corretor)
                 opcao_nao = driver.find_element(By.CSS_SELECTOR, ".cursor-pointer:nth-child(2) > .border .font-workSans")
                 opcao_nao.click()
-                print("✅ 'Não, quero outro corretor' selecionado")
+                message = format_success_message("'Não, quero outro corretor' selecionado")
+                print(message)
             except Exception as e:
-                print(f"⚠️ Tentativa 1 falhou: {e}")
+                message = handle_retry_attempt(1, 3, e, "Seleção 'Não, quero outro corretor'")
+                print(message)
                 
                 # Tentativa 2: Via JavaScript
                 try:
                     opcao_nao = driver.find_element(By.CSS_SELECTOR, ".cursor-pointer:nth-child(2) > .border .font-workSans")
                     driver.execute_script("arguments[0].click();", opcao_nao)
-                    print("✅ 'Não, quero outro corretor' selecionado via JavaScript")
+                    message = format_success_message("'Não, quero outro corretor' selecionado", "JavaScript")
+                    print(message)
                 except Exception as e2:
-                    print(f"⚠️ Tentativa 2 falhou: {e2}")
+                    message = handle_retry_attempt(2, 3, e2, "Seleção 'Não, quero outro corretor'")
+                    print(message)
                     
                     # Tentativa 3: Via texto
                     if not clicar_radio_via_javascript(driver, "Não, quero outro corretor", "Não quero outro corretor"):
                         print("❌ Erro: Falha ao selecionar 'Não, quero outro corretor'")
                         return False
-                    print("✅ 'Não, quero outro corretor' selecionado via texto")
+                    message = format_success_message("'Não, quero outro corretor' selecionado", "Texto")
+                    print(message)
         
         # Aguardar estabilização
         aguardar_estabilizacao(driver, 5)

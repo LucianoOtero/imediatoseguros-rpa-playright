@@ -1,0 +1,1073 @@
+[
+  {
+    "caractere": "£",
+    "codigo_decimal": 163,
+    "codigo_hexadecimal": "U+00A3",
+    "substituicao_ascii": "[LIBRA]",
+    "representacao": "'£'"
+  },
+  {
+    "caractere": "ª",
+    "codigo_decimal": 170,
+    "codigo_hexadecimal": "U+00AA",
+    "substituicao_ascii": "[ORDINAL]",
+    "representacao": "'ª'"
+  },
+  {
+    "caractere": "À",
+    "codigo_decimal": 192,
+    "codigo_hexadecimal": "U+00C0",
+    "substituicao_ascii": "A",
+    "representacao": "'À'"
+  },
+  {
+    "caractere": "Á",
+    "codigo_decimal": 193,
+    "codigo_hexadecimal": "U+00C1",
+    "substituicao_ascii": "A",
+    "representacao": "'Á'"
+  },
+  {
+    "caractere": "Â",
+    "codigo_decimal": 194,
+    "codigo_hexadecimal": "U+00C2",
+    "substituicao_ascii": "A",
+    "representacao": "'Â'"
+  },
+  {
+    "caractere": "Ã",
+    "codigo_decimal": 195,
+    "codigo_hexadecimal": "U+00C3",
+    "substituicao_ascii": "A",
+    "representacao": "'Ã'"
+  },
+  {
+    "caractere": "Ç",
+    "codigo_decimal": 199,
+    "codigo_hexadecimal": "U+00C7",
+    "substituicao_ascii": "C",
+    "representacao": "'Ç'"
+  },
+  {
+    "caractere": "É",
+    "codigo_decimal": 201,
+    "codigo_hexadecimal": "U+00C9",
+    "substituicao_ascii": "E",
+    "representacao": "'É'"
+  },
+  {
+    "caractere": "Ê",
+    "codigo_decimal": 202,
+    "codigo_hexadecimal": "U+00CA",
+    "substituicao_ascii": "E",
+    "representacao": "'Ê'"
+  },
+  {
+    "caractere": "Í",
+    "codigo_decimal": 205,
+    "codigo_hexadecimal": "U+00CD",
+    "substituicao_ascii": "I",
+    "representacao": "'Í'"
+  },
+  {
+    "caractere": "Ó",
+    "codigo_decimal": 211,
+    "codigo_hexadecimal": "U+00D3",
+    "substituicao_ascii": "O",
+    "representacao": "'Ó'"
+  },
+  {
+    "caractere": "Ô",
+    "codigo_decimal": 212,
+    "codigo_hexadecimal": "U+00D4",
+    "substituicao_ascii": "O",
+    "representacao": "'Ô'"
+  },
+  {
+    "caractere": "Õ",
+    "codigo_decimal": 213,
+    "codigo_hexadecimal": "U+00D5",
+    "substituicao_ascii": "O",
+    "representacao": "'Õ'"
+  },
+  {
+    "caractere": "Ú",
+    "codigo_decimal": 218,
+    "codigo_hexadecimal": "U+00DA",
+    "substituicao_ascii": "U",
+    "representacao": "'Ú'"
+  },
+  {
+    "caractere": "à",
+    "codigo_decimal": 224,
+    "codigo_hexadecimal": "U+00E0",
+    "substituicao_ascii": "a",
+    "representacao": "'à'"
+  },
+  {
+    "caractere": "á",
+    "codigo_decimal": 225,
+    "codigo_hexadecimal": "U+00E1",
+    "substituicao_ascii": "a",
+    "representacao": "'á'"
+  },
+  {
+    "caractere": "â",
+    "codigo_decimal": 226,
+    "codigo_hexadecimal": "U+00E2",
+    "substituicao_ascii": "a",
+    "representacao": "'â'"
+  },
+  {
+    "caractere": "ã",
+    "codigo_decimal": 227,
+    "codigo_hexadecimal": "U+00E3",
+    "substituicao_ascii": "a",
+    "representacao": "'ã'"
+  },
+  {
+    "caractere": "ç",
+    "codigo_decimal": 231,
+    "codigo_hexadecimal": "U+00E7",
+    "substituicao_ascii": "c",
+    "representacao": "'ç'"
+  },
+  {
+    "caractere": "é",
+    "codigo_decimal": 233,
+    "codigo_hexadecimal": "U+00E9",
+    "substituicao_ascii": "e",
+    "representacao": "'é'"
+  },
+  {
+    "caractere": "ê",
+    "codigo_decimal": 234,
+    "codigo_hexadecimal": "U+00EA",
+    "substituicao_ascii": "e",
+    "representacao": "'ê'"
+  },
+  {
+    "caractere": "í",
+    "codigo_decimal": 237,
+    "codigo_hexadecimal": "U+00ED",
+    "substituicao_ascii": "i",
+    "representacao": "'í'"
+  },
+  {
+    "caractere": "ó",
+    "codigo_decimal": 243,
+    "codigo_hexadecimal": "U+00F3",
+    "substituicao_ascii": "o",
+    "representacao": "'ó'"
+  },
+  {
+    "caractere": "ô",
+    "codigo_decimal": 244,
+    "codigo_hexadecimal": "U+00F4",
+    "substituicao_ascii": "o",
+    "representacao": "'ô'"
+  },
+  {
+    "caractere": "õ",
+    "codigo_decimal": 245,
+    "codigo_hexadecimal": "U+00F5",
+    "substituicao_ascii": "o",
+    "representacao": "'õ'"
+  },
+  {
+    "caractere": "ú",
+    "codigo_decimal": 250,
+    "codigo_hexadecimal": "U+00FA",
+    "substituicao_ascii": "u",
+    "representacao": "'ú'"
+  },
+  {
+    "caractere": "ÿ",
+    "codigo_decimal": 255,
+    "codigo_hexadecimal": "U+00FF",
+    "substituicao_ascii": "y",
+    "representacao": "'ÿ'"
+  },
+  {
+    "caractere": "‍",
+    "codigo_decimal": 8205,
+    "codigo_hexadecimal": "U+200D",
+    "substituicao_ascii": "[ZWJ]",
+    "representacao": "'\\u200d'"
+  },
+  {
+    "caractere": "•",
+    "codigo_decimal": 8226,
+    "codigo_hexadecimal": "U+2022",
+    "substituicao_ascii": "[BULLET]",
+    "representacao": "'•'"
+  },
+  {
+    "caractere": "⃣",
+    "codigo_decimal": 8419,
+    "codigo_hexadecimal": "U+20E3",
+    "substituicao_ascii": "[COMBINING]",
+    "representacao": "'⃣'"
+  },
+  {
+    "caractere": "ℹ",
+    "codigo_decimal": 8505,
+    "codigo_hexadecimal": "U+2139",
+    "substituicao_ascii": "[INFO]",
+    "representacao": "'ℹ'"
+  },
+  {
+    "caractere": "←",
+    "codigo_decimal": 8592,
+    "codigo_hexadecimal": "U+2190",
+    "substituicao_ascii": "[LEFT]",
+    "representacao": "'←'"
+  },
+  {
+    "caractere": "→",
+    "codigo_decimal": 8594,
+    "codigo_hexadecimal": "U+2192",
+    "substituicao_ascii": "[RIGHT]",
+    "representacao": "'→'"
+  },
+  {
+    "caractere": "↓",
+    "codigo_decimal": 8595,
+    "codigo_hexadecimal": "U+2193",
+    "substituicao_ascii": "[DOWN]",
+    "representacao": "'↓'"
+  },
+  {
+    "caractere": "⏭",
+    "codigo_decimal": 9197,
+    "codigo_hexadecimal": "U+23ED",
+    "substituicao_ascii": "[FAST_FORWARD]",
+    "representacao": "'⏭'"
+  },
+  {
+    "caractere": "⏰",
+    "codigo_decimal": 9200,
+    "codigo_hexadecimal": "U+23F0",
+    "substituicao_ascii": "[CLOCK]",
+    "representacao": "'⏰'"
+  },
+  {
+    "caractere": "⏱",
+    "codigo_decimal": 9201,
+    "codigo_hexadecimal": "U+23F1",
+    "substituicao_ascii": "[TIMER]",
+    "representacao": "'⏱'"
+  },
+  {
+    "caractere": "⏳",
+    "codigo_decimal": 9203,
+    "codigo_hexadecimal": "U+23F3",
+    "substituicao_ascii": "[AGUARDE]",
+    "representacao": "'⏳'"
+  },
+  {
+    "caractere": "⏸",
+    "codigo_decimal": 9208,
+    "codigo_hexadecimal": "U+23F8",
+    "substituicao_ascii": "[PAUSE]",
+    "representacao": "'⏸'"
+  },
+  {
+    "caractere": "─",
+    "codigo_decimal": 9472,
+    "codigo_hexadecimal": "U+2500",
+    "substituicao_ascii": "[HORIZONTAL]",
+    "representacao": "'─'"
+  },
+  {
+    "caractere": "│",
+    "codigo_decimal": 9474,
+    "codigo_hexadecimal": "U+2502",
+    "substituicao_ascii": "[VERTICAL]",
+    "representacao": "'│'"
+  },
+  {
+    "caractere": "└",
+    "codigo_decimal": 9492,
+    "codigo_hexadecimal": "U+2514",
+    "substituicao_ascii": "[CORNER]",
+    "representacao": "'└'"
+  },
+  {
+    "caractere": "├",
+    "codigo_decimal": 9500,
+    "codigo_hexadecimal": "U+251C",
+    "substituicao_ascii": "[T]",
+    "representacao": "'├'"
+  },
+  {
+    "caractere": "▶",
+    "codigo_decimal": 9654,
+    "codigo_hexadecimal": "U+25B6",
+    "substituicao_ascii": "[PLAY]",
+    "representacao": "'▶'"
+  },
+  {
+    "caractere": "☑",
+    "codigo_decimal": 9745,
+    "codigo_hexadecimal": "U+2611",
+    "substituicao_ascii": "[CHECKBOX]",
+    "representacao": "'☑'"
+  },
+  {
+    "caractere": "⚙",
+    "codigo_decimal": 9881,
+    "codigo_hexadecimal": "U+2699",
+    "substituicao_ascii": "[GEAR]",
+    "representacao": "'⚙'"
+  },
+  {
+    "caractere": "⚠",
+    "codigo_decimal": 9888,
+    "codigo_hexadecimal": "U+26A0",
+    "substituicao_ascii": "[ALERT]",
+    "representacao": "'⚠'"
+  },
+  {
+    "caractere": "⚡",
+    "codigo_decimal": 9889,
+    "codigo_hexadecimal": "U+26A1",
+    "substituicao_ascii": "[FAST]",
+    "representacao": "'⚡'"
+  },
+  {
+    "caractere": "⛽",
+    "codigo_decimal": 9981,
+    "codigo_hexadecimal": "U+26FD",
+    "substituicao_ascii": "[FUEL]",
+    "representacao": "'⛽'"
+  },
+  {
+    "caractere": "✅",
+    "codigo_decimal": 9989,
+    "codigo_hexadecimal": "U+2705",
+    "substituicao_ascii": "[OK]",
+    "representacao": "'✅'"
+  },
+  {
+    "caractere": "✏",
+    "codigo_decimal": 9999,
+    "codigo_hexadecimal": "U+270F",
+    "substituicao_ascii": "[PENCIL]",
+    "representacao": "'✏'"
+  },
+  {
+    "caractere": "✓",
+    "codigo_decimal": 10003,
+    "codigo_hexadecimal": "U+2713",
+    "substituicao_ascii": "[CHECK]",
+    "representacao": "'✓'"
+  },
+  {
+    "caractere": "❌",
+    "codigo_decimal": 10060,
+    "codigo_hexadecimal": "U+274C",
+    "substituicao_ascii": "[ERROR]",
+    "representacao": "'❌'"
+  },
+  {
+    "caractere": "❓",
+    "codigo_decimal": 10067,
+    "codigo_hexadecimal": "U+2753",
+    "substituicao_ascii": "[QUESTION]",
+    "representacao": "'❓'"
+  },
+  {
+    "caractere": "➕",
+    "codigo_decimal": 10133,
+    "codigo_hexadecimal": "U+2795",
+    "substituicao_ascii": "[PLUS]",
+    "representacao": "'➕'"
+  },
+  {
+    "caractere": "➖",
+    "codigo_decimal": 10134,
+    "codigo_hexadecimal": "U+2796",
+    "substituicao_ascii": "[MINUS]",
+    "representacao": "'➖'"
+  },
+  {
+    "caractere": "➡",
+    "codigo_decimal": 10145,
+    "codigo_hexadecimal": "U+27A1",
+    "substituicao_ascii": "[ARROW]",
+    "representacao": "'➡'"
+  },
+  {
+    "caractere": "⭐",
+    "codigo_decimal": 11088,
+    "codigo_hexadecimal": "U+2B50",
+    "substituicao_ascii": "[STAR]",
+    "representacao": "'⭐'"
+  },
+  {
+    "caractere": "️",
+    "codigo_decimal": 65039,
+    "codigo_hexadecimal": "U+FE0F",
+    "substituicao_ascii": "[EMOJI_MODIFIER]",
+    "representacao": "'️'"
+  },
+  {
+    "caractere": "�",
+    "codigo_decimal": 65533,
+    "codigo_hexadecimal": "U+FFFD",
+    "substituicao_ascii": "[UNKNOWN]",
+    "representacao": "'�'"
+  },
+  {
+    "caractere": "🆕",
+    "codigo_decimal": 127381,
+    "codigo_hexadecimal": "U+1F195",
+    "substituicao_ascii": "[NEW]",
+    "representacao": "'🆕'"
+  },
+  {
+    "caractere": "🌐",
+    "codigo_decimal": 127760,
+    "codigo_hexadecimal": "U+1F310",
+    "substituicao_ascii": "[ACESSANDO]",
+    "representacao": "'🌐'"
+  },
+  {
+    "caractere": "🌟",
+    "codigo_decimal": 127775,
+    "codigo_hexadecimal": "U+1F31F",
+    "substituicao_ascii": "[SPARKLE]",
+    "representacao": "'🌟'"
+  },
+  {
+    "caractere": "🎁",
+    "codigo_decimal": 127873,
+    "codigo_hexadecimal": "U+1F381",
+    "substituicao_ascii": "[GIFT]",
+    "representacao": "'🎁'"
+  },
+  {
+    "caractere": "🎉",
+    "codigo_decimal": 127881,
+    "codigo_hexadecimal": "U+1F389",
+    "substituicao_ascii": "[PROGRESSO]",
+    "representacao": "'🎉'"
+  },
+  {
+    "caractere": "🎛",
+    "codigo_decimal": 127899,
+    "codigo_hexadecimal": "U+1F39B",
+    "substituicao_ascii": "[KNOBS]",
+    "representacao": "'🎛'"
+  },
+  {
+    "caractere": "🎠",
+    "codigo_decimal": 127904,
+    "codigo_hexadecimal": "U+1F3A0",
+    "substituicao_ascii": "[CAROUSEL]",
+    "representacao": "'🎠'"
+  },
+  {
+    "caractere": "🎨",
+    "codigo_decimal": 127912,
+    "codigo_hexadecimal": "U+1F3A8",
+    "substituicao_ascii": "[ESTILIZANDO]",
+    "representacao": "'🎨'"
+  },
+  {
+    "caractere": "🎬",
+    "codigo_decimal": 127916,
+    "codigo_hexadecimal": "U+1F3AC",
+    "substituicao_ascii": "[MOVIE]",
+    "representacao": "'🎬'"
+  },
+  {
+    "caractere": "🎭",
+    "codigo_decimal": 127917,
+    "codigo_hexadecimal": "U+1F3AD",
+    "substituicao_ascii": "[THEATER]",
+    "representacao": "'🎭'"
+  },
+  {
+    "caractere": "🎮",
+    "codigo_decimal": 127918,
+    "codigo_hexadecimal": "U+1F3AE",
+    "substituicao_ascii": "[GAME]",
+    "representacao": "'🎮'"
+  },
+  {
+    "caractere": "🎯",
+    "codigo_decimal": 127919,
+    "codigo_hexadecimal": "U+1F3AF",
+    "substituicao_ascii": "[PROGRESSO]",
+    "representacao": "'🎯'"
+  },
+  {
+    "caractere": "🏆",
+    "codigo_decimal": 127942,
+    "codigo_hexadecimal": "U+1F3C6",
+    "substituicao_ascii": "[TROPHY]",
+    "representacao": "'🏆'"
+  },
+  {
+    "caractere": "🏎",
+    "codigo_decimal": 127950,
+    "codigo_hexadecimal": "U+1F3CE",
+    "substituicao_ascii": "[RACING]",
+    "representacao": "'🏎'"
+  },
+  {
+    "caractere": "🏗",
+    "codigo_decimal": 127959,
+    "codigo_hexadecimal": "U+1F3D7",
+    "substituicao_ascii": "[CONSTRUCTION]",
+    "representacao": "'🏗'"
+  },
+  {
+    "caractere": "🏠",
+    "codigo_decimal": 127968,
+    "codigo_hexadecimal": "U+1F3E0",
+    "substituicao_ascii": "[HOUSE]",
+    "representacao": "'🏠'"
+  },
+  {
+    "caractere": "🏢",
+    "codigo_decimal": 127970,
+    "codigo_hexadecimal": "U+1F3E2",
+    "substituicao_ascii": "[HOME]",
+    "representacao": "'🏢'"
+  },
+  {
+    "caractere": "🏷",
+    "codigo_decimal": 127991,
+    "codigo_hexadecimal": "U+1F3F7",
+    "substituicao_ascii": "[LABEL]",
+    "representacao": "'🏷'"
+  },
+  {
+    "caractere": "🐍",
+    "codigo_decimal": 128013,
+    "codigo_hexadecimal": "U+1F40D",
+    "substituicao_ascii": "[PYTHON]",
+    "representacao": "'🐍'"
+  },
+  {
+    "caractere": "🐛",
+    "codigo_decimal": 128027,
+    "codigo_hexadecimal": "U+1F41B",
+    "substituicao_ascii": "[BUG]",
+    "representacao": "'🐛'"
+  },
+  {
+    "caractere": "👁",
+    "codigo_decimal": 128065,
+    "codigo_hexadecimal": "U+1F441",
+    "substituicao_ascii": "[EYE]",
+    "representacao": "'👁'"
+  },
+  {
+    "caractere": "👤",
+    "codigo_decimal": 128100,
+    "codigo_hexadecimal": "U+1F464",
+    "substituicao_ascii": "[USER]",
+    "representacao": "'👤'"
+  },
+  {
+    "caractere": "👥",
+    "codigo_decimal": 128101,
+    "codigo_hexadecimal": "U+1F465",
+    "substituicao_ascii": "[GROUP]",
+    "representacao": "'👥'"
+  },
+  {
+    "caractere": "👦",
+    "codigo_decimal": 128102,
+    "codigo_hexadecimal": "U+1F466",
+    "substituicao_ascii": "[BOY]",
+    "representacao": "'👦'"
+  },
+  {
+    "caractere": "👧",
+    "codigo_decimal": 128103,
+    "codigo_hexadecimal": "U+1F467",
+    "substituicao_ascii": "[GIRL]",
+    "representacao": "'👧'"
+  },
+  {
+    "caractere": "👨",
+    "codigo_decimal": 128104,
+    "codigo_hexadecimal": "U+1F468",
+    "substituicao_ascii": "[MAN]",
+    "representacao": "'👨'"
+  },
+  {
+    "caractere": "👩",
+    "codigo_decimal": 128105,
+    "codigo_hexadecimal": "U+1F469",
+    "substituicao_ascii": "[WOMAN]",
+    "representacao": "'👩'"
+  },
+  {
+    "caractere": "💡",
+    "codigo_decimal": 128161,
+    "codigo_hexadecimal": "U+1F4A1",
+    "substituicao_ascii": "[IDEA]",
+    "representacao": "'💡'"
+  },
+  {
+    "caractere": "💬",
+    "codigo_decimal": 128172,
+    "codigo_hexadecimal": "U+1F4AC",
+    "substituicao_ascii": "[CHAT]",
+    "representacao": "'💬'"
+  },
+  {
+    "caractere": "💰",
+    "codigo_decimal": 128176,
+    "codigo_hexadecimal": "U+1F4B0",
+    "substituicao_ascii": "[MONEY]",
+    "representacao": "'💰'"
+  },
+  {
+    "caractere": "💵",
+    "codigo_decimal": 128181,
+    "codigo_hexadecimal": "U+1F4B5",
+    "substituicao_ascii": "[CASH]",
+    "representacao": "'💵'"
+  },
+  {
+    "caractere": "💻",
+    "codigo_decimal": 128187,
+    "codigo_hexadecimal": "U+1F4BB",
+    "substituicao_ascii": "[LAPTOP]",
+    "representacao": "'💻'"
+  },
+  {
+    "caractere": "💾",
+    "codigo_decimal": 128190,
+    "codigo_hexadecimal": "U+1F4BE",
+    "substituicao_ascii": "[SAVE]",
+    "representacao": "'💾'"
+  },
+  {
+    "caractere": "📁",
+    "codigo_decimal": 128193,
+    "codigo_hexadecimal": "U+1F4C1",
+    "substituicao_ascii": "[FOLDER]",
+    "representacao": "'📁'"
+  },
+  {
+    "caractere": "📂",
+    "codigo_decimal": 128194,
+    "codigo_hexadecimal": "U+1F4C2",
+    "substituicao_ascii": "[OPEN_FOLDER]",
+    "representacao": "'📂'"
+  },
+  {
+    "caractere": "📄",
+    "codigo_decimal": 128196,
+    "codigo_hexadecimal": "U+1F4C4",
+    "substituicao_ascii": "[DOCUMENTANDO]",
+    "representacao": "'📄'"
+  },
+  {
+    "caractere": "📅",
+    "codigo_decimal": 128197,
+    "codigo_hexadecimal": "U+1F4C5",
+    "substituicao_ascii": "[CALENDAR]",
+    "representacao": "'📅'"
+  },
+  {
+    "caractere": "📈",
+    "codigo_decimal": 128200,
+    "codigo_hexadecimal": "U+1F4C8",
+    "substituicao_ascii": "[CHART_UP]",
+    "representacao": "'📈'"
+  },
+  {
+    "caractere": "📉",
+    "codigo_decimal": 128201,
+    "codigo_hexadecimal": "U+1F4C9",
+    "substituicao_ascii": "[CHART_DOWN]",
+    "representacao": "'📉'"
+  },
+  {
+    "caractere": "📊",
+    "codigo_decimal": 128202,
+    "codigo_hexadecimal": "U+1F4CA",
+    "substituicao_ascii": "[PROCESSANDO]",
+    "representacao": "'📊'"
+  },
+  {
+    "caractere": "📋",
+    "codigo_decimal": 128203,
+    "codigo_hexadecimal": "U+1F4CB",
+    "substituicao_ascii": "[PROC-LISTA]",
+    "representacao": "'📋'"
+  },
+  {
+    "caractere": "📍",
+    "codigo_decimal": 128205,
+    "codigo_hexadecimal": "U+1F4CD",
+    "substituicao_ascii": "[PIN]",
+    "representacao": "'📍'"
+  },
+  {
+    "caractere": "📏",
+    "codigo_decimal": 128207,
+    "codigo_hexadecimal": "U+1F4CF",
+    "substituicao_ascii": "[RULER]",
+    "representacao": "'📏'"
+  },
+  {
+    "caractere": "📖",
+    "codigo_decimal": 128214,
+    "codigo_hexadecimal": "U+1F4D6",
+    "substituicao_ascii": "[BOOK]",
+    "representacao": "'📖'"
+  },
+  {
+    "caractere": "📚",
+    "codigo_decimal": 128218,
+    "codigo_hexadecimal": "U+1F4DA",
+    "substituicao_ascii": "[BOOKS]",
+    "representacao": "'📚'"
+  },
+  {
+    "caractere": "📝",
+    "codigo_decimal": 128221,
+    "codigo_hexadecimal": "U+1F4DD",
+    "substituicao_ascii": "[OBS]",
+    "representacao": "'📝'"
+  },
+  {
+    "caractere": "📞",
+    "codigo_decimal": 128222,
+    "codigo_hexadecimal": "U+1F4DE",
+    "substituicao_ascii": "[CONECTANDO]",
+    "representacao": "'📞'"
+  },
+  {
+    "caractere": "📡",
+    "codigo_decimal": 128225,
+    "codigo_hexadecimal": "U+1F4E1",
+    "substituicao_ascii": "[SATELLITE]",
+    "representacao": "'📡'"
+  },
+  {
+    "caractere": "📤",
+    "codigo_decimal": 128228,
+    "codigo_hexadecimal": "U+1F4E4",
+    "substituicao_ascii": "[UPLOAD]",
+    "representacao": "'📤'"
+  },
+  {
+    "caractere": "📥",
+    "codigo_decimal": 128229,
+    "codigo_hexadecimal": "U+1F4E5",
+    "substituicao_ascii": "[DOWNLOAD]",
+    "representacao": "'📥'"
+  },
+  {
+    "caractere": "📦",
+    "codigo_decimal": 128230,
+    "codigo_hexadecimal": "U+1F4E6",
+    "substituicao_ascii": "[PACKAGE]",
+    "representacao": "'📦'"
+  },
+  {
+    "caractere": "📧",
+    "codigo_decimal": 128231,
+    "codigo_hexadecimal": "U+1F4E7",
+    "substituicao_ascii": "[EMAIL]",
+    "representacao": "'📧'"
+  },
+  {
+    "caractere": "📱",
+    "codigo_decimal": 128241,
+    "codigo_hexadecimal": "U+1F4F1",
+    "substituicao_ascii": "[CONECTANDO]",
+    "representacao": "'📱'"
+  },
+  {
+    "caractere": "📸",
+    "codigo_decimal": 128248,
+    "codigo_hexadecimal": "U+1F4F8",
+    "substituicao_ascii": "[CAPTURANDO]",
+    "representacao": "'📸'"
+  },
+  {
+    "caractere": "📺",
+    "codigo_decimal": 128250,
+    "codigo_hexadecimal": "U+1F4FA",
+    "substituicao_ascii": "[TV]",
+    "representacao": "'📺'"
+  },
+  {
+    "caractere": "📻",
+    "codigo_decimal": 128251,
+    "codigo_hexadecimal": "U+1F4FB",
+    "substituicao_ascii": "[RADIO]",
+    "representacao": "'📻'"
+  },
+  {
+    "caractere": "🔄",
+    "codigo_decimal": 128260,
+    "codigo_hexadecimal": "U+1F504",
+    "substituicao_ascii": "[SINCRONIZANDO]",
+    "representacao": "'🔄'"
+  },
+  {
+    "caractere": "🔇",
+    "codigo_decimal": 128263,
+    "codigo_hexadecimal": "U+1F507",
+    "substituicao_ascii": "[MUTE]",
+    "representacao": "'🔇'"
+  },
+  {
+    "caractere": "🔍",
+    "codigo_decimal": 128269,
+    "codigo_hexadecimal": "U+1F50D",
+    "substituicao_ascii": "[PROCURANDO]",
+    "representacao": "'🔍'"
+  },
+  {
+    "caractere": "🔐",
+    "codigo_decimal": 128272,
+    "codigo_hexadecimal": "U+1F510",
+    "substituicao_ascii": "[LOCK]",
+    "representacao": "'🔐'"
+  },
+  {
+    "caractere": "🔒",
+    "codigo_decimal": 128274,
+    "codigo_hexadecimal": "U+1F512",
+    "substituicao_ascii": "[LOCKED]",
+    "representacao": "'🔒'"
+  },
+  {
+    "caractere": "🔗",
+    "codigo_decimal": 128279,
+    "codigo_hexadecimal": "U+1F517",
+    "substituicao_ascii": "[LINK]",
+    "representacao": "'🔗'"
+  },
+  {
+    "caractere": "🔘",
+    "codigo_decimal": 128280,
+    "codigo_hexadecimal": "U+1F518",
+    "substituicao_ascii": "[RADIO_BUTTON]",
+    "representacao": "'🔘'"
+  },
+  {
+    "caractere": "🔚",
+    "codigo_decimal": 128282,
+    "codigo_hexadecimal": "U+1F51A",
+    "substituicao_ascii": "[END]",
+    "representacao": "'🔚'"
+  },
+  {
+    "caractere": "🔢",
+    "codigo_decimal": 128290,
+    "codigo_hexadecimal": "U+1F522",
+    "substituicao_ascii": "[NUMBERS]",
+    "representacao": "'🔢'"
+  },
+  {
+    "caractere": "🔥",
+    "codigo_decimal": 128293,
+    "codigo_hexadecimal": "U+1F525",
+    "substituicao_ascii": "[FIRE]",
+    "representacao": "'🔥'"
+  },
+  {
+    "caractere": "🔧",
+    "codigo_decimal": 128295,
+    "codigo_hexadecimal": "U+1F527",
+    "substituicao_ascii": "[CORRIGINDO]",
+    "representacao": "'🔧'"
+  },
+  {
+    "caractere": "🔨",
+    "codigo_decimal": 128296,
+    "codigo_hexadecimal": "U+1F528",
+    "substituicao_ascii": "[HAMMER]",
+    "representacao": "'🔨'"
+  },
+  {
+    "caractere": "🔬",
+    "codigo_decimal": 128300,
+    "codigo_hexadecimal": "U+1F52C",
+    "substituicao_ascii": "[MICROSCOPE]",
+    "representacao": "'🔬'"
+  },
+  {
+    "caractere": "🔮",
+    "codigo_decimal": 128302,
+    "codigo_hexadecimal": "U+1F52E",
+    "substituicao_ascii": "[CRYSTAL_BALL]",
+    "representacao": "'🔮'"
+  },
+  {
+    "caractere": "🔴",
+    "codigo_decimal": 128308,
+    "codigo_hexadecimal": "U+1F534",
+    "substituicao_ascii": "[RED]",
+    "representacao": "'🔴'"
+  },
+  {
+    "caractere": "🔸",
+    "codigo_decimal": 128312,
+    "codigo_hexadecimal": "U+1F538",
+    "substituicao_ascii": "[DIAMOND]",
+    "representacao": "'🔸'"
+  },
+  {
+    "caractere": "🔹",
+    "codigo_decimal": 128313,
+    "codigo_hexadecimal": "U+1F539",
+    "substituicao_ascii": "[BLUE_DIAMOND]",
+    "representacao": "'🔹'"
+  },
+  {
+    "caractere": "🔽",
+    "codigo_decimal": 128317,
+    "codigo_hexadecimal": "U+1F53D",
+    "substituicao_ascii": "[DOWN_ARROW]",
+    "representacao": "'🔽'"
+  },
+  {
+    "caractere": "🖥",
+    "codigo_decimal": 128421,
+    "codigo_hexadecimal": "U+1F5A5",
+    "substituicao_ascii": "[DESKTOP]",
+    "representacao": "'🖥'"
+  },
+  {
+    "caractere": "🖱",
+    "codigo_decimal": 128433,
+    "codigo_hexadecimal": "U+1F5B1",
+    "substituicao_ascii": "[MOUSE]",
+    "representacao": "'🖱'"
+  },
+  {
+    "caractere": "🗑",
+    "codigo_decimal": 128465,
+    "codigo_hexadecimal": "U+1F5D1",
+    "substituicao_ascii": "[DEL]",
+    "representacao": "'🗑'"
+  },
+  {
+    "caractere": "🙏",
+    "codigo_decimal": 128591,
+    "codigo_hexadecimal": "U+1F64F",
+    "substituicao_ascii": "[PRAY]",
+    "representacao": "'🙏'"
+  },
+  {
+    "caractere": "🚀",
+    "codigo_decimal": 128640,
+    "codigo_hexadecimal": "U+1F680",
+    "substituicao_ascii": "[INICIANDO]",
+    "representacao": "'🚀'"
+  },
+  {
+    "caractere": "🚗",
+    "codigo_decimal": 128663,
+    "codigo_hexadecimal": "U+1F697",
+    "substituicao_ascii": "[CAR]",
+    "representacao": "'🚗'"
+  },
+  {
+    "caractere": "🚙",
+    "codigo_decimal": 128665,
+    "codigo_hexadecimal": "U+1F699",
+    "substituicao_ascii": "[SUV]",
+    "representacao": "'🚙'"
+  },
+  {
+    "caractere": "🚦",
+    "codigo_decimal": 128678,
+    "codigo_hexadecimal": "U+1F6A6",
+    "substituicao_ascii": "[TRAFFIC_LIGHT]",
+    "representacao": "'🚦'"
+  },
+  {
+    "caractere": "🚨",
+    "codigo_decimal": 128680,
+    "codigo_hexadecimal": "U+1F6A8",
+    "substituicao_ascii": "[POLICE]",
+    "representacao": "'🚨'"
+  },
+  {
+    "caractere": "🚫",
+    "codigo_decimal": 128683,
+    "codigo_hexadecimal": "U+1F6AB",
+    "substituicao_ascii": "[FORBIDDEN]",
+    "representacao": "'🚫'"
+  },
+  {
+    "caractere": "🛠",
+    "codigo_decimal": 128736,
+    "codigo_hexadecimal": "U+1F6E0",
+    "substituicao_ascii": "[TOOLS]",
+    "representacao": "'🛠'"
+  },
+  {
+    "caractere": "🛡",
+    "codigo_decimal": 128737,
+    "codigo_hexadecimal": "U+1F6E1",
+    "substituicao_ascii": "[SAFE]",
+    "representacao": "'🛡'"
+  },
+  {
+    "caractere": "🟢",
+    "codigo_decimal": 128994,
+    "codigo_hexadecimal": "U+1F7E2",
+    "substituicao_ascii": "[GREEN]",
+    "representacao": "'🟢'"
+  },
+  {
+    "caractere": "🤖",
+    "codigo_decimal": 129302,
+    "codigo_hexadecimal": "U+1F916",
+    "substituicao_ascii": "[ROBOT]",
+    "representacao": "'🤖'"
+  },
+  {
+    "caractere": "🤝",
+    "codigo_decimal": 129309,
+    "codigo_hexadecimal": "U+1F91D",
+    "substituicao_ascii": "[HANDSHAKE]",
+    "representacao": "'🤝'"
+  },
+  {
+    "caractere": "🧠",
+    "codigo_decimal": 129504,
+    "codigo_hexadecimal": "U+1F9E0",
+    "substituicao_ascii": "[BRAIN]",
+    "representacao": "'🧠'"
+  },
+  {
+    "caractere": "🧪",
+    "codigo_decimal": 129514,
+    "codigo_hexadecimal": "U+1F9EA",
+    "substituicao_ascii": "[TEST_TUBE]",
+    "representacao": "'🧪'"
+  },
+  {
+    "caractere": "🧭",
+    "codigo_decimal": 129517,
+    "codigo_hexadecimal": "U+1F9ED",
+    "substituicao_ascii": "[COMPASS]",
+    "representacao": "'🧭'"
+  },
+  {
+    "caractere": "🧹",
+    "codigo_decimal": 129529,
+    "codigo_hexadecimal": "U+1F9F9",
+    "substituicao_ascii": "[BROOM]",
+    "representacao": "'🧹'"
+  }
+]
