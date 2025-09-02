@@ -2674,6 +2674,13 @@ if __name__ == "__main__":
             print("✅ RPA executado com sucesso!")
         else:
             print("❌ RPA falhou!")
+        
+        # Exibir retorno estruturado completo
+        print("\n" + "="*50)
+        print("📋 RETORNO ESTRUTURADO COMPLETO")
+        print("="*50)
+        import json
+        print(json.dumps(resultado, indent=2, ensure_ascii=False))
             
     except Exception as e:
         exception_handler.capturar_excecao(e, "EXECUCAO_DIRETA", "Erro na execução direta")
