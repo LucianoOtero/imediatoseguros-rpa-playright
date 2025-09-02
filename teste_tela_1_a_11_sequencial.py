@@ -46,20 +46,20 @@ def exibir_mensagem(mensagem):
 
 def navegar_tela_1_playwright(page):
     """
-    TELA 1: Seleção do tipo de seguro (Carro)
+    TELA 1: Seleção do tipo de seguro (Carro) - VERSÃO OTIMIZADA
     
     DESCRIÇÃO:
         Navega para a Tela 1 e seleciona "Carro" como tipo de seguro
+        Usa auto-waiting do Playwright para melhor performance
     
     ELEMENTOS IDENTIFICADOS:
         - Botão "Carro": button.group
     
     IMPLEMENTAÇÃO:
-        1. Aguarda carregamento inicial da página
+        1. Aguarda carregamento do botão usando wait_for_selector
         2. Localiza o botão "Carro"
-        3. Verifica se está visível
-        4. Clica no botão
-        5. Aguarda transição para próxima tela
+        3. Clica no botão
+        4. Aguarda transição para próxima tela usando wait_for_selector
     
     PARÂMETROS:
         page: Objeto page do Playwright
@@ -69,40 +69,44 @@ def navegar_tela_1_playwright(page):
     
     LOGS ESPERADOS:
         - "📱 TELA 1: Selecionando Carro..."
+        - "✅ Botão 'Carro' carregado e visível"
         - "✅ Botão 'Carro' clicado com sucesso"
-        - "❌ Botão 'Carro' não está visível" (se falhar)
+        - "✅ Transição para Tela 2 realizada"
         - "❌ ERRO na Tela 1: {erro}" (se exceção)
     """
     try:
         # PASSO 1: Exibir mensagem de início da Tela 1
         exibir_mensagem("📱 TELA 1: Selecionando Carro...")
         
-        # PASSO 2: Aguardar carregamento inicial da página
-        time.sleep(3)
+        # PASSO 2: Aguardar carregamento do botão usando auto-waiting (máximo 10 segundos)
+        exibir_mensagem("⏳ Aguardando carregamento do botão 'Carro'...")
+        page.wait_for_selector("button.group", timeout=10000)
         
         # PASSO 3: Localizar o botão "Carro"
         botao_carro = page.locator("button.group").first
         
-        # PASSO 4: Verificar se o botão está visível
+        # PASSO 4: Verificar se está visível e clicar
         if botao_carro.is_visible():
+            exibir_mensagem("✅ Botão 'Carro' carregado e visível")
+            
             # PASSO 5: Clicar no botão "Carro"
             botao_carro.click()
-            
-            # PASSO 6: Confirmar sucesso da ação
             exibir_mensagem("✅ Botão 'Carro' clicado com sucesso")
             
-            # PASSO 7: Aguardar transição para próxima tela
-            time.sleep(3)
+            # PASSO 6: Aguardar transição para próxima tela usando auto-waiting
+            exibir_mensagem("⏳ Aguardando transição para Tela 2...")
+            page.wait_for_selector("#placaTelaDadosPlaca", timeout=10000)
+            exibir_mensagem("✅ Transição para Tela 2 realizada")
             
-            # PASSO 8: Retornar sucesso
+            # PASSO 7: Retornar sucesso
             return True
         else:
-            # PASSO 9: Tratar caso onde botão não está visível
+            # PASSO 8: Tratar caso onde botão não está visível
             exibir_mensagem("❌ Botão 'Carro' não está visível")
             return False
             
     except Exception as e:
-        # PASSO 10: Tratar exceções durante a execução
+        # PASSO 9: Tratar exceções durante a execução
         exibir_mensagem(f"❌ ERRO na Tela 1: {str(e)}")
         return False
 
