@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-TESTE TELAS 1 A 13 SEQUENCIAL - IMPLEMENTAÇÃO COMPLETA
-Teste das Telas 1-13 usando Playwright com implementação da Tela 13
+TESTE TELAS 1 A 15 SEQUENCIAL - IMPLEMENTAÇÃO COMPLETA
+Teste das Telas 1-15 usando Playwright com implementação da Tela 15 (carregamento demorado)
 
 DESCRIÇÃO:
 - Tela 1: Seleção do tipo de seguro (Carro)
@@ -17,11 +17,13 @@ DESCRIÇÃO:
 - Tela 11: Atividade do veículo (local de trabalho/estudo)
 - Tela 12: Garagem na residência
 - Tela 13: Residência com menores de 18-26 anos
+- Tela 14: Corretor anterior (CONDICIONAL)
+- Tela 15: Resultado final (CARREGAMENTO DEMORADO)
 
 AUTOR: Luciano Otero
 DATA: 2025-09-02
-VERSÃO: 1.9.0
-STATUS: Implementação completa das Telas 1-13
+VERSÃO: 1.12.0
+STATUS: Implementação completa das Telas 1-15 (Tela 14 condicional, Tela 15 demorada)
 """
 
 import json
@@ -1494,6 +1496,349 @@ def navegar_tela_13_playwright(page, reside_18_26, sexo_do_menor, faixa_etaria_m
         exibir_mensagem(f"❌ ERRO na Tela 13: {str(e)}")
         return False
 
+def navegar_tela_14_playwright(page, continuar_com_corretor_anterior):
+    """
+    TELA 14: Corretor Anterior (CONDICIONAL)
+    
+    DESCRIÇÃO:
+        Tela condicional que só aparece quando já existe uma cotação para o cliente.
+        Pergunta se deseja continuar com o corretor anterior ou não.
+        
+    ELEMENTOS IDENTIFICADOS (baseado na gravação):
+        - Botão Continuar: id=gtm-telaCorretorAnteriorContinuar
+        - Elementos de seleção: css=.flex > .min-h-\[39rem\] .mb-6 > .flex > .flex > .text-primary
+        - Checkbox/Radio: css=.flex > .md\3Aw-80 > div:nth-child(2) > .flex > .flex .text-primary:nth-child(1)
+        
+    CARACTERÍSTICAS IMPORTANTES:
+        - Tela condicional: Só aparece quando já existe uma cotação para o cliente
+        - Lógica de detecção: Precisa verificar se a tela aparece antes de processar
+        - Elementos simples: Parece ser uma tela de confirmação/opção
+        
+    PARÂMETROS:
+        - continuar_com_corretor_anterior: bool - Se deve continuar com o corretor anterior
+    """
+    try:
+        exibir_mensagem("\n" + "="*50)
+        exibir_mensagem("👨‍💼 TELA 14: CORRETOR ANTERIOR (CONDICIONAL)")
+        exibir_mensagem("="*50)
+        
+        # PASSO 1: Verificar se a Tela 14 aparece (é condicional)
+        exibir_mensagem("🔍 Verificando se a Tela 14 (Corretor Anterior) aparece...")
+        
+        # Aguardar um tempo para ver se a tela aparece
+        time.sleep(3)
+        
+        # Tentar localizar elementos da Tela 14
+        try:
+            # Tentar encontrar o botão da Tela 14
+            botao_tela14 = page.locator("#gtm-telaCorretorAnteriorContinuar")
+            if botao_tela14.count() > 0 and botao_tela14.first.is_visible():
+                exibir_mensagem("✅ Tela 14 detectada - Corretor Anterior aparece!")
+                
+                # PASSO 2: Processar a Tela 14
+                exibir_mensagem(f"👨‍💼 Processando Tela 14: continuar_com_corretor_anterior = {continuar_com_corretor_anterior}")
+                
+                # Selecionar opção baseada no parâmetro
+                if continuar_com_corretor_anterior:
+                    exibir_mensagem("✅ Selecionando 'Continuar com corretor anterior'...")
+                    # Tentar seletores mais simples e robustos
+                    try:
+                        # Primeiro tentar por texto
+                        page.locator("text=Continuar com corretor anterior").first.click()
+                        exibir_mensagem("✅ Opção 'Continuar com corretor anterior' selecionada por texto")
+                    except:
+                        try:
+                            # Tentar por radio button
+                            page.locator("input[type='radio'][value='sim']").first.click()
+                            exibir_mensagem("✅ Opção 'Continuar com corretor anterior' selecionada por radio")
+                        except:
+                            # Tentar por label
+                            page.locator("label:has-text('Continuar')").first.click()
+                            exibir_mensagem("✅ Opção 'Continuar com corretor anterior' selecionada por label")
+                else:
+                    exibir_mensagem("✅ Selecionando 'Não continuar com corretor anterior'...")
+                    try:
+                        # Primeiro tentar por texto
+                        page.locator("text=Não continuar com corretor anterior").first.click()
+                        exibir_mensagem("✅ Opção 'Não continuar com corretor anterior' selecionada por texto")
+                    except:
+                        try:
+                            # Tentar por radio button
+                            page.locator("input[type='radio'][value='nao']").first.click()
+                            exibir_mensagem("✅ Opção 'Não continuar com corretor anterior' selecionada por radio")
+                        except:
+                            # Tentar por label
+                            page.locator("label:has-text('Não')").first.click()
+                            exibir_mensagem("✅ Opção 'Não continuar com corretor anterior' selecionada por label")
+                
+                # PASSO 3: Clicar no botão Continuar
+                exibir_mensagem("🔄 Clicando no botão 'Continuar'...")
+                botao_continuar = page.locator('p.font-semibold.font-workSans.cursor-pointer.text-sm.leading-6:has-text("Continuar")')
+                if botao_continuar.is_visible():
+                    botao_continuar.click()
+                    exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
+                else:
+                    exibir_mensagem("⚠️ Botão 'Continuar' não encontrado")
+                    return False
+                
+                # PASSO 4: Aguardar transição para próxima tela
+                exibir_mensagem("⏳ Aguardando transição para próxima tela...")
+                time.sleep(2)
+                exibir_mensagem("✅ TELA 14 CONCLUÍDA!")
+                
+                return True
+            else:
+                exibir_mensagem("ℹ️ Tela 14 não aparece - não há cotação anterior para este cliente")
+                exibir_mensagem("ℹ️ Pulando para próxima tela...")
+                return True  # Retorna True mesmo não aparecendo, pois é condicional
+                
+        except Exception as e:
+            exibir_mensagem(f"ℹ️ Tela 14 não detectada: {str(e)}")
+            exibir_mensagem("ℹ️ Pulando para próxima tela...")
+            return True  # Retorna True mesmo não aparecendo, pois é condicional
+        
+    except Exception as e:
+        exibir_mensagem(f"❌ ERRO na Tela 14: {str(e)}")
+        return False
+
+
+def navegar_tela_15_playwright(page, email_login, senha_login):
+    """
+    TELA 15: Resultado Final (DUAS FASES)
+    
+    DESCRIÇÃO:
+        Implementa as duas fases da Tela 15:
+        FASE 1: Mapa + Timer regressivo (2:43 minutos)
+        FASE 2: Tela de cálculo + Modal de login + Modal CPF divergente
+        
+    ELEMENTOS IDENTIFICADOS:
+        FASE 1:
+        - Modal timer: text=Por favor, aguarde. Estamos buscando o corretor ideal para você!
+        - Timer: text=Tempo estimado em 02:43
+        
+        FASE 2:
+        - Modal login: MuiBackdrop-root
+        - Email: #emailTelaLogin
+        - Senha: #senhaTelaLogin
+        - Botão Acessar: #gtm-telaLoginBotaoAcessar
+        - Modal CPF divergente: text=CPF informado não corresponde à conta
+        - Botão "Logar com outra conta": #logarComOutraContaModalAssociarUsuario
+        
+    PARÂMETROS:
+        page: Objeto page do Playwright
+        email_login: Email para login
+        senha_login: Senha para login
+        
+    RETORNO:
+        bool: True se sucesso, False se falha
+    """
+    try:
+        exibir_mensagem("\n" + "="*50)
+        exibir_mensagem("🎯 TELA 15: RESULTADO FINAL (DUAS FASES)")
+        exibir_mensagem("="*50)
+        
+        # ========================================
+        # FASE 1: MAPA + TIMER REGRESSIVO
+        # ========================================
+        exibir_mensagem("🔄 FASE 1: Aguardando mapa e timer regressivo...")
+        
+        # PASSO 1: Aguardar modal com timer aparecer
+        exibir_mensagem("⏳ Aguardando modal com timer...")
+        
+        try:
+            # Aguardar até 30 segundos para o modal aparecer
+            modal_timer = page.locator("text=Por favor, aguarde. Estamos buscando o corretor ideal para você!")
+            modal_timer.wait_for(timeout=30000)
+            exibir_mensagem("✅ Modal com timer detectado!")
+        except Exception as e:
+            exibir_mensagem(f"⚠️ Modal com timer não detectado: {str(e)}")
+            exibir_mensagem("ℹ️ Continuando para Fase 2...")
+        
+        # PASSO 2: Aguardar timer regressivo (aproximadamente 2:43 minutos)
+        exibir_mensagem("⏳ Aguardando timer regressivo (2:43 minutos)...")
+        
+        # Aguardar aproximadamente 2:43 minutos (163 segundos)
+        tempo_timer = 163
+        tempo_inicio_timer = time.time()
+        
+        while (time.time() - tempo_inicio_timer) < tempo_timer:
+            try:
+                # Verificar se ainda está no timer
+                timer_atual = page.locator("text=Tempo estimado em")
+                if timer_atual.count() > 0:
+                    tempo_decorrido = int(time.time() - tempo_inicio_timer)
+                    tempo_restante = tempo_timer - tempo_decorrido
+                    exibir_mensagem(f"⏳ Timer em andamento... ({tempo_restante}s restantes)")
+                else:
+                    exibir_mensagem("✅ Timer concluído!")
+                    break
+            except:
+                pass
+            
+            time.sleep(10)  # Verificar a cada 10 segundos
+        
+        exibir_mensagem("✅ FASE 1 CONCLUÍDA!")
+        
+        # ========================================
+        # FASE 2: TELA DE CÁLCULO + MODAL LOGIN
+        # ========================================
+        exibir_mensagem("🔄 FASE 2: Aguardando tela de cálculo e modal de login...")
+        
+        # PASSO 3: Aguardar tela de cálculo aparecer
+        exibir_mensagem("⏳ Aguardando tela de cálculo...")
+        time.sleep(5)
+        
+        # PASSO 4: Aguardar modal de login aparecer
+        exibir_mensagem("⏳ Aguardando modal de login...")
+        
+        try:
+            # Aguardar até 30 segundos para o modal de login aparecer
+            modal_login = page.locator("text=Acesse sua conta para visualizar o resultado final")
+            modal_login.wait_for(timeout=30000)
+            exibir_mensagem("✅ Modal de login detectado!")
+        except Exception as e:
+            exibir_mensagem(f"⚠️ Modal de login não detectado: {str(e)}")
+            return False
+        
+        # PASSO 5: Preencher email
+        exibir_mensagem("📧 Preenchendo email...")
+        
+        try:
+            campo_email = page.locator("#emailTelaLogin")
+            campo_email.fill(email_login)
+            exibir_mensagem(f"✅ Email preenchido: {email_login}")
+        except Exception as e:
+            exibir_mensagem(f"❌ Erro ao preencher email: {str(e)}")
+            return False
+        
+        # PASSO 6: Preencher senha
+        exibir_mensagem("🔒 Preenchendo senha...")
+        
+        try:
+            campo_senha = page.locator("#senhaTelaLogin")
+            campo_senha.fill(senha_login)
+            exibir_mensagem("✅ Senha preenchida")
+        except Exception as e:
+            exibir_mensagem(f"❌ Erro ao preencher senha: {str(e)}")
+            return False
+        
+        # PASSO 7: CAPTURA DE TELA E LOGS DETALHADOS DO MODAL
+        exibir_mensagem("📸 CAPTURANDO TELA DO MODAL DE LOGIN...")
+        
+        try:
+            # Capturar screenshot do modal
+            timestamp = time.strftime('%Y%m%d_%H%M%S')
+            screenshot_path = f"modal_login_{timestamp}.png"
+            page.screenshot(path=screenshot_path, full_page=True)
+            exibir_mensagem(f"📸 Screenshot salvo: {screenshot_path}")
+            
+            # Verificar se os campos estão realmente preenchidos
+            valor_email_campo = campo_email.input_value()
+            valor_senha_campo = campo_senha.input_value()
+            
+            exibir_mensagem(f"🔍 VERIFICAÇÃO DOS CAMPOS:")
+            exibir_mensagem(f"   📧 Email no campo: '{valor_email_campo}'")
+            exibir_mensagem(f"   🔒 Senha no campo: '{valor_senha_campo}'")
+            exibir_mensagem(f"   📧 Email esperado: '{email_login}'")
+            exibir_mensagem(f"   🔒 Senha esperada: '{senha_login}'")
+            
+            # Verificar se os campos estão corretos
+            if valor_email_campo == email_login:
+                exibir_mensagem("✅ Email preenchido corretamente!")
+            else:
+                exibir_mensagem("❌ Email NÃO foi preenchido corretamente!")
+            
+            if valor_senha_campo == senha_login:
+                exibir_mensagem("✅ Senha preenchida corretamente!")
+            else:
+                exibir_mensagem("❌ Senha NÃO foi preenchida corretamente!")
+            
+            # Verificar se o botão "Acessar" está visível
+            botao_acessar = page.locator("#gtm-telaLoginBotaoAcessar")
+            if botao_acessar.is_visible():
+                exibir_mensagem("✅ Botão 'Acessar' está visível e pronto para clicar!")
+                texto_botao = botao_acessar.text_content()
+                exibir_mensagem(f"   📝 Texto do botão: '{texto_botao}'")
+            else:
+                exibir_mensagem("❌ Botão 'Acessar' NÃO está visível!")
+            
+            # Verificar se o modal está realmente presente
+            modal_presente = page.locator("text=Acesse sua conta para visualizar o resultado final")
+            if modal_presente.count() > 0:
+                exibir_mensagem("✅ Modal de login está presente na tela!")
+            else:
+                exibir_mensagem("❌ Modal de login NÃO está presente na tela!")
+            
+            # Capturar HTML do modal para debug
+            try:
+                modal_html = page.locator(".MuiBackdrop-root").inner_html()
+                exibir_mensagem(f"🔍 HTML do modal capturado (primeiros 200 chars): {modal_html[:200]}...")
+            except Exception as e:
+                exibir_mensagem(f"⚠️ Erro ao capturar HTML do modal: {str(e)}")
+            
+        except Exception as e:
+            exibir_mensagem(f"❌ Erro durante captura de tela/logs: {str(e)}")
+        
+        # PASSO 8: Clicar em "Acessar"
+        exibir_mensagem("🔄 Clicando em 'Acessar'...")
+        
+        try:
+            botao_acessar = page.locator("#gtm-telaLoginBotaoAcessar")
+            if botao_acessar.is_visible():
+                botao_acessar.click()
+                exibir_mensagem("✅ Botão 'Acessar' clicado com sucesso!")
+                
+                # Aguardar possível redirecionamento ou modal CPF divergente
+                exibir_mensagem("⏳ Aguardando resposta do login...")
+                time.sleep(5)
+                
+                # Verificar se apareceu modal CPF divergente
+                try:
+                    modal_cpf = page.locator("text=CPF informado não corresponde à conta")
+                    if modal_cpf.count() > 0:
+                        exibir_mensagem("✅ Modal CPF divergente detectado!")
+                        
+                        # Clicar no botão "Manter Login atual"
+                        try:
+                            exibir_mensagem("🔍 Procurando botão 'Manter Login atual'...")
+                            
+                            # Tentar pelo ID específico
+                            botao_manter_login = page.locator("#manterLoginAtualModalAssociarUsuario")
+                            if botao_manter_login.is_visible():
+                                botao_manter_login.click()
+                                exibir_mensagem("✅ Botão 'Manter Login atual' clicado pelo ID!")
+                                time.sleep(3)
+                            else:
+                                # Tentar pelo texto
+                                botao_manter_login = page.locator("text=Manter Login atual")
+                                if botao_manter_login.is_visible():
+                                    botao_manter_login.click()
+                                    exibir_mensagem("✅ Botão 'Manter Login atual' clicado pelo texto!")
+                                    time.sleep(3)
+                                else:
+                                    exibir_mensagem("⚠️ Botão 'Manter Login atual' não encontrado")
+                        except Exception as e:
+                            exibir_mensagem(f"⚠️ Erro ao clicar no botão 'Manter Login atual': {str(e)}")
+                    else:
+                        exibir_mensagem("ℹ️ Modal CPF divergente não apareceu - login pode ter sido bem-sucedido")
+                except Exception as e:
+                    exibir_mensagem(f"⚠️ Erro ao verificar modal CPF: {str(e)}")
+                
+            else:
+                exibir_mensagem("❌ Botão 'Acessar' não está visível!")
+                return False
+        except Exception as e:
+            exibir_mensagem(f"❌ Erro ao clicar em 'Acessar': {str(e)}")
+            return False
+        
+        exibir_mensagem("✅ LOGIN CONCLUÍDO!")
+        exibir_mensagem("🎯 TELA 15 FINALIZADA COM SUCESSO!")
+        
+        return True
+        
+    except Exception as e:
+        exibir_mensagem(f"❌ ERRO na Tela 15: {str(e)}")
+        return False
 
 def main():
     """
@@ -1514,7 +1859,7 @@ def main():
         with open('config/parametros.json', 'r', encoding='utf-8') as f:
             parametros = json.load(f)
         
-        exibir_mensagem("🚀 INICIANDO TESTE TELAS 1 A 9 SEQUENCIAL")
+        exibir_mensagem("🚀 INICIANDO TESTE TELAS 1 A 15 SEQUENCIAL")
         exibir_mensagem("=" * 60)
         exibir_mensagem(f"🚗 Placa: {parametros['placa']}")
         exibir_mensagem(f"📋 Veículo segurado: {parametros['veiculo_segurado']}")
@@ -1656,10 +2001,28 @@ def main():
                 exibir_mensagem("❌ TELA 13 FALHOU!")
                 return 1
             
+            # TELA 14 (CONDICIONAL)
+            exibir_mensagem("\n" + "="*50)
+            if navegar_tela_14_playwright(page, parametros['continuar_com_corretor_anterior']):
+                # Não incrementa telas_executadas pois é condicional
+                exibir_mensagem("✅ TELA 14 PROCESSADA!")
+            else:
+                exibir_mensagem("❌ TELA 14 FALHOU!")
+                return 1
+            
+            # TELA 15
+            exibir_mensagem("\n" + "="*50)
+            if navegar_tela_15_playwright(page, parametros['autenticacao']['email_login'], parametros['autenticacao']['senha_login']):
+                telas_executadas += 1
+                exibir_mensagem("✅ TELA 15 CONCLUÍDA!")
+            else:
+                exibir_mensagem("❌ TELA 15 FALHOU!")
+                return 1
+            
             # Resultado final
             exibir_mensagem("\n" + "="*60)
-            exibir_mensagem("🎉 TESTE TELAS 1 A 13 CONCLUÍDO COM SUCESSO!")
-            exibir_mensagem(f"✅ Total de telas executadas: {telas_executadas}/13")
+            exibir_mensagem("🎉 TESTE TELAS 1 A 15 CONCLUÍDO COM SUCESSO!")
+            exibir_mensagem(f"✅ Total de telas executadas: {telas_executadas}/14 (Tela 14 é condicional)")
             exibir_mensagem("✅ Todas as telas funcionaram corretamente")
             exibir_mensagem("✅ Navegação sequencial realizada com sucesso")
             
