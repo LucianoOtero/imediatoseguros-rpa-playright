@@ -1,0 +1,32 @@
+{
+  "plano_recomendado": {
+    "plano": "Plano recomendado",
+    "valor": "R$3.368,88",
+    "forma_pagamento": "anual",
+    "parcelamento": "10x sem juros",
+    "valor_franquia": "R$ 2.516,60",
+    "valor_mercado": "100% da tabela FIPE",
+    "assistencia": false,
+    "vidros": true,
+    "carro_reserva": false,
+    "danos_materiais": "R$ 100.000,00",
+    "danos_corporais": "R$ 100.000,00",
+    "danos_morais": "R$ 10.000,00",
+    "morte_invalidez": "R$ 5.000,00"
+  },
+  "plano_alternativo": {
+    "plano": "Plano alternativo",
+    "valor": "R$4.435,23",
+    "forma_pagamento": "anual",
+    "parcelamento": "N/A",
+    "valor_franquia": "N/A",
+    "valor_mercado": "N/A",
+    "assistencia": false,
+    "vidros": false,
+    "carro_reserva": false,
+    "danos_materiais": "N/A",
+    "danos_corporais": "N/A",
+    "danos_morais": "N/A",
+    "morte_invalidez": "N/A"
+  }
+}
