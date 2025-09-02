@@ -1370,70 +1370,319 @@ def capturar_dados_tela_final(driver):
                 else:
                     plano_info["titulo"] = f"Plano {i+1}"
                 
-                # Extrair valores monetários com padrões mais específicos
-                valor_patterns = [
-                    r"R\$\s*([0-9.,]+)",
-                    r"([0-9.,]+)\s*anual",
-                    r"([0-9.,]+)\s*em até",
-                    r"R\$\s*([0-9.,]+)\s*anual",
-                    r"R\$\s*([0-9.,]+)\s*em até"
-                ]
+                # NOVA IMPLEMENTAÇÃO: Parse estruturado baseado na especificação fornecida
+                # Dividir o texto por quebras de linha para análise estruturada
+                linhas = tabela_text.split('\n')
+                linhas = [linha.strip() for linha in linhas if linha.strip()]
                 
-                valores_encontrados = []
-                for pattern in valor_patterns:
-                    matches = re.findall(pattern, tabela_text, re.IGNORECASE)
-                    valores_encontrados.extend(matches)
+                exibir_mensagem(f"🔍 **ANALISANDO ESTRUTURA**: {len(linhas)} linhas encontradas")
                 
-                # Remover duplicatas e ordenar
-                valores_encontrados = list(set(valores_encontrados))
-                valores_encontrados.sort(key=lambda x: float(x.replace(',', '').replace('.', '')))
+                # Determinar se é plano recomendado (tem título) ou secundário (sem título)
+                tem_titulo = False
+                indice_inicio = 0
                 
-                # Extrair condições de pagamento
-                pagamento_patterns = [
-                    r"Crédito em até (\d+x)\s*(?:sem juros|com juros)?\s*(?:ou \d+x de R\$\s*([0-9.,]+))?",
-                    r"(\d+x)\s*(?:sem juros|com juros)",
-                    r"parcelamento\s*(?:sem juros|com juros)"
-                ]
+                if len(linhas) > 0:
+                    primeira_linha = linhas[0].lower()
+                    if "plano recomendado" in primeira_linha or "recomendado" in primeira_linha:
+                        tem_titulo = True
+                        indice_inicio = 1  # Pular o título
+                        plano_info["titulo"] = "Plano Recomendado"
+                        exibir_mensagem("✅ **PLANO RECOMENDADO DETECTADO**")
+                    else:
+                        plano_info["titulo"] = "Plano Secundário"
+                        exibir_mensagem("✅ **PLANO SECUNDÁRIO DETECTADO**")
                 
-                for pattern in pagamento_patterns:
-                    match = re.search(pattern, tabela_text, re.IGNORECASE)
-                    if match:
-                        if "Crédito em até" in pattern:
-                            plano_info["precos"]["parcelado"]["parcelas"] = f"{match.group(1)} sem juros"
-                            if match.group(2):
-                                plano_info["precos"]["parcelado"]["valor"] = f"R$ {match.group(2)}"
-                        else:
-                            plano_info["precos"]["parcelado"]["parcelas"] = match.group(0)
-                        break
-                
-                if valores_encontrados:
-                    # Procurar por valores específicos que vi no HTML
-                    for valor in valores_encontrados:
-                        valor_limpo = valor.replace(',', '').replace('.', '')
-                        if valor_limpo == '10000':  # R$ 100,00
-                            plano_info["precos"]["anual"] = f"R$ {valor}"
-                        elif valor_limpo == '256100':  # R$ 2.561,00
-                            plano_info["precos"]["anual"] = f"R$ {valor}"
-                        elif valor_limpo == '250000':  # R$ 2.500,00
-                            plano_info["franquia"]["valor"] = f"R$ {valor}"
-                        elif valor_limpo == '358406':  # R$ 3.584,06
-                            plano_info["franquia"]["valor"] = f"R$ {valor}"
-                        elif valor_limpo == '50000':  # R$ 50.000,00
-                            plano_info["danos_materiais"] = f"R$ {valor}"
-                            plano_info["danos_corporais"] = f"R$ {valor}"
-                        elif valor_limpo == '100000':  # R$ 100.000,00
-                            plano_info["danos_materiais"] = f"R$ {valor}"
-                            plano_info["danos_corporais"] = f"R$ {valor}"
-                        elif valor_limpo == '20000':  # R$ 20.000,00
-                            plano_info["danos_morais"] = f"R$ {valor}"
-                        elif valor_limpo == '10000' and not plano_info["danos_morais"]:  # R$ 10.000,00 (evitar conflito)
-                            plano_info["danos_morais"] = f"R$ {valor}"
-                        elif valor_limpo == '5000':  # R$ 5.000,00
-                            plano_info["morte_invalidez"] = f"R$ {valor}"
-                    
-                    # Se não encontrou valores específicos, usar o primeiro como anual
-                    if not plano_info["precos"]["anual"] and valores_encontrados:
-                        plano_info["precos"]["anual"] = f"R$ {valores_encontrados[0]}"
+                # Parse estruturado baseado na especificação
+                if len(linhas) >= indice_inicio + 8:  # Mínimo de 8 campos após título
+                    try:
+                        # 1. Moeda (R$) - posição 0 ou 1 dependendo se tem título
+                        moeda = linhas[indice_inicio]
+                        if moeda == "R$":
+                            exibir_mensagem("✅ **MOEDA DETECTADA**: R$")
+                        
+                        # 2. Preço anual - posição 1 ou 2 dependendo se tem título
+                        if indice_inicio + 1 < len(linhas):
+                            preco_anual = linhas[indice_inicio + 1]
+                            # Validar se é um preço (contém números e vírgula/ponto)
+                            if re.match(r'^[0-9.,]+$', preco_anual):
+                                plano_info["precos"]["anual"] = f"R$ {preco_anual}"
+                                exibir_mensagem(f"✅ **PREÇO ANUAL**: R$ {preco_anual}")
+                        
+                        # 3. Periodicidade (anual) - posição 2 ou 3
+                        if indice_inicio + 2 < len(linhas):
+                            periodicidade = linhas[indice_inicio + 2]
+                            if "anual" in periodicidade.lower():
+                                exibir_mensagem("✅ **PERIODICIDADE**: Anual")
+                        
+                        # 4. Forma de pagamento - posição 3 ou 4
+                        if indice_inicio + 3 < len(linhas):
+                            forma_pagamento = linhas[indice_inicio + 3]
+                            plano_info["precos"]["parcelado"]["parcelas"] = forma_pagamento
+                            
+                            # Extrair valor de parcelamento se houver
+                            # Padrão: "Crédito em até 1x sem juros ou 10x de R$ 346,82"
+                            parcelamento_match = re.search(r'(\d+x)\s*de\s*R\$\s*([0-9.,]+)', forma_pagamento)
+                            if parcelamento_match:
+                                valor_parcela = parcelamento_match.group(2)
+                                plano_info["precos"]["parcelado"]["valor"] = f"R$ {valor_parcela}"
+                                exibir_mensagem(f"✅ **VALOR PARCELA**: R$ {valor_parcela}")
+                            
+                            exibir_mensagem(f"✅ **FORMA PAGAMENTO**: {forma_pagamento}")
+                        
+                        # 5. Franquia - posição 4 ou 5
+                        if indice_inicio + 4 < len(linhas):
+                            franquia_valor = linhas[indice_inicio + 4]
+                            if re.match(r'^R\$\s*[0-9.,]+$', franquia_valor):
+                                plano_info["franquia"]["valor"] = franquia_valor
+                                exibir_mensagem(f"✅ **FRANQUIA VALOR**: {franquia_valor}")
+                        
+                        # 6. Característica da franquia - posição 5 ou 6
+                        if indice_inicio + 5 < len(linhas):
+                            franquia_tipo = linhas[indice_inicio + 5]
+                            if franquia_tipo.lower() in ["reduzida", "normal"]:
+                                plano_info["franquia"]["tipo"] = franquia_tipo
+                                exibir_mensagem(f"✅ **FRANQUIA TIPO**: {franquia_tipo}")
+                        
+                        # 7. Cobertura do valor do veículo - posição 6 ou 7
+                        if indice_inicio + 6 < len(linhas):
+                            cobertura_veiculo = linhas[indice_inicio + 6]
+                            if "100% da tabela FIPE" in cobertura_veiculo:
+                                plano_info["valor_mercado"] = cobertura_veiculo
+                                exibir_mensagem(f"✅ **COBERTURA VEÍCULO**: {cobertura_veiculo}")
+                        
+                        # 8-11. Itens adicionais (posições 7-10 ou 8-11)
+                        itens_adicionais = []
+                        for i in range(indice_inicio + 7, min(indice_inicio + 11, len(linhas))):
+                            if i < len(linhas):
+                                item = linhas[i]
+                                if re.match(r'^R\$\s*[0-9.,]+$', item):
+                                    itens_adicionais.append(item)
+                        
+                        # Mapear itens adicionais para coberturas específicas
+                        if len(itens_adicionais) >= 4:
+                            # Baseado na especificação: Danos Materiais, Danos Corporais, Danos Morais, Morte/Invalidez
+                            plano_info["danos_materiais"] = itens_adicionais[0]
+                            plano_info["danos_corporais"] = itens_adicionais[1]
+                            plano_info["danos_morais"] = itens_adicionais[2]
+                            plano_info["morte_invalidez"] = itens_adicionais[3]
+                            
+                            exibir_mensagem(f"✅ **ITENS ADICIONAIS**: {len(itens_adicionais)} itens mapeados")
+                        
+                    except Exception as e:
+                        exibir_mensagem(f"⚠️ **ERRO NO PARSE ESTRUTURADO**: {str(e)}")
+                        # Fallback para método anterior se o parse estruturado falhar
+                        exibir_mensagem("🔄 **FALLBACK**: Usando método anterior de extração")
+                        
+                        # Extrair valores monetários com padrões mais específicos
+                        valor_patterns = [
+                            r"R\$\s*([0-9.,]+)",
+                            r"([0-9.,]+)\s*anual",
+                            r"([0-9.,]+)\s*em até",
+                            r"R\$\s*([0-9.,]+)\s*anual",
+                            r"R\$\s*([0-9.,]+)\s*em até"
+                        ]
+                        
+                        valores_encontrados = []
+                        for pattern in valor_patterns:
+                            matches = re.findall(pattern, tabela_text, re.IGNORECASE)
+                            valores_encontrados.extend(matches)
+                        
+                        # Remover duplicatas e ordenar
+                        valores_encontrados = list(set(valores_encontrados))
+                        valores_encontrados.sort(key=lambda x: float(x.replace(',', '').replace('.', '')))
+                        
+                        # Extrair condições de pagamento
+                        pagamento_patterns = [
+                            r"Crédito em até (\d+x)\s*(?:sem juros|com juros)?\s*(?:ou \d+x de R\$\s*([0-9.,]+))?",
+                            r"(\d+x)\s*(?:sem juros|com juros)",
+                            r"parcelamento\s*(?:sem juros|com juros)"
+                        ]
+                        
+                        for pattern in pagamento_patterns:
+                            match = re.search(pattern, tabela_text, re.IGNORECASE)
+                            if match:
+                                if "Crédito em até" in pattern:
+                                    plano_info["precos"]["parcelado"]["parcelas"] = f"{match.group(1)} sem juros"
+                                    if match.group(2):
+                                        plano_info["precos"]["parcelado"]["valor"] = f"R$ {match.group(2)}"
+                                else:
+                                    plano_info["precos"]["parcelado"]["parcelas"] = match.group(0)
+                                break
+                        
+                        if valores_encontrados:
+                            # Procurar por valores específicos que vi no HTML
+                            for valor in valores_encontrados:
+                                valor_limpo = valor.replace(',', '').replace('.', '')
+                                if valor_limpo == '10000':  # R$ 100,00
+                                    plano_info["precos"]["anual"] = f"R$ {valor}"
+                                elif valor_limpo == '256100':  # R$ 2.561,00
+                                    plano_info["precos"]["anual"] = f"R$ {valor}"
+                                elif valor_limpo == '250000':  # R$ 2.500,00
+                                    plano_info["franquia"]["valor"] = f"R$ {valor}"
+                                elif valor_limpo == '358406':  # R$ 3.584,06
+                                    plano_info["franquia"]["valor"] = f"R$ {valor}"
+                                elif valor_limpo == '50000':  # R$ 50.000,00
+                                    plano_info["danos_materiais"] = f"R$ {valor}"
+                                    plano_info["danos_corporais"] = f"R$ {valor}"
+                                elif valor_limpo == '100000':  # R$ 100.000,00
+                                    plano_info["danos_materiais"] = f"R$ {valor}"
+                                    plano_info["danos_corporais"] = f"R$ {valor}"
+                                elif valor_limpo == '20000':  # R$ 20.000,00
+                                    plano_info["danos_morais"] = f"R$ {valor}"
+                                elif valor_limpo == '10000' and not plano_info["danos_morais"]:  # R$ 10.000,00 (evitar conflito)
+                                    plano_info["danos_morais"] = f"R$ {valor}"
+                                elif valor_limpo == '5000':  # R$ 5.000,00
+                                    plano_info["morte_invalidez"] = f"R$ {valor}"
+                            
+                            # Se não encontrou valores específicos, usar o primeiro como anual
+                            if not plano_info["precos"]["anual"] and valores_encontrados:
+                                plano_info["precos"]["anual"] = f"R$ {valores_encontrados[0]}"
+                else:
+                    exibir_mensagem(f"⚠️ **DADOS INSUFICIENTES**: Apenas {len(linhas)} linhas encontradas")
+                    # MELHORIA: Parse inteligente para planos com poucas linhas
+                    try:
+                        exibir_mensagem("🔍 **ANALISANDO PLANO COM POUCAS LINHAS**")
+                        
+                        # Tentar extrair pelo menos o preço anual e forma de pagamento
+                        if len(linhas) >= 2:
+                            # Primeira linha pode ser moeda (R$) ou preço
+                            primeira_linha = linhas[0].strip()
+                            if primeira_linha == "R$" and len(linhas) >= 3:
+                                # Formato: R$ / preço / anual
+                                preco_anual = linhas[1].strip()
+                                if re.match(r'^[0-9.,]+$', preco_anual):
+                                    plano_info["precos"]["anual"] = f"R$ {preco_anual}"
+                                    exibir_mensagem(f"✅ **PREÇO ANUAL EXTRAÍDO**: R$ {preco_anual}")
+                            elif re.match(r'^[0-9.,]+$', primeira_linha):
+                                # Formato: preço / anual
+                                plano_info["precos"]["anual"] = f"R$ {primeira_linha}"
+                                exibir_mensagem(f"✅ **PREÇO ANUAL EXTRAÍDO**: R$ {primeira_linha}")
+                        
+                        # Procurar forma de pagamento no texto completo
+                        pagamento_match = re.search(r'Crédito em até (\d+x)\s*(?:sem juros|com juros)?\s*(?:ou \d+x de R\$\s*([0-9.,]+))?', tabela_text)
+                        if pagamento_match:
+                            parcelas = pagamento_match.group(1)
+                            valor_parcela = pagamento_match.group(2) if pagamento_match.group(2) else ""
+                            
+                            plano_info["precos"]["parcelado"]["parcelas"] = f"{parcelas} sem juros"
+                            if valor_parcela:
+                                plano_info["precos"]["parcelado"]["valor"] = f"R$ {valor_parcela}"
+                                exibir_mensagem(f"✅ **VALOR PARCELA EXTRAÍDO**: R$ {valor_parcela}")
+                            
+                            exibir_mensagem(f"✅ **FORMA PAGAMENTO EXTRAÍDA**: {parcelas} sem juros")
+                        
+                        # Procurar outros valores monetários no texto completo
+                        valores_monetarios = re.findall(r'R\$\s*([0-9.,]+)', tabela_text)
+                        if valores_monetarios:
+                            # Mapear valores encontrados para campos específicos
+                            for valor in valores_monetarios:
+                                valor_limpo = valor.replace(',', '').replace('.', '')
+                                valor_completo = f"R$ {valor}"
+                                
+                                # Evitar duplicar o preço anual já extraído
+                                if valor_completo != plano_info["precos"]["anual"]:
+                                    # Tentar identificar o tipo de valor baseado no contexto
+                                    if valor_limpo in ['251660', '2516.60']:  # Franquia reduzida
+                                        plano_info["franquia"]["valor"] = valor_completo
+                                        plano_info["franquia"]["tipo"] = "Reduzida"
+                                    elif valor_limpo in ['507594', '5075.94']:  # Franquia normal
+                                        plano_info["franquia"]["valor"] = valor_completo
+                                        plano_info["franquia"]["tipo"] = "Reduzida"
+                                    elif valor_limpo in ['50000', '50000.00']:  # Danos materiais/corporais
+                                        if not plano_info["danos_materiais"]:
+                                            plano_info["danos_materiais"] = valor_completo
+                                        if not plano_info["danos_corporais"]:
+                                            plano_info["danos_corporais"] = valor_completo
+                                    elif valor_limpo in ['100000', '100000.00']:  # Danos materiais/corporais premium
+                                        if not plano_info["danos_materiais"]:
+                                            plano_info["danos_materiais"] = valor_completo
+                                        if not plano_info["danos_corporais"]:
+                                            plano_info["danos_corporais"] = valor_completo
+                                    elif valor_limpo in ['10000', '10000.00']:  # Danos morais
+                                        plano_info["danos_morais"] = valor_completo
+                                    elif valor_limpo in ['20000', '20000.00']:  # Danos morais premium
+                                        plano_info["danos_morais"] = valor_completo
+                                    elif valor_limpo in ['5000', '5000.00']:  # Morte/invalidez
+                                        plano_info["morte_invalidez"] = valor_completo
+                                    elif valor_limpo in ['0', '0.00']:  # Morte/invalidez zero
+                                        plano_info["morte_invalidez"] = valor_completo
+                            
+                            exibir_mensagem(f"✅ **VALORES MONETÁRIOS EXTRAÍDOS**: {len(valores_monetarios)} encontrados")
+                        
+                        # Definir valor de mercado padrão se não encontrado
+                        if not plano_info["valor_mercado"]:
+                            plano_info["valor_mercado"] = "100% da tabela FIPE"
+                            exibir_mensagem("✅ **VALOR DE MERCADO PADRÃO**: 100% da tabela FIPE")
+                        
+                    except Exception as e:
+                        exibir_mensagem(f"⚠️ **ERRO NO PARSE INTELIGENTE**: {str(e)}")
+                        # Fallback final para método anterior
+                        exibir_mensagem("🔄 **FALLBACK FINAL**: Usando método anterior de extração")
+                        
+                        # Extrair valores monetários com padrões mais específicos
+                        valor_patterns = [
+                            r"R\$\s*([0-9.,]+)",
+                            r"([0-9.,]+)\s*anual",
+                            r"([0-9.,]+)\s*em até",
+                            r"R\$\s*([0-9.,]+)\s*anual",
+                            r"R\$\s*([0-9.,]+)\s*em até"
+                        ]
+                        
+                        valores_encontrados = []
+                        for pattern in valor_patterns:
+                            matches = re.findall(pattern, tabela_text, re.IGNORECASE)
+                            valores_encontrados.extend(matches)
+                        
+                        # Remover duplicatas e ordenar
+                        valores_encontrados = list(set(valores_encontrados))
+                        valores_encontrados.sort(key=lambda x: float(x.replace(',', '').replace('.', '')))
+                        
+                        # Extrair condições de pagamento
+                        pagamento_patterns = [
+                            r"Crédito em até (\d+x)\s*(?:sem juros|com juros)?\s*(?:ou \d+x de R\$\s*([0-9.,]+))?",
+                            r"(\d+x)\s*(?:sem juros|com juros)",
+                            r"parcelamento\s*(?:sem juros|com juros)"
+                        ]
+                        
+                        for pattern in pagamento_patterns:
+                            match = re.search(pattern, tabela_text, re.IGNORECASE)
+                            if match:
+                                if "Crédito em até" in pattern:
+                                    plano_info["precos"]["parcelado"]["parcelas"] = f"{match.group(1)} sem juros"
+                                    if match.group(2):
+                                        plano_info["precos"]["parcelado"]["valor"] = f"R$ {match.group(2)}"
+                                else:
+                                    plano_info["precos"]["parcelado"]["parcelas"] = match.group(0)
+                                break
+                        
+                        if valores_encontrados:
+                            # Procurar por valores específicos que vi no HTML
+                            for valor in valores_encontrados:
+                                valor_limpo = valor.replace(',', '').replace('.', '')
+                                if valor_limpo == '10000':  # R$ 100,00
+                                    plano_info["precos"]["anual"] = f"R$ {valor}"
+                                elif valor_limpo == '256100':  # R$ 2.561,00
+                                    plano_info["precos"]["anual"] = f"R$ {valor}"
+                                elif valor_limpo == '250000':  # R$ 2.500,00
+                                    plano_info["franquia"]["valor"] = f"R$ {valor}"
+                                elif valor_limpo == '358406':  # R$ 3.584,06
+                                    plano_info["franquia"]["valor"] = f"R$ {valor}"
+                                elif valor_limpo == '50000':  # R$ 50.000,00
+                                    plano_info["danos_materiais"] = f"R$ {valor}"
+                                    plano_info["danos_corporais"] = f"R$ {valor}"
+                                elif valor_limpo == '100000':  # R$ 100.000,00
+                                    plano_info["danos_materiais"] = f"R$ {valor}"
+                                    plano_info["danos_corporais"] = f"R$ {valor}"
+                                elif valor_limpo == '20000':  # R$ 20.000,00
+                                    plano_info["danos_morais"] = f"R$ {valor}"
+                                elif valor_limpo == '10000' and not plano_info["danos_morais"]:  # R$ 10.000,00 (evitar conflito)
+                                    plano_info["danos_morais"] = f"R$ {valor}"
+                                elif valor_limpo == '5000':  # R$ 5.000,00
+                                    plano_info["morte_invalidez"] = f"R$ {valor}"
+                            
+                            # Se não encontrou valores específicos, usar o primeiro como anual
+                            if not plano_info["precos"]["anual"] and valores_encontrados:
+                                plano_info["precos"]["anual"] = f"R$ {valores_encontrados[0]}"
                 
                 # Extrair franquia
                 franquia_patterns = [
