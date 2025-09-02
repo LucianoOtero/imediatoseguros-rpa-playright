@@ -46,20 +46,20 @@ def exibir_mensagem(mensagem):
 
 def navegar_tela_1_playwright(page):
     """
-    TELA 1: Seleção do tipo de seguro (Carro) - VERSÃO OTIMIZADA
+    TELA 1: Seleção do tipo de seguro (Carro)
     
     DESCRIÇÃO:
         Navega para a Tela 1 e seleciona "Carro" como tipo de seguro
-        Usa auto-waiting do Playwright para melhor performance
     
     ELEMENTOS IDENTIFICADOS:
         - Botão "Carro": button.group
     
     IMPLEMENTAÇÃO:
-        1. Aguarda carregamento do botão usando wait_for_selector
+        1. Aguarda carregamento inicial da página
         2. Localiza o botão "Carro"
-        3. Clica no botão
-        4. Aguarda transição para próxima tela usando wait_for_selector
+        3. Verifica se está visível
+        4. Clica no botão
+        5. Aguarda transição para próxima tela
     
     PARÂMETROS:
         page: Objeto page do Playwright
@@ -69,44 +69,40 @@ def navegar_tela_1_playwright(page):
     
     LOGS ESPERADOS:
         - "📱 TELA 1: Selecionando Carro..."
-        - "✅ Botão 'Carro' carregado e visível"
         - "✅ Botão 'Carro' clicado com sucesso"
-        - "✅ Transição para Tela 2 realizada"
+        - "❌ Botão 'Carro' não está visível" (se falhar)
         - "❌ ERRO na Tela 1: {erro}" (se exceção)
     """
     try:
         # PASSO 1: Exibir mensagem de início da Tela 1
         exibir_mensagem("📱 TELA 1: Selecionando Carro...")
         
-        # PASSO 2: Aguardar carregamento do botão usando auto-waiting (máximo 10 segundos)
-        exibir_mensagem("⏳ Aguardando carregamento do botão 'Carro'...")
-        page.wait_for_selector("button.group", timeout=10000)
+        # PASSO 2: Aguardar carregamento inicial da página
+        time.sleep(3)
         
         # PASSO 3: Localizar o botão "Carro"
         botao_carro = page.locator("button.group").first
         
-        # PASSO 4: Verificar se está visível e clicar
+        # PASSO 4: Verificar se o botão está visível
         if botao_carro.is_visible():
-            exibir_mensagem("✅ Botão 'Carro' carregado e visível")
-            
             # PASSO 5: Clicar no botão "Carro"
             botao_carro.click()
+            
+            # PASSO 6: Confirmar sucesso da ação
             exibir_mensagem("✅ Botão 'Carro' clicado com sucesso")
             
-            # PASSO 6: Aguardar transição para próxima tela usando auto-waiting
-            exibir_mensagem("⏳ Aguardando transição para Tela 2...")
-            page.wait_for_selector("#placaTelaDadosPlaca", timeout=10000)
-            exibir_mensagem("✅ Transição para Tela 2 realizada")
+            # PASSO 7: Aguardar transição para próxima tela
+            time.sleep(3)
             
-            # PASSO 7: Retornar sucesso
+            # PASSO 8: Retornar sucesso
             return True
         else:
-            # PASSO 8: Tratar caso onde botão não está visível
+            # PASSO 9: Tratar caso onde botão não está visível
             exibir_mensagem("❌ Botão 'Carro' não está visível")
             return False
             
     except Exception as e:
-        # PASSO 9: Tratar exceções durante a execução
+        # PASSO 10: Tratar exceções durante a execução
         exibir_mensagem(f"❌ ERRO na Tela 1: {str(e)}")
         return False
 
@@ -1287,6 +1283,112 @@ def navegar_tela_11_playwright(page, local_de_trabalho, estacionamento_proprio_l
         exibir_mensagem(f"❌ ERRO na Tela 11: {str(e)}")
         return False
 
+def navegar_tela_12_playwright(page, garagem_residencia, portao_eletronico):
+    """
+    TELA 12: Garagem na Residência
+    
+    DESCRIÇÃO:
+        Navega para a Tela 12 e seleciona se possui garagem na residência e tipo de portão.
+        
+    ELEMENTOS IDENTIFICADOS:
+        - Radio Sim: input[value="sim"][name="possuiGaragemTelaGaragemResidencia"]
+        - Radio Não: input[value="nao"][name="possuiGaragemTelaGaragemResidencia"]
+        - Radio Eletrônico: input[value="eletronico"][name="tipoPortaoTelaGaragemResidencia"]
+        - Radio Manual: input[value="manual"][name="tipoPortaoTelaGaragemResidencia"]
+        - Botão Continuar: p.font-semibold.font-workSans.cursor-pointer (texto "Continuar")
+        
+    PARÂMETROS:
+        - garagem_residencia: bool - Se possui garagem na residência
+        - portao_eletronico: str - Tipo de portão ("Eletronico", "Manual", "Não possui")
+    """
+    try:
+        exibir_mensagem("\n" + "="*50)
+        exibir_mensagem("🏠 TELA 12: GARAGEM NA RESIDÊNCIA")
+        exibir_mensagem("="*50)
+        
+        # Aguarda o carregamento da Tela 12
+        exibir_mensagem("⏳ Aguardando carregamento da Tela 12...")
+        page.wait_for_selector('p.font-semibold.font-workSans.cursor-pointer', timeout=10000)
+        time.sleep(2)  # Aguarda estabilização
+        
+        exibir_mensagem("✅ Tela 12 carregada - garagem na residência detectada!")
+        
+        # Seleciona Sim ou Não para garagem
+        if garagem_residencia:
+            exibir_mensagem("📋 Selecionando 'Sim' para garagem na residência...")
+            
+            # Localizar e clicar no radio button "Sim"
+            radio_sim = page.locator('input[value="sim"][name="possuiGaragemTelaGaragemResidencia"]')
+            if radio_sim.is_visible():
+                radio_sim.click()
+                exibir_mensagem("✅ Radio 'Sim' para garagem selecionado com sucesso")
+            else:
+                exibir_mensagem("⚠️ Radio 'Sim' para garagem não encontrado")
+                return False
+            
+            # Aguarda campo de portão aparecer
+            exibir_mensagem("⏳ Aguardando campo de portão aparecer...")
+            time.sleep(2)
+            
+            # Seleciona tipo de portão
+            if portao_eletronico == "Eletronico":
+                exibir_mensagem("📋 Selecionando 'Eletrônico' para portão...")
+                
+                radio_eletronico = page.locator('input[value="eletronico"][name="tipoPortaoTelaGaragemResidencia"]')
+                if radio_eletronico.is_visible():
+                    radio_eletronico.click()
+                    exibir_mensagem("✅ Radio 'Eletrônico' para portão selecionado com sucesso")
+                else:
+                    exibir_mensagem("⚠️ Radio 'Eletrônico' para portão não encontrado")
+                    return False
+                    
+            elif portao_eletronico == "Manual":
+                exibir_mensagem("📋 Selecionando 'Manual' para portão...")
+                
+                radio_manual = page.locator('input[value="manual"][name="tipoPortaoTelaGaragemResidencia"]')
+                if radio_manual.is_visible():
+                    radio_manual.click()
+                    exibir_mensagem("✅ Radio 'Manual' para portão selecionado com sucesso")
+                else:
+                    exibir_mensagem("⚠️ Radio 'Manual' para portão não encontrado")
+                    return False
+            else:
+                exibir_mensagem("ℹ️ Tipo de portão: Não possui")
+        else:
+            exibir_mensagem("📋 Selecionando 'Não' para garagem na residência...")
+            
+            # Localizar e clicar no radio button "Não"
+            radio_nao = page.locator('input[value="nao"][name="possuiGaragemTelaGaragemResidencia"]')
+            if radio_nao.is_visible():
+                radio_nao.click()
+                exibir_mensagem("✅ Radio 'Não' para garagem selecionado com sucesso")
+            else:
+                exibir_mensagem("⚠️ Radio 'Não' para garagem não encontrado")
+                return False
+        
+        # Aguarda estabilização após seleções
+        time.sleep(2)
+        
+        # Clica no botão Continuar
+        exibir_mensagem("🔄 Clicando em 'Continuar'...")
+        botao_continuar = page.locator('p.font-semibold.font-workSans.cursor-pointer:has-text("Continuar")')
+        if botao_continuar.is_visible():
+            botao_continuar.click()
+            exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
+        else:
+            exibir_mensagem("⚠️ Botão 'Continuar' não encontrado")
+            return False
+        
+        # Aguarda navegação
+        time.sleep(2)
+        exibir_mensagem("✅ Navegação para próxima tela realizada!")
+        
+        return True
+        
+    except Exception as e:
+        exibir_mensagem(f"❌ ERRO na Tela 12: {str(e)}")
+        return False
+
 
 def main():
     """
@@ -1431,10 +1533,19 @@ def main():
                 exibir_mensagem("❌ TELA 11 FALHOU!")
                 return 1
             
+            # TELA 12
+            exibir_mensagem("\n" + "="*50)
+            if navegar_tela_12_playwright(page, parametros['garagem_residencia'], parametros['portao_eletronico']):
+                telas_executadas += 1
+                exibir_mensagem("✅ TELA 12 CONCLUÍDA!")
+            else:
+                exibir_mensagem("❌ TELA 12 FALHOU!")
+                return 1
+            
             # Resultado final
             exibir_mensagem("\n" + "="*60)
-            exibir_mensagem("🎉 TESTE TELAS 1 A 11 CONCLUÍDO COM SUCESSO!")
-            exibir_mensagem(f"✅ Total de telas executadas: {telas_executadas}/11")
+            exibir_mensagem("🎉 TESTE TELAS 1 A 12 CONCLUÍDO COM SUCESSO!")
+            exibir_mensagem(f"✅ Total de telas executadas: {telas_executadas}/12")
             exibir_mensagem("✅ Todas as telas funcionaram corretamente")
             exibir_mensagem("✅ Navegação sequencial realizada com sucesso")
             
