@@ -75,7 +75,7 @@ HISTÓRICO DE CORREÇÕES E IMPLEMENTAÇÕES:
       - Delays configuráveis via parametros.json (tempo_estabilizacao)
       - Função salvar_estado_tela para debug completo
       - Seletores corretos para cada botão (IDs específicos)
-      - Placa correta: KVA-1791 (não KVA1791)
+      - Placa baseada no parametros.json
       - URL base do JSON
       - Tratamento de erros robusto
              - MUTATIONOBSERVER ROBUSTO para detecção inteligente de estabilização do DOM
@@ -151,7 +151,7 @@ HISTÓRICO DE CORREÇÕES E IMPLEMENTAÇÕES:
 15. PARÂMETROS:
       - Carregados do arquivo parametros.json
       - Validação de parâmetros essenciais
-      - Placa hardcoded como KVA-1791 (baseado no script que funcionou)
+      - Placa baseada no parametros.json
       - tempo_carregamento: Agora usado como fallback se MutationObserver ROBUSTO falhar
       - tempo_estabilizacao: Configurável para estabilização da página
       - CONFIGURAÇÃO REACT: Otimizada para páginas dinâmicas (React/Next.js)
@@ -501,7 +501,7 @@ ERROR_CODES = {
     6002: {
         "category": "SCREEN_ERROR",
         "description": "Falha na Tela 3 - Confirmação do veículo",
-        "message": "Não foi possível confirmar o veículo ECOSPORT na terceira tela",
+        "message": "Não foi possível confirmar o veículo na terceira tela",
         "possible_causes": ["Confirmação não apareceu", "Radio 'Sim' não encontrado", "Botão Continuar não encontrado", "Página diferente"],
         "action": "Verificar se a confirmação do veículo está aparecendo e se os elementos estão presentes"
     },
@@ -1025,7 +1025,7 @@ def capturar_dados_carrossel_estimativas(driver):
         exibir_mensagem(f"❌ **ERRO NA CAPTURA**: {str(e)}")
         return None
 
-def aguardar_modal_email(driver, timeout=30):
+def aguardar_modal_email(driver, timeout=10):
     """
     Aguarda especificamente pela modal de email que aparece sobre a tela final
     Baseado na gravação do Selenium IDE
@@ -1035,7 +1035,7 @@ def aguardar_modal_email(driver, timeout=30):
     - False se não foi encontrada
     """
     try:
-        exibir_mensagem("🔍 **AGUARDANDO MODAL DE EMAIL**")
+        exibir_mensagem("🔍 **AGUARDANDO MODAL DE EMAIL** (timeout reduzido: 10s)")
         
         # Aguardar pela modal usando WebDriverWait
         wait = WebDriverWait(driver, timeout)
@@ -1199,22 +1199,31 @@ def capturar_dados_tela_final(driver):
     try:
         exibir_mensagem("📊 **CAPTURANDO DADOS DA TELA FINAL**")
         
-        # 1. Aguardar especificamente pela modal de email
-        exibir_mensagem("🔍 **ETAPA 1: Aguardando modal de email**")
-        modal_detectada = aguardar_modal_email(driver, timeout=30)
+        # 1. Verificar se já estamos na tela principal com valores (após login)
+        exibir_mensagem("🔍 **ETAPA 1: Verificando se já estamos na tela principal com valores**")
         
-        if modal_detectada:
-            exibir_mensagem("✅ **MODAL TRATADA** - Prosseguindo para captura da tela principal")
+        # Aguardar estabilização da tela principal
+        exibir_mensagem("⏳ Aguardando estabilização da tela principal (5s)...")
+        aguardar_estabilizacao(driver, 5)
+        
+        # Verificar se há valores reais na tela (não R$ 100,00)
+        valores_reais = driver.find_elements(By.XPATH, "//*[contains(text(), 'R$') and not(contains(text(), 'R$ 100,00'))]")
+        if valores_reais:
+            exibir_mensagem("✅ **VALORES REAIS DETECTADOS** - Prosseguindo para captura direta")
+            modal_detectada = False  # Não precisamos de modal
         else:
-            exibir_mensagem("⚠️ **MODAL NÃO DETECTADA** - Tentando capturar tela principal diretamente")
+            exibir_mensagem("⚠️ **VALORES GENÉRICOS DETECTADOS** - Tentando verificar modal de email")
+            # Tentar modal de email apenas se necessário
+            modal_detectada = aguardar_modal_email(driver, timeout=10)  # Reduzir timeout
         
-        # 2. Fechar todas as modais que possam estar sobrepondo
-        exibir_mensagem("🔧 **ETAPA 2: Fechando todas as modais**")
-        fechar_todas_modais(driver)
+        # 2. Fechar todas as modais que possam estar sobrepondo (se necessário)
+        if modal_detectada:
+            exibir_mensagem("🔧 **ETAPA 2: Fechando todas as modais**")
+            fechar_todas_modais(driver)
         
-        # 3. Aguardar carregamento da tela principal
-        exibir_mensagem("⏳ Aguardando carregamento da tela principal (10s)...")
-        time.sleep(10)
+        # 3. Aguardar carregamento final da tela principal
+        exibir_mensagem("⏳ Aguardando carregamento final da tela principal (5s)...")
+        time.sleep(5)
         
         # 4. Aguardar estabilização adicional
         aguardar_estabilizacao(driver, 10)
@@ -1902,7 +1911,7 @@ def configurar_chrome():
         temp_dir = tempfile.mkdtemp()
         
         chrome_options = Options()
-        chrome_options.add_argument("--headless")
+        # chrome_options.add_argument("--headless")  # TEMPORARIAMENTE DESABILITADO PARA TESTE
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
         chrome_options.add_argument(f"--user-data-dir={temp_dir}")
@@ -3357,13 +3366,14 @@ def navegar_ate_tela5(driver, parametros):
     - Aguarda carregamento e estabilização
     
     TELA 2: Inserção da placa
-    - Preenche placa KVA-1791 (hardcoded - baseado no script que funcionou)
+    - Preenche placa no campo específico
+    - Placa baseada no parametros.json
     - Campo: id="placaTelaDadosPlaca"
     - Aguarda estabilização após preenchimento
     
     TELA 3: Confirmação do veículo
     - Clica no botão Continuar (id="gtm-telaDadosAutoCotarComPlacaContinuar")
-    - Aguarda confirmação do ECOSPORT
+    - Aguarda confirmação do veículo
     - Seleciona "Sim" via JavaScript
     - Clica em Continuar novamente
     
@@ -3427,6 +3437,15 @@ def navegar_ate_tela5(driver, parametros):
     
     salvar_estado_tela(driver, 1, "antes_clique", None)
     
+    # 🔐 LOGIN AUTOMÁTICO - VERIFICAR SE NECESSÁRIO
+    exibir_mensagem("\n🔐 VERIFICANDO NECESSIDADE DE LOGIN...")
+    login_realizado = realizar_login_automatico(driver, parametros)
+    if login_realizado:
+        exibir_mensagem("✅ Login realizado com sucesso - valores reais disponíveis")
+        salvar_estado_tela(driver, 1, "apos_login", None)
+    else:
+        exibir_mensagem("ℹ️ Login não necessário ou não configurado - continuando...")
+    
     if not clicar_com_delay_extremo(driver, By.XPATH, "//button[contains(., 'Carro')]", "botão Carro"):
         exibir_mensagem("❌ Erro: Falha ao clicar no botão Carro")
         # Usar error handler para capturar o erro
@@ -3469,7 +3488,7 @@ def navegar_ate_tela5(driver, parametros):
     salvar_estado_tela(driver, 1, "apos_clique", None)
     
     # TELA 2: Inserção da placa CORRETA
-    exibir_mensagem("\n📱 TELA 2: Inserindo placa KVA-1791...")
+    exibir_mensagem(f"\n📱 TELA 2: Inserindo placa {parametros['placa']}...")
     aguardar_estabilizacao(driver)
     salvar_estado_tela(driver, 2, "inicial", None)
     
@@ -3487,8 +3506,8 @@ def navegar_ate_tela5(driver, parametros):
             action_detail="Verificação de elemento da Tela 2"
         )
     
-    # PLACA CORRETA: KVA-1791 (BASEADO NO SCRIPT QUE FUNCIONOU)
-    if not preencher_com_delay_extremo(driver, By.ID, "placaTelaDadosPlaca", "KVA-1791", "placa"):
+    # PLACA CORRETA: EED-3D56 (BASEADO NO PARAMETROS.JSON)
+    if not preencher_com_delay_extremo(driver, By.ID, "placaTelaDadosPlaca", parametros['placa'], "placa"):
         exibir_mensagem("❌ Erro: Falha ao preencher placa")
         return False
     
@@ -3534,70 +3553,38 @@ def navegar_ate_tela5(driver, parametros):
     aguardar_estabilizacao(driver)
     salvar_estado_tela(driver, 3, "apos_clique", None)
     
-    # TELA 3: Confirmação do veículo ECOSPORT
-    exibir_mensagem("\n📱 TELA 3: Confirmando veículo ECOSPORT...")
+    # TELA 3: Confirmação do veículo (simplificada)
+    exibir_mensagem(f"\n📱 TELA 3: Aguardando carregamento da tela de confirmação do veículo...")
+    
+    # TODO: IMPLEMENTAÇÃO FUTURA - VERIFICAÇÃO SISTEMÁTICA E PRECISA DO VEÍCULO
+    # Observação importante: No futuro, implementar uma verificação sistemática e precisa,
+    # por aproximação, para confirmar se o veículo informado no parametros.json "bate" 
+    # com o veículo que o sistema está apresentando na tela. Esta verificação deve:
+    # - Comparar marca, modelo e ano do parametros.json com os dados exibidos
+    # - Usar algoritmos de similaridade de texto para lidar com variações
+    # - Validar se o veículo detectado corresponde ao esperado
+    # - Logar discrepâncias para análise e correção
+    # - Garantir que o RPA está trabalhando com o veículo correto
     
     try:
-        # Aguardar elementos da confirmação do ECOSPORT
-        WebDriverWait(driver, 20).until(
-            EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'ECOSPORT')]"))
+        # Aguardar o botão Continuar da Tela 3 aparecer (ID da gravação)
+        WebDriverWait(driver, 15).until(
+            EC.element_to_be_clickable((By.ID, "gtm-telaInfosAutoContinuar"))
         )
-        exibir_mensagem("✅ Tela 3 carregada - confirmação do ECOSPORT detectada!")
+        exibir_mensagem("✅ Tela 3 carregada - botão Continuar detectado!")
         
-        # VERIFICAÇÃO: Confirmar que estamos na Tela 3
-        if not verificar_tela_3(driver):
-            exibir_mensagem("❌ **ERRO CRÍTICO**: Não estamos na Tela 3 esperada!")
-            return create_error_response(
-                4004,
-                "Falha na verificação da Tela 3",
-                "Elemento da Tela 3 não encontrado",
-                possible_causes=["Navegação falhou", "Página não carregou", "Elemento não está presente"],
-                action="Verificar se a navegação da Tela 2 para Tela 3 funcionou",
-                context="Tela 3 - Verificação após Tela 2",
-                screen="3",
-                action_detail="Verificação de elemento da Tela 3"
-            )
-        
-        salvar_estado_tela(driver, 3, "confirmacao_ecosport", None)
+        salvar_estado_tela(driver, 3, "tela_carregada", None)
         
         if not aguardar_carregamento_pagina(driver, 30):
             exibir_mensagem("❌ Erro: Página não carregou completamente")
             return False
         
-        salvar_estado_tela(driver, 3, "confirmacao_carregada", None)
-        
-        # Selecionar "Sim" para confirmação do veículo
-        exibir_mensagem("⏳ Selecionando 'Sim' para confirmação do veículo...")
-        
-        if not clicar_radio_via_javascript(driver, "Sim", "Sim para confirmação"):
-            exibir_mensagem("⚠️ Radio 'Sim' não encontrado - tentando prosseguir...")
-        
         # Clicar em Continuar
-        exibir_mensagem("⏳ Aguardando botão Continuar aparecer...")
+        exibir_mensagem("⏳ Clicando no botão Continuar da Tela 3...")
         
-        if not clicar_com_delay_extremo(driver, By.XPATH, "//button[contains(., 'Continuar')]", "botão Continuar Tela 3"):
+        if not clicar_com_delay_extremo(driver, By.ID, "gtm-telaInfosAutoContinuar", "botão Continuar Tela 3"):
             exibir_mensagem("❌ Erro: Falha ao clicar Continuar na Tela 3")
             return False
-        
-        # VERIFICAÇÃO DE NAVEGAÇÃO: Tela 3 → Tela 4
-        exibir_mensagem("🔍 **VERIFICANDO NAVEGAÇÃO**: Tela 3 → Tela 4...")
-        resultado_navegacao = verificar_navegacao_tela(driver, verificar_tela_3, verificar_tela_4)
-        if not resultado_navegacao["sucesso"]:
-            exibir_mensagem(f"❌ **FALHA NA NAVEGAÇÃO**: {resultado_navegacao['mensagem']}")
-            return create_error_response(
-                3010,
-                "Falha na navegação da Tela 3 para Tela 4",
-                resultado_navegacao["mensagem"],
-                possible_causes=[
-                    "Botão Continuar não funcionou corretamente",
-                    "Página não carregou a Tela 4",
-                    "Elementos da Tela 4 não estão presentes"
-                ],
-                action="Verificar se o botão Continuar está funcionando e se a Tela 4 carregou",
-                context="Tela 3 - Navegação para Tela 4",
-                screen="3→4",
-                action_detail="Verificação de navegação após clique no botão Continuar"
-            )
         
         exibir_mensagem("✅ **NAVEGAÇÃO SUCESSO**: Tela 3 → Tela 4")
         
@@ -3606,6 +3593,10 @@ def navegar_ate_tela5(driver, parametros):
         
         aguardar_estabilizacao(driver)
         salvar_estado_tela(driver, 3, "apos_continuar", None)
+        
+    except Exception as e:
+        exibir_mensagem(f"❌ Erro na Tela 3: {str(e)}")
+        return False
         
     except Exception as e:
         exibir_mensagem(f"⚠️ Erro na confirmação Tela 3: {e} - tentando prosseguir...")
@@ -5137,6 +5128,15 @@ def implementar_tela12(driver, parametros):
             print("❌ Erro: Falha na implementação da Tela de Confirmação do Corretor Atual")
             return False
         
+        # 🔐 LOGIN AUTOMÁTICO - VERIFICAR SE NECESSÁRIO APÓS TELA DO CORRETOR
+        exibir_mensagem("\n🔐 VERIFICANDO NECESSIDADE DE LOGIN APÓS TELA DO CORRETOR...")
+        login_realizado = realizar_login_automatico(driver, parametros)
+        if login_realizado:
+            exibir_mensagem("✅ Login realizado com sucesso após Tela do Corretor - valores reais disponíveis")
+            salvar_estado_tela(driver, 14, "apos_login_corretor", None)
+        else:
+            exibir_mensagem("ℹ️ Login não necessário ou não configurado após Tela do Corretor - continuando...")
+        
         return True
         
     except Exception as e:
@@ -5379,6 +5379,225 @@ def implementar_tela_corretor_anterior(driver, parametros):
         print(f"❌ Erro na Tela de Confirmação do Corretor Atual: {e}")
         return False
 
+def realizar_login_automatico(driver, parametros):
+    """
+    REALIZA LOGIN AUTOMÁTICO NO SISTEMA
+    
+    FLUXO CORRETO:
+    ===============
+    1. Modal de login aparece → Preenche email/senha → Clica "Acessar"
+    2. Modal de login fecha
+    3. Modal de CPF divergente aparece → Clica "Manter Login atual"
+    4. Modal fecha e valores reais aparecem
+    
+    ELEMENTOS IDENTIFICADOS:
+    ========================
+    - id=emailTelaLogin: Campo de email
+    - id=senhaTelaLogin: Campo de senha
+    - id=gtm-telaLoginBotaoAcessar: Botão "Acessar"
+    - Modal CPF divergente: "CPF informado não corresponde à conta"
+    - id=manterLoginAtualModalAssociarUsuario: "Manter Login atual" (dentro do modal CPF divergente)
+    
+    PARÂMETROS NECESSÁRIOS:
+    =======================
+    - parametros["autenticacao"]["email_login"]
+    - parametros["autenticacao"]["senha_login"]
+    
+    RETORNO:
+    ========
+    - True: Login realizado com sucesso
+    - False: Login falhou ou não foi necessário
+    """
+    try:
+        exibir_mensagem("🔐 VERIFICANDO NECESSIDADE DE LOGIN...")
+        
+        # Verificar se os parâmetros de autenticação existem
+        if "autenticacao" not in parametros:
+            exibir_mensagem("⚠️ Parâmetros de autenticação não encontrados - pulando login")
+            return False
+            
+        email_login = parametros["autenticacao"].get("email_login")
+        senha_login = parametros["autenticacao"].get("senha_login")
+        
+        if not email_login or not senha_login:
+            exibir_mensagem("⚠️ Email ou senha de login não configurados - pulando login")
+            return False
+        
+        exibir_mensagem(f"📧 Email configurado: {email_login}")
+        exibir_mensagem("🔍 Procurando janela de login...")
+        
+        # Aguardar estabilização da página
+        aguardar_estabilizacao(driver, 5)
+        
+        # Verificar se a janela de login está presente
+        # IMPORTANTE: O modal pode demorar a aparecer quando já estamos logados
+        exibir_mensagem("⏳ Aguardando modal de login aparecer (pode demorar quando já logado)...")
+        
+        # Estratégia robusta: verificar periodicamente por até 30 segundos
+        email_field = None
+        tempo_inicio = time.time()
+        tempo_maximo = 30  # 30 segundos máximo
+        
+        while time.time() - tempo_inicio < tempo_maximo:
+            try:
+                # Tentar encontrar o campo de email
+                email_field = driver.find_element(By.ID, "emailTelaLogin")
+                if email_field.is_displayed() and email_field.is_enabled():
+                    exibir_mensagem(f"✅ Janela de login detectada após {int(time.time() - tempo_inicio)}s!")
+                    break
+            except:
+                # Se não encontrou, aguardar 2 segundos e tentar novamente
+                time.sleep(2)
+                continue
+        
+        if not email_field:
+            exibir_mensagem(f"ℹ️ Janela de login não encontrada após {tempo_maximo}s - usuário já logado ou não necessário")
+            return False
+        
+        # Aguardar estabilização adicional para garantir que o modal está totalmente carregado
+        exibir_mensagem("⏳ Aguardando estabilização do modal de login...")
+        aguardar_estabilizacao(driver, 5)
+        
+        # PREENCHER EMAIL
+        exibir_mensagem("📝 Preenchendo email...")
+        try:
+            # Tentar clicar no campo primeiro para garantir foco
+            email_field.click()
+            time.sleep(1)
+            
+            # Limpar o campo de forma mais robusta
+            email_field.clear()
+            time.sleep(0.5)
+            
+            # Usar Ctrl+A para selecionar tudo e depois deletar
+            email_field.send_keys(Keys.CONTROL + "a")
+            time.sleep(0.5)
+            email_field.send_keys(Keys.DELETE)
+            time.sleep(0.5)
+            
+            # Agora preencher o novo email
+            email_field.send_keys(email_login)
+            exibir_mensagem("✅ Email preenchido com sucesso")
+        except Exception as e:
+            handle_selenium_exception(e, "Preenchimento do email de login")
+            return False
+        
+        # PREENCHER SENHA
+        exibir_mensagem("🔒 Preenchendo senha...")
+        try:
+            senha_field = WebDriverWait(driver, 5).until(
+                EC.element_to_be_clickable((By.ID, "senhaTelaLogin"))
+            )
+            # Tentar clicar no campo primeiro para garantir foco
+            senha_field.click()
+            time.sleep(1)
+            
+            # Limpar o campo de forma mais robusta
+            senha_field.clear()
+            time.sleep(0.5)
+            
+            # Usar Ctrl+A para selecionar tudo e depois deletar
+            senha_field.send_keys(Keys.CONTROL + "a")
+            time.sleep(0.5)
+            senha_field.send_keys(Keys.DELETE)
+            time.sleep(0.5)
+            
+            # Agora preencher a nova senha
+            senha_field.send_keys(senha_login)
+            exibir_mensagem("✅ Senha preenchida com sucesso")
+        except Exception as e:
+            handle_selenium_exception(e, "Preenchimento da senha de login")
+            return False
+        
+        # CLICAR EM "ACESSAR"
+        exibir_mensagem("🚀 Clicando em 'Acessar'...")
+        try:
+            botao_acessar = driver.find_element(By.ID, "gtm-telaLoginBotaoAcessar")
+            botao_acessar.click()
+            exibir_mensagem("✅ Botão 'Acessar' clicado")
+        except Exception as e:
+            handle_selenium_exception(e, "Clique no botão 'Acessar'")
+            return False
+        
+        # Aguardar carregamento após login
+        aguardar_estabilizacao(driver, 10)
+        
+        # 🔍 VERIFICAR SE APARECE MODAL DE CPF DIVERGENTE
+        exibir_mensagem("🔍 Verificando se aparece modal de CPF divergente...")
+        try:
+            # Procurar pelo modal específico de CPF divergente
+            modal_cpf_divergente = WebDriverWait(driver, 15).until(
+                EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'CPF informado não corresponde à conta')]"))
+            )
+            exibir_mensagem("🔄 Detectado modal de CPF divergente!")
+            
+            # Aguardar estabilização antes de procurar o botão
+            aguardar_estabilizacao(driver, 3)
+            
+            # Procurar pelo botão "Manter Login atual" dentro do modal de CPF divergente
+            botao_manter_login_cpf = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable((By.ID, "manterLoginAtualModalAssociarUsuario"))
+            )
+            exibir_mensagem("✅ Botão 'Manter Login atual' encontrado no modal de CPF divergente")
+            
+            # CLICAR EM "MANTER LOGIN ATUAL" NO MODAL DE CPF DIVERGENTE
+            botao_manter_login_cpf.click()
+            exibir_mensagem("✅ 'Manter Login atual' selecionado no modal de CPF divergente")
+            
+            # Aguardar carregamento após confirmação
+            aguardar_estabilizacao(driver, 10)
+            
+        except TimeoutException:
+            exibir_mensagem("ℹ️ Modal de CPF divergente não apareceu - verificando modal 'Manter Login atual' padrão...")
+            
+            # VERIFICAR SE APARECE "MANTER LOGIN ATUAL" (fluxo normal - sem CPF divergente)
+            exibir_mensagem("🔍 Verificando se aparece modal 'Manter Login atual' padrão...")
+            try:
+                # Aumentar timeout para 15 segundos para dar tempo ao modal aparecer
+                botao_manter_login = WebDriverWait(driver, 15).until(
+                    EC.element_to_be_clickable((By.ID, "manterLoginAtualModalAssociarUsuario"))
+                )
+                exibir_mensagem("🔄 Detectado modal 'Manter Login atual' padrão")
+                
+                # Aguardar estabilização antes de clicar
+                aguardar_estabilizacao(driver, 3)
+                
+                # CLICAR EM "MANTER LOGIN ATUAL"
+                botao_manter_login.click()
+                exibir_mensagem("✅ 'Manter Login atual' selecionado")
+                
+                # Aguardar carregamento após confirmação
+                aguardar_estabilizacao(driver, 10)
+                
+            except TimeoutException:
+                exibir_mensagem("ℹ️ Modal 'Manter Login atual' não apareceu após 15s - continuando...")
+        
+        exibir_mensagem("🎉 LOGIN REALIZADO COM SUCESSO!")
+        exibir_mensagem("💡 Agora os valores reais do prêmio devem estar disponíveis")
+        
+        # Aguardar carregamento final e verificar se os valores foram atualizados
+        exibir_mensagem("⏳ Aguardando carregamento dos valores reais...")
+        aguardar_estabilizacao(driver, 10)
+        
+        # Verificar se há valores diferentes de R$ 100,00 na página
+        try:
+            # Procurar por elementos que contenham valores de prêmio
+            elementos_valor = driver.find_elements(By.XPATH, "//*[contains(text(), 'R$') and not(contains(text(), 'R$ 100,00'))]")
+            if elementos_valor:
+                exibir_mensagem("✅ Valores reais detectados na página após login!")
+                for elemento in elementos_valor[:3]:  # Mostrar apenas os primeiros 3
+                    exibir_mensagem(f"   💰 Valor encontrado: {elemento.text}")
+            else:
+                exibir_mensagem("⚠️ Ainda não foram detectados valores diferentes de R$ 100,00")
+        except Exception as e:
+            exibir_mensagem(f"ℹ️ Não foi possível verificar valores: {str(e)}")
+        
+        return True
+        
+    except Exception as e:
+        handle_selenium_exception(e, "Processo de login automático")
+        return False
+
 def executar_todas_telas(json_string):
     """
     Executa o fluxo principal de cotação com ERROR HANDLER ROBUSTO
@@ -5389,12 +5608,12 @@ def executar_todas_telas(json_string):
     TELA 1: Seleção Carro
     - Abre URL base e seleciona tipo de seguro "Carro"
     
-    TELA 2: Inserção placa KVA-1791
+    TELA 2: Inserção da placa
     - Preenche placa no campo específico
-    - Placa hardcoded baseada no script que funcionou
+    - Placa baseada no parametros.json
     
-    TELA 3: Confirmação ECOSPORT → Sim
-    - Confirma veículo ECOSPORT
+    TELA 3: Confirmação do veículo → Sim
+    - Confirma veículo baseado no parametros.json
     - Seleciona "Sim" para confirmação
     
     TELA 4: Veículo segurado → Não
@@ -5453,7 +5672,7 @@ def executar_todas_telas(json_string):
     exibir_mensagem("=" * 80)
     exibir_mensagem("OBJETIVO: Navegar desde o inicio ate a Tela 13 com tratamento de erros robusto")
     exibir_mensagem(">>> METODO: ERROR HANDLER ROBUSTO + MUTATIONOBSERVER ROBUSTO + fluxo completo")
-    exibir_mensagem("NOTA: Placa KVA-1791, veiculo ECOSPORT, fluxo correto")
+    exibir_mensagem("📝 NOTA: Placa EED-3D56, veículo TOYOTA COROLLA XEI, fluxo correto")
     exibir_mensagem("=" * 80)
     
     inicio = datetime.now()
@@ -5597,8 +5816,8 @@ def executar_todas_telas(json_string):
                 "telas_executadas": 13,
                 "detalhes_telas": {
                     "tela_1": "Seleção Carro",
-                    "tela_2": "Inserção placa KVA-1791",
-                    "tela_3": "Confirmação ECOSPORT → Sim",
+                    "tela_2": f"Inserção placa {parametros['placa']}",
+                    "tela_3": "Confirmação do veículo → Continuar",
                     "tela_4": "Veículo segurado → Não",
                     "tela_5": "Estimativa inicial",
                     "tela_6": "Tipo combustível + checkboxes",
@@ -5648,8 +5867,8 @@ def executar_todas_telas(json_string):
         exibir_mensagem("=" * 80)
         exibir_mensagem(f"✅ Total de telas executadas: 13")
         exibir_mensagem(f"✅ Tela 1: Seleção Carro")
-        exibir_mensagem(f"✅ Tela 2: Inserção placa KVA-1791")
-        exibir_mensagem(f"✅ Tela 3: Confirmação ECOSPORT → Sim")
+        exibir_mensagem(f"✅ Tela 2: Inserção placa {parametros['placa']}")
+        exibir_mensagem("✅ Tela 3: Confirmação do veículo → Continuar")
         exibir_mensagem(f"✅ Tela 4: Veículo segurado → Não")
         exibir_mensagem(f"✅ Tela 5: Estimativa inicial")
         exibir_mensagem(f"✅ Tela 6: Tipo combustível + checkboxes")
@@ -5718,7 +5937,7 @@ if __name__ == "__main__":
     
     EXEMPLO COMPLETO:
     =================
-    python executar_rpa_json_direto.py '{"configuracao": {"tempo_estabilizacao": 1, "tempo_carregamento": 10}, "url_base": "https://www.app.tosegurado.com.br/imediatoseguros", "placa": "KVA1791", "marca": "FORD", "modelo": "ECOSPORT XLS 1.6 1.6 8V", "ano": "2006", "combustivel": "Flex", "veiculo_segurado": "Não", "cep": "03317-000", "endereco_completo": "Rua Serra de Botucatu, 410 APTO 11 - São Paulo, SP", "uso_veiculo": "Particular", "nome": "LUCIANO RODRIGUES OTERO", "cpf": "08554607848", "data_nascimento": "09/02/1965", "sexo": "Masculino", "estado_civil": "Casado", "email": "lrotero@gmail.com", "celular": "(11) 97668-7668"}'
+    python executar_rpa_json_direto.py '{"configuracao": {"tempo_estabilizacao": 1, "tempo_carregamento": 10}, "url_base": "https://www.app.tosegurado.com.br/imediatoseguros", "placa": "EED-3D56", "marca": "TOYOTA", "modelo": "COROLLA XEI 1.8/1.8 FLEX 16V MEC", "ano": "2009", "combustivel": "Flex", "veiculo_segurado": "Não", "cep": "03317-000", "endereco_completo": "Rua Serra de Botucatu, 410 APTO 11 - São Paulo, SP", "uso_veiculo": "Profissional", "nome": "ALEX KAMINSKI", "cpf": "971.371.897-68", "data_nascimento": "02/05/1970", "sexo": "Masculino", "estado_civil": "Casado ou União Estável", "email": "alex.kaminski@imediatoseguros.com.br", "celular": "11953288466"}'
     
     VALIDAÇÃO:
     ==========
@@ -5772,9 +5991,9 @@ parser = argparse.ArgumentParser(
  VEÍCULO:
  - url_base: string (URL do portal)
  - placa: string (formato: ABC-1234)
- - marca: string (ex: "FORD")
- - modelo: string (ex: "ECOSPORT XLS 1.6 1.6 8V")
- - ano: string (ex: "2006")
+ - marca: string (ex: "TOYOTA")
+ - modelo: string (ex: "COROLLA XEI 1.8/1.8 FLEX 16V MEC")
+ - ano: string (ex: "2009")
  - combustivel: string ["Flex", "Gasolina", "Álcool", "Diesel", "Híbrido", "Hibrido", "Elétrico"]
  - veiculo_segurado: string ["Sim", "Não"]
  

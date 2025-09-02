@@ -1,0 +1,10 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"github-actions.remote-name": "imediatoseguros-rpa"
+	}
+}
