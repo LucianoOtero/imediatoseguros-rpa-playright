@@ -1,270 +1,386 @@
 #!/usr/bin/env python3
 """
-Módulo de Retorno Estruturado para RPA Tô Segurado
-===================================================
+SISTEMA DE RETORNO ESTRUTURADO
+==============================
 
-Este módulo implementa funções para criar retornos estruturados
-padronizados para frontend/API, incluindo códigos de erro e sucesso.
+Módulo para criação de retornos estruturados padronizados
+com códigos de status, logs, erros e warnings organizados.
 
-VERSÃO: 2.4.0
-DATA: 29/08/2025
+VERSÃO: 3.0.0
+DATA: 2025-09-02
+AUTOR: Luciano Otero
 """
 
 import json
-import time
 from datetime import datetime
-import os
+from typing import Dict, Any
+from .codigos_retorno import obter_mensagem_codigo, validar_codigo
 
-def criar_retorno_estruturado(status, codigo_erro=None, dados_extras=None, logs_recentes=None):
+
+# ========================================
+# CLASSE RETORNO ESTRUTURADO
+# ========================================
+
+class RetornoEstruturado:
     """
-    Cria um retorno estruturado para o frontend com códigos de sucesso/erro padronizados
-
-    Args:
-        status: 'sucesso' ou 'erro'
-        codigo_erro: Código de erro da tabela (1000-9999)
-        dados_extras: Dicionário com dados adicionais
-        logs_recentes: Lista de logs recentes para incluir no retorno
-
-    Returns:
-        Dicionário estruturado com retorno completo
+    Classe para criação de retornos estruturados padronizados
     """
 
-    # Códigos de sucesso e mensagens
-    CODIGOS_SUCESSO = {
-        9001: "Tela executada com sucesso",
-        9002: "RPA executado com sucesso",
-        9003: "Elemento encontrado e processado",
-        9004: "Ação realizada com sucesso"
+    def __init__(self, versao: str = "3.0.0", sistema: str = "RPA Tô Segurado - Playwright"):
+        self.versao = versao
+        self.sistema = sistema
+        self.status = None
+        self.codigo = None
+        self.mensagem = None
+        self.timestamp = datetime.now().isoformat()
+        self.tempo_execucao = None
+        self.dados = {}
+        self.logs = []
+        self.erros = []
+        self.warnings = []
+
+    def definir_sucesso(self, codigo: int, mensagem: str = None):
+        """Define o retorno como sucesso"""
+        if not validar_codigo(codigo):
+            raise ValueError(f"Código {codigo} inválido")
+        
+        self.status = "success"
+        self.codigo = codigo
+        self.mensagem = mensagem or obter_mensagem_codigo(codigo)
+
+    def definir_erro(self, codigo: int, mensagem: str = None):
+        """Define o retorno como erro"""
+        if not validar_codigo(codigo):
+            raise ValueError(f"Código {codigo} inválido")
+        
+        self.status = "error"
+        self.codigo = codigo
+        self.mensagem = mensagem or obter_mensagem_codigo(codigo)
+
+    def definir_warning(self, codigo: int, mensagem: str = None):
+        """Define o retorno como warning"""
+        if not validar_codigo(codigo):
+            raise ValueError(f"Código {codigo} inválido")
+        
+        self.status = "warning"
+        self.codigo = codigo
+        self.mensagem = mensagem or obter_mensagem_codigo(codigo)
+
+    def adicionar_dados(self, chave: str, valor: Any):
+        """Adiciona dados ao retorno"""
+        self.dados[chave] = valor
+
+    def adicionar_log(self, mensagem: str, nivel: str = "INFO", timestamp: str = None):
+        """Adiciona um log ao retorno"""
+        self.logs.append({
+            "timestamp": timestamp or datetime.now().isoformat(),
+            "nivel": nivel,
+            "mensagem": mensagem
+        })
+
+    def adicionar_erro(self, erro: Dict[str, Any]):
+        """Adiciona um erro ao retorno"""
+        self.erros.append(erro)
+
+    def adicionar_warning(self, warning: Dict[str, Any]):
+        """Adiciona um warning ao retorno"""
+        self.warnings.append(warning)
+
+    def adicionar_logs_do_exception_handler(self, exception_handler):
+        """Adiciona logs do exception handler"""
+        if hasattr(exception_handler, 'obter_resumo_erros'):
+            resumo = exception_handler.obter_resumo_erros()
+            if 'erros' in resumo:
+                for erro in resumo['erros']:
+                    self.adicionar_erro(erro)
+            if 'warnings' in resumo:
+                for warning in resumo['warnings']:
+                    self.adicionar_warning(warning)
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Converte para dicionário"""
+        return {
+            "status": self.status,
+            "codigo": self.codigo,
+            "mensagem": self.mensagem,
+            "timestamp": self.timestamp,
+            "tempo_execucao": self.tempo_execucao,
+            "versao": self.versao,
+            "sistema": self.sistema,
+            "dados": self.dados,
+            "logs": self.logs,
+            "erros": {
+                "total_erros": len(self.erros),
+                "total_warnings": len(self.warnings),
+                "erros": self.erros,
+                "warnings": self.warnings
+            }
+        }
+
+    def to_json(self, indent: int = 2, ensure_ascii: bool = False) -> str:
+        """Converte para JSON string"""
+        return json.dumps(self.to_dict(), indent=indent, ensure_ascii=ensure_ascii)
+
+    def validar_estrutura(self) -> bool:
+        """Valida se a estrutura está correta"""
+        if not self.status or not self.codigo or not self.mensagem:
+            return False
+        return True
+
+    def obter_resumo(self) -> Dict[str, Any]:
+        """Obtém um resumo do retorno"""
+        return {
+            "status": self.status,
+            "codigo": self.codigo,
+            "mensagem": self.mensagem,
+            "total_logs": len(self.logs),
+            "total_erros": len(self.erros),
+            "total_warnings": len(self.warnings),
+            "total_dados": len(self.dados)
+        }
+
+    def limpar_logs(self):
+        """Limpa todos os logs"""
+        self.logs = []
+
+    def limpar_erros(self):
+        """Limpa todos os erros"""
+        self.erros = []
+
+    def limpar_warnings(self):
+        """Limpa todos os warnings"""
+        self.warnings = []
+
+    def limpar_dados(self):
+        """Limpa todos os dados"""
+        self.dados = {}
+
+    def limpar_tudo(self):
+        """Limpa logs, erros, warnings e dados"""
+        self.limpar_logs()
+        self.limpar_erros()
+        self.limpar_warnings()
+        self.limpar_dados()
+
+
+# ========================================
+# FUNÇÕES AUXILIARES
+# ========================================
+
+def criar_retorno_sucesso(
+    telas_executadas: Dict[str, bool],
+    dados_planos: Dict[str, Any],
+    arquivo_dados: str,
+    tempo_execucao: float,
+    parametros: Dict[str, Any]
+) -> Dict[str, Any]:
+    """
+    Cria um retorno de sucesso estruturado
+    
+    PARÂMETROS:
+        telas_executadas: Dict[str, bool] - Status das telas executadas
+        dados_planos: Dict[str, Any] - Dados dos planos capturados
+        arquivo_dados: str - Nome do arquivo salvo
+        tempo_execucao: float - Tempo de execução em segundos
+        parametros: Dict[str, Any] - Parâmetros de entrada
+        
+    RETORNO:
+        Dict[str, Any]: Retorno estruturado de sucesso
+    """
+    retorno = RetornoEstruturado()
+    
+    # Definir sucesso
+    retorno.definir_sucesso(9002, "RPA executado com sucesso - Todas as telas")
+    
+    # Adicionar dados
+    retorno.adicionar_dados("telas_executadas", telas_executadas)
+    retorno.adicionar_dados("dados_planos", dados_planos)
+    retorno.adicionar_dados("arquivo_dados", arquivo_dados)
+    retorno.adicionar_dados("parametros_entrada", parametros)
+    
+    # Definir tempo de execução
+    retorno.tempo_execucao = tempo_execucao
+    
+    return retorno.to_dict()
+
+
+def criar_retorno_erro(
+    erro: str,
+    tela_falhou: str,
+    tempo_execucao: float,
+    parametros: Dict[str, Any],
+    exception_handler
+) -> Dict[str, Any]:
+    """
+    Cria um retorno de erro estruturado
+    
+    PARÂMETROS:
+        erro: str - Mensagem de erro
+        tela_falhou: str - Nome da tela que falhou
+        tempo_execucao: float - Tempo de execução em segundos
+        parametros: Dict[str, Any] - Parâmetros de entrada
+        exception_handler: ExceptionHandler - Handler de exceções
+        
+    RETORNO:
+        Dict[str, Any]: Retorno estruturado de erro
+    """
+    retorno = RetornoEstruturado()
+    
+    # Definir erro
+    retorno.definir_erro(9102, f"Erro na navegação - {erro}")
+    
+    # Adicionar dados
+    retorno.adicionar_dados("tela_falhou", tela_falhou)
+    retorno.adicionar_dados("parametros_entrada", parametros)
+    
+    # Adicionar logs do exception handler
+    retorno.adicionar_logs_do_exception_handler(exception_handler)
+    
+    # Definir tempo de execução
+    retorno.tempo_execucao = tempo_execucao
+    
+    return retorno.to_dict()
+
+
+def criar_retorno_warning(
+    warning: str,
+    tela: str,
+    tempo_execucao: float,
+    parametros: Dict[str, Any],
+    exception_handler
+) -> Dict[str, Any]:
+    """
+    Cria um retorno de warning estruturado
+    
+    PARÂMETROS:
+        warning: str - Mensagem de warning
+        tela: str - Nome da tela
+        tempo_execucao: float - Tempo de execução em segundos
+        parametros: Dict[str, Any] - Parâmetros de entrada
+        exception_handler: ExceptionHandler - Handler de exceções
+        
+    RETORNO:
+        Dict[str, Any]: Retorno estruturado de warning
+    """
+    retorno = RetornoEstruturado()
+    
+    # Definir warning
+    retorno.definir_warning(9201, f"Warning - {warning}")
+    
+    # Adicionar dados
+    retorno.adicionar_dados("tela", tela)
+    retorno.adicionar_dados("parametros_entrada", parametros)
+    
+    # Adicionar logs do exception handler
+    retorno.adicionar_logs_do_exception_handler(exception_handler)
+    
+    # Definir tempo de execução
+    retorno.tempo_execucao = tempo_execucao
+    
+    return retorno.to_dict()
+
+
+def validar_retorno_estruturado(retorno: Dict[str, Any]) -> bool:
+    """
+    Valida se um retorno está estruturado corretamente
+    
+    PARÂMETROS:
+        retorno: Dict[str, Any] - Retorno a ser validado
+        
+    RETORNO:
+        bool: True se válido, False caso contrário
+    """
+    campos_obrigatorios = [
+        "status", "codigo", "mensagem", "timestamp", "versao", "sistema"
+    ]
+    
+    # Verificar campos obrigatórios
+    for campo in campos_obrigatorios:
+        if campo not in retorno:
+            return False
+    
+    # Validar tipos
+    if not isinstance(retorno["status"], str):
+        return False
+    
+    if not isinstance(retorno["codigo"], int):
+        return False
+    
+    # Validar valores permitidos
+    if retorno["status"] not in ["success", "error", "warning"]:
+        return False
+    
+    return True
+
+
+def obter_resumo_retorno(retorno: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Obtém um resumo do retorno estruturado
+    
+    PARÂMETROS:
+        retorno: Dict[str, Any] - Retorno estruturado
+        
+    RETORNO:
+        Dict[str, Any]: Resumo com estatísticas
+    """
+    if not validar_retorno_estruturado(retorno):
+        return {"erro": "Retorno inválido"}
+    
+    dados = retorno.get("dados", {})
+    erros = retorno.get("erros", {})
+    
+    return {
+        "status": retorno["status"],
+        "codigo": retorno["codigo"],
+        "mensagem": retorno["mensagem"],
+        "total_logs": len(retorno.get("logs", [])),
+        "total_erros": erros.get("total_erros", 0),
+        "total_warnings": erros.get("total_warnings", 0),
+        "total_telas": len(dados.get("telas_executadas", {})),
+        "total_planos": len(dados.get("dados_planos", {}).get("planos", [])),
+        "tempo_execucao": retorno.get("tempo_execucao", "N/A")
     }
 
-    # Códigos de erro e mensagens compreensivas
-    CODIGOS_ERRO = {
-        # Erros de configuração (1000-1999)
-        1001: "Erro ao carregar arquivo de configuração - Verifique se o arquivo parametros.json existe e está válido",
-        1002: "Configuração inválida ou incompleta - Verifique a estrutura do arquivo de configuração",
-        1003: "Erro no ChromeDriver - Verifique se o ChromeDriver está instalado e acessível",
-        1004: "Erro ao inicializar navegador - Verifique as configurações do Chrome e permissões",
 
-        # Erros de navegação (2000-2999)
-        2001: "Timeout na navegação - A página demorou muito para carregar, verifique a conexão",
-        2002: "Elemento não encontrado na página - A estrutura da página pode ter mudado",
-        2003: "Elemento não está clicável - O elemento existe mas não pode ser interagido",
-        2004: "Página não carregou completamente - Aguarde mais tempo ou verifique a conexão",
-        2005: "Erro no redirecionamento - Problema na navegação entre páginas",
-
-        # Erros de automação (3000-3999)
-        3001: "Falha ao clicar no elemento - Elemento pode estar sobreposto ou não visível",
-        3002: "Falha ao inserir dados no campo - Campo pode estar desabilitado ou inválido",
-        3003: "Timeout aguardando elemento - Elemento não apareceu no tempo esperado",
-        3004: "Elemento obsoleto (stale) - A página foi recarregada, tente novamente",
-        3005: "Erro na execução de JavaScript - Problema na interação com a página",
-
-        # Erros de sistema (4000-4999)
-        4001: "Erro de conexão de rede - Verifique sua conexão com a internet",
-        4002: "Erro de memória insuficiente - Feche outros programas e tente novamente",
-        4003: "Erro de disco/arquivo - Verifique o espaço em disco e permissões",
-        4004: "Erro de permissão - Execute como administrador se necessário",
-
-        # Erros de validação (5000-5999)
-        5001: "Dados inválidos fornecidos - Verifique os dados de entrada",
-        5002: "Formato de dados incorreto - Verifique o formato dos dados",
-        5003: "Validação falhou - Dados não passaram na validação"
-    }
-
-    # Estrutura base do retorno
-    retorno = {
-        "status": status,
-        "timestamp": datetime.now().isoformat(),
-        "versao": "2.4.0",
-        "sistema": "RPA Tô Segurado"
-    }
-
-    if status == "sucesso":
-        # Retorno de sucesso
-        if codigo_erro and codigo_erro in CODIGOS_SUCESSO:
-            retorno.update({
-                "codigo": codigo_erro,
-                "mensagem": CODIGOS_SUCESSO[codigo_erro],
-                "tipo": "sucesso"
-            })
-        else:
-            retorno.update({
-                "codigo": 9002,
-                "mensagem": "RPA executado com sucesso",
-                "tipo": "sucesso"
-            })
-
-        # Adicionar dados extras se fornecidos
-        if dados_extras:
-            retorno["dados"] = dados_extras
-
-        # Adicionar logs recentes se solicitado
-        if logs_recentes:
-            retorno["logs"] = logs_recentes
-
+def converter_retorno_antigo_para_estruturado(
+    retorno_antigo: Dict[str, Any],
+    parametros: Dict[str, Any]
+) -> Dict[str, Any]:
+    """
+    Converte um retorno antigo para o formato estruturado
+    
+    PARÂMETROS:
+        retorno_antigo: Dict[str, Any] - Retorno no formato antigo
+        parametros: Dict[str, Any] - Parâmetros de entrada
+        
+    RETORNO:
+        Dict[str, Any]: Retorno no formato estruturado
+    """
+    retorno = RetornoEstruturado()
+    
+    # Determinar status e código baseado no retorno antigo
+    if retorno_antigo.get("status") == "success":
+        retorno.definir_sucesso(9002, "RPA executado com sucesso")
+    elif retorno_antigo.get("status") == "error":
+        erro_msg = retorno_antigo.get("erro", "Erro desconhecido")
+        retorno.definir_erro(9108, erro_msg)
     else:
-        # Retorno de erro
-        if codigo_erro and codigo_erro in CODIGOS_ERRO:
-            retorno.update({
-                "codigo": codigo_erro,
-                "mensagem": CODIGOS_ERRO[codigo_erro],
-                "tipo": "erro"
-            })
-        else:
-            retorno.update({
-                "codigo": 4001,
-                "mensagem": "Erro desconhecido durante a execução",
-                "tipo": "erro"
-            })
-
-        # Adicionar dados extras se fornecidos
-        if dados_extras:
-            retorno["dados"] = dados_extras
-
-    return retorno
-
-def criar_retorno_sucesso(mensagem: str, dados: dict = None):
-    """
-    Função de compatibilidade para criar retorno de sucesso
+        retorno.definir_warning(9201, "Status desconhecido")
     
-    Args:
-        mensagem: Mensagem de sucesso
-        dados: Dados adicionais
-        
-    Returns:
-        Dicionário com retorno de sucesso
-    """
-    dados_extras = {"mensagem": mensagem}
-    if dados:
-        dados_extras.update(dados)
+    # Adicionar dados do retorno antigo
+    if "telas_executadas" in retorno_antigo:
+        retorno.adicionar_dados("telas_executadas", retorno_antigo["telas_executadas"])
     
-    return criar_retorno_estruturado(
-        status="sucesso",
-        codigo_erro=9002,
-        dados_extras=dados_extras
-    )
-
-def criar_retorno_erro(codigo_erro: int, mensagem: str):
-    """
-    Função de compatibilidade para criar retorno de erro
+    if "dados_planos" in retorno_antigo:
+        retorno.adicionar_dados("dados_planos", retorno_antigo["dados_planos"])
     
-    Args:
-        codigo_erro: Código de erro
-        mensagem: Mensagem de erro
-        
-    Returns:
-        Dicionário com retorno de erro
-    """
-    dados_extras = {"mensagem": mensagem}
+    if "arquivo_dados" in retorno_antigo:
+        retorno.adicionar_dados("arquivo_dados", retorno_antigo["arquivo_dados"])
     
-    return criar_retorno_estruturado(
-        status="erro",
-        codigo_erro=codigo_erro,
-        dados_extras=dados_extras
-    )
-
-def obter_logs_recentes(max_linhas=10):
-    """
-    Obtém os logs mais recentes do arquivo de log
-
-    Args:
-        max_linhas: Número máximo de linhas de log a retornar
-
-    Returns:
-        Lista de logs recentes ou None se não disponível
-    """
-    try:
-        # Tentar obter logs do sistema de logging se disponível
-        try:
-            from utils.logger_rpa import rpa_logger
-            log_file = rpa_logger.get_log_file_path()
-            if log_file and os.path.exists(log_file):
-                with open(log_file, 'r', encoding='utf-8') as f:
-                    linhas = f.readlines()
-                    # Retornar as últimas linhas
-                    return [linha.strip() for linha in linhas[-max_linhas:]] if len(linhas) > max_linhas else [linha.strip() for linha in linhas]
-        except ImportError:
-            pass
-
-        # Fallback: procurar por arquivos de log comuns
-        arquivos_log = [
-            "rpa.log",
-            "logs/rpa.log",
-            "temp/rpa.log"
-        ]
-        
-        for arquivo in arquivos_log:
-            if os.path.exists(arquivo):
-                try:
-                    with open(arquivo, 'r', encoding='utf-8') as f:
-                        linhas = f.readlines()
-                        return [linha.strip() for linha in linhas[-max_linhas:]] if len(linhas) > max_linhas else [linha.strip() for linha in linhas]
-                except:
-                    continue
-
-        return None
-
-    except Exception:
-        return None
-
-def main():
-    """Função principal para teste do módulo"""
-    print("🧪 **TESTE DO MÓDULO DE RETORNO ESTRUTURADO**")
-    print("=" * 60)
+    if "tempo_execucao" in retorno_antigo:
+        retorno.adicionar_dados("tempo_execucao", retorno_antigo["tempo_execucao"])
     
-    # Teste 1: Retorno de sucesso
-    print("\n🟢 **TESTE 1: RETORNO DE SUCESSO**")
-    print("-" * 40)
+    # Adicionar parâmetros
+    retorno.adicionar_dados("parametros_entrada", parametros)
     
-    dados_extras = {
-        "telas_executadas": 8,
-        "tempo_execucao": "85.2s",
-        "placa_processada": "ABC1234",
-        "url_final": "https://www.app.tosegurado.com.br/cotacao/resultado"
-    }
-    
-    retorno_sucesso = criar_retorno_estruturado(
-        status="sucesso",
-        codigo_erro=9002,
-        dados_extras=dados_extras
-    )
-    
-    print("📤 JSON de retorno para o frontend:")
-    print(json.dumps(retorno_sucesso, indent=2, ensure_ascii=False))
-    
-    # Teste 2: Retorno de erro
-    print("\n🔴 **TESTE 2: RETORNO DE ERRO**")
-    print("-" * 40)
-    
-    dados_extras_erro = {
-        "tela_falhou": 6,
-        "elemento_nao_encontrado": "//button[contains(., 'Continuar')]",
-        "tentativas_realizadas": 3,
-        "ultimo_url": "https://www.app.tosegurado.com.br/cotacao/tela5"
-    }
-    
-    retorno_erro = criar_retorno_estruturado(
-        status="erro",
-        codigo_erro=2002,
-        dados_extras=dados_extras_erro
-    )
-    
-    print("📤 JSON de retorno para o frontend:")
-    print(json.dumps(retorno_erro, indent=2, ensure_ascii=False))
-    
-    # Teste 3: Obter logs recentes
-    print("\n📝 **TESTE 3: LOGS RECENTES**")
-    print("-" * 40)
-    
-    logs = obter_logs_recentes(5)
-    if logs:
-        print(f"✅ Logs encontrados: {len(logs)} linhas")
-        for i, log in enumerate(logs, 1):
-            print(f"   {i}: {log[:100]}...")
-    else:
-        print("⚠️ Nenhum log encontrado")
-    
-    print(f"\n⏰ Teste concluído em: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-
-if __name__ == "__main__":
-    main()
+    return retorno.to_dict()

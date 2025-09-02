@@ -26,6 +26,15 @@ from datetime import datetime
 from typing import Dict, Any, Optional, Union
 from playwright.sync_api import sync_playwright, Page, Browser, BrowserContext
 
+# Importar Sistema de Retorno Estruturado
+from utils.retorno_estruturado import (
+    RetornoEstruturado,
+    criar_retorno_sucesso,
+    criar_retorno_erro,
+    criar_retorno_warning,
+    validar_retorno_estruturado
+)
+
 # ========================================
 # SISTEMA DE EXCEPTION HANDLER
 # ========================================
@@ -2355,14 +2364,13 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             else:
                 resultado_telas["tela_1"] = False
                 exibir_mensagem("❌ TELA 1 FALHOU!")
-                return {
-                    "status": "error",
-                    "timestamp": datetime.now().isoformat(),
-                    "tempo_execucao": f"{time.time() - inicio_execucao:.2f}s",
-                    "erro": "Tela 1 falhou",
-                    "erros": exception_handler.obter_resumo_erros(),
-                    "parametros_entrada": parametros
-                }
+                return criar_retorno_erro(
+                    "Tela 1 falhou",
+                    "TELA_1",
+                    time.time() - inicio_execucao,
+                    parametros,
+                    exception_handler
+                )
             
             # TELA 2
             exibir_mensagem("\n" + "="*50)
@@ -2373,14 +2381,13 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             else:
                 resultado_telas["tela_2"] = False
                 exibir_mensagem("❌ TELA 2 FALHOU!")
-                return {
-                    "status": "error",
-                    "timestamp": datetime.now().isoformat(),
-                    "tempo_execucao": f"{time.time() - inicio_execucao:.2f}s",
-                    "erro": "Tela 2 falhou",
-                    "erros": exception_handler.obter_resumo_erros(),
-                    "parametros_entrada": parametros
-                }
+                return criar_retorno_erro(
+                    "Tela 2 falhou",
+                    "TELA_2",
+                    time.time() - inicio_execucao,
+                    parametros,
+                    exception_handler
+                )
             
             # TELA 3
             exibir_mensagem("\n" + "="*50)
@@ -2391,14 +2398,13 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             else:
                 resultado_telas["tela_3"] = False
                 exibir_mensagem("❌ TELA 3 FALHOU!")
-                return {
-                    "status": "error",
-                    "timestamp": datetime.now().isoformat(),
-                    "tempo_execucao": f"{time.time() - inicio_execucao:.2f}s",
-                    "erro": "Tela 3 falhou",
-                    "erros": exception_handler.obter_resumo_erros(),
-                    "parametros_entrada": parametros
-                }
+                return criar_retorno_erro(
+                    "Tela 3 falhou",
+                    "TELA_3",
+                    time.time() - inicio_execucao,
+                    parametros,
+                    exception_handler
+                )
             
             # TELA 4
             exibir_mensagem("\n" + "="*50)
@@ -2409,14 +2415,13 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             else:
                 resultado_telas["tela_4"] = False
                 exibir_mensagem("❌ TELA 4 FALHOU!")
-                return {
-                    "status": "error",
-                    "timestamp": datetime.now().isoformat(),
-                    "tempo_execucao": f"{time.time() - inicio_execucao:.2f}s",
-                    "erro": "Tela 4 falhou",
-                    "erros": exception_handler.obter_resumo_erros(),
-                    "parametros_entrada": parametros
-                }
+                return criar_retorno_erro(
+                    "Tela 4 falhou",
+                    "TELA_4",
+                    time.time() - inicio_execucao,
+                    parametros,
+                    exception_handler
+                )
             
             # TELA 5
             exibir_mensagem("\n" + "="*50)
@@ -2427,14 +2432,13 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             else:
                 resultado_telas["tela_5"] = False
                 exibir_mensagem("❌ TELA 5 FALHOU!")
-                return {
-                    "status": "error",
-                    "timestamp": datetime.now().isoformat(),
-                    "tempo_execucao": f"{time.time() - inicio_execucao:.2f}s",
-                    "erro": "Tela 5 falhou",
-                    "erros": exception_handler.obter_resumo_erros(),
-                    "parametros_entrada": parametros
-                }
+                return criar_retorno_erro(
+                    "Tela 5 falhou",
+                    "TELA_5",
+                    time.time() - inicio_execucao,
+                    parametros,
+                    exception_handler
+                )
             
             # TELA 6
             exibir_mensagem("\n" + "="*50)
@@ -2445,14 +2449,13 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             else:
                 resultado_telas["tela_6"] = False
                 exibir_mensagem("❌ TELA 6 FALHOU!")
-                return {
-                    "status": "error",
-                    "timestamp": datetime.now().isoformat(),
-                    "tempo_execucao": f"{time.time() - inicio_execucao:.2f}s",
-                    "erro": "Tela 6 falhou",
-                    "erros": exception_handler.obter_resumo_erros(),
-                    "parametros_entrada": parametros
-                }
+                return criar_retorno_erro(
+                    "Tela 6 falhou",
+                    "TELA_6",
+                    time.time() - inicio_execucao,
+                    parametros,
+                    exception_handler
+                )
             
             # TELA 7
             exibir_mensagem("\n" + "="*50)
@@ -2463,14 +2466,13 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             else:
                 resultado_telas["tela_7"] = False
                 exibir_mensagem("❌ TELA 7 FALHOU!")
-                return {
-                    "status": "error",
-                    "timestamp": datetime.now().isoformat(),
-                    "tempo_execucao": f"{time.time() - inicio_execucao:.2f}s",
-                    "erro": "Tela 7 falhou",
-                    "erros": exception_handler.obter_resumo_erros(),
-                    "parametros_entrada": parametros
-                }
+                return criar_retorno_erro(
+                    "Tela 7 falhou",
+                    "TELA_7",
+                    time.time() - inicio_execucao,
+                    parametros,
+                    exception_handler
+                )
             
             # TELA 8
             exibir_mensagem("\n" + "="*50)
@@ -2481,14 +2483,13 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             else:
                 resultado_telas["tela_8"] = False
                 exibir_mensagem("❌ TELA 8 FALHOU!")
-                return {
-                    "status": "error",
-                    "timestamp": datetime.now().isoformat(),
-                    "tempo_execucao": f"{time.time() - inicio_execucao:.2f}s",
-                    "erro": "Tela 8 falhou",
-                    "erros": exception_handler.obter_resumo_erros(),
-                    "parametros_entrada": parametros
-                }
+                return criar_retorno_erro(
+                    "Tela 8 falhou",
+                    "TELA_8",
+                    time.time() - inicio_execucao,
+                    parametros,
+                    exception_handler
+                )
             
             # TELA 9
             exibir_mensagem("\n" + "="*50)
@@ -2499,14 +2500,13 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             else:
                 resultado_telas["tela_9"] = False
                 exibir_mensagem("❌ TELA 9 FALHOU!")
-                return {
-                    "status": "error",
-                    "timestamp": datetime.now().isoformat(),
-                    "tempo_execucao": f"{time.time() - inicio_execucao:.2f}s",
-                    "erro": "Tela 9 falhou",
-                    "erros": exception_handler.obter_resumo_erros(),
-                    "parametros_entrada": parametros
-                }
+                return criar_retorno_erro(
+                    "Tela 9 falhou",
+                    "TELA_9",
+                    time.time() - inicio_execucao,
+                    parametros,
+                    exception_handler
+                )
             
             # TELA 10
             exibir_mensagem("\n" + "="*50)
@@ -2517,14 +2517,13 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             else:
                 resultado_telas["tela_10"] = False
                 exibir_mensagem("❌ TELA 10 FALHOU!")
-                return {
-                    "status": "error",
-                    "timestamp": datetime.now().isoformat(),
-                    "tempo_execucao": f"{time.time() - inicio_execucao:.2f}s",
-                    "erro": "Tela 10 falhou",
-                    "erros": exception_handler.obter_resumo_erros(),
-                    "parametros_entrada": parametros
-                }
+                return criar_retorno_erro(
+                    "Tela 10 falhou",
+                    "TELA_10",
+                    time.time() - inicio_execucao,
+                    parametros,
+                    exception_handler
+                )
             
             # TELA 11
             exibir_mensagem("\n" + "="*50)
@@ -2535,14 +2534,13 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             else:
                 resultado_telas["tela_11"] = False
                 exibir_mensagem("❌ TELA 11 FALHOU!")
-                return {
-                    "status": "error",
-                    "timestamp": datetime.now().isoformat(),
-                    "tempo_execucao": f"{time.time() - inicio_execucao:.2f}s",
-                    "erro": "Tela 11 falhou",
-                    "erros": exception_handler.obter_resumo_erros(),
-                    "parametros_entrada": parametros
-                }
+                return criar_retorno_erro(
+                    "Tela 11 falhou",
+                    "TELA_11",
+                    time.time() - inicio_execucao,
+                    parametros,
+                    exception_handler
+                )
             
             # TELA 12
             exibir_mensagem("\n" + "="*50)
@@ -2553,14 +2551,13 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             else:
                 resultado_telas["tela_12"] = False
                 exibir_mensagem("❌ TELA 12 FALHOU!")
-                return {
-                    "status": "error",
-                    "timestamp": datetime.now().isoformat(),
-                    "tempo_execucao": f"{time.time() - inicio_execucao:.2f}s",
-                    "erro": "Tela 12 falhou",
-                    "erros": exception_handler.obter_resumo_erros(),
-                    "parametros_entrada": parametros
-                }
+                return criar_retorno_erro(
+                    "Tela 12 falhou",
+                    "TELA_12",
+                    time.time() - inicio_execucao,
+                    parametros,
+                    exception_handler
+                )
             
             # TELA 13
             exibir_mensagem("\n" + "="*50)
@@ -2571,14 +2568,13 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             else:
                 resultado_telas["tela_13"] = False
                 exibir_mensagem("❌ TELA 13 FALHOU!")
-                return {
-                    "status": "error",
-                    "timestamp": datetime.now().isoformat(),
-                    "tempo_execucao": f"{time.time() - inicio_execucao:.2f}s",
-                    "erro": "Tela 13 falhou",
-                    "erros": exception_handler.obter_resumo_erros(),
-                    "parametros_entrada": parametros
-                }
+                return criar_retorno_erro(
+                    "Tela 13 falhou",
+                    "TELA_13",
+                    time.time() - inicio_execucao,
+                    parametros,
+                    exception_handler
+                )
             
             # TELA 14 (CONDICIONAL)
             exibir_mensagem("\n" + "="*50)
@@ -2589,14 +2585,13 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             else:
                 resultado_telas["tela_14"] = False
                 exibir_mensagem("❌ TELA 14 FALHOU!")
-                return {
-                    "status": "error",
-                    "timestamp": datetime.now().isoformat(),
-                    "tempo_execucao": f"{time.time() - inicio_execucao:.2f}s",
-                    "erro": "Tela 14 falhou",
-                    "erros": exception_handler.obter_resumo_erros(),
-                    "parametros_entrada": parametros
-                }
+                return criar_retorno_erro(
+                    "Tela 14 falhou",
+                    "TELA_14",
+                    time.time() - inicio_execucao,
+                    parametros,
+                    exception_handler
+                )
             
             # TELA 15
             exibir_mensagem("\n" + "="*50)
@@ -2607,14 +2602,13 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             else:
                 resultado_telas["tela_15"] = False
                 exibir_mensagem("❌ TELA 15 FALHOU!")
-                return {
-                    "status": "error",
-                    "timestamp": datetime.now().isoformat(),
-                    "tempo_execucao": f"{time.time() - inicio_execucao:.2f}s",
-                    "erro": "Tela 15 falhou",
-                    "erros": exception_handler.obter_resumo_erros(),
-                    "parametros_entrada": parametros
-                }
+                return criar_retorno_erro(
+                    "Tela 15 falhou",
+                    "TELA_15",
+                    time.time() - inicio_execucao,
+                    parametros,
+                    exception_handler
+                )
             
             # Resultado final
             exibir_mensagem("\n" + "="*60)
@@ -2636,28 +2630,24 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             tempo_execucao = time.time() - inicio_execucao
             
             # Retorno estruturado
-            return {
-                "status": "success",
-                "timestamp": datetime.now().isoformat(),
-                "tempo_execucao": f"{tempo_execucao:.2f}s",
-                "telas_executadas": resultado_telas,
-                "dados_planos": dados_planos,
-                "arquivo_dados": arquivo_dados,
-                "erros": exception_handler.obter_resumo_erros(),
-                "parametros_entrada": parametros
-            }
+            return criar_retorno_sucesso(
+                resultado_telas,
+                dados_planos,
+                arquivo_dados,
+                tempo_execucao,
+                parametros
+            )
             
     except Exception as e:
         exception_handler.capturar_excecao(e, "EXECUCAO_PRINCIPAL", "Erro na execução principal")
         
-        return {
-            "status": "error",
-            "timestamp": datetime.now().isoformat(),
-            "tempo_execucao": f"{time.time() - inicio_execucao:.2f}s",
-            "erro": str(e),
-            "erros": exception_handler.obter_resumo_erros(),
-            "parametros_entrada": parametros
-        }
+        return criar_retorno_erro(
+            str(e),
+            "EXECUCAO_PRINCIPAL",
+            time.time() - inicio_execucao,
+            parametros,
+            exception_handler
+        )
 
 # ========================================
 # EXECUÇÃO DIRETA
