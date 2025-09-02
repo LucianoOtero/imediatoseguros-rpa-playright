@@ -2234,7 +2234,44 @@ def capturar_dados_planos_seguro(page):
                                 exibir_mensagem(f"❌ {cobertura.title()}: False")
                     except Exception as e:
                         dados_planos[plano_tipo][cobertura] = False
-                        exibir_mensagem(f"⚠️ Erro ao capturar {cobertura}: {str(e)}")
+                        exibir_mensagem(f"⚠️ Erro ao capturar {cobertura}: {str(e)} - definindo como False")
+                
+                # ========================================
+                # ETAPA 5: CAPTURA ESPECÍFICA DE VALORES DE MERCADO E DANOS
+                # ========================================
+                # Procurar por "100% da tabela FIPE" no texto
+                if "100% da tabela FIPE" in tabela_text:
+                    dados_planos[plano_tipo]["valor_mercado"] = "100% da tabela FIPE"
+                    exibir_mensagem("✅ VALOR DE MERCADO: 100% da tabela FIPE")
+                
+                # Procurar por valores específicos de danos no texto completo
+                # Danos Materiais
+                danos_materiais_match = re.search(r'Danos Materiais.*?R\$\s*([0-9.,]+)', tabela_text, re.IGNORECASE)
+                if danos_materiais_match:
+                    valor_danos_materiais = danos_materiais_match.group(1)
+                    dados_planos[plano_tipo]["danos_materiais"] = f"R$ {valor_danos_materiais}"
+                    exibir_mensagem(f"✅ DANOS MATERIAIS: R$ {valor_danos_materiais}")
+                
+                # Danos Corporais
+                danos_corporais_match = re.search(r'Danos Corporais.*?R\$\s*([0-9.,]+)', tabela_text, re.IGNORECASE)
+                if danos_corporais_match:
+                    valor_danos_corporais = danos_corporais_match.group(1)
+                    dados_planos[plano_tipo]["danos_corporais"] = f"R$ {valor_danos_corporais}"
+                    exibir_mensagem(f"✅ DANOS CORPORAIS: R$ {valor_danos_corporais}")
+                
+                # Danos Morais
+                danos_morais_match = re.search(r'Danos Morais.*?R\$\s*([0-9.,]+)', tabela_text, re.IGNORECASE)
+                if danos_morais_match:
+                    valor_danos_morais = danos_morais_match.group(1)
+                    dados_planos[plano_tipo]["danos_morais"] = f"R$ {valor_danos_morais}"
+                    exibir_mensagem(f"✅ DANOS MORAIS: R$ {valor_danos_morais}")
+                
+                # Morte/Invalidez
+                morte_invalidez_match = re.search(r'Morte/Invalidez.*?R\$\s*([0-9.,]+)', tabela_text, re.IGNORECASE)
+                if morte_invalidez_match:
+                    valor_morte_invalidez = morte_invalidez_match.group(1)
+                    dados_planos[plano_tipo]["morte_invalidez"] = f"R$ {valor_morte_invalidez}"
+                    exibir_mensagem(f"✅ MORTE/INVALIDEZ: R$ {valor_morte_invalidez}")
                 
                 # Se encontrou dados válidos, sair do loop
                 if dados_planos[plano_tipo]["valor"] != "N/A":
