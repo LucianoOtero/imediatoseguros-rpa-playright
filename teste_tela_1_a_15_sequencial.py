@@ -1866,26 +1866,13 @@ def capturar_dados_planos_seguro(page):
     
     DESCRIÇÃO:
         Captura os dados dos planos de seguro (Recomendado e Alternativo) na Tela 15.
-        Extrai valores, características e coberturas de cada plano.
+        Extrai valores, características e coberturas de cada plano usando seletores mais precisos.
         
-    ELEMENTOS IDENTIFICADOS:
-        PLANO RECOMENDADO (Primeira Coluna):
-        - Label: label.font-workSans.font-semibold (texto "Plano recomendado")
-        - Valor do Seguro: p.md\\:font-bold (texto "R$ 2.516,60")
-        - Forma de Pagamento: label.text-primary.text-xs.font-normal.mb-2 (texto "anual")
-        - Parcelamento: div.text-primary.text-xs.font-bold (texto "Crédito em até 1x...")
-        - Valor da Franquia: p.md\\:font-bold (texto "R$ 2.516,60")
-        - Valor de Mercado: p.mb-1 (texto "100% da tabela FIPE")
-        - Assistência: img[src="/icone-ok.svg"] (verificar se existe)
-        - Vidros: img[src="/icone-ok.svg"] (verificar se existe)
-        - Carro Reserva: img[src="/icone-ok.svg"] (verificar se existe)
-        - Danos Materiais: div.items-center.justify-center.flex.flex-col.md\\:flex-row (texto "R$ 50.000,00")
-        - Danos Corporais: div.items-center.justify-center.flex.flex-col.md\\:flex-row (texto "R$ 50.000,00")
-        - Danos Morais: div.items-center.justify-center.flex.flex-col.md\\:flex-row (texto "R$ 50.000,00")
-        - Morte/Invalidez: div.items-center.justify-center.flex.flex-col.md\\:flex-row (texto "R$ 5.000,00")
-        
-        PLANO ALTERNATIVO (Segunda Coluna):
-        - Mesmos elementos, exceto "Plano recomendado"
+    ESTRATÉGIA:
+        1. Identificar as duas colunas usando containers específicos
+        2. Usar seletores mais específicos para cada elemento
+        3. Verificar presença de ícones de check para coberturas
+        4. Extrair valores de danos usando estrutura hierárquica
         
     RETORNO:
         dict: Dicionário com os dados dos planos estruturados
@@ -1908,7 +1895,8 @@ def capturar_dados_planos_seguro(page):
         
         # Label do plano
         try:
-            label_plano = page.locator("label.font-workSans.font-semibold").first
+            # Procurar por label que contenha "Plano recomendado"
+            label_plano = page.locator("label:has-text('Plano recomendado')").first
             if label_plano.is_visible():
                 dados_planos["plano_recomendado"]["plano"] = label_plano.text_content().strip()
                 exibir_mensagem(f"✅ Plano: {dados_planos['plano_recomendado']['plano']}")
@@ -1919,11 +1907,11 @@ def capturar_dados_planos_seguro(page):
             dados_planos["plano_recomendado"]["plano"] = "Plano recomendado"
             exibir_mensagem(f"⚠️ Erro ao capturar label do plano: {str(e)}")
         
-        # Valor do Seguro
+        # Valor do Seguro - procurar por valores que começam com R$
         try:
-            valor_seguro = page.locator("p.md\\:font-bold").first
-            if valor_seguro.is_visible():
-                dados_planos["plano_recomendado"]["valor"] = valor_seguro.text_content().strip()
+            valores_seguro = page.locator("p:has-text('R$')").all()
+            if len(valores_seguro) > 0:
+                dados_planos["plano_recomendado"]["valor"] = valores_seguro[0].text_content().strip()
                 exibir_mensagem(f"✅ Valor: {dados_planos['plano_recomendado']['valor']}")
             else:
                 dados_planos["plano_recomendado"]["valor"] = "N/A"
@@ -1932,9 +1920,9 @@ def capturar_dados_planos_seguro(page):
             dados_planos["plano_recomendado"]["valor"] = "N/A"
             exibir_mensagem(f"⚠️ Erro ao capturar valor: {str(e)}")
         
-        # Forma de Pagamento
+        # Forma de Pagamento - procurar por "anual"
         try:
-            forma_pagamento = page.locator("label.text-primary.text-xs.font-normal.mb-2").first
+            forma_pagamento = page.locator("label:has-text('anual')").first
             if forma_pagamento.is_visible():
                 dados_planos["plano_recomendado"]["forma_pagamento"] = forma_pagamento.text_content().strip()
                 exibir_mensagem(f"✅ Forma de Pagamento: {dados_planos['plano_recomendado']['forma_pagamento']}")
@@ -1945,9 +1933,9 @@ def capturar_dados_planos_seguro(page):
             dados_planos["plano_recomendado"]["forma_pagamento"] = "N/A"
             exibir_mensagem(f"⚠️ Erro ao capturar forma de pagamento: {str(e)}")
         
-        # Parcelamento
+        # Parcelamento - procurar por texto que contenha "Crédito" de forma mais específica
         try:
-            parcelamento = page.locator("div.text-primary.text-xs.font-bold").first
+            parcelamento = page.locator("div.text-primary.text-xs.font-bold:has-text('Crédito')").first
             if parcelamento.is_visible():
                 dados_planos["plano_recomendado"]["parcelamento"] = parcelamento.text_content().strip()
                 exibir_mensagem(f"✅ Parcelamento: {dados_planos['plano_recomendado']['parcelamento']}")
@@ -1958,11 +1946,11 @@ def capturar_dados_planos_seguro(page):
             dados_planos["plano_recomendado"]["parcelamento"] = "N/A"
             exibir_mensagem(f"⚠️ Erro ao capturar parcelamento: {str(e)}")
         
-        # Valor da Franquia
+        # Valor da Franquia - segundo valor R$
         try:
-            franquia = page.locator("p.md\\:font-bold").nth(1)  # Segundo elemento
-            if franquia.is_visible():
-                dados_planos["plano_recomendado"]["valor_franquia"] = franquia.text_content().strip()
+            valores_franquia = page.locator("p:has-text('R$')").all()
+            if len(valores_franquia) > 1:
+                dados_planos["plano_recomendado"]["valor_franquia"] = valores_franquia[1].text_content().strip()
                 exibir_mensagem(f"✅ Valor da Franquia: {dados_planos['plano_recomendado']['valor_franquia']}")
             else:
                 dados_planos["plano_recomendado"]["valor_franquia"] = "N/A"
@@ -1971,9 +1959,9 @@ def capturar_dados_planos_seguro(page):
             dados_planos["plano_recomendado"]["valor_franquia"] = "N/A"
             exibir_mensagem(f"⚠️ Erro ao capturar valor da franquia: {str(e)}")
         
-        # Valor de Mercado
+        # Valor de Mercado - procurar por "100% da tabela FIPE"
         try:
-            valor_mercado = page.locator("p.mb-1").first
+            valor_mercado = page.locator("p:has-text('100% da tabela FIPE')").first
             if valor_mercado.is_visible():
                 dados_planos["plano_recomendado"]["valor_mercado"] = valor_mercado.text_content().strip()
                 exibir_mensagem(f"✅ Valor de Mercado: {dados_planos['plano_recomendado']['valor_mercado']}")
@@ -1984,13 +1972,13 @@ def capturar_dados_planos_seguro(page):
             dados_planos["plano_recomendado"]["valor_mercado"] = "N/A"
             exibir_mensagem(f"⚠️ Erro ao capturar valor de mercado: {str(e)}")
         
-        # Coberturas (Assistência, Vidros, Carro Reserva)
+        # Coberturas (Assistência, Vidros, Carro Reserva) - verificar ícones de OK
         coberturas = ["assistencia", "vidros", "carro_reserva"]
         for i, cobertura in enumerate(coberturas):
             try:
                 # Procurar por ícone de OK para cada cobertura
-                icone_ok = page.locator(f"img[src='/icone-ok.svg']").nth(i)
-                if icone_ok.is_visible():
+                icones_ok = page.locator("img[src='/icone-ok.svg']").all()
+                if len(icones_ok) > i and icones_ok[i].is_visible():
                     dados_planos["plano_recomendado"][cobertura] = True
                     exibir_mensagem(f"✅ {cobertura.title()}: True")
                 else:
@@ -2004,13 +1992,17 @@ def capturar_dados_planos_seguro(page):
         danos = ["danos_materiais", "danos_corporais", "danos_morais", "morte_invalidez"]
         for i, dano in enumerate(danos):
             try:
-                # Procurar por div com classe específica
-                elemento_dano = page.locator("div.items-center.justify-center.flex.flex-col.md\\:flex-row").nth(i)
+                # Procurar por div que contenha o texto do dano
+                elemento_dano = page.locator(f"div:has-text('{dano.replace('_', ' ').title()}')").first
                 if elemento_dano.is_visible():
-                    # Extrair o valor (texto dentro do segundo p)
-                    valor_dano = elemento_dano.locator("p.mb-1").nth(1).text_content().strip()
-                    dados_planos["plano_recomendado"][dano] = valor_dano
-                    exibir_mensagem(f"✅ {dano.replace('_', ' ').title()}: {valor_dano}")
+                    # Extrair o valor (procurar por R$ dentro do elemento)
+                    valor_dano = elemento_dano.locator("p:has-text('R$')").first
+                    if valor_dano.is_visible():
+                        dados_planos["plano_recomendado"][dano] = valor_dano.text_content().strip()
+                        exibir_mensagem(f"✅ {dano.replace('_', ' ').title()}: {dados_planos['plano_recomendado'][dano]}")
+                    else:
+                        dados_planos["plano_recomendado"][dano] = "N/A"
+                        exibir_mensagem(f"⚠️ Valor de {dano.replace('_', ' ').title()} não encontrado")
                 else:
                     dados_planos["plano_recomendado"][dano] = "N/A"
                     exibir_mensagem(f"⚠️ {dano.replace('_', ' ').title()} não encontrado")
@@ -2019,7 +2011,7 @@ def capturar_dados_planos_seguro(page):
                 exibir_mensagem(f"⚠️ Erro ao capturar {dano}: {str(e)}")
         
         # ========================================
-        # CAPTURA PLANO ALTERNATIVO (Segunda Coluna)
+        # CAPTURA PLANO ALTERNATIVO (Segunda COLUNA)
         # ========================================
         exibir_mensagem("🔍 Capturando dados do Plano Alternativo...")
         
@@ -2027,11 +2019,11 @@ def capturar_dados_planos_seguro(page):
         dados_planos["plano_alternativo"]["plano"] = "Plano alternativo"
         
         # Capturar os mesmos elementos, mas da segunda coluna
-        # Valor do Seguro (segunda coluna)
+        # Valor do Seguro (segunda coluna) - terceiro valor R$
         try:
-            valor_seguro_alt = page.locator("p.md\\:font-bold").nth(2)  # Terceiro elemento
-            if valor_seguro_alt.is_visible():
-                dados_planos["plano_alternativo"]["valor"] = valor_seguro_alt.text_content().strip()
+            valores_seguro_alt = page.locator("p:has-text('R$')").all()
+            if len(valores_seguro_alt) > 2:
+                dados_planos["plano_alternativo"]["valor"] = valores_seguro_alt[2].text_content().strip()
                 exibir_mensagem(f"✅ Valor (Alternativo): {dados_planos['plano_alternativo']['valor']}")
             else:
                 dados_planos["plano_alternativo"]["valor"] = "N/A"
@@ -2040,11 +2032,11 @@ def capturar_dados_planos_seguro(page):
             dados_planos["plano_alternativo"]["valor"] = "N/A"
             exibir_mensagem(f"⚠️ Erro ao capturar valor alternativo: {str(e)}")
         
-        # Forma de Pagamento (segunda coluna)
+        # Forma de Pagamento (segunda coluna) - segundo "anual"
         try:
-            forma_pagamento_alt = page.locator("label.text-primary.text-xs.font-normal.mb-2").nth(1)  # Segundo elemento
-            if forma_pagamento_alt.is_visible():
-                dados_planos["plano_alternativo"]["forma_pagamento"] = forma_pagamento_alt.text_content().strip()
+            formas_pagamento_alt = page.locator("label:has-text('anual')").all()
+            if len(formas_pagamento_alt) > 1:
+                dados_planos["plano_alternativo"]["forma_pagamento"] = formas_pagamento_alt[1].text_content().strip()
                 exibir_mensagem(f"✅ Forma de Pagamento (Alternativo): {dados_planos['plano_alternativo']['forma_pagamento']}")
             else:
                 dados_planos["plano_alternativo"]["forma_pagamento"] = "N/A"
@@ -2053,11 +2045,11 @@ def capturar_dados_planos_seguro(page):
             dados_planos["plano_alternativo"]["forma_pagamento"] = "N/A"
             exibir_mensagem(f"⚠️ Erro ao capturar forma de pagamento alternativo: {str(e)}")
         
-        # Parcelamento (segunda coluna)
+        # Parcelamento (segunda coluna) - segundo "Crédito" de forma mais específica
         try:
-            parcelamento_alt = page.locator("div.text-primary.text-xs.font-bold").nth(1)  # Segundo elemento
-            if parcelamento_alt.is_visible():
-                dados_planos["plano_alternativo"]["parcelamento"] = parcelamento_alt.text_content().strip()
+            parcelamentos_alt = page.locator("div.text-primary.text-xs.font-bold:has-text('Crédito')").all()
+            if len(parcelamentos_alt) > 1:
+                dados_planos["plano_alternativo"]["parcelamento"] = parcelamentos_alt[1].text_content().strip()
                 exibir_mensagem(f"✅ Parcelamento (Alternativo): {dados_planos['plano_alternativo']['parcelamento']}")
             else:
                 dados_planos["plano_alternativo"]["parcelamento"] = "N/A"
@@ -2066,11 +2058,11 @@ def capturar_dados_planos_seguro(page):
             dados_planos["plano_alternativo"]["parcelamento"] = "N/A"
             exibir_mensagem(f"⚠️ Erro ao capturar parcelamento alternativo: {str(e)}")
         
-        # Valor da Franquia (segunda coluna)
+        # Valor da Franquia (segunda coluna) - quarto valor R$
         try:
-            franquia_alt = page.locator("p.md\\:font-bold").nth(3)  # Quarto elemento
-            if franquia_alt.is_visible():
-                dados_planos["plano_alternativo"]["valor_franquia"] = franquia_alt.text_content().strip()
+            valores_franquia_alt = page.locator("p:has-text('R$')").all()
+            if len(valores_franquia_alt) > 3:
+                dados_planos["plano_alternativo"]["valor_franquia"] = valores_franquia_alt[3].text_content().strip()
                 exibir_mensagem(f"✅ Valor da Franquia (Alternativo): {dados_planos['plano_alternativo']['valor_franquia']}")
             else:
                 dados_planos["plano_alternativo"]["valor_franquia"] = "N/A"
@@ -2079,11 +2071,11 @@ def capturar_dados_planos_seguro(page):
             dados_planos["plano_alternativo"]["valor_franquia"] = "N/A"
             exibir_mensagem(f"⚠️ Erro ao capturar valor da franquia alternativo: {str(e)}")
         
-        # Valor de Mercado (segunda coluna)
+        # Valor de Mercado (segunda coluna) - segundo "100% da tabela FIPE"
         try:
-            valor_mercado_alt = page.locator("p.mb-1").nth(1)  # Segundo elemento
-            if valor_mercado_alt.is_visible():
-                dados_planos["plano_alternativo"]["valor_mercado"] = valor_mercado_alt.text_content().strip()
+            valores_mercado_alt = page.locator("p:has-text('100% da tabela FIPE')").all()
+            if len(valores_mercado_alt) > 1:
+                dados_planos["plano_alternativo"]["valor_mercado"] = valores_mercado_alt[1].text_content().strip()
                 exibir_mensagem(f"✅ Valor de Mercado (Alternativo): {dados_planos['plano_alternativo']['valor_mercado']}")
             else:
                 dados_planos["plano_alternativo"]["valor_mercado"] = "N/A"
@@ -2092,12 +2084,11 @@ def capturar_dados_planos_seguro(page):
             dados_planos["plano_alternativo"]["valor_mercado"] = "N/A"
             exibir_mensagem(f"⚠️ Erro ao capturar valor de mercado alternativo: {str(e)}")
         
-        # Coberturas do plano alternativo (ícones de OK)
+        # Coberturas do plano alternativo (ícones de OK) - pular os 3 primeiros
         for i, cobertura in enumerate(coberturas):
             try:
-                # Procurar por ícone de OK para cada cobertura (segunda coluna)
-                icone_ok_alt = page.locator(f"img[src='/icone-ok.svg']").nth(i + 3)  # Pular os 3 primeiros
-                if icone_ok_alt.is_visible():
+                icones_ok_alt = page.locator("img[src='/icone-ok.svg']").all()
+                if len(icones_ok_alt) > (i + 3) and icones_ok_alt[i + 3].is_visible():
                     dados_planos["plano_alternativo"][cobertura] = True
                     exibir_mensagem(f"✅ {cobertura.title()} (Alternativo): True")
                 else:
@@ -2107,16 +2098,25 @@ def capturar_dados_planos_seguro(page):
                 dados_planos["plano_alternativo"][cobertura] = False
                 exibir_mensagem(f"⚠️ Erro ao capturar {cobertura} alternativo: {str(e)}")
         
-        # Danos do plano alternativo
+        # Danos do plano alternativo - procurar na segunda coluna
         for i, dano in enumerate(danos):
             try:
-                # Procurar por div com classe específica (segunda coluna)
-                elemento_dano_alt = page.locator("div.items-center.justify-center.flex.flex-col.md\\:flex-row").nth(i + 4)  # Pular os 4 primeiros
-                if elemento_dano_alt.is_visible():
-                    # Extrair o valor (texto dentro do segundo p)
-                    valor_dano_alt = elemento_dano_alt.locator("p.mb-1").nth(1).text_content().strip()
-                    dados_planos["plano_alternativo"][dano] = valor_dano_alt
-                    exibir_mensagem(f"✅ {dano.replace('_', ' ').title()} (Alternativo): {valor_dano_alt}")
+                # Procurar por div que contenha o texto do dano na segunda coluna
+                elementos_dano_alt = page.locator(f"div:has-text('{dano.replace('_', ' ').title()}')").all()
+                if len(elementos_dano_alt) > 1:
+                    elemento_dano_alt = elementos_dano_alt[1]  # Segundo elemento
+                    if elemento_dano_alt.is_visible():
+                        # Extrair o valor (procurar por R$ dentro do elemento)
+                        valor_dano_alt = elemento_dano_alt.locator("p:has-text('R$')").first
+                        if valor_dano_alt.is_visible():
+                            dados_planos["plano_alternativo"][dano] = valor_dano_alt.text_content().strip()
+                            exibir_mensagem(f"✅ {dano.replace('_', ' ').title()} (Alternativo): {dados_planos['plano_alternativo'][dano]}")
+                        else:
+                            dados_planos["plano_alternativo"][dano] = "N/A"
+                            exibir_mensagem(f"⚠️ Valor de {dano.replace('_', ' ').title()} alternativo não encontrado")
+                    else:
+                        dados_planos["plano_alternativo"][dano] = "N/A"
+                        exibir_mensagem(f"⚠️ {dano.replace('_', ' ').title()} alternativo não encontrado")
                 else:
                     dados_planos["plano_alternativo"][dano] = "N/A"
                     exibir_mensagem(f"⚠️ {dano.replace('_', ' ').title()} alternativo não encontrado")
