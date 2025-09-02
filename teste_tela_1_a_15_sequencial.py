@@ -1832,6 +1832,26 @@ def navegar_tela_15_playwright(page, email_login, senha_login):
             return False
         
         exibir_mensagem("✅ LOGIN CONCLUÍDO!")
+        
+        # ========================================
+        # CAPTURA DE DADOS DOS PLANOS DE SEGURO
+        # ========================================
+        exibir_mensagem("📊 INICIANDO CAPTURA DE DADOS DOS PLANOS...")
+        
+        # Aguardar carregamento dos planos
+        time.sleep(5)
+        
+        # Capturar dados dos planos
+        dados_planos = capturar_dados_planos_seguro(page)
+        
+        if dados_planos:
+            exibir_mensagem("✅ DADOS DOS PLANOS CAPTURADOS COM SUCESSO!")
+            exibir_mensagem("📋 RESUMO DOS DADOS CAPTURADOS:")
+            exibir_mensagem(f"   📊 Plano Recomendado: {dados_planos['plano_recomendado'].get('valor', 'N/A')}")
+            exibir_mensagem(f"   📊 Plano Alternativo: {dados_planos['plano_alternativo'].get('valor', 'N/A')}")
+        else:
+            exibir_mensagem("⚠️ FALHA NA CAPTURA DE DADOS DOS PLANOS")
+        
         exibir_mensagem("🎯 TELA 15 FINALIZADA COM SUCESSO!")
         
         return True
@@ -1839,6 +1859,286 @@ def navegar_tela_15_playwright(page, email_login, senha_login):
     except Exception as e:
         exibir_mensagem(f"❌ ERRO na Tela 15: {str(e)}")
         return False
+
+def capturar_dados_planos_seguro(page):
+    """
+    CAPTURA DADOS DOS PLANOS DE SEGURO
+    
+    DESCRIÇÃO:
+        Captura os dados dos planos de seguro (Recomendado e Alternativo) na Tela 15.
+        Extrai valores, características e coberturas de cada plano.
+        
+    ELEMENTOS IDENTIFICADOS:
+        PLANO RECOMENDADO (Primeira Coluna):
+        - Label: label.font-workSans.font-semibold (texto "Plano recomendado")
+        - Valor do Seguro: p.md\\:font-bold (texto "R$ 2.516,60")
+        - Forma de Pagamento: label.text-primary.text-xs.font-normal.mb-2 (texto "anual")
+        - Parcelamento: div.text-primary.text-xs.font-bold (texto "Crédito em até 1x...")
+        - Valor da Franquia: p.md\\:font-bold (texto "R$ 2.516,60")
+        - Valor de Mercado: p.mb-1 (texto "100% da tabela FIPE")
+        - Assistência: img[src="/icone-ok.svg"] (verificar se existe)
+        - Vidros: img[src="/icone-ok.svg"] (verificar se existe)
+        - Carro Reserva: img[src="/icone-ok.svg"] (verificar se existe)
+        - Danos Materiais: div.items-center.justify-center.flex.flex-col.md\\:flex-row (texto "R$ 50.000,00")
+        - Danos Corporais: div.items-center.justify-center.flex.flex-col.md\\:flex-row (texto "R$ 50.000,00")
+        - Danos Morais: div.items-center.justify-center.flex.flex-col.md\\:flex-row (texto "R$ 50.000,00")
+        - Morte/Invalidez: div.items-center.justify-center.flex.flex-col.md\\:flex-row (texto "R$ 5.000,00")
+        
+        PLANO ALTERNATIVO (Segunda Coluna):
+        - Mesmos elementos, exceto "Plano recomendado"
+        
+    RETORNO:
+        dict: Dicionário com os dados dos planos estruturados
+    """
+    try:
+        exibir_mensagem("📊 CAPTURANDO DADOS DOS PLANOS DE SEGURO...")
+        
+        # Aguardar carregamento dos planos
+        time.sleep(3)
+        
+        dados_planos = {
+            "plano_recomendado": {},
+            "plano_alternativo": {}
+        }
+        
+        # ========================================
+        # CAPTURA PLANO RECOMENDADO (Primeira Coluna)
+        # ========================================
+        exibir_mensagem("🔍 Capturando dados do Plano Recomendado...")
+        
+        # Label do plano
+        try:
+            label_plano = page.locator("label.font-workSans.font-semibold").first
+            if label_plano.is_visible():
+                dados_planos["plano_recomendado"]["plano"] = label_plano.text_content().strip()
+                exibir_mensagem(f"✅ Plano: {dados_planos['plano_recomendado']['plano']}")
+            else:
+                dados_planos["plano_recomendado"]["plano"] = "Plano recomendado"
+                exibir_mensagem("⚠️ Label do plano não encontrado, usando padrão")
+        except Exception as e:
+            dados_planos["plano_recomendado"]["plano"] = "Plano recomendado"
+            exibir_mensagem(f"⚠️ Erro ao capturar label do plano: {str(e)}")
+        
+        # Valor do Seguro
+        try:
+            valor_seguro = page.locator("p.md\\:font-bold").first
+            if valor_seguro.is_visible():
+                dados_planos["plano_recomendado"]["valor"] = valor_seguro.text_content().strip()
+                exibir_mensagem(f"✅ Valor: {dados_planos['plano_recomendado']['valor']}")
+            else:
+                dados_planos["plano_recomendado"]["valor"] = "N/A"
+                exibir_mensagem("⚠️ Valor do seguro não encontrado")
+        except Exception as e:
+            dados_planos["plano_recomendado"]["valor"] = "N/A"
+            exibir_mensagem(f"⚠️ Erro ao capturar valor: {str(e)}")
+        
+        # Forma de Pagamento
+        try:
+            forma_pagamento = page.locator("label.text-primary.text-xs.font-normal.mb-2").first
+            if forma_pagamento.is_visible():
+                dados_planos["plano_recomendado"]["forma_pagamento"] = forma_pagamento.text_content().strip()
+                exibir_mensagem(f"✅ Forma de Pagamento: {dados_planos['plano_recomendado']['forma_pagamento']}")
+            else:
+                dados_planos["plano_recomendado"]["forma_pagamento"] = "N/A"
+                exibir_mensagem("⚠️ Forma de pagamento não encontrada")
+        except Exception as e:
+            dados_planos["plano_recomendado"]["forma_pagamento"] = "N/A"
+            exibir_mensagem(f"⚠️ Erro ao capturar forma de pagamento: {str(e)}")
+        
+        # Parcelamento
+        try:
+            parcelamento = page.locator("div.text-primary.text-xs.font-bold").first
+            if parcelamento.is_visible():
+                dados_planos["plano_recomendado"]["parcelamento"] = parcelamento.text_content().strip()
+                exibir_mensagem(f"✅ Parcelamento: {dados_planos['plano_recomendado']['parcelamento']}")
+            else:
+                dados_planos["plano_recomendado"]["parcelamento"] = "N/A"
+                exibir_mensagem("⚠️ Parcelamento não encontrado")
+        except Exception as e:
+            dados_planos["plano_recomendado"]["parcelamento"] = "N/A"
+            exibir_mensagem(f"⚠️ Erro ao capturar parcelamento: {str(e)}")
+        
+        # Valor da Franquia
+        try:
+            franquia = page.locator("p.md\\:font-bold").nth(1)  # Segundo elemento
+            if franquia.is_visible():
+                dados_planos["plano_recomendado"]["valor_franquia"] = franquia.text_content().strip()
+                exibir_mensagem(f"✅ Valor da Franquia: {dados_planos['plano_recomendado']['valor_franquia']}")
+            else:
+                dados_planos["plano_recomendado"]["valor_franquia"] = "N/A"
+                exibir_mensagem("⚠️ Valor da franquia não encontrado")
+        except Exception as e:
+            dados_planos["plano_recomendado"]["valor_franquia"] = "N/A"
+            exibir_mensagem(f"⚠️ Erro ao capturar valor da franquia: {str(e)}")
+        
+        # Valor de Mercado
+        try:
+            valor_mercado = page.locator("p.mb-1").first
+            if valor_mercado.is_visible():
+                dados_planos["plano_recomendado"]["valor_mercado"] = valor_mercado.text_content().strip()
+                exibir_mensagem(f"✅ Valor de Mercado: {dados_planos['plano_recomendado']['valor_mercado']}")
+            else:
+                dados_planos["plano_recomendado"]["valor_mercado"] = "N/A"
+                exibir_mensagem("⚠️ Valor de mercado não encontrado")
+        except Exception as e:
+            dados_planos["plano_recomendado"]["valor_mercado"] = "N/A"
+            exibir_mensagem(f"⚠️ Erro ao capturar valor de mercado: {str(e)}")
+        
+        # Coberturas (Assistência, Vidros, Carro Reserva)
+        coberturas = ["assistencia", "vidros", "carro_reserva"]
+        for i, cobertura in enumerate(coberturas):
+            try:
+                # Procurar por ícone de OK para cada cobertura
+                icone_ok = page.locator(f"img[src='/icone-ok.svg']").nth(i)
+                if icone_ok.is_visible():
+                    dados_planos["plano_recomendado"][cobertura] = True
+                    exibir_mensagem(f"✅ {cobertura.title()}: True")
+                else:
+                    dados_planos["plano_recomendado"][cobertura] = False
+                    exibir_mensagem(f"❌ {cobertura.title()}: False")
+            except Exception as e:
+                dados_planos["plano_recomendado"][cobertura] = False
+                exibir_mensagem(f"⚠️ Erro ao capturar {cobertura}: {str(e)}")
+        
+        # Danos (Materiais, Corporais, Morais, Morte/Invalidez)
+        danos = ["danos_materiais", "danos_corporais", "danos_morais", "morte_invalidez"]
+        for i, dano in enumerate(danos):
+            try:
+                # Procurar por div com classe específica
+                elemento_dano = page.locator("div.items-center.justify-center.flex.flex-col.md\\:flex-row").nth(i)
+                if elemento_dano.is_visible():
+                    # Extrair o valor (texto dentro do segundo p)
+                    valor_dano = elemento_dano.locator("p.mb-1").nth(1).text_content().strip()
+                    dados_planos["plano_recomendado"][dano] = valor_dano
+                    exibir_mensagem(f"✅ {dano.replace('_', ' ').title()}: {valor_dano}")
+                else:
+                    dados_planos["plano_recomendado"][dano] = "N/A"
+                    exibir_mensagem(f"⚠️ {dano.replace('_', ' ').title()} não encontrado")
+            except Exception as e:
+                dados_planos["plano_recomendado"][dano] = "N/A"
+                exibir_mensagem(f"⚠️ Erro ao capturar {dano}: {str(e)}")
+        
+        # ========================================
+        # CAPTURA PLANO ALTERNATIVO (Segunda Coluna)
+        # ========================================
+        exibir_mensagem("🔍 Capturando dados do Plano Alternativo...")
+        
+        # Para o plano alternativo, não há label "Plano recomendado"
+        dados_planos["plano_alternativo"]["plano"] = "Plano alternativo"
+        
+        # Capturar os mesmos elementos, mas da segunda coluna
+        # Valor do Seguro (segunda coluna)
+        try:
+            valor_seguro_alt = page.locator("p.md\\:font-bold").nth(2)  # Terceiro elemento
+            if valor_seguro_alt.is_visible():
+                dados_planos["plano_alternativo"]["valor"] = valor_seguro_alt.text_content().strip()
+                exibir_mensagem(f"✅ Valor (Alternativo): {dados_planos['plano_alternativo']['valor']}")
+            else:
+                dados_planos["plano_alternativo"]["valor"] = "N/A"
+                exibir_mensagem("⚠️ Valor do seguro alternativo não encontrado")
+        except Exception as e:
+            dados_planos["plano_alternativo"]["valor"] = "N/A"
+            exibir_mensagem(f"⚠️ Erro ao capturar valor alternativo: {str(e)}")
+        
+        # Forma de Pagamento (segunda coluna)
+        try:
+            forma_pagamento_alt = page.locator("label.text-primary.text-xs.font-normal.mb-2").nth(1)  # Segundo elemento
+            if forma_pagamento_alt.is_visible():
+                dados_planos["plano_alternativo"]["forma_pagamento"] = forma_pagamento_alt.text_content().strip()
+                exibir_mensagem(f"✅ Forma de Pagamento (Alternativo): {dados_planos['plano_alternativo']['forma_pagamento']}")
+            else:
+                dados_planos["plano_alternativo"]["forma_pagamento"] = "N/A"
+                exibir_mensagem("⚠️ Forma de pagamento alternativo não encontrada")
+        except Exception as e:
+            dados_planos["plano_alternativo"]["forma_pagamento"] = "N/A"
+            exibir_mensagem(f"⚠️ Erro ao capturar forma de pagamento alternativo: {str(e)}")
+        
+        # Parcelamento (segunda coluna)
+        try:
+            parcelamento_alt = page.locator("div.text-primary.text-xs.font-bold").nth(1)  # Segundo elemento
+            if parcelamento_alt.is_visible():
+                dados_planos["plano_alternativo"]["parcelamento"] = parcelamento_alt.text_content().strip()
+                exibir_mensagem(f"✅ Parcelamento (Alternativo): {dados_planos['plano_alternativo']['parcelamento']}")
+            else:
+                dados_planos["plano_alternativo"]["parcelamento"] = "N/A"
+                exibir_mensagem("⚠️ Parcelamento alternativo não encontrado")
+        except Exception as e:
+            dados_planos["plano_alternativo"]["parcelamento"] = "N/A"
+            exibir_mensagem(f"⚠️ Erro ao capturar parcelamento alternativo: {str(e)}")
+        
+        # Valor da Franquia (segunda coluna)
+        try:
+            franquia_alt = page.locator("p.md\\:font-bold").nth(3)  # Quarto elemento
+            if franquia_alt.is_visible():
+                dados_planos["plano_alternativo"]["valor_franquia"] = franquia_alt.text_content().strip()
+                exibir_mensagem(f"✅ Valor da Franquia (Alternativo): {dados_planos['plano_alternativo']['valor_franquia']}")
+            else:
+                dados_planos["plano_alternativo"]["valor_franquia"] = "N/A"
+                exibir_mensagem("⚠️ Valor da franquia alternativo não encontrado")
+        except Exception as e:
+            dados_planos["plano_alternativo"]["valor_franquia"] = "N/A"
+            exibir_mensagem(f"⚠️ Erro ao capturar valor da franquia alternativo: {str(e)}")
+        
+        # Valor de Mercado (segunda coluna)
+        try:
+            valor_mercado_alt = page.locator("p.mb-1").nth(1)  # Segundo elemento
+            if valor_mercado_alt.is_visible():
+                dados_planos["plano_alternativo"]["valor_mercado"] = valor_mercado_alt.text_content().strip()
+                exibir_mensagem(f"✅ Valor de Mercado (Alternativo): {dados_planos['plano_alternativo']['valor_mercado']}")
+            else:
+                dados_planos["plano_alternativo"]["valor_mercado"] = "N/A"
+                exibir_mensagem("⚠️ Valor de mercado alternativo não encontrado")
+        except Exception as e:
+            dados_planos["plano_alternativo"]["valor_mercado"] = "N/A"
+            exibir_mensagem(f"⚠️ Erro ao capturar valor de mercado alternativo: {str(e)}")
+        
+        # Coberturas do plano alternativo (ícones de OK)
+        for i, cobertura in enumerate(coberturas):
+            try:
+                # Procurar por ícone de OK para cada cobertura (segunda coluna)
+                icone_ok_alt = page.locator(f"img[src='/icone-ok.svg']").nth(i + 3)  # Pular os 3 primeiros
+                if icone_ok_alt.is_visible():
+                    dados_planos["plano_alternativo"][cobertura] = True
+                    exibir_mensagem(f"✅ {cobertura.title()} (Alternativo): True")
+                else:
+                    dados_planos["plano_alternativo"][cobertura] = False
+                    exibir_mensagem(f"❌ {cobertura.title()} (Alternativo): False")
+            except Exception as e:
+                dados_planos["plano_alternativo"][cobertura] = False
+                exibir_mensagem(f"⚠️ Erro ao capturar {cobertura} alternativo: {str(e)}")
+        
+        # Danos do plano alternativo
+        for i, dano in enumerate(danos):
+            try:
+                # Procurar por div com classe específica (segunda coluna)
+                elemento_dano_alt = page.locator("div.items-center.justify-center.flex.flex-col.md\\:flex-row").nth(i + 4)  # Pular os 4 primeiros
+                if elemento_dano_alt.is_visible():
+                    # Extrair o valor (texto dentro do segundo p)
+                    valor_dano_alt = elemento_dano_alt.locator("p.mb-1").nth(1).text_content().strip()
+                    dados_planos["plano_alternativo"][dano] = valor_dano_alt
+                    exibir_mensagem(f"✅ {dano.replace('_', ' ').title()} (Alternativo): {valor_dano_alt}")
+                else:
+                    dados_planos["plano_alternativo"][dano] = "N/A"
+                    exibir_mensagem(f"⚠️ {dano.replace('_', ' ').title()} alternativo não encontrado")
+            except Exception as e:
+                dados_planos["plano_alternativo"][dano] = "N/A"
+                exibir_mensagem(f"⚠️ Erro ao capturar {dano} alternativo: {str(e)}")
+        
+        # Salvar dados em arquivo JSON
+        timestamp = time.strftime('%Y%m%d_%H%M%S')
+        json_path = f"dados_planos_seguro_{timestamp}.json"
+        
+        with open(json_path, 'w', encoding='utf-8') as f:
+            json.dump(dados_planos, f, indent=2, ensure_ascii=False)
+        
+        exibir_mensagem(f"💾 Dados salvos em: {json_path}")
+        exibir_mensagem("📊 CAPTURA DE DADOS CONCLUÍDA!")
+        
+        return dados_planos
+        
+    except Exception as e:
+        exibir_mensagem(f"❌ ERRO na captura de dados: {str(e)}")
+        return None
 
 def main():
     """
