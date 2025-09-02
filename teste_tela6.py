@@ -67,7 +67,7 @@ def testar_tela6(driver, parametros):
         time.sleep(5)
         
         # Simular navegação até Tela 6 (pular telas 1-5)
-        print("⏭️ Simulando navegação até Tela 6...")
+        print("[PROSSEGUINDO] Simulando navegação até Tela 6...")
         
         # Aguardar elementos da Tela 6
         print("⏳ Aguardando elementos da Tela 6...")

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-TESTE TELAS 1 A 6 SEQUENCIAL - IMPLEMENTAÇÃO COMPLETA
-Teste das Telas 1-6 usando Playwright com implementação da Tela 6
+TESTE TELAS 1 A 7 SEQUENCIAL - IMPLEMENTAÇÃO COMPLETA
+Teste das Telas 1-7 usando Playwright com implementação da Tela 7
 
 DESCRIÇÃO:
 - Tela 1: Seleção do tipo de seguro (Carro)
@@ -9,12 +9,13 @@ DESCRIÇÃO:
 - Tela 3: Confirmação do veículo
 - Tela 4: Veículo segurado
 - Tela 5: Estimativa inicial (captura de dados)
-- Tela 6: Itens do carro (nova implementação)
+- Tela 6: Itens do carro (combustível e checkboxes)
+- Tela 7: Endereço de pernoite (CEP)
 
 AUTOR: Luciano Otero
 DATA: 2025-09-02
-VERSÃO: 1.0.0
-STATUS: Implementação completa das Telas 1-6
+VERSÃO: 1.1.0
+STATUS: Implementação completa das Telas 1-7
 """
 
 import json
@@ -315,7 +316,10 @@ def navegar_tela_5_playwright(page):
         # PASSO 1: Exibir mensagem de início da Tela 5
         exibir_mensagem("📱 TELA 5: Aguardando carregamento da estimativa...")
         
-        # PASSO 2: Aguardar até que o elemento específico apareça (máximo 30 segundos)
+        # PASSO 2: Aguardar carregamento inicial da tela
+        time.sleep(2)
+        
+        # PASSO 3: Aguardar até que o elemento específico apareça (máximo 30 segundos)
         max_tentativas = 30
         tentativa = 0
         
@@ -326,64 +330,79 @@ def navegar_tela_5_playwright(page):
             time.sleep(1)
             tentativa += 1
         
-        # PASSO 3: Verificar se encontrou elementos
+        # PASSO 4: Verificar se encontrou elementos
         if tentativa >= max_tentativas:
             exibir_mensagem("❌ Elementos da estimativa não carregaram")
             return False
         
-        # PASSO 4: Confirmar carregamento
+        # PASSO 5: Confirmar carregamento
         exibir_mensagem("✅ Estimativa carregada com sucesso")
         
-        # PASSO 5: Localizar e clicar no botão "Continuar"
+        # PASSO 6: Localizar e clicar no botão "Continuar"
         botao_continuar = page.locator("#gtm-telaEstimativaContinuarParaCotacaoFinal").first
         botao_continuar.click()
         
-        # PASSO 6: Confirmar clique
+        # PASSO 7: Confirmar clique
         exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
         
-        # PASSO 7: Aguardar transição
+        # PASSO 8: Aguardar transição
         time.sleep(3)
         
-        # PASSO 8: Retornar sucesso
+        # PASSO 9: Retornar sucesso
         return True
         
     except Exception as e:
-        # PASSO 9: Tratar exceções
+        # PASSO 10: Tratar exceções
         exibir_mensagem(f"❌ ERRO na Tela 5: {str(e)}")
         return False
 
-def navegar_tela_6_playwright(page):
+def navegar_tela_6_playwright(page, combustivel, kit_gas, blindado, financiado):
     """
-    TELA 6: Itens do carro
+    TELA 6: Itens do carro - SELEÇÃO DE COMBUSTÍVEL E CHECKBOXES
     
     DESCRIÇÃO:
-        Navega pela Tela 6 (Itens do carro) e clica em "Continuar"
+        Seleciona o tipo de combustível, marca/desmarca checkboxes e clica em "Continuar"
     
-    ELEMENTOS IDENTIFICADOS (baseado na gravação):
+    ELEMENTOS IDENTIFICADOS:
+        - Seleção de combustível: Radio buttons com name="tipoCombustivelTelaItens"
+        - Checkbox Kit Gas: input[value="Kit Gás"]
+        - Checkbox Blindado: input[value="Blindado"]
+        - Checkbox Financiado: input[value="Financiado"]
         - Botão continuar: #gtm-telaItensAutoContinuar
     
     IMPLEMENTAÇÃO:
         1. Aguarda carregamento da Tela 6
-        2. Localiza o botão "Continuar"
-        3. Clica no botão
-        4. Aguarda transição
+        2. Seleciona o combustível baseado no parâmetro
+        3. Marca/desmarca checkboxes baseado nos parâmetros
+        4. Localiza o botão "Continuar"
+        5. Clica no botão
+        6. Aguarda transição
     
     PARÂMETROS:
         page: Objeto page do Playwright
+        combustivel (str): Tipo de combustível ("Flex", "Gasolina", "Etanol", etc.)
+        kit_gas (bool): Se deve marcar checkbox Kit Gas
+        blindado (bool): Se deve marcar checkbox Blindado
+        financiado (bool): Se deve marcar checkbox Financiado
     
     RETORNO:
         bool: True se sucesso, False se falha
     
     LOGS ESPERADOS:
-        - "📱 TELA 6: Navegando pelos itens do carro..."
-        - "✅ Tela 6 carregada com sucesso"
+        - "📱 TELA 6: Aguardando carregamento..."
+        - "📱 TELA 6: Selecionando combustível {combustivel}..."
+        - "✅ Combustível {combustivel} selecionado com sucesso"
+        - "📱 TELA 6: Configurando checkboxes..."
+        - "✅ Checkbox Kit Gas: {estado}"
+        - "✅ Checkbox Blindado: {estado}"
+        - "✅ Checkbox Financiado: {estado}"
         - "✅ Botão 'Continuar' clicado com sucesso"
         - "❌ Tela 6 não carregou" (se falhar)
         - "❌ ERRO na Tela 6: {erro}" (se exceção)
     """
     try:
         # PASSO 1: Exibir mensagem de início da Tela 6
-        exibir_mensagem("📱 TELA 6: Navegando pelos itens do carro...")
+        exibir_mensagem("📱 TELA 6: Aguardando carregamento...")
         
         # PASSO 2: Aguardar carregamento da Tela 6 (máximo 20 segundos)
         max_tentativas = 20
@@ -404,31 +423,229 @@ def navegar_tela_6_playwright(page):
         # PASSO 4: Confirmar carregamento
         exibir_mensagem("✅ Tela 6 carregada com sucesso")
         
-        # PASSO 5: Clicar no botão "Continuar"
+        # PASSO 5: Selecionar combustível
+        exibir_mensagem(f"📱 TELA 6: Selecionando combustível {combustivel}...")
+        
+        # PASSO 6: Mapear combustível para valor do radio button
+        mapeamento_combustivel = {
+            "Flex": "1",
+            "Gasolina": "2", 
+            "Alcool": "3",
+            "Etanol": "3",  # Alcool e Etanol são o mesmo
+            "Diesel": "4",
+            "Híbrido": "5",
+            "Elétrico": "6"
+        }
+        
+        # PASSO 7: Obter valor do radio button para o combustível
+        valor_radio = mapeamento_combustivel.get(combustivel)
+        combustivel_selecionado = False
+        
+        if valor_radio:
+            # PASSO 8: Localizar e clicar no radio button específico
+            try:
+                radio_combustivel = page.locator(f"input[name='tipoCombustivelTelaItens'][value='{valor_radio}']").first
+                if radio_combustivel.is_visible():
+                    radio_combustivel.click()
+                    combustivel_selecionado = True
+                    exibir_mensagem(f"✅ Combustível {combustivel} selecionado com sucesso (valor={valor_radio})")
+                else:
+                    exibir_mensagem(f"⚠️ Radio button para {combustivel} (valor={valor_radio}) não está visível")
+            except Exception as e:
+                exibir_mensagem(f"⚠️ Erro ao selecionar {combustivel}: {str(e)}")
+        else:
+            exibir_mensagem(f"⚠️ Combustível '{combustivel}' não mapeado")
+        
+        # PASSO 9: Verificar se conseguiu selecionar
+        if not combustivel_selecionado:
+            exibir_mensagem(f"⚠️ Combustível {combustivel} não encontrado, continuando sem seleção")
+        
+        # PASSO 10: Configurar checkboxes
+        exibir_mensagem("📱 TELA 6: Configurando checkboxes...")
+        
+        # PASSO 11: Configurar checkbox Kit Gas
+        try:
+            checkbox_kit_gas = page.locator('input[value="Kit Gás"]').first
+            if checkbox_kit_gas.is_visible():
+                if kit_gas and not checkbox_kit_gas.is_checked():
+                    checkbox_kit_gas.check()
+                    exibir_mensagem("✅ Checkbox Kit Gas: MARCADO")
+                elif not kit_gas and checkbox_kit_gas.is_checked():
+                    checkbox_kit_gas.uncheck()
+                    exibir_mensagem("✅ Checkbox Kit Gas: DESMARCADO")
+                else:
+                    estado = "MARCADO" if kit_gas else "DESMARCADO"
+                    exibir_mensagem(f"✅ Checkbox Kit Gas: {estado} (já estava correto)")
+            else:
+                exibir_mensagem("⚠️ Checkbox Kit Gas não encontrado")
+        except Exception as e:
+            exibir_mensagem(f"⚠️ Erro ao configurar Kit Gas: {str(e)}")
+        
+        # PASSO 12: Configurar checkbox Blindado
+        try:
+            checkbox_blindado = page.locator('input[value="Blindado"]').first
+            if checkbox_blindado.is_visible():
+                if blindado and not checkbox_blindado.is_checked():
+                    checkbox_blindado.check()
+                    exibir_mensagem("✅ Checkbox Blindado: MARCADO")
+                elif not blindado and checkbox_blindado.is_checked():
+                    checkbox_blindado.uncheck()
+                    exibir_mensagem("✅ Checkbox Blindado: DESMARCADO")
+                else:
+                    estado = "MARCADO" if blindado else "DESMARCADO"
+                    exibir_mensagem(f"✅ Checkbox Blindado: {estado} (já estava correto)")
+            else:
+                exibir_mensagem("⚠️ Checkbox Blindado não encontrado")
+        except Exception as e:
+            exibir_mensagem(f"⚠️ Erro ao configurar Blindado: {str(e)}")
+        
+        # PASSO 13: Configurar checkbox Financiado
+        try:
+            checkbox_financiado = page.locator('input[value="Financiado"]').first
+            if checkbox_financiado.is_visible():
+                if financiado and not checkbox_financiado.is_checked():
+                    checkbox_financiado.check()
+                    exibir_mensagem("✅ Checkbox Financiado: MARCADO")
+                elif not financiado and checkbox_financiado.is_checked():
+                    checkbox_financiado.uncheck()
+                    exibir_mensagem("✅ Checkbox Financiado: DESMARCADO")
+                else:
+                    estado = "MARCADO" if financiado else "DESMARCADO"
+                    exibir_mensagem(f"✅ Checkbox Financiado: {estado} (já estava correto)")
+            else:
+                exibir_mensagem("⚠️ Checkbox Financiado não encontrado")
+        except Exception as e:
+            exibir_mensagem(f"⚠️ Erro ao configurar Financiado: {str(e)}")
+        
+        # PASSO 14: Clicar no botão "Continuar"
         botao_continuar.first.click()
         
-        # PASSO 6: Confirmar clique
+        # PASSO 15: Confirmar clique
         exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
         
-        # PASSO 7: Aguardar transição
+        # PASSO 16: Aguardar transição
         time.sleep(3)
         
-        # PASSO 8: Retornar sucesso
+        # PASSO 17: Retornar sucesso
         return True
         
     except Exception as e:
-        # PASSO 9: Tratar exceções
+        # PASSO 18: Tratar exceções
         exibir_mensagem(f"❌ ERRO na Tela 6: {str(e)}")
+        return False
+
+def navegar_tela_7_playwright(page, cep):
+    """
+    TELA 7: Endereço de pernoite (CEP)
+    
+    DESCRIÇÃO:
+        Preenche o campo CEP, aguarda carregamento do endereço e clica em "Continuar"
+    
+    ELEMENTOS IDENTIFICADOS (baseado na gravação):
+        - Campo CEP: id=enderecoTelaEndereco
+        - Sugestão de endereço: css=.overflow-hidden
+        - Botão continuar: id=gtm-telaPernoiteVeiculoContinuar
+    
+    IMPLEMENTAÇÃO:
+        1. Aguarda carregamento da Tela 7
+        2. Localiza o campo CEP
+        3. Preenche o CEP
+        4. Aguarda carregamento do endereço baseado no CEP
+        5. Clica no endereço sugerido
+        6. Clica no botão "Continuar"
+        7. Aguarda transição
+    
+    PARÂMETROS:
+        page: Objeto page do Playwright
+        cep (str): CEP do endereço (ex: "03317-000")
+    
+    RETORNO:
+        bool: True se sucesso, False se falha
+    
+    LOGS ESPERADOS:
+        - "📱 TELA 7: Aguardando carregamento..."
+        - "✅ Tela 7 carregada com sucesso"
+        - "📱 TELA 7: Preenchendo CEP..."
+        - "✅ CEP preenchido com sucesso"
+        - "⏳ Aguardando carregamento do endereço..."
+        - "✅ Endereço sugerido selecionado"
+        - "✅ Botão 'Continuar' clicado com sucesso"
+        - "❌ Tela 7 não carregou" (se falhar)
+        - "❌ ERRO na Tela 7: {erro}" (se exceção)
+    """
+    try:
+        # PASSO 1: Exibir mensagem de início da Tela 7
+        exibir_mensagem("📱 TELA 7: Aguardando carregamento...")
+        
+        # PASSO 2: Aguardar carregamento da Tela 7 (máximo 20 segundos)
+        max_tentativas = 20
+        tentativa = 0
+        
+        while tentativa < max_tentativas:
+            campo_endereco = page.locator("#enderecoTelaEndereco")
+            if campo_endereco.count() > 0 and campo_endereco.first.is_visible():
+                break
+            time.sleep(1)
+            tentativa += 1
+        
+        # PASSO 3: Verificar se encontrou o campo
+        if tentativa >= max_tentativas:
+            exibir_mensagem("❌ Tela 7 não carregou")
+            return False
+        
+        # PASSO 4: Confirmar carregamento
+        exibir_mensagem("✅ Tela 7 carregada com sucesso")
+        
+        # PASSO 5: Preencher CEP
+        exibir_mensagem("📱 TELA 7: Preenchendo CEP...")
+        
+        # PASSO 6: Preencher o CEP no campo
+        campo_endereco.first.fill(cep)
+        exibir_mensagem(f"✅ CEP preenchido: {cep}")
+        time.sleep(1)
+        
+        # PASSO 7: Aguardar carregamento do endereço baseado no CEP (5 segundos)
+        exibir_mensagem("⏳ Aguardando carregamento do endereço...")
+        time.sleep(5)
+        
+        # PASSO 8: Tentar selecionar endereço sugerido
+        try:
+            sugestao_endereco = page.locator("css=.overflow-hidden").first
+            if sugestao_endereco.is_visible():
+                sugestao_endereco.click()
+                exibir_mensagem("✅ Endereço sugerido selecionado")
+                time.sleep(1)
+            else:
+                exibir_mensagem("⚠️ Endereço sugerido não encontrado")
+        except Exception as e:
+            exibir_mensagem(f"⚠️ Erro ao selecionar endereço: {str(e)}")
+        
+        # PASSO 9: Localizar e clicar no botão "Continuar"
+        botao_continuar = page.locator("#gtm-telaPernoiteVeiculoContinuar").first
+        botao_continuar.click()
+        
+        # PASSO 10: Confirmar clique
+        exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
+        
+        # PASSO 11: Aguardar transição
+        time.sleep(3)
+        
+        # PASSO 12: Retornar sucesso
+        return True
+        
+    except Exception as e:
+        # PASSO 14: Tratar exceções
+        exibir_mensagem(f"❌ ERRO na Tela 7: {str(e)}")
         return False
 
 def main():
     """
-    Função principal que executa o teste das Telas 1-6 sequencialmente
+    Função principal que executa o teste das Telas 1-7 sequencialmente
     
     FLUXO:
         1. Carrega parâmetros do JSON
         2. Configura browser Playwright
-        3. Executa Tela 1 → Tela 2 → Tela 3 → Tela 4 → Tela 5 → Tela 6
+        3. Executa Tela 1 → Tela 2 → Tela 3 → Tela 4 → Tela 5 → Tela 6 → Tela 7
         4. Exibe resultados de cada tela
         5. Fecha browser
     
@@ -440,7 +657,7 @@ def main():
         with open('config/parametros.json', 'r', encoding='utf-8') as f:
             parametros = json.load(f)
         
-        exibir_mensagem("🚀 INICIANDO TESTE TELAS 1 A 6 SEQUENCIAL")
+        exibir_mensagem("🚀 INICIANDO TESTE TELAS 1 A 7 SEQUENCIAL")
         exibir_mensagem("=" * 60)
         exibir_mensagem(f"🚗 Placa: {parametros['placa']}")
         exibir_mensagem(f"📋 Veículo segurado: {parametros['veiculo_segurado']}")
@@ -512,17 +729,26 @@ def main():
             
             # TELA 6
             exibir_mensagem("\n" + "="*50)
-            if navegar_tela_6_playwright(page):
+            if navegar_tela_6_playwright(page, parametros['combustivel'], parametros['kit_gas'], parametros['blindado'], parametros['financiado']):
                 telas_executadas += 1
                 exibir_mensagem("✅ TELA 6 CONCLUÍDA!")
             else:
                 exibir_mensagem("❌ TELA 6 FALHOU!")
                 return 1
             
+            # TELA 7
+            exibir_mensagem("\n" + "="*50)
+            if navegar_tela_7_playwright(page, parametros['cep']):
+                telas_executadas += 1
+                exibir_mensagem("✅ TELA 7 CONCLUÍDA!")
+            else:
+                exibir_mensagem("❌ TELA 7 FALHOU!")
+                return 1
+            
             # Resultado final
             exibir_mensagem("\n" + "="*60)
-            exibir_mensagem("🎉 TESTE TELAS 1 A 6 CONCLUÍDO COM SUCESSO!")
-            exibir_mensagem(f"✅ Total de telas executadas: {telas_executadas}/6")
+            exibir_mensagem("🎉 TESTE TELAS 1 A 7 CONCLUÍDO COM SUCESSO!")
+            exibir_mensagem(f"✅ Total de telas executadas: {telas_executadas}/7")
             exibir_mensagem("✅ Todas as telas funcionaram corretamente")
             exibir_mensagem("✅ Navegação sequencial realizada com sucesso")
             

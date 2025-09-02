@@ -366,35 +366,6 @@ python executar_todas_telas_corrigido.py '{"configuracao": {"log": true, "displa
 - Formato de campo estiver incorreto
 """
 
-def validar_parametros_json(parametros: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Função de compatibilidade para validar parâmetros JSON
-    
-    Args:
-        parametros: Dicionário com parâmetros
-        
-    Returns:
-        Dicionário com resultado da validação
-    """
-    try:
-        validador = ValidadorParametros()
-        parametros_validados = validador.validar_json_string(json.dumps(parametros))
-        return {
-            "sucesso": True,
-            "mensagem": "Parâmetros validados com sucesso",
-            "parametros": parametros_validados
-        }
-    except ValidacaoParametrosError as e:
-        return {
-            "sucesso": False,
-            "mensagem": str(e)
-        }
-    except Exception as e:
-        return {
-            "sucesso": False,
-            "mensagem": f"Erro inesperado na validação: {str(e)}"
-        }
-
 def validar_parametros_entrada(json_string: str) -> Dict[str, Any]:
     """
     Função principal para validar parâmetros de entrada

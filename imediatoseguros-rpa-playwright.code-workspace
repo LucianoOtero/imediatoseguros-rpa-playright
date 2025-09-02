@@ -1,0 +1,26 @@
+{
+    "folders": [
+        {
+            "name": "RPA Playwright",
+            "path": "."
+        }
+    ],
+    "settings": {
+        "python.defaultInterpreterPath": "python",
+        "python.terminal.activateEnvironment": true,
+        "files.exclude": {
+            "**/__pycache__": true,
+            "**/*.pyc": true,
+            "**/temp": true,
+            "**/logs": true,
+            "**/backup_versao_atual": true
+        }
+    },
+    "extensions": {
+        "recommendations": [
+            "ms-python.python",
+            "ms-python.black-formatter",
+            "ms-python.flake8"
+        ]
+    }
+}

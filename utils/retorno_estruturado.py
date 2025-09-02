@@ -123,6 +123,46 @@ def criar_retorno_estruturado(status, codigo_erro=None, dados_extras=None, logs_
 
     return retorno
 
+def criar_retorno_sucesso(mensagem: str, dados: dict = None):
+    """
+    Função de compatibilidade para criar retorno de sucesso
+    
+    Args:
+        mensagem: Mensagem de sucesso
+        dados: Dados adicionais
+        
+    Returns:
+        Dicionário com retorno de sucesso
+    """
+    dados_extras = {"mensagem": mensagem}
+    if dados:
+        dados_extras.update(dados)
+    
+    return criar_retorno_estruturado(
+        status="sucesso",
+        codigo_erro=9002,
+        dados_extras=dados_extras
+    )
+
+def criar_retorno_erro(codigo_erro: int, mensagem: str):
+    """
+    Função de compatibilidade para criar retorno de erro
+    
+    Args:
+        codigo_erro: Código de erro
+        mensagem: Mensagem de erro
+        
+    Returns:
+        Dicionário com retorno de erro
+    """
+    dados_extras = {"mensagem": mensagem}
+    
+    return criar_retorno_estruturado(
+        status="erro",
+        codigo_erro=codigo_erro,
+        dados_extras=dados_extras
+    )
+
 def obter_logs_recentes(max_linhas=10):
     """
     Obtém os logs mais recentes do arquivo de log

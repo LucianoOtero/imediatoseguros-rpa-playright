@@ -447,3 +447,29 @@ def log_exception(message: str, error_code: Optional[int] = None,
                   extra_data: Optional[Dict[str, Any]] = None):
     """Log de exceção"""
     rpa_logger.log_exception(message, error_code, extra_data)
+
+def setup_logger():
+    """
+    Função de compatibilidade para configurar o logger
+    """
+    # O logger já é configurado automaticamente na instância global
+    pass
+
+def exibir_mensagem(mensagem: str, nivel: str = "INFO"):
+    """
+    Função de compatibilidade para exibir mensagens
+    
+    Args:
+        mensagem: Mensagem a ser exibida
+        nivel: Nível da mensagem (INFO, DEBUG, WARNING, ERROR)
+    """
+    if nivel == "INFO":
+        rpa_logger.info(mensagem)
+    elif nivel == "DEBUG":
+        rpa_logger.debug(mensagem)
+    elif nivel == "WARNING":
+        rpa_logger.warning(mensagem)
+    elif nivel == "ERROR":
+        rpa_logger.error(mensagem)
+    else:
+        rpa_logger.info(mensagem)
