@@ -1,0 +1,217 @@
+{
+  "status": "sucesso",
+  "timestamp": "2025-09-02T03:45:30.523994",
+  "versao": "2.11.0",
+  "sistema": "RPA Tô Segurado - Playwright",
+  "codigo": 9002,
+  "mensagem": "RPA executado com sucesso - Telas 1-5",
+  "dados": {
+    "telas_executadas": 5,
+    "tempo_execucao": "45.3s",
+    "placa_processada": "EED-3D56",
+    "url_final": "https://www.app.tosegurado.com.br/cotacao/carro",
+    "capturas_intermediarias": {
+      "carrossel": {
+        "timestamp": "2025-09-02T03:45:30.523994",
+        "tela": 5,
+        "nome_tela": "Estimativa Inicial",
+        "url": "https://www.app.tosegurado.com.br/cotacao/carro",
+        "titulo": "Faça agora sua cotação de Seguro Auto",
+        "coberturas_detalhadas": [
+          {
+            "indice": 1,
+            "cobertura": "Cobertura Compreensiva",
+            "valores": {
+              "de": "R$ 1.600,00",
+              "ate": "R$ 2.200,00"
+            },
+            "beneficios": [
+              {
+                "nome": "Colisão e Acidentes",
+                "status": "incluido"
+              },
+              {
+                "nome": "Roubo e Furto",
+                "status": "incluido"
+              },
+              {
+                "nome": "Incêndio",
+                "status": "incluido"
+              },
+              {
+                "nome": "Danos a terceiros",
+                "status": "incluido"
+              },
+              {
+                "nome": "Assistência 24h",
+                "status": "incluido"
+              },
+              {
+                "nome": "Carro Reserva",
+                "status": "incluido"
+              },
+              {
+                "nome": "Vidros",
+                "status": "incluido"
+              }
+            ],
+            "texto_completo": "Cobertura Compreensiva"
+          },
+          {
+            "indice": 2,
+            "cobertura": "Cobertura Roubo e Furto",
+            "valores": {
+              "de": "R$ 1.400,00",
+              "ate": "R$ 1.700,00"
+            },
+            "beneficios": [
+              {
+                "nome": "Roubo",
+                "status": "incluido"
+              },
+              {
+                "nome": "Furto",
+                "status": "incluido"
+              },
+              {
+                "nome": "Danos parciais em tentativas de roubo.",
+                "status": "incluido"
+              }
+            ],
+            "texto_completo": "Cobertura Roubo e Furto"
+          },
+          {
+            "indice": 3,
+            "cobertura": "Cobertura RCF",
+            "valores": {
+              "de": "R$ 1.000,00",
+              "ate": "R$ 1.500,00"
+            },
+            "beneficios": [
+              {
+                "nome": "Danos materiais a terceiros",
+                "status": "incluido"
+              },
+              {
+                "nome": "Danos corporais a terceiros",
+                "status": "incluido"
+              }
+            ],
+            "texto_completo": "Cobertura RCF"
+          }
+        ],
+        "beneficios_gerais": [
+          {
+            "nome": "Colisão e Acidentes",
+            "encontrado": true,
+            "quantidade_elementos": 1
+          },
+          {
+            "nome": "Roubo e Furto",
+            "encontrado": true,
+            "quantidade_elementos": 2
+          },
+          {
+            "nome": "Incêndio",
+            "encontrado": true,
+            "quantidade_elementos": 1
+          },
+          {
+            "nome": "Danos a terceiros",
+            "encontrado": true,
+            "quantidade_elementos": 1
+          },
+          {
+            "nome": "Assistência 24h",
+            "encontrado": true,
+            "quantidade_elementos": 1
+          },
+          {
+            "nome": "Carro Reserva",
+            "encontrado": true,
+            "quantidade_elementos": 1
+          },
+          {
+            "nome": "Vidros",
+            "encontrado": true,
+            "quantidade_elementos": 1
+          },
+          {
+            "nome": "Roubo",
+            "encontrado": true,
+            "quantidade_elementos": 4
+          },
+          {
+            "nome": "Furto",
+            "encontrado": true,
+            "quantidade_elementos": 3
+          },
+          {
+            "nome": "Danos parciais em tentativas de roubo",
+            "encontrado": true,
+            "quantidade_elementos": 1
+          },
+          {
+            "nome": "Danos materiais a terceiros",
+            "encontrado": true,
+            "quantidade_elementos": 1
+          },
+          {
+            "nome": "Danos corporais a terceiro",
+            "encontrado": true,
+            "quantidade_elementos": 1
+          }
+        ],
+        "valores_encontrados": 6,
+        "seguradoras": [
+          {
+            "nome": "Essa é somente uma estimativa baseada nos dados fornecidos. O valor estimado é baseado em mais de 30 milhões de cotações de seguros das principais seguradoras do país.",
+            "seletor": "texto_contido"
+          },
+          {
+            "nome": "Seguro de Carro",
+            "seletor": "texto_contido"
+          },
+          {
+            "nome": "Confira abaixo a estimativa inicial para o seu seguro carro!",
+            "seletor": "texto_contido"
+          }
+        ],
+        "elementos_detectados": [
+          "palavra_chave: estimativa",
+          "palavra_chave: cobertura",
+          "palavra_chave: valor"
+        ],
+        "resumo": {
+          "total_coberturas": 3,
+          "cobertura_mais_cara": "Cobertura Compreensiva (R$ 1.600,00 - R$ 2.200,00)",
+          "cobertura_mais_barata": "Cobertura RCF (R$ 1.000,00 - R$ 1.500,00)",
+          "total_beneficios": 12,
+          "valores_encontrados": 6,
+          "qualidade_captura": "excelente"
+        }
+      }
+    }
+  },
+  "logs": [
+    "2025-09-02 03:44:56 | INFO | 🚀 INICIANDO TESTE TELAS 1 A 5 SEQUENCIAL FINAL",
+    "2025-09-02 03:45:01 | INFO | 📱 TELA 1: Selecionando Carro...",
+    "2025-09-02 03:45:04 | INFO | ✅ Botão 'Carro' clicado com sucesso",
+    "2025-09-02 03:45:10 | INFO | 📱 TELA 2: Inserindo placa EED-3D56...",
+    "2025-09-02 03:45:10 | INFO | ✅ Placa EED-3D56 inserida com sucesso",
+    "2025-09-02 03:45:16 | INFO | 📱 TELA 3: Confirmando veículo...",
+    "2025-09-02 03:45:16 | INFO | ✅ Botão 'Continuar' clicado com sucesso",
+    "2025-09-02 03:45:22 | INFO | 📱 TELA 4: Veículo já segurado (Não)...",
+    "2025-09-02 03:45:22 | INFO | ✅ 'Não' selecionado com sucesso",
+    "2025-09-02 03:45:25 | INFO | 📱 TELA 5: Estimativa Inicial - Aguardando cálculo da estimativa...",
+    "2025-09-02 03:45:30 | INFO | ✅ Elemento de estimativa encontrado: 3 cards",
+    "2025-09-02 03:45:30 | INFO | 📋 Card 1: Cobertura Compreensiva - De R$ 1.600,00 até R$ 2.200,00",
+    "2025-09-02 03:45:30 | INFO | 📋 Card 2: Cobertura Roubo e Furto - De R$ 1.400,00 até R$ 1.700,00",
+    "2025-09-02 03:45:30 | INFO | 📋 Card 3: Cobertura RCF - De R$ 1.000,00 até R$ 1.500,00",
+    "2025-09-02 03:45:30 | INFO | 💾 DADOS SALVOS: temp/captura_carrossel/carrossel_estimativas_20250902_034530.json",
+    "2025-09-02 03:45:30 | INFO | 📊 RESUMO: 3 coberturas detalhadas, 12 benefícios gerais",
+    "2025-09-02 03:45:33 | INFO | ✅ Navegação da Tela 5 concluída",
+    "2025-09-02 03:45:33 | INFO | 🏁 TESTE TELAS 1 A 5 CONCLUÍDO COM SUCESSO!",
+    "2025-09-02 03:45:38 | INFO | ✅ TESTE CONCLUÍDO COM SUCESSO!"
+  ]
+}
