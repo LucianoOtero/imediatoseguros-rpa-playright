@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-TESTE TELAS 1 A 11 SEQUENCIAL - IMPLEMENTAÇÃO COMPLETA
-Teste das Telas 1-11 usando Playwright com implementação da Tela 11
+TESTE TELAS 1 A 13 SEQUENCIAL - IMPLEMENTAÇÃO COMPLETA
+Teste das Telas 1-13 usando Playwright com implementação da Tela 13
 
 DESCRIÇÃO:
 - Tela 1: Seleção do tipo de seguro (Carro)
@@ -15,11 +15,13 @@ DESCRIÇÃO:
 - Tela 9: Dados pessoais do segurado
 - Tela 10: Condutor principal
 - Tela 11: Atividade do veículo (local de trabalho/estudo)
+- Tela 12: Garagem na residência
+- Tela 13: Residência com menores de 18-26 anos
 
 AUTOR: Luciano Otero
 DATA: 2025-09-02
-VERSÃO: 1.5.0
-STATUS: Implementação completa das Telas 1-11
+VERSÃO: 1.9.0
+STATUS: Implementação completa das Telas 1-13
 """
 
 import json
@@ -1390,6 +1392,109 @@ def navegar_tela_12_playwright(page, garagem_residencia, portao_eletronico):
         return False
 
 
+def navegar_tela_13_playwright(page, reside_18_26, sexo_do_menor, faixa_etaria_menor_mais_novo):
+    """
+    TELA 13: Residência com Menores de 18-26 anos
+    
+    DESCRIÇÃO:
+        Navega para a Tela 13 e seleciona se reside com alguém entre 18 e 26 anos.
+        Se sim, seleciona o sexo e faixa etária do mais novo.
+        
+    ELEMENTOS IDENTIFICADOS (baseado na gravação):
+        - Radio principal: Você reside com alguém entre 18 e 26 anos?
+            - Não
+            - Sim, mas não utilizam o veículo
+            - Sim e utilizam o veículo
+        - Radio condicional Sexo (só aparece se "Sim e utilizam o veículo"):
+            - Feminino
+            - Masculino
+            - Ambos
+        - Radio condicional Faixa etária (só aparece se "Sim e utilizam o veículo"):
+            - 18 a 24 anos
+            - 25 anos
+        - Botão Continuar: p.font-semibold.font-workSans.cursor-pointer:has-text("Continuar")
+        
+    PARÂMETROS:
+        - reside_18_26: str - Resposta principal ("Não", "Sim, mas não utilizam o veículo", "Sim e utilizam o veículo")
+        - sexo_do_menor: str - Sexo do menor ("Feminino", "Masculino", "Ambos", "N/A")
+        - faixa_etaria_menor_mais_novo: str - Faixa etária ("18 a 24 anos", "25 anos", "N/A")
+    """
+    try:
+        exibir_mensagem("\n" + "="*50)
+        exibir_mensagem("👥 TELA 13: RESIDÊNCIA COM MENORES DE 18-26 ANOS")
+        exibir_mensagem("="*50)
+        
+        # PASSO 1: Aguardar carregamento da tela
+        exibir_mensagem("⏳ Aguardando carregamento da Tela 13...")
+        page.wait_for_selector("p.font-semibold.font-workSans.cursor-pointer:has-text('Continuar')", timeout=10000)
+        exibir_mensagem("✅ Tela 13 carregada - residência com menores detectada!")
+        
+        # PASSO 2: Selecionar resposta principal
+        exibir_mensagem(f"👥 Selecionando resposta principal: '{reside_18_26}'...")
+        
+        # Mapear valores para os selectors da gravação
+        if reside_18_26 == "Não":
+            # Selecionar "Não"
+            page.locator("input[type='radio'][value='nao']").first.check()
+            exibir_mensagem("✅ Radio 'Não' selecionado com sucesso")
+            
+        elif reside_18_26 == "Sim, mas não utilizam o veículo":
+            # Selecionar "Sim, mas não utilizam o veículo"
+            page.locator("input[type='radio'][value='sim_nao_utilizam']").check()
+            exibir_mensagem("✅ Radio 'Sim, mas não utilizam o veículo' selecionado com sucesso")
+            
+        elif reside_18_26 == "Sim e utilizam o veículo":
+            # Selecionar "Sim e utilizam o veículo"
+            page.locator("input[type='radio'][value='sim_utilizam']").check()
+            exibir_mensagem("✅ Radio 'Sim e utilizam o veículo' selecionado com sucesso")
+            
+            # PASSO 3: Se "Sim e utilizam o veículo", selecionar campos condicionais
+            if sexo_do_menor != "N/A":
+                exibir_mensagem(f"👤 Selecionando sexo do menor: '{sexo_do_menor}'...")
+                
+                if sexo_do_menor == "Feminino":
+                    page.locator("input[type='radio'][value='feminino']").check()
+                    exibir_mensagem("✅ Radio 'Feminino' para sexo selecionado com sucesso")
+                elif sexo_do_menor == "Masculino":
+                    page.locator("input[type='radio'][value='masculino']").check()
+                    exibir_mensagem("✅ Radio 'Masculino' para sexo selecionado com sucesso")
+                elif sexo_do_menor == "Ambos":
+                    page.locator("input[type='radio'][value='ambos']").check()
+                    exibir_mensagem("✅ Radio 'Ambos' para sexo selecionado com sucesso")
+            
+            if faixa_etaria_menor_mais_novo != "N/A":
+                exibir_mensagem(f"📅 Selecionando faixa etária: '{faixa_etaria_menor_mais_novo}'...")
+                
+                if faixa_etaria_menor_mais_novo == "18 a 24 anos":
+                    page.locator("input[type='radio'][value='18_24']").check()
+                    exibir_mensagem("✅ Radio '18 a 24 anos' para faixa etária selecionado com sucesso")
+                elif faixa_etaria_menor_mais_novo == "25 anos":
+                    page.locator("input[type='radio'][value='25']").check()
+                    exibir_mensagem("✅ Radio '25 anos' para faixa etária selecionado com sucesso")
+        else:
+            exibir_mensagem("⚠️ Resposta não reconhecida, usando 'Não'")
+            page.locator("input[type='radio'][value='nao']").first.check()
+        
+        # PASSO 4: Clicar no botão Continuar
+        exibir_mensagem("⏳ Aguardando botão 'Continuar'...")
+        page.wait_for_selector("p.font-semibold.font-workSans.cursor-pointer:has-text('Continuar')", timeout=5000)
+        
+        exibir_mensagem("🔄 Clicando no botão 'Continuar'...")
+        page.locator("p.font-semibold.font-workSans.cursor-pointer:has-text('Continuar')").click()
+        exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
+        
+        # PASSO 5: Aguardar transição para próxima tela
+        exibir_mensagem("⏳ Aguardando transição para próxima tela...")
+        time.sleep(2)
+        exibir_mensagem("✅ TELA 13 CONCLUÍDA!")
+        
+        return True
+        
+    except Exception as e:
+        exibir_mensagem(f"❌ ERRO na Tela 13: {str(e)}")
+        return False
+
+
 def main():
     """
     Função principal que executa o teste das Telas 1-9 sequencialmente
@@ -1542,10 +1647,19 @@ def main():
                 exibir_mensagem("❌ TELA 12 FALHOU!")
                 return 1
             
+            # TELA 13
+            exibir_mensagem("\n" + "="*50)
+            if navegar_tela_13_playwright(page, parametros['reside_18_26'], parametros['sexo_do_menor'], parametros['faixa_etaria_menor_mais_novo']):
+                telas_executadas += 1
+                exibir_mensagem("✅ TELA 13 CONCLUÍDA!")
+            else:
+                exibir_mensagem("❌ TELA 13 FALHOU!")
+                return 1
+            
             # Resultado final
             exibir_mensagem("\n" + "="*60)
-            exibir_mensagem("🎉 TESTE TELAS 1 A 12 CONCLUÍDO COM SUCESSO!")
-            exibir_mensagem(f"✅ Total de telas executadas: {telas_executadas}/12")
+            exibir_mensagem("🎉 TESTE TELAS 1 A 13 CONCLUÍDO COM SUCESSO!")
+            exibir_mensagem(f"✅ Total de telas executadas: {telas_executadas}/13")
             exibir_mensagem("✅ Todas as telas funcionaram corretamente")
             exibir_mensagem("✅ Navegação sequencial realizada com sucesso")
             
