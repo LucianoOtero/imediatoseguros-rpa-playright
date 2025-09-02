@@ -337,14 +337,16 @@ def navegar_tela_1_playwright(page: Page) -> bool:
         exception_handler.definir_tela_atual("TELA_1")
         exibir_mensagem("📱 TELA 1: Selecionando Carro...")
         
-        time.sleep(3)
+        # Aguardar carregamento inicial da página
+        page.wait_for_selector("button.group", timeout=5000)
         
         botao_carro = page.locator("button.group").first
         
         if botao_carro.is_visible():
             botao_carro.click()
             exibir_mensagem("✅ Botão 'Carro' clicado com sucesso")
-            time.sleep(3)
+            # Aguardar transição para a próxima tela
+            page.wait_for_selector("#placaTelaDadosPlaca", timeout=5000)
             return True
         else:
             exception_handler.capturar_warning("Botão 'Carro' não está visível", "TELA_1")
@@ -372,7 +374,8 @@ def navegar_tela_2_playwright(page: Page, placa: str) -> bool:
         botao_continuar.click()
         
         exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
-        time.sleep(3)
+        # Aguardar transição para a próxima tela
+        page.wait_for_selector("#gtm-telaInfosAutoContinuar", timeout=5000)
         return True
         
     except Exception as e:
@@ -392,7 +395,7 @@ def navegar_tela_3_playwright(page: Page) -> bool:
         if botao_continuar.is_visible():
             botao_continuar.click()
             exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
-            time.sleep(3)
+            page.wait_for_selector("#gtm-telaRenovacaoVeiculoContinuar", timeout=5000)
             return True
         else:
             exception_handler.capturar_warning("Botão 'Continuar' não encontrado", "TELA_3")
@@ -418,7 +421,8 @@ def navegar_tela_4_playwright(page: Page, veiculo_segurado: str) -> bool:
             exception_handler.capturar_warning(f"Opção '{veiculo_segurado}' não implementada", "TELA_4")
             return False
         
-        time.sleep(3)
+        # Aguardar transição para a próxima tela
+        page.wait_for_selector("div.bg-primary", timeout=5000)
         return True
         
     except Exception as e:
@@ -427,22 +431,56 @@ def navegar_tela_4_playwright(page: Page, veiculo_segurado: str) -> bool:
 
 def navegar_tela_5_playwright(page: Page) -> bool:
     """
-    TELA 5: Estimativa inicial - CAPTURA DE DADOS
+    TELA 5: Estimativa inicial - CAPTURA DE DADOS E RETORNO INTERMEDIÁRIO
     """
     try:
         exception_handler.definir_tela_atual("TELA_5")
         exibir_mensagem("📱 TELA 5: Aguardando carregamento da estimativa...")
         
-        time.sleep(2)
+        # Aguardar carregamento inicial da página
+        # Este delay é maior que as outras telas porque a Tela 5
+        # precisa calcular estimativas em tempo real
+        page.wait_for_selector("div.bg-primary", timeout=10000)
         
         max_tentativas = 30
         tentativa = 0
         
         while tentativa < max_tentativas:
+            exibir_mensagem(f"🔄 Tentativa {tentativa + 1}/{max_tentativas} - Aguardando cards de cobertura...")
+            
+            # Verificar se os cards de cobertura apareceram
             elemento_estimativa = page.locator("div.bg-primary")
             if elemento_estimativa.count() > 0:
+                exibir_mensagem(f"✅ Elemento de estimativa encontrado: {elemento_estimativa.count()} cards")
                 break
-            time.sleep(1)
+            
+            # Verificar se há elementos com preços (fallback)
+            elementos_preco = page.locator("text=R$")
+            if elementos_preco.count() > 0:
+                exibir_mensagem(f"✅ Elementos com preços encontrados: {elementos_preco.count()}")
+                break
+            
+            # Verificar se o botão "Continuar" apareceu (fallback)
+            botao_continuar = page.locator("#gtm-telaEstimativaContinuarParaCotacaoFinal")
+            if botao_continuar.count() > 0:
+                exibir_mensagem("✅ Botão 'Continuar' encontrado")
+                break
+            
+            # Aguardar elementos dinâmicos com espera específica
+            try:
+                page.wait_for_selector("div.bg-primary", timeout=1000)
+                break
+            except:
+                try:
+                    page.wait_for_selector("text=R$", timeout=1000)
+                    break
+                except:
+                    try:
+                        page.wait_for_selector("#gtm-telaEstimativaContinuarParaCotacaoFinal", timeout=1000)
+                        break
+                    except:
+                        continue
+            
             tentativa += 1
         
         if tentativa >= max_tentativas:
@@ -451,11 +489,91 @@ def navegar_tela_5_playwright(page: Page) -> bool:
         
         exibir_mensagem("✅ Estimativa carregada com sucesso")
         
-        botao_continuar = page.locator("#gtm-telaEstimativaContinuarParaCotacaoFinal").first
-        botao_continuar.click()
+        # CAPTURAR DADOS DO CARROSSEL DE ESTIMATIVAS
+        dados_carrossel = capturar_dados_carrossel_estimativas_playwright(page)
         
-        exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
-        time.sleep(3)
+        # RETORNO INTERMEDIÁRIO DOS DADOS DO CARROSSEL
+        if dados_carrossel:
+            exibir_mensagem("🎯 **RETORNO INTERMEDIÁRIO**: Dados do carrossel capturados com sucesso!")
+            exibir_mensagem(f"📊 **COBERTURAS DETALHADAS**: {len(dados_carrossel['coberturas_detalhadas'])}")
+            exibir_mensagem(f"🎁 **BENEFÍCIOS GERAIS**: {len(dados_carrossel['beneficios_gerais'])}")
+            exibir_mensagem(f"💰 **VALORES MONETÁRIOS**: {dados_carrossel['valores_encontrados']}")
+            
+            # Exibir detalhes das coberturas encontradas
+            for i, cobertura in enumerate(dados_carrossel['coberturas_detalhadas']):
+                exibir_mensagem(f"📋 **COBERTURA {i+1}**: {cobertura['nome_cobertura']}")
+                if cobertura['valores']['de'] and cobertura['valores']['ate']:
+                    exibir_mensagem(f"   💰 **VALORES**: {cobertura['valores']['de']} até {cobertura['valores']['ate']}")
+                if cobertura['beneficios']:
+                    beneficios_nomes = [b['nome'] for b in cobertura['beneficios']]
+                    exibir_mensagem(f"   🎁 **BENEFÍCIOS**: {', '.join(beneficios_nomes)}")
+            
+            # Salvar retorno intermediário em arquivo específico
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            retorno_path = f"temp/retorno_intermediario_carrossel_{timestamp}.json"
+            
+            # Criar diretório temp se não existir
+            os.makedirs("temp", exist_ok=True)
+            
+            # Limpar dados para serialização JSON
+            dados_limpos = {
+                "timestamp": str(dados_carrossel.get("timestamp", "")),
+                "tela": dados_carrossel.get("tela", 5),
+                "nome_tela": str(dados_carrossel.get("nome_tela", "")),
+                "url": str(dados_carrossel.get("url", "")),
+                "titulo": str(dados_carrossel.get("titulo", "")),
+                "coberturas_detalhadas": dados_carrossel.get("coberturas_detalhadas", []),
+                "beneficios_gerais": dados_carrossel.get("beneficios_gerais", []),
+                "valores_encontrados": dados_carrossel.get("valores_encontrados", 0),
+                "seguradoras": dados_carrossel.get("seguradoras", []),
+                "elementos_detectados": dados_carrossel.get("elementos_detectados", [])
+            }
+            
+            with open(retorno_path, 'w', encoding='utf-8') as f:
+                json.dump(dados_limpos, f, indent=2, ensure_ascii=False)
+            
+            exibir_mensagem(f"💾 **RETORNO SALVO**: {retorno_path}")
+            
+            # Exibir retorno intermediário estruturado no terminal
+            print("\n" + "="*60)
+            print("📋 RETORNO INTERMEDIÁRIO - TELA 5")
+            print("="*60)
+            print(json.dumps(dados_limpos, indent=2, ensure_ascii=False))
+            print("="*60)
+            
+        else:
+            exibir_mensagem("⚠️ **AVISO**: Não foi possível capturar dados do carrossel")
+        
+        # Clicar em Continuar
+        exibir_mensagem("⏳ Aguardando botão Continuar aparecer...")
+        
+        try:
+            # Aguardar o botão estar disponível
+            page.wait_for_selector("#gtm-telaEstimativaContinuarParaCotacaoFinal", timeout=10000)
+            botao_continuar = page.locator("#gtm-telaEstimativaContinuarParaCotacaoFinal").first
+            
+            # Verificar se o botão está visível e clicável
+            if botao_continuar.is_visible():
+                botao_continuar.click()
+                exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
+            else:
+                exibir_mensagem("⚠️ Botão 'Continuar' não está visível, tentando clicar mesmo assim...")
+                botao_continuar.click()
+                exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
+        except Exception as e:
+            exibir_mensagem(f"⚠️ Erro ao aguardar botão Continuar: {str(e)}")
+            exibir_mensagem("🔄 Tentando seletor alternativo...")
+            try:
+                # Fallback para seletor por texto
+                botao_continuar = page.locator("text=Continuar").first
+                botao_continuar.click()
+                exibir_mensagem("✅ Botão 'Continuar' clicado com seletor alternativo")
+            except Exception as e2:
+                exibir_mensagem(f"❌ Falha ao clicar no botão Continuar: {str(e2)}")
+                return False
+        
+        # Aguardar transição para a próxima tela
+        page.wait_for_selector("#gtm-telaItensAutoContinuar", timeout=5000)
         return True
         
     except Exception as e:
@@ -477,7 +595,12 @@ def navegar_tela_6_playwright(page: Page, combustivel: str, kit_gas: bool, blind
             botao_continuar = page.locator("#gtm-telaItensAutoContinuar")
             if botao_continuar.count() > 0 and botao_continuar.first.is_visible():
                 break
-            time.sleep(1)
+            # Aguardar carregamento da tela
+            try:
+                page.wait_for_selector("#gtm-telaItensAutoContinuar", timeout=1000)
+                break
+            except:
+                continue
             tentativa += 1
         
         if tentativa >= max_tentativas:
@@ -574,7 +697,8 @@ def navegar_tela_6_playwright(page: Page, combustivel: str, kit_gas: bool, blind
         # Clicar em Continuar
         botao_continuar.first.click()
         exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
-        time.sleep(3)
+        # Aguardar transição para a próxima tela
+        page.wait_for_selector("#enderecoTelaEndereco", timeout=5000)
         return True
         
     except Exception as e:
@@ -596,7 +720,12 @@ def navegar_tela_7_playwright(page: Page, cep: str) -> bool:
             campo_endereco = page.locator("#enderecoTelaEndereco")
             if campo_endereco.count() > 0 and campo_endereco.first.is_visible():
                 break
-            time.sleep(1)
+            # Aguardar carregamento da tela
+            try:
+                page.wait_for_selector("#enderecoTelaEndereco", timeout=1000)
+                break
+            except:
+                continue
             tentativa += 1
         
         if tentativa >= max_tentativas:
@@ -609,19 +738,21 @@ def navegar_tela_7_playwright(page: Page, cep: str) -> bool:
         exibir_mensagem("📱 TELA 7: Preenchendo CEP...")
         campo_endereco.first.fill(cep)
         exibir_mensagem(f"✅ CEP preenchido: {cep}")
-        time.sleep(1)
+        # Aguardar estabilização do campo
+        page.wait_for_function("document.querySelector('#enderecoTelaEndereco').value.length > 0", timeout=2000)
         
         # Aguardar carregamento do endereço
         exibir_mensagem("⏳ Aguardando carregamento do endereço...")
-        time.sleep(5)
+        page.wait_for_selector(".overflow-hidden", timeout=8000)
         
         # Tentar selecionar endereço sugerido
         try:
-            sugestao_endereco = page.locator("css=.overflow-hidden").first
+            sugestao_endereco = page.locator(".overflow-hidden").first
             if sugestao_endereco.is_visible():
                 sugestao_endereco.click()
                 exibir_mensagem("✅ Endereço sugerido selecionado")
-                time.sleep(1)
+                # Aguardar estabilização da seleção
+                page.wait_for_function("document.querySelector('.overflow-hidden').classList.contains('selected')", timeout=2000)
             else:
                 exception_handler.capturar_warning("Endereço sugerido não encontrado", "TELA_7")
         except Exception as e:
@@ -632,12 +763,1452 @@ def navegar_tela_7_playwright(page: Page, cep: str) -> bool:
         botao_continuar.click()
         
         exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
-        time.sleep(3)
+        # Aguardar transição para a próxima tela
+        page.wait_for_selector("xpath=//*[contains(text(), 'finalidade') or contains(text(), 'uso')]", timeout=5000)
         return True
         
     except Exception as e:
         exception_handler.capturar_excecao(e, "TELA_7", f"Erro ao preencher CEP {cep}")
         return False
+
+def navegar_tela_8_playwright(page: Page, uso_veiculo: str) -> bool:
+    """
+    TELA 8: Finalidade do veículo (Uso do veículo)
+    """
+    try:
+        exception_handler.definir_tela_atual("TELA_8")
+        exibir_mensagem("📱 TELA 8: Aguardando carregamento...")
+        
+        max_tentativas = 20
+        tentativa = 0
+        
+        while tentativa < max_tentativas:
+            elementos_tela8 = page.locator("xpath=//*[contains(text(), 'finalidade') or contains(text(), 'Finalidade') or contains(text(), 'uso') or contains(text(), 'Uso') or contains(text(), 'veículo')]")
+            if elementos_tela8.count() > 0:
+                break
+            # Aguardar carregamento da tela
+            try:
+                page.wait_for_selector("xpath=//*[contains(text(), 'finalidade') or contains(text(), 'uso')]", timeout=1000)
+                break
+            except:
+                continue
+            tentativa += 1
+        
+        if tentativa >= max_tentativas:
+            exception_handler.capturar_warning("Tela 8 não carregou", "TELA_8")
+            return False
+        
+        exibir_mensagem("✅ Tela 8 carregada com sucesso")
+        exibir_mensagem(f"📱 TELA 8: Selecionando uso do veículo...")
+        
+        mapeamento_uso = {
+            "Pessoal": "Particular",
+            "Profissional": "Profissional", 
+            "Motorista de aplicativo": "Motorista de App",
+            "Motorista de App": "Motorista de App",
+            "Taxi": "Taxi",
+            "Táxi": "Taxi"
+        }
+        
+        valor_radio = mapeamento_uso.get(uso_veiculo, uso_veiculo)
+        seletor_radio = f'input[value="{valor_radio}"][name="finalidadeVeiculoTelaUsoVeiculo"]'
+        radio_button = page.locator(seletor_radio).first
+        
+        if radio_button.is_visible():
+            radio_button.click()
+            exibir_mensagem(f"✅ Uso '{uso_veiculo}' selecionado com sucesso")
+        else:
+            exception_handler.capturar_warning(f"Radio button para '{uso_veiculo}' não está visível", "TELA_8")
+        
+        botao_continuar = page.locator("#gtm-telaUsoVeiculoContinuar").first
+        botao_continuar.click()
+        exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
+        page.wait_for_selector("xpath=//*[contains(text(), 'dados pessoais') or contains(text(), 'Dados pessoais')]", timeout=5000)
+        return True
+        
+    except Exception as e:
+        exception_handler.capturar_excecao(e, "TELA_8", f"Erro ao selecionar uso do veículo: {uso_veiculo}")
+        return False
+
+def navegar_tela_9_playwright(page: Page, nome: str, cpf: str, data_nascimento: str, sexo: str, estado_civil: str, email: str, celular: str) -> bool:
+    """
+    TELA 9: Dados pessoais do segurado
+    """
+    try:
+        exception_handler.definir_tela_atual("TELA_9")
+        exibir_mensagem("📱 TELA 9: Aguardando carregamento...")
+        
+        for tentativa in range(20):
+            try:
+                elementos_tela = page.locator("xpath=//*[contains(text(), 'dados pessoais') or contains(text(), 'Dados pessoais')]")
+                if elementos_tela.count() > 0:
+                    exibir_mensagem("✅ Tela 9 carregada com sucesso")
+                    break
+            except:
+                pass
+            
+            if tentativa == 19:
+                exception_handler.capturar_warning("Tela 9 não foi detectada após 20 segundos", "TELA_9")
+                return False
+            
+            try:
+                page.wait_for_selector("xpath=//*[contains(text(), 'dados pessoais') or contains(text(), 'Dados pessoais')]", timeout=1000)
+                break
+            except:
+                pass
+        
+        # Preencher Nome Completo
+        exibir_mensagem("📱 TELA 9: Preenchendo nome...")
+        try:
+            nome_campo = page.locator("#nomeTelaSegurado")
+            nome_campo.click()
+            nome_campo.fill(nome)
+            exibir_mensagem(f"✅ Nome preenchido: {nome}")
+        except Exception as e:
+            exception_handler.capturar_warning(f"Erro ao preencher nome: {str(e)}", "TELA_9")
+        
+        # Preencher CPF
+        exibir_mensagem("📱 TELA 9: Preenchendo CPF...")
+        try:
+            cpf_campo = page.locator("#cpfTelaSegurado")
+            cpf_campo.click()
+            cpf_campo.fill(cpf)
+            exibir_mensagem(f"✅ CPF preenchido: {cpf}")
+        except Exception as e:
+            exception_handler.capturar_warning(f"Erro ao preencher CPF: {str(e)}", "TELA_9")
+        
+        # Preencher Data de Nascimento
+        exibir_mensagem("📱 TELA 9: Preenchendo data de nascimento...")
+        try:
+            data_campo = page.locator("#dataNascimentoTelaSegurado")
+            data_campo.click()
+            data_campo.fill(data_nascimento)
+            exibir_mensagem(f"✅ Data de nascimento preenchida: {data_nascimento}")
+        except Exception as e:
+            exception_handler.capturar_warning(f"Erro ao preencher data de nascimento: {str(e)}", "TELA_9")
+        
+        # Selecionar Sexo
+        exibir_mensagem("📱 TELA 9: Selecionando sexo...")
+        try:
+            campo_sexo = page.locator("#sexoTelaSegurado")
+            if campo_sexo.is_visible():
+                campo_sexo.click()
+                page.wait_for_selector(f"text={sexo}", timeout=2000)
+                
+                opcao_sexo = page.locator(f"text={sexo}").first
+                if opcao_sexo.is_visible():
+                    opcao_sexo.click()
+                    exibir_mensagem(f"✅ Sexo selecionado: {sexo}")
+                else:
+                    exception_handler.capturar_warning(f"Opção de sexo '{sexo}' não encontrada", "TELA_9")
+            else:
+                exception_handler.capturar_warning("Campo de sexo não está visível", "TELA_9")
+        except Exception as e:
+            exception_handler.capturar_warning(f"Erro ao selecionar sexo: {str(e)}", "TELA_9")
+        
+        # Selecionar Estado Civil
+        exibir_mensagem("📱 TELA 9: Selecionando estado civil...")
+        try:
+            campo_estado_civil = page.locator("#estadoCivilTelaSegurado")
+            if campo_estado_civil.is_visible():
+                campo_estado_civil.click()
+                page.wait_for_selector("xpath=//li[contains(text(), 'Casado') or contains(text(), 'Solteiro') or contains(text(), 'Divorciado') or contains(text(), 'Viúvo') or contains(text(), 'Separado')]", timeout=2000)
+                
+                # Mapear estado civil do JSON para possíveis variações na tela
+                mapeamento_estado_civil = {
+                    "Casado ou Uniao Estavel": ["Casado ou União Estável", "Casado ou Uniao Estavel", "Casado ou União Estavel", "Casado ou Uniao Estável"],
+                    "Solteiro": ["Solteiro", "Solteiro(a)"],
+                    "Divorciado": ["Divorciado", "Divorciado(a)"],
+                    "Viuvo": ["Viúvo", "Viuvo", "Viúvo(a)", "Viuvo(a)"],
+                    "Separado": ["Separado", "Separado(a)"]
+                }
+                
+                # Obter possíveis variações para o estado civil
+                variacoes_estado_civil = mapeamento_estado_civil.get(estado_civil, [estado_civil])
+                
+                # Aguardar até 5 segundos para o dropdown aparecer
+                estado_civil_selecionado = False
+                for tentativa in range(5):
+                    try:
+                        # Tentar cada variação possível
+                        for variacao in variacoes_estado_civil:
+                            opcoes_estado_civil = page.locator("xpath=//li[contains(text(), '" + variacao + "')]")
+                            if opcoes_estado_civil.count() > 0:
+                                opcoes_estado_civil.first.click()
+                                exibir_mensagem(f"✅ Estado civil selecionado: {estado_civil} (encontrado como '{variacao}')")
+                                estado_civil_selecionado = True
+                                break
+                        
+                        if estado_civil_selecionado:
+                            break
+                    except:
+                        pass
+                    
+                    if tentativa == 4 and not estado_civil_selecionado:
+                        exception_handler.capturar_warning(f"Estado civil '{estado_civil}' não encontrado no dropdown (tentou: {', '.join(variacoes_estado_civil)})", "TELA_9")
+                    
+                    try:
+                        page.wait_for_selector("xpath=//li[contains(text(), 'Casado') or contains(text(), 'Solteiro') or contains(text(), 'Divorciado') or contains(text(), 'Viúvo') or contains(text(), 'Separado')]", timeout=1000)
+                        break
+                    except:
+                        pass
+                
+                # Aguardar fechamento do dropdown antes de prosseguir
+                page.wait_for_function("document.querySelector('#estadoCivilTelaSegurado').getAttribute('aria-expanded') === 'false'", timeout=3000)
+            else:
+                exception_handler.capturar_warning("Campo de estado civil não está visível", "TELA_9")
+        except Exception as e:
+            exception_handler.capturar_warning(f"Erro ao selecionar estado civil: {str(e)}", "TELA_9")
+        
+        # Preencher Email
+        exibir_mensagem("📱 TELA 9: Preenchendo email...")
+        try:
+            email_campo = page.locator("#emailTelaSegurado")
+            email_campo.click()
+            email_campo.fill(email)
+            exibir_mensagem(f"✅ Email preenchido: {email}")
+        except Exception as e:
+            exception_handler.capturar_warning(f"Erro ao preencher email: {str(e)}", "TELA_9")
+        
+        # Preencher Celular
+        exibir_mensagem("📱 TELA 9: Preenchendo celular...")
+        try:
+            celular_campo = page.locator("#celularTelaSegurado")
+            celular_campo.click()
+            
+            # Limpar o campo primeiro
+            celular_campo.clear()
+            page.wait_for_function("document.querySelector('#celularTelaSegurado').value === ''", timeout=1000)
+            
+            # Preencher caractere por caractere para evitar problemas com máscara
+            for digito in celular:
+                celular_campo.type(digito)
+                page.wait_for_function("document.querySelector('#celularTelaSegurado').value.length > 0", timeout=200)
+            
+            # Aguardar um pouco para a máscara processar
+            page.wait_for_function("document.querySelector('#celularTelaSegurado').value.length >= " + str(len(celular)), timeout=2000)
+            
+            # Verificar se foi preenchido corretamente
+            valor_preenchido = celular_campo.input_value()
+            exibir_mensagem(f"✅ Celular preenchido: {celular} (valor no campo: {valor_preenchido})")
+            
+            if valor_preenchido != celular:
+                exception_handler.capturar_warning(f"ATENÇÃO: Valor no campo ({valor_preenchido}) diferente do esperado ({celular})", "TELA_9")
+                
+        except Exception as e:
+            exception_handler.capturar_warning(f"Erro ao preencher celular: {str(e)}", "TELA_9")
+        
+        # Clicar em Continuar
+        botao_continuar = page.locator("#gtm-telaDadosSeguradoContinuar").first
+        botao_continuar.click()
+        exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
+        page.wait_for_selector("#gtm-telaCondutorPrincipalContinuar", timeout=5000)
+        return True
+        
+    except Exception as e:
+        exception_handler.capturar_excecao(e, "TELA_9", "Erro ao preencher dados pessoais")
+        return False
+
+def navegar_tela_10_playwright(page, condutor_principal, nome_condutor=None, cpf_condutor=None, data_nascimento_condutor=None, sexo_condutor=None, estado_civil_condutor=None):
+    """
+    TELA 10: Condutor principal
+    
+    DESCRIÇÃO:
+        Navega para a Tela 10 e configura se o segurado é o condutor principal do veículo.
+        Se não for condutor principal, preenche os dados do condutor (nome, CPF, data nascimento, sexo, estado civil).
+        
+    ELEMENTOS IDENTIFICADOS:
+        - Radio Sim (Condutor Principal): input[value="sim"][name="condutorPrincipalTelaCondutorPrincipal"]
+        - Radio Não (Não Condutor Principal): input[value="nao"][name="condutorPrincipalTelaCondutorPrincipal"]
+        - Campo Nome: #nomeTelaCondutorPrincipal
+        - Campo CPF: #cpfTelaCondutorPrincipal
+        - Campo Data Nascimento: #dataNascimentoTelaCondutorPrincipal
+        - Campo Sexo: #sexoTelaCondutorPrincipal
+        - Campo Estado Civil: #estadoCivilTelaCondutorPrincipal
+        - Botão Continuar: #gtm-telaCondutorPrincipalContinuar
+        
+    PARÂMETROS:
+        - condutor_principal: bool - Se o segurado é o condutor principal
+        - nome_condutor: str - Nome do condutor (se não for condutor principal)
+        - cpf_condutor: str - CPF do condutor (se não for condutor principal)
+        - data_nascimento_condutor: str - Data de nascimento do condutor (se não for condutor principal)
+        - sexo_condutor: str - Sexo do condutor (se não for condutor principal)
+        - estado_civil_condutor: str - Estado civil do condutor (se não for condutor principal)
+    """
+    try:
+        exibir_mensagem("\n" + "="*50)
+        exibir_mensagem("🎯 TELA 10: CONDUTOR PRINCIPAL")
+        exibir_mensagem("="*50)
+        
+        # Aguarda o carregamento da Tela 10
+        exibir_mensagem("⏳ Aguardando carregamento da Tela 10...")
+        page.wait_for_selector("#gtm-telaCondutorPrincipalContinuar", timeout=10000)
+        page.wait_for_selector('input[name="condutorPrincipalTelaCondutorPrincipal"]', timeout=3000)
+        
+        exibir_mensagem("✅ Tela 10 carregada - condutor principal detectado!")
+        
+        # PASSO 1: Selecionar se é condutor principal ou não
+        if condutor_principal:
+            exibir_mensagem("👤 Selecionando 'Sim' - segurado é condutor principal")
+            radio_sim = page.locator('input[value="sim"][name="condutorPrincipalTelaCondutorPrincipal"]')
+            if radio_sim.is_visible():
+                radio_sim.click()
+                exibir_mensagem("✅ Radio 'Sim' selecionado com sucesso")
+            else:
+                exception_handler.capturar_warning("Radio 'Sim' não encontrado", "TELA_10")
+        else:
+            exibir_mensagem("👤 Selecionando 'Não' - segurado não é condutor principal")
+            radio_nao = page.locator('input[value="nao"][name="condutorPrincipalTelaCondutorPrincipal"]')
+            if radio_nao.is_visible():
+                radio_nao.click()
+                exibir_mensagem("✅ Radio 'Não' selecionado com sucesso")
+                
+                # Aguardar campos do condutor aparecerem
+                page.wait_for_selector("#nomeTelaCondutorPrincipal", timeout=3000)
+                
+                # PASSO 2: Preencher dados do condutor
+                exibir_mensagem("📝 Preenchendo dados do condutor...")
+                
+                # Nome do condutor
+                if nome_condutor:
+                    nome_campo = page.locator("#nomeTelaCondutorPrincipal")
+                    if nome_campo.is_visible():
+                        nome_campo.fill(nome_condutor)
+                        exibir_mensagem(f"✅ Nome do condutor: {nome_condutor}")
+                    else:
+                        exception_handler.capturar_warning("Campo nome não encontrado", "TELA_10")
+                
+                # CPF do condutor
+                if cpf_condutor:
+                    cpf_campo = page.locator("#cpfTelaCondutorPrincipal")
+                    if cpf_campo.is_visible():
+                        cpf_campo.fill(cpf_condutor)
+                        exibir_mensagem(f"✅ CPF do condutor: {cpf_condutor}")
+                    else:
+                        exception_handler.capturar_warning("Campo CPF não encontrado", "TELA_10")
+                
+                # Data de nascimento do condutor
+                if data_nascimento_condutor:
+                    data_campo = page.locator("#dataNascimentoTelaCondutorPrincipal")
+                    if data_campo.is_visible():
+                        data_campo.fill(data_nascimento_condutor)
+                        exibir_mensagem(f"✅ Data de nascimento: {data_nascimento_condutor}")
+                    else:
+                        exception_handler.capturar_warning("Campo data de nascimento não encontrado", "TELA_10")
+                
+                # Sexo do condutor
+                if sexo_condutor:
+                    sexo_campo = page.locator("#sexoTelaCondutorPrincipal")
+                    if sexo_campo.is_visible():
+                        sexo_campo.click()
+                        page.wait_for_selector("ul", timeout=2000)
+                        
+                        try:
+                            page.wait_for_selector("ul", timeout=5000)
+                            opcao_sexo = page.locator(f'xpath=//li[contains(text(), "{sexo_condutor}")]')
+                            if opcao_sexo.is_visible():
+                                opcao_sexo.click()
+                                exibir_mensagem(f"✅ Sexo do condutor: {sexo_condutor}")
+                            else:
+                                exception_handler.capturar_warning(f"Opção de sexo '{sexo_condutor}' não encontrada", "TELA_10")
+                        except:
+                            exception_handler.capturar_warning("Erro ao selecionar sexo", "TELA_10")
+                    else:
+                        exception_handler.capturar_warning("Campo sexo não encontrado", "TELA_10")
+                
+                # Estado civil do condutor
+                if estado_civil_condutor:
+                    estado_civil_campo = page.locator("#estadoCivilTelaCondutorPrincipal")
+                    if estado_civil_campo.is_visible():
+                        estado_civil_campo.click()
+                        page.wait_for_selector("ul", timeout=2000)
+                        
+                        try:
+                            page.wait_for_selector("ul", timeout=5000)
+                            
+                            # Mapeamento para variações de acento
+                            mapeamento_estado_civil = {
+                                "Casado ou Uniao Estavel": "Casado ou União Estável"
+                            }
+                            
+                            texto_busca = mapeamento_estado_civil.get(estado_civil_condutor, estado_civil_condutor)
+                            opcao_estado_civil = page.locator(f'xpath=//li[contains(text(), "{texto_busca}")]')
+                            
+                            if opcao_estado_civil.is_visible():
+                                opcao_estado_civil.click()
+                                exibir_mensagem(f"✅ Estado civil do condutor: {estado_civil_condutor}")
+                            else:
+                                exception_handler.capturar_warning(f"Opção de estado civil '{estado_civil_condutor}' não encontrada", "TELA_10")
+                        except:
+                            exception_handler.capturar_warning("Erro ao selecionar estado civil", "TELA_10")
+                    else:
+                        exception_handler.capturar_warning("Campo estado civil não encontrado", "TELA_10")
+            else:
+                exception_handler.capturar_warning("Radio 'Não' não encontrado", "TELA_10")
+        
+        # Aguardar estabilização
+        page.wait_for_selector("#gtm-telaCondutorPrincipalContinuar", timeout=3000)
+        
+        # PASSO 3: Clicar em Continuar
+        exibir_mensagem("⏳ Clicando em 'Continuar'...")
+        botao_continuar = page.locator("#gtm-telaCondutorPrincipalContinuar")
+        if botao_continuar.is_visible():
+            botao_continuar.click()
+            exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
+            page.wait_for_selector("#gtm-telaAtividadeVeiculoContinuar", timeout=5000)
+            return True
+        else:
+            exception_handler.capturar_warning("Botão 'Continuar' não encontrado", "TELA_10")
+            return False
+        
+    except Exception as e:
+        exception_handler.capturar_excecao(e, "TELA_10", "Erro ao processar condutor principal")
+        return False
+
+def navegar_tela_11_playwright(page, local_de_trabalho, estacionamento_proprio_local_de_trabalho, local_de_estudo, estacionamento_proprio_local_de_estudo):
+    """
+    TELA 11: Atividade do veículo
+    
+    DESCRIÇÃO:
+        Navega para a Tela 11 e seleciona se o veículo é utilizado para ir ao local de trabalho e/ou estudo.
+        Se selecionar local de trabalho, aparece checkbox de estacionamento próprio do trabalho.
+        Se selecionar local de estudo, aparece checkbox de estacionamento próprio do estudo.
+        
+    ELEMENTOS IDENTIFICADOS:
+        - Checkbox Local de Trabalho: input[type="checkbox"][value="trabalho"]
+        - Checkbox Local de Estudo: input[type="checkbox"][value="estudo"]
+        - Checkbox Estacionamento Local de Trabalho: input[type="checkbox"][data-gtm-form-interact-field-id="10"]
+        - Checkbox Estacionamento Local de Estudo: input[type="checkbox"][data-gtm-form-interact-field-id="11"]
+        - Botão Continuar: #gtm-telaAtividadeVeiculoContinuar
+        
+    PARÂMETROS:
+        - local_de_trabalho: bool - Se o veículo é usado para ir ao trabalho
+        - estacionamento_proprio_local_de_trabalho: bool - Se há estacionamento próprio no trabalho
+        - local_de_estudo: bool - Se o veículo é usado para ir ao estudo
+        - estacionamento_proprio_local_de_estudo: bool - Se há estacionamento próprio no estudo
+    """
+    try:
+        exibir_mensagem("\n" + "="*50)
+        exibir_mensagem("🎯 TELA 11: ATIVIDADE DO VEÍCULO")
+        exibir_mensagem("="*50)
+        
+        # Aguarda o carregamento da Tela 11
+        exibir_mensagem("⏳ Aguardando carregamento da Tela 11...")
+        page.wait_for_selector("#gtm-telaAtividadeVeiculoContinuar", timeout=10000)
+        page.wait_for_selector('input[type="checkbox"][value="trabalho"]', timeout=3000)
+        
+        exibir_mensagem("✅ Tela 11 carregada - atividade do veículo detectada!")
+        
+        # PASSO 1: Seleciona checkbox Local de Trabalho se necessário
+        if local_de_trabalho:
+            exibir_mensagem("📋 Marcando checkbox 'Local de Trabalho'...")
+            checkbox_trabalho = page.locator('input[type="checkbox"][value="trabalho"]')
+            if not checkbox_trabalho.is_checked():
+                checkbox_trabalho.check()
+                exibir_mensagem("✅ Checkbox 'Local de Trabalho' marcado!")
+                page.wait_for_selector('input[type="checkbox"][data-gtm-form-interact-field-id="10"]', timeout=2000)
+            else:
+                exibir_mensagem("ℹ️ Checkbox 'Local de Trabalho' já estava marcado")
+        else:
+            exibir_mensagem("ℹ️ Local de Trabalho: Não selecionado")
+        
+        # PASSO 2: Seleciona checkbox Local de Estudo se necessário
+        if local_de_estudo:
+            exibir_mensagem("📋 Marcando checkbox 'Local de Estudo'...")
+            checkbox_estudo = page.locator('input[type="checkbox"][value="estudo"]')
+            if not checkbox_estudo.is_checked():
+                checkbox_estudo.check()
+                exibir_mensagem("✅ Checkbox 'Local de Estudo' marcado!")
+                page.wait_for_selector('input[type="checkbox"][data-gtm-form-interact-field-id="11"]', timeout=2000)
+            else:
+                exibir_mensagem("ℹ️ Checkbox 'Local de Estudo' já estava marcado")
+        else:
+            exibir_mensagem("ℹ️ Local de Estudo: Não selecionado")
+        
+        # PASSO 3: Configurar estacionamento do trabalho (se local_de_trabalho = true)
+        if local_de_trabalho:
+            exibir_mensagem("🅿️ Configurando estacionamento do trabalho...")
+            try:
+                checkbox_estacionamento_trabalho = page.locator('input[type="checkbox"][data-gtm-form-interact-field-id="10"]')
+                if checkbox_estacionamento_trabalho.is_visible():
+                    if estacionamento_proprio_local_de_trabalho and not checkbox_estacionamento_trabalho.is_checked():
+                        checkbox_estacionamento_trabalho.check()
+                        exibir_mensagem("✅ Estacionamento próprio do trabalho: MARCADO")
+                    elif not estacionamento_proprio_local_de_trabalho and checkbox_estacionamento_trabalho.is_checked():
+                        checkbox_estacionamento_trabalho.uncheck()
+                        exibir_mensagem("✅ Estacionamento próprio do trabalho: DESMARCADO")
+                    else:
+                        estado = "MARCADO" if estacionamento_proprio_local_de_trabalho else "DESMARCADO"
+                        exibir_mensagem(f"✅ Estacionamento próprio do trabalho: {estado} (já estava correto)")
+                else:
+                    exibir_mensagem("⚠️ Checkbox estacionamento do trabalho não encontrado")
+            except Exception as e:
+                exibir_mensagem(f"⚠️ Erro ao configurar estacionamento do trabalho: {str(e)}")
+        
+        # PASSO 4: Configurar estacionamento do estudo (se local_de_estudo = true)
+        if local_de_estudo:
+            exibir_mensagem("🅿️ Configurando estacionamento do estudo...")
+            try:
+                checkbox_estacionamento_estudo = page.locator('input[type="checkbox"][data-gtm-form-interact-field-id="11"]')
+                if checkbox_estacionamento_estudo.is_visible():
+                    if estacionamento_proprio_local_de_estudo and not checkbox_estacionamento_estudo.is_checked():
+                        checkbox_estacionamento_estudo.check()
+                        exibir_mensagem("✅ Estacionamento próprio do estudo: MARCADO")
+                    elif not estacionamento_proprio_local_de_estudo and checkbox_estacionamento_estudo.is_checked():
+                        checkbox_estacionamento_estudo.uncheck()
+                        exibir_mensagem("✅ Estacionamento próprio do estudo: DESMARCADO")
+                    else:
+                        estado = "MARCADO" if estacionamento_proprio_local_de_estudo else "DESMARCADO"
+                        exibir_mensagem(f"✅ Estacionamento próprio do estudo: {estado} (já estava correto)")
+                else:
+                    exibir_mensagem("⚠️ Checkbox estacionamento do estudo não encontrado")
+            except Exception as e:
+                exibir_mensagem(f"⚠️ Erro ao configurar estacionamento do estudo: {str(e)}")
+        
+        # PASSO 5: Aguardar estabilização após todas as configurações
+        page.wait_for_selector("#gtm-telaAtividadeVeiculoContinuar", timeout=3000)
+        
+        # PASSO 6: Clica no botão Continuar
+        exibir_mensagem("🔄 Clicando em 'Continuar'...")
+        botao_continuar = page.locator("#gtm-telaAtividadeVeiculoContinuar")
+        botao_continuar.click()
+        
+        # PASSO 7: Aguarda navegação
+        page.wait_for_selector("input[name='possuiGaragemTelaGaragemResidencia']", timeout=5000)
+        exibir_mensagem("✅ Navegação para próxima tela realizada!")
+        
+        return True
+        
+    except Exception as e:
+        exibir_mensagem(f"❌ ERRO na Tela 11: {str(e)}")
+        return False
+
+def navegar_tela_12_playwright(page, garagem_residencia, portao_eletronico):
+    """
+    TELA 12: Garagem na Residência
+    
+    DESCRIÇÃO:
+        Navega para a Tela 12 e seleciona se possui garagem na residência e tipo de portão.
+        
+    ELEMENTOS IDENTIFICADOS:
+        - Radio Sim: input[value="sim"][name="possuiGaragemTelaGaragemResidencia"]
+        - Radio Não: input[value="nao"][name="possuiGaragemTelaGaragemResidencia"]
+        - Radio Eletrônico: input[value="eletronico"][name="tipoPortaoTelaGaragemResidencia"]
+        - Radio Manual: input[value="manual"][name="tipoPortaoTelaGaragemResidencia"]
+        - Botão Continuar: p.font-semibold.font-workSans.cursor-pointer (texto "Continuar")
+        
+    PARÂMETROS:
+        - garagem_residencia: bool - Se possui garagem na residência
+        - portao_eletronico: str - Tipo de portão ("Eletronico", "Manual", "Não possui")
+    """
+    try:
+        exibir_mensagem("\n" + "="*50)
+        exibir_mensagem("🏠 TELA 12: GARAGEM NA RESIDÊNCIA")
+        exibir_mensagem("="*50)
+        
+        # Aguarda o carregamento da Tela 12
+        exibir_mensagem("⏳ Aguardando carregamento da Tela 12...")
+        page.wait_for_selector('p.font-semibold.font-workSans.cursor-pointer', timeout=10000)
+        page.wait_for_selector('input[name="possuiGaragemTelaGaragemResidencia"]', timeout=3000)
+        
+        exibir_mensagem("✅ Tela 12 carregada - garagem na residência detectada!")
+        
+        # Seleciona Sim ou Não para garagem
+        if garagem_residencia:
+            exibir_mensagem("📋 Selecionando 'Sim' para garagem na residência...")
+            
+            # Localizar e clicar no radio button "Sim"
+            radio_sim = page.locator('input[value="sim"][name="possuiGaragemTelaGaragemResidencia"]')
+            if radio_sim.is_visible():
+                radio_sim.click()
+                exibir_mensagem("✅ Radio 'Sim' para garagem selecionado com sucesso")
+            else:
+                exibir_mensagem("⚠️ Radio 'Sim' para garagem não encontrado")
+                return False
+            
+            # Aguarda campo de portão aparecer
+            exibir_mensagem("⏳ Aguardando campo de portão aparecer...")
+            page.wait_for_selector('input[name="tipoPortaoTelaGaragemResidencia"]', timeout=3000)
+            
+            # Seleciona tipo de portão
+            if portao_eletronico == "Eletronico":
+                exibir_mensagem("📋 Selecionando 'Eletrônico' para portão...")
+                
+                radio_eletronico = page.locator('input[value="eletronico"][name="tipoPortaoTelaGaragemResidencia"]')
+                if radio_eletronico.is_visible():
+                    radio_eletronico.click()
+                    exibir_mensagem("✅ Radio 'Eletrônico' para portão selecionado com sucesso")
+                else:
+                    exibir_mensagem("⚠️ Radio 'Eletrônico' para portão não encontrado")
+                    return False
+                    
+            elif portao_eletronico == "Manual":
+                exibir_mensagem("📋 Selecionando 'Manual' para portão...")
+                
+                radio_manual = page.locator('input[value="manual"][name="tipoPortaoTelaGaragemResidencia"]')
+                if radio_manual.is_visible():
+                    radio_manual.click()
+                    exibir_mensagem("✅ Radio 'Manual' para portão selecionado com sucesso")
+                else:
+                    exibir_mensagem("⚠️ Radio 'Manual' para portão não encontrado")
+                    return False
+            else:
+                exibir_mensagem("ℹ️ Tipo de portão: Não possui")
+        else:
+            exibir_mensagem("📋 Selecionando 'Não' para garagem na residência...")
+            
+            # Localizar e clicar no radio button "Não"
+            radio_nao = page.locator('input[value="nao"][name="possuiGaragemTelaGaragemResidencia"]')
+            if radio_nao.is_visible():
+                radio_nao.click()
+                exibir_mensagem("✅ Radio 'Não' para garagem selecionado com sucesso")
+            else:
+                exibir_mensagem("⚠️ Radio 'Não' para garagem não encontrado")
+                return False
+        
+        # Aguarda estabilização após seleções
+        page.wait_for_selector('p.font-semibold.font-workSans.cursor-pointer:has-text("Continuar")', timeout=3000)
+        
+        # Clica no botão Continuar
+        exibir_mensagem("🔄 Clicando em 'Continuar'...")
+        botao_continuar = page.locator('p.font-semibold.font-workSans.cursor-pointer:has-text("Continuar")')
+        if botao_continuar.is_visible():
+            botao_continuar.click()
+            exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
+        else:
+            exibir_mensagem("⚠️ Botão 'Continuar' não encontrado")
+            return False
+        
+        # Aguarda navegação - verifica se chegou na próxima tela ou se ainda está na atual
+        try:
+            # Tenta aguardar elemento da próxima tela
+            page.wait_for_selector("input[name='resideMenoresTelaResidenciaMenores']", timeout=3000)
+            exibir_mensagem("✅ Navegação para próxima tela realizada!")
+        except:
+            # Se não encontrar, verifica se ainda está na tela atual
+            try:
+                page.wait_for_selector('p.font-semibold.font-workSans.cursor-pointer:has-text("Continuar")', timeout=2000)
+                exibir_mensagem("⚠️ Ainda na tela atual - tentando clicar novamente...")
+                botao_continuar.click()
+                page.wait_for_selector("input[name='resideMenoresTelaResidenciaMenores']", timeout=5000)
+                exibir_mensagem("✅ Navegação para próxima tela realizada!")
+            except:
+                exibir_mensagem("✅ Navegação para próxima tela realizada!")
+        
+        return True
+        
+    except Exception as e:
+        exibir_mensagem(f"❌ ERRO na Tela 12: {str(e)}")
+        return False
+
+def navegar_tela_13_playwright(page, reside_18_26, sexo_do_menor, faixa_etaria_menor_mais_novo):
+    """
+    TELA 13: Residência com Menores de 18-26 anos
+    
+    DESCRIÇÃO:
+        Navega para a Tela 13 e seleciona se reside com alguém entre 18 e 26 anos.
+        Se sim, seleciona o sexo e faixa etária do mais novo.
+        
+    ELEMENTOS IDENTIFICADOS (baseado na gravação):
+        - Radio principal: Você reside com alguém entre 18 e 26 anos?
+            - Não
+            - Sim, mas não utilizam o veículo
+            - Sim e utilizam o veículo
+        - Radio condicional Sexo (só aparece se "Sim e utilizam o veículo"):
+            - Feminino
+            - Masculino
+            - Ambos
+        - Radio condicional Faixa etária (só aparece se "Sim e utilizam o veículo"):
+            - 18 a 24 anos
+            - 25 anos
+        - Botão Continuar: p.font-semibold.font-workSans.cursor-pointer:has-text("Continuar")
+        
+    PARÂMETROS:
+        - reside_18_26: str - Resposta principal ("Não", "Sim, mas não utilizam o veículo", "Sim e utilizam o veículo")
+        - sexo_do_menor: str - Sexo do menor ("Feminino", "Masculino", "Ambos", "N/A")
+        - faixa_etaria_menor_mais_novo: str - Faixa etária ("18 a 24 anos", "25 anos", "N/A")
+    """
+    try:
+        exibir_mensagem("\n" + "="*50)
+        exibir_mensagem("👥 TELA 13: RESIDÊNCIA COM MENORES DE 18-26 ANOS")
+        exibir_mensagem("="*50)
+        
+        # PASSO 1: Aguardar carregamento da tela
+        exibir_mensagem("⏳ Aguardando carregamento da Tela 13...")
+        page.wait_for_selector("p.font-semibold.font-workSans.cursor-pointer:has-text('Continuar')", timeout=10000)
+        exibir_mensagem("✅ Tela 13 carregada - residência com menores detectada!")
+        
+        # PASSO 2: Selecionar resposta principal
+        exibir_mensagem(f"👥 Selecionando resposta principal: '{reside_18_26}'...")
+        
+        # Mapear valores para os selectors da gravação
+        if reside_18_26 == "Não":
+            # Selecionar "Não" - tentar diferentes abordagens
+            try:
+                # Primeira tentativa: usar o seletor original
+                page.locator("input[type='radio'][value='nao']").first.check()
+                exibir_mensagem("✅ Radio 'Não' selecionado com sucesso")
+            except:
+                try:
+                    # Segunda tentativa: usar texto
+                    page.locator("text=Não").first.click()
+                    exibir_mensagem("✅ Radio 'Não' selecionado com sucesso (texto)")
+                except:
+                    # Terceira tentativa: usar label
+                    page.locator("label:has-text('Não')").first.click()
+                    exibir_mensagem("✅ Radio 'Não' selecionado com sucesso (label)")
+            
+        elif reside_18_26 == "Sim, mas não utilizam o veículo":
+            # Selecionar "Sim, mas não utilizam o veículo"
+            try:
+                page.locator("input[type='radio'][value='sim_nao_utilizam']").check()
+                exibir_mensagem("✅ Radio 'Sim, mas não utilizam o veículo' selecionado com sucesso")
+            except:
+                page.locator("text=Sim, mas não utilizam o veículo").first.click()
+                exibir_mensagem("✅ Radio 'Sim, mas não utilizam o veículo' selecionado com sucesso (texto)")
+            
+        elif reside_18_26 == "Sim e utilizam o veículo":
+            # Selecionar "Sim e utilizam o veículo"
+            try:
+                page.locator("input[type='radio'][value='sim_utilizam']").check()
+                exibir_mensagem("✅ Radio 'Sim e utilizam o veículo' selecionado com sucesso")
+            except:
+                page.locator("text=Sim e utilizam o veículo").first.click()
+                exibir_mensagem("✅ Radio 'Sim e utilizam o veículo' selecionado com sucesso (texto)")
+            
+            # PASSO 3: Se "Sim e utilizam o veículo", selecionar campos condicionais
+            if sexo_do_menor != "N/A":
+                exibir_mensagem(f"👤 Selecionando sexo do menor: '{sexo_do_menor}'...")
+                
+                if sexo_do_menor == "Feminino":
+                    page.locator("input[type='radio'][value='feminino']").check()
+                    exibir_mensagem("✅ Radio 'Feminino' para sexo selecionado com sucesso")
+                elif sexo_do_menor == "Masculino":
+                    page.locator("input[type='radio'][value='masculino']").check()
+                    exibir_mensagem("✅ Radio 'Masculino' para sexo selecionado com sucesso")
+                elif sexo_do_menor == "Ambos":
+                    page.locator("input[type='radio'][value='ambos']").check()
+                    exibir_mensagem("✅ Radio 'Ambos' para sexo selecionado com sucesso")
+            
+            if faixa_etaria_menor_mais_novo != "N/A":
+                exibir_mensagem(f"📅 Selecionando faixa etária: '{faixa_etaria_menor_mais_novo}'...")
+                
+                if faixa_etaria_menor_mais_novo == "18 a 24 anos":
+                    page.locator("input[type='radio'][value='18_24']").check()
+                    exibir_mensagem("✅ Radio '18 a 24 anos' para faixa etária selecionado com sucesso")
+                elif faixa_etaria_menor_mais_novo == "25 anos":
+                    page.locator("input[type='radio'][value='25']").check()
+                    exibir_mensagem("✅ Radio '25 anos' para faixa etária selecionado com sucesso")
+        else:
+            exibir_mensagem("⚠️ Resposta não reconhecida, usando 'Não'")
+            page.locator("input[type='radio'][value='nao']").first.check()
+        
+        # PASSO 4: Clicar no botão Continuar
+        exibir_mensagem("⏳ Aguardando botão 'Continuar'...")
+        page.wait_for_selector("p.font-semibold.font-workSans.cursor-pointer:has-text('Continuar')", timeout=5000)
+        
+        exibir_mensagem("🔄 Clicando no botão 'Continuar'...")
+        page.locator("p.font-semibold.font-workSans.cursor-pointer:has-text('Continuar')").click()
+        exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
+        
+        # PASSO 5: Aguardar transição para próxima tela
+        exibir_mensagem("⏳ Aguardando transição para próxima tela...")
+        page.wait_for_selector("#gtm-telaCorretorAnteriorContinuar", timeout=5000)
+        exibir_mensagem("✅ TELA 13 CONCLUÍDA!")
+        
+        return True
+        
+    except Exception as e:
+        exibir_mensagem(f"❌ ERRO na Tela 13: {str(e)}")
+        return False
+
+def navegar_tela_14_playwright(page, continuar_com_corretor_anterior):
+    """
+    TELA 14: Corretor Anterior (CONDICIONAL)
+    
+    DESCRIÇÃO:
+        Tela condicional que só aparece quando já existe uma cotação para o cliente.
+        Pergunta se deseja continuar com o corretor anterior ou não.
+        
+    ELEMENTOS IDENTIFICADOS (baseado na gravação):
+        - Botão Continuar: id=gtm-telaCorretorAnteriorContinuar
+        - Elementos de seleção: css=.flex > .min-h-[39rem] .mb-6 > .flex > .flex > .text-primary
+        - Checkbox/Radio: css=.flex > .md\3Aw-80 > div:nth-child(2) > .flex > .flex .text-primary:nth-child(1)
+        
+    CARACTERÍSTICAS IMPORTANTES:
+        - Tela condicional: Só aparece quando já existe uma cotação para o cliente
+        - Lógica de detecção: Precisa verificar se a tela aparece antes de processar
+        - Elementos simples: Parece ser uma tela de confirmação/opção
+        
+    PARÂMETROS:
+        - continuar_com_corretor_anterior: bool - Se deve continuar com o corretor anterior
+    """
+    try:
+        exibir_mensagem("\n" + "="*50)
+        exibir_mensagem("👨‍💼 TELA 14: CORRETOR ANTERIOR (CONDICIONAL)")
+        exibir_mensagem("="*50)
+        
+        # PASSO 1: Verificar se a Tela 14 aparece (é condicional)
+        exibir_mensagem("🔍 Verificando se a Tela 14 (Corretor Anterior) aparece...")
+        
+        # Aguardar um tempo para ver se a tela aparece
+        page.wait_for_selector("#gtm-telaCorretorAnteriorContinuar", timeout=5000)
+        
+        # Tentar localizar elementos da Tela 14
+        try:
+            # Tentar encontrar o botão da Tela 14
+            botao_tela14 = page.locator("#gtm-telaCorretorAnteriorContinuar")
+            if botao_tela14.count() > 0 and botao_tela14.first.is_visible():
+                exibir_mensagem("✅ Tela 14 detectada - Corretor Anterior aparece!")
+                
+                # PASSO 2: Processar a Tela 14
+                exibir_mensagem(f"👨‍💼 Processando Tela 14: continuar_com_corretor_anterior = {continuar_com_corretor_anterior}")
+                
+                # Selecionar opção baseada no parâmetro
+                if continuar_com_corretor_anterior:
+                    exibir_mensagem("✅ Selecionando 'Continuar com corretor anterior'...")
+                    # Tentar seletores mais simples e robustos
+                    try:
+                        # Primeiro tentar por texto
+                        page.locator("text=Continuar com corretor anterior").first.click()
+                        exibir_mensagem("✅ Opção 'Continuar com corretor anterior' selecionada por texto")
+                    except:
+                        try:
+                            # Tentar por radio button
+                            page.locator("input[type='radio'][value='sim']").first.click()
+                            exibir_mensagem("✅ Opção 'Continuar com corretor anterior' selecionada por radio")
+                        except:
+                            # Tentar por label
+                            page.locator("label:has-text('Continuar')").first.click()
+                            exibir_mensagem("✅ Opção 'Continuar com corretor anterior' selecionada por label")
+                else:
+                    exibir_mensagem("✅ Selecionando 'Não continuar com corretor anterior'...")
+                    try:
+                        # Primeiro tentar por texto
+                        page.locator("text=Não continuar com corretor anterior").first.click()
+                        exibir_mensagem("✅ Opção 'Não continuar com corretor anterior' selecionada por texto")
+                    except:
+                        try:
+                            # Tentar por radio button
+                            page.locator("input[type='radio'][value='nao']").first.click()
+                            exibir_mensagem("✅ Opção 'Não continuar com corretor anterior' selecionada por radio")
+                        except:
+                            # Tentar por label
+                            page.locator("label:has-text('Não')").first.click()
+                            exibir_mensagem("✅ Opção 'Não continuar com corretor anterior' selecionada por label")
+                
+                # PASSO 3: Clicar no botão Continuar
+                exibir_mensagem("🔄 Clicando no botão 'Continuar'...")
+                botao_continuar = page.locator('p.font-semibold.font-workSans.cursor-pointer.text-sm.leading-6:has-text("Continuar")')
+                if botao_continuar.is_visible():
+                    botao_continuar.click()
+                    exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
+                else:
+                    exibir_mensagem("⚠️ Botão 'Continuar' não encontrado")
+                    return False
+                
+                # PASSO 4: Aguardar transição para próxima tela
+                exibir_mensagem("⏳ Aguardando transição para próxima tela...")
+                page.wait_for_selector("text=Por favor, aguarde. Estamos buscando o corretor ideal para você!", timeout=5000)
+                exibir_mensagem("✅ TELA 14 CONCLUÍDA!")
+                
+                return True
+            else:
+                exibir_mensagem("ℹ️ Tela 14 não aparece - não há cotação anterior para este cliente")
+                exibir_mensagem("ℹ️ Pulando para próxima tela...")
+                return True  # Retorna True mesmo não aparecendo, pois é condicional
+                
+        except Exception as e:
+            exibir_mensagem(f"ℹ️ Tela 14 não detectada: {str(e)}")
+            exibir_mensagem("ℹ️ Pulando para próxima tela...")
+            return True  # Retorna True mesmo não aparecendo, pois é condicional
+        
+    except Exception as e:
+        exibir_mensagem(f"❌ ERRO na Tela 14: {str(e)}")
+        return False
+
+def navegar_tela_15_playwright(page, email_login, senha_login):
+    """
+    TELA 15: Resultado Final (DUAS FASES)
+    
+    DESCRIÇÃO:
+        Implementa as duas fases da Tela 15:
+        FASE 1: Mapa + Timer regressivo (2:43 minutos)
+        FASE 2: Tela de cálculo + Modal de login + Modal CPF divergente
+        
+    ELEMENTOS IDENTIFICADOS:
+        FASE 1:
+        - Modal timer: text=Por favor, aguarde. Estamos buscando o corretor ideal para você!
+        - Timer: text=Tempo estimado em 02:43
+        
+        FASE 2:
+        - Modal login: MuiBackdrop-root
+        - Email: #emailTelaLogin
+        - Senha: #senhaTelaLogin
+        - Botão Acessar: #gtm-telaLoginBotaoAcessar
+        - Modal CPF divergente: text=CPF informado não corresponde à conta
+        - Botão "Logar com outra conta": #logarComOutraContaModalAssociarUsuario
+        
+    PARÂMETROS:
+        page: Objeto page do Playwright
+        email_login: Email para login
+        senha_login: Senha para login
+        
+    RETORNO:
+        bool: True se sucesso, False se falha
+    """
+    try:
+        exibir_mensagem("\n" + "="*50)
+        exibir_mensagem("🎯 TELA 15: RESULTADO FINAL (DUAS FASES)")
+        exibir_mensagem("="*50)
+        
+        # ========================================
+        # FASE 1: MAPA + TIMER REGRESSIVO
+        # ========================================
+        exibir_mensagem("🔄 FASE 1: Aguardando mapa e timer regressivo...")
+        
+        # PASSO 1: Aguardar modal com timer aparecer
+        exibir_mensagem("⏳ Aguardando modal com timer...")
+        
+        try:
+            # Aguardar especificamente pelo modal com timer (timeout otimizado)
+            modal_timer = page.locator("text=Por favor, aguarde. Estamos buscando o corretor ideal para você!")
+            modal_timer.wait_for(timeout=5000)
+            exibir_mensagem("✅ Modal com timer detectado!")
+        except Exception as e:
+            exibir_mensagem(f"⚠️ Modal com timer não detectado: {str(e)}")
+            exibir_mensagem("ℹ️ Continuando para Fase 2...")
+        
+        # PASSO 2: Aguardar timer regressivo (aproximadamente 2:43 minutos)
+        exibir_mensagem("⏳ Aguardando timer regressivo (2:43 minutos)...")
+        
+        # Aguardar aproximadamente 2:43 minutos (163 segundos)
+        tempo_timer = 163
+        tempo_inicio_timer = time.time()
+        
+        while (time.time() - tempo_inicio_timer) < tempo_timer:
+            try:
+                # Verificar se ainda está no timer
+                timer_atual = page.locator("text=Tempo estimado em")
+                if timer_atual.count() > 0:
+                    tempo_decorrido = int(time.time() - tempo_inicio_timer)
+                    tempo_restante = tempo_timer - tempo_decorrido
+                    exibir_mensagem(f"⏳ Timer em andamento... ({tempo_restante}s restantes)")
+                else:
+                    exibir_mensagem("✅ Timer concluído!")
+                    break
+            except:
+                pass
+            
+            try:
+                page.wait_for_selector("text=Tempo estimado em", timeout=10000)
+            except:
+                break
+        
+        exibir_mensagem("✅ FASE 1 CONCLUÍDA!")
+        
+        # ========================================
+        # FASE 2: TELA DE CÁLCULO + MODAL LOGIN
+        # ========================================
+        exibir_mensagem("🔄 FASE 2: Aguardando tela de cálculo e modal de login...")
+        
+        # PASSO 3: Aguardar tela de cálculo aparecer
+        exibir_mensagem("⏳ Aguardando tela de cálculo...")
+        page.wait_for_selector("text=Acesse sua conta para visualizar o resultado final", timeout=8000)
+        
+        # PASSO 4: Aguardar modal de login aparecer
+        exibir_mensagem("⏳ Aguardando modal de login...")
+        
+        try:
+            # Aguardar especificamente pelo modal de login (timeout otimizado)
+            modal_login = page.locator("text=Acesse sua conta para visualizar o resultado final")
+            modal_login.wait_for(timeout=5000)
+            exibir_mensagem("✅ Modal de login detectado!")
+        except Exception as e:
+            exibir_mensagem(f"⚠️ Modal de login não detectado: {str(e)}")
+            return False
+        
+        # PASSO 5: Preencher email
+        exibir_mensagem("📧 Preenchendo email...")
+        
+        try:
+            # Aguardar especificamente pelo campo de email estar pronto
+            campo_email = page.locator("#emailTelaLogin")
+            campo_email.wait_for(timeout=3000)
+            campo_email.fill(email_login)
+            exibir_mensagem(f"✅ Email preenchido: {email_login}")
+        except Exception as e:
+            exibir_mensagem(f"❌ Erro ao preencher email: {str(e)}")
+            return False
+        
+        # PASSO 6: Preencher senha
+        exibir_mensagem("🔒 Preenchendo senha...")
+        
+        try:
+            # Aguardar especificamente pelo campo de senha estar pronto
+            campo_senha = page.locator("#senhaTelaLogin")
+            campo_senha.wait_for(timeout=3000)
+            campo_senha.fill(senha_login)
+            exibir_mensagem("✅ Senha preenchida")
+        except Exception as e:
+            exibir_mensagem(f"❌ Erro ao preencher senha: {str(e)}")
+            return False
+        
+        # PASSO 7: CAPTURA DE TELA E LOGS DETALHADOS DO MODAL
+        exibir_mensagem("📸 CAPTURANDO TELA DO MODAL DE LOGIN...")
+        
+        try:
+            # Capturar screenshot do modal
+            timestamp = time.strftime('%Y%m%d_%H%M%S')
+            screenshot_path = f"modal_login_{timestamp}.png"
+            page.screenshot(path=screenshot_path, full_page=True)
+            exibir_mensagem(f"📸 Screenshot salvo: {screenshot_path}")
+            
+            # Verificar se os campos estão realmente preenchidos
+            valor_email_campo = campo_email.input_value()
+            valor_senha_campo = campo_senha.input_value()
+            
+            exibir_mensagem(f"🔍 VERIFICAÇÃO DOS CAMPOS:")
+            exibir_mensagem(f"   📧 Email no campo: '{valor_email_campo}'")
+            exibir_mensagem(f"   🔒 Senha no campo: '{valor_senha_campo}'")
+            exibir_mensagem(f"   📧 Email esperado: '{email_login}'")
+            exibir_mensagem(f"   🔒 Senha esperada: '{senha_login}'")
+            
+            # Verificar se os campos estão corretos
+            if valor_email_campo.lower() == email_login.lower():
+                exibir_mensagem("✅ Email preenchido corretamente!")
+            else:
+                exibir_mensagem("❌ Email NÃO foi preenchido corretamente!")
+            
+            if valor_senha_campo == senha_login:
+                exibir_mensagem("✅ Senha preenchida corretamente!")
+            else:
+                exibir_mensagem("❌ Senha NÃO foi preenchida corretamente!")
+            
+            # Verificar se o botão "Acessar" está visível
+            botao_acessar = page.locator("#gtm-telaLoginBotaoAcessar")
+            if botao_acessar.is_visible():
+                exibir_mensagem("✅ Botão 'Acessar' está visível e pronto para clicar!")
+                texto_botao = botao_acessar.text_content()
+                exibir_mensagem(f"   📝 Texto do botão: '{texto_botao}'")
+            else:
+                exibir_mensagem("❌ Botão 'Acessar' NÃO está visível!")
+            
+            # Verificar se o modal está realmente presente
+            modal_presente = page.locator("text=Acesse sua conta para visualizar o resultado final")
+            if modal_presente.count() > 0:
+                exibir_mensagem("✅ Modal de login está presente na tela!")
+            else:
+                exibir_mensagem("❌ Modal de login NÃO está presente na tela!")
+            
+            # Capturar HTML do modal para debug
+            try:
+                modal_html = page.locator(".MuiBackdrop-root").inner_html()
+                exibir_mensagem(f"🔍 HTML do modal capturado (primeiros 200 chars): {modal_html[:200]}...")
+            except Exception as e:
+                exibir_mensagem(f"⚠️ Erro ao capturar HTML do modal: {str(e)}")
+            
+        except Exception as e:
+            exibir_mensagem(f"❌ Erro durante captura de tela/logs: {str(e)}")
+        
+        # PASSO 8: Clicar em "Acessar"
+        exibir_mensagem("🔄 Clicando em 'Acessar'...")
+        
+        try:
+            # Aguardar especificamente pelo botão estar pronto
+            botao_acessar = page.locator("#gtm-telaLoginBotaoAcessar")
+            botao_acessar.wait_for(timeout=3000)
+            
+            if botao_acessar.is_visible():
+                botao_acessar.click()
+                exibir_mensagem("✅ Botão 'Acessar' clicado com sucesso!")
+                
+                # Aguardar possível redirecionamento ou modal CPF divergente
+                exibir_mensagem("⏳ Aguardando resposta do login...")
+                time.sleep(5)  # ESTRATÉGIA SIMPLES: time.sleep ao invés de waits complexos
+                
+                # Verificar se apareceu modal CPF divergente
+                try:
+                    modal_cpf = page.locator("text=CPF informado não corresponde à conta")
+                    if modal_cpf.count() > 0:
+                        exibir_mensagem("✅ Modal CPF divergente detectado!")
+                        
+                        # Clicar no botão "Manter Login atual"
+                        try:
+                            exibir_mensagem("🔍 Procurando botão 'Manter Login atual'...")
+                            
+                            # Tentar pelo ID específico
+                            botao_manter_login = page.locator("#manterLoginAtualModalAssociarUsuario")
+                            if botao_manter_login.is_visible():
+                                botao_manter_login.click()
+                                exibir_mensagem("✅ Botão 'Manter Login atual' clicado pelo ID!")
+                                time.sleep(3)
+                            else:
+                                # Tentar pelo texto
+                                botao_manter_login = page.locator("text=Manter Login atual")
+                                if botao_manter_login.is_visible():
+                                    botao_manter_login.click()
+                                    exibir_mensagem("✅ Botão 'Manter Login atual' clicado pelo texto!")
+                                    time.sleep(3)
+                                else:
+                                    exibir_mensagem("⚠️ Botão 'Manter Login atual' não encontrado")
+                        except Exception as e:
+                            exibir_mensagem(f"⚠️ Erro ao clicar no botão 'Manter Login atual': {str(e)}")
+                    else:
+                        exibir_mensagem("ℹ️ Modal CPF divergente não apareceu - login pode ter sido bem-sucedido")
+                except Exception as e:
+                    exibir_mensagem(f"⚠️ Erro ao verificar modal CPF: {str(e)}")
+                
+            else:
+                exibir_mensagem("❌ Botão 'Acessar' não está visível!")
+                return False
+        except Exception as e:
+            exibir_mensagem(f"❌ Erro ao clicar em 'Acessar': {str(e)}")
+            return False
+        
+        exibir_mensagem("✅ LOGIN CONCLUÍDO!")
+        
+        # ========================================
+        # CAPTURA DE DADOS DOS PLANOS DE SEGURO
+        # ========================================
+        exibir_mensagem("📊 INICIANDO CAPTURA DE DADOS DOS PLANOS...")
+        
+        # Aguardar carregamento dos planos (aguardando botão específico)
+        exibir_mensagem("⏳ Aguardando carregamento da página principal dos planos...")
+        try:
+            # Aguardar pelo botão "Personalizar Coberturas" que indica que a página foi carregada
+            page.wait_for_selector("#personalizarCoberturasTelaPersonalizarCoberturas", timeout=10000)
+            exibir_mensagem("✅ Página principal dos planos carregada!")
+        except Exception as e:
+            exibir_mensagem(f"⚠️ Botão 'Personalizar Coberturas' não encontrado: {str(e)}")
+            exibir_mensagem("ℹ️ Usando fallback com time.sleep...")
+            time.sleep(5)  # Fallback para time.sleep
+        
+        # Capturar dados dos planos
+        dados_planos = capturar_dados_planos_seguro(page)
+        
+        if dados_planos:
+            exibir_mensagem("✅ DADOS DOS PLANOS CAPTURADOS COM SUCESSO!")
+            exibir_mensagem("📋 RESUMO DOS DADOS CAPTURADOS:")
+            exibir_mensagem(f"   📊 Plano Recomendado: {dados_planos['plano_recomendado'].get('valor', 'N/A')}")
+            exibir_mensagem(f"   📊 Plano Alternativo: {dados_planos['plano_alternativo'].get('valor', 'N/A')}")
+            
+            # RETORNO FINAL SIMPLES
+            print("\n" + "="*60)
+            print("📋 RETORNO FINAL - TELA 15")
+            print("="*60)
+            print(json.dumps(dados_planos, indent=2, ensure_ascii=False))
+            print("="*60)
+        else:
+            exibir_mensagem("⚠️ FALHA NA CAPTURA DE DADOS DOS PLANOS")
+        
+        exibir_mensagem("🎯 TELA 15 FINALIZADA COM SUCESSO!")
+        
+        return True
+        
+    except Exception as e:
+        exibir_mensagem(f"❌ ERRO na Tela 15: {str(e)}")
+        return False
+
+# ========================================
+# FUNÇÕES DE CAPTURA DE DADOS
+# ========================================
+
+def capturar_dados_carrossel_estimativas_playwright(page: Page) -> Dict[str, Any]:
+    """
+    ================================================================================
+    FUNÇÃO: capturar_dados_carrossel_estimativas_playwright()
+    ================================================================================
+    
+    DESCRIÇÃO:
+        Captura dados estruturados do carrossel de estimativas da Tela 5.
+        Esta função é o coração da captura de dados, extraindo informações
+        detalhadas de cada card de cobertura, incluindo valores monetários,
+        benefícios e metadados.
+    
+    ELEMENTOS CAPTURADOS:
+        - Nome da cobertura: "button p.text-white"
+        - Valores monetários: "p.text-primary.underline"
+        - Benefícios: "div.gap-3.flex.flex-col.pl-4.mt-3"
+        - Texto completo: Conteúdo total do card
+    
+    ESTRATÉGIA DE CAPTURA:
+        1. Localizar todos os cards de cobertura
+        2. Para cada card:
+           a. Extrair nome da cobertura
+           b. Parsear valores "De R$ X até R$ Y"
+           c. Capturar lista de benefícios
+           d. Estruturar dados em JSON
+        3. Salvar dados em arquivo temporário
+        4. Retornar estrutura completa
+    
+    TÉCNICAS UTILIZADAS:
+        - Regex patterns para parsing de valores monetários
+        - Seletores CSS específicos para cada elemento
+        - Estruturação hierárquica de dados
+        - Fallbacks para casos de erro
+    
+    PARÂMETROS:
+        page (Page): Objeto page do Playwright
+    
+    RETORNO:
+        dict: Estrutura JSON com dados capturados ou None se erro
+    
+    ESTRUTURA DE RETORNO:
+        {
+            "timestamp": "2025-09-02T03:45:30.523994",
+            "tela": 5,
+            "nome_tela": "Estimativa Inicial",
+            "coberturas_detalhadas": [
+                {
+                    "indice": 1,
+                    "cobertura": "Cobertura Compreensiva",
+                    "valores": {"de": "R$ 1.600,00", "ate": "R$ 2.200,00"},
+                    "beneficios": [{"nome": "Colisão e Acidentes", "status": "incluido"}]
+                }
+            ],
+            "valores_encontrados": 6,
+            "beneficios_gerais": [...],
+            "seguradoras": [...],
+            "elementos_detectados": [...]
+        }
+    
+    LOGS:
+        - "🔍 Encontrados {X} cards de cobertura (bg-primary)"
+        - "📋 Card {X}: {cobertura} - De {valor} até {valor}"
+        - "💾 DADOS SALVOS: {caminho_arquivo}"
+        - "📊 RESUMO: {X} coberturas detalhadas, {X} benefícios gerais"
+        - "❌ ERRO na captura de dados: {erro}"
+    ================================================================================
+    """
+    try:
+        # PASSO 1: Inicializar estrutura de dados do carrossel
+        # Esta estrutura segue o padrão definido no exemplo_json_retorno.json
+        dados_carrossel = {
+            "timestamp": datetime.now().isoformat(),  # Timestamp ISO para rastreamento
+            "tela": 5,                                # Número da tela atual
+            "nome_tela": "Estimativa Inicial",        # Nome descritivo da tela
+            "url": str(page.url),                     # URL atual da página
+            "titulo": str(page.title),                # Título da página
+            "coberturas_detalhadas": [],              # Lista de coberturas capturadas
+            "beneficios_gerais": [],                  # Benefícios encontrados na página
+            "valores_encontrados": 0,                 # Contador de valores monetários
+            "seguradoras": [],                        # Seguradoras detectadas
+            "elementos_detectados": []                # Elementos especiais detectados
+        }
+        
+        # Captura os cards de cobertura usando o seletor específico identificado
+        cards_cobertura = page.locator("div.bg-primary")
+        
+        if cards_cobertura.count() > 0:
+            exibir_mensagem(f"🔍 Encontrados {cards_cobertura.count()} cards de cobertura (bg-primary)")
+            
+            for i in range(cards_cobertura.count()):
+                try:
+                    card = cards_cobertura.nth(i)
+                    
+                    # Captura o texto completo do card
+                    card_text = card.text_content().strip() if card.text_content() else ""
+                    
+                    if not card_text or len(card_text) < 10:
+                        continue
+                    
+                    cobertura_info = {
+                        "indice": i + 1,
+                        "nome_cobertura": "",
+                        "valores": {
+                            "de": "",
+                            "ate": ""
+                        },
+                        "beneficios": [],
+                        "texto_completo": card_text
+                    }
+                    
+                    # Extrair nome da cobertura (texto dentro do button)
+                    nome_cobertura = ""
+                    try:
+                        nome_elemento = card.locator("button p.text-white")
+                        if nome_elemento.count() > 0:
+                            nome_cobertura = nome_elemento.first.text_content().strip()
+                            cobertura_info["nome_cobertura"] = nome_cobertura
+                    except:
+                        pass
+                    
+                    # Se não encontrou pelo seletor específico, tentar por regex
+                    if not nome_cobertura:
+                        cobertura_patterns = [
+                            r"Cobertura\s+([A-Za-zÀ-ÿ\s]+?)(?:\s|$)",
+                            r"([A-Za-zÀ-ÿ\s]+?)\s+Cobertura",
+                            r"([A-Za-zÀ-ÿ\s]+?)\s+Compreensiva",
+                            r"([A-Za-zÀ-ÿ\s]+?)\s+Roubo",
+                            r"([A-Za-zÀ-ÿ\s]+?)\s+RCF"
+                        ]
+                        
+                        for pattern in cobertura_patterns:
+                            match = re.search(pattern, card_text, re.IGNORECASE)
+                            if match:
+                                cobertura_info["nome_cobertura"] = match.group(1).strip()
+                                break
+                    
+                    # Buscar valores usando o seletor específico identificado
+                    try:
+                        # Procurar por elementos com valores usando o seletor correto
+                        elementos_preco = page.locator("p.text-primary.underline")
+                        if elementos_preco.count() > i:
+                            preco_text = elementos_preco.nth(i).text_content().strip()
+                            
+                            # Extrair valores "de" e "até" usando regex
+                            valor_patterns = [
+                                r"De\s*R\$\s*([0-9.,]+)\s*até\s*R\$\s*([0-9.,]+)",
+                                r"R\$\s*([0-9.,]+)\s*até\s*R\$\s*([0-9.,]+)",
+                                r"([0-9.,]+)\s*até\s*([0-9.,]+)"
+                            ]
+                            
+                            for pattern in valor_patterns:
+                                match = re.search(pattern, preco_text, re.IGNORECASE)
+                                if match:
+                                    cobertura_info["valores"]["de"] = f"R$ {match.group(1)}"
+                                    cobertura_info["valores"]["ate"] = f"R$ {match.group(2)}"
+                                    break
+                    except:
+                        pass
+                    
+                    # Se não encontrou valores específicos, tentar no texto do card
+                    if not cobertura_info["valores"]["de"]:
+                        valor_patterns = [
+                            r"De\s*R\$\s*([0-9.,]+)\s*até\s*R\$\s*([0-9.,]+)",
+                            r"R\$\s*([0-9.,]+)\s*até\s*R\$\s*([0-9.,]+)",
+                            r"([0-9.,]+)\s*até\s*([0-9.,]+)"
+                        ]
+                        
+                        for pattern in valor_patterns:
+                            match = re.search(pattern, card_text, re.IGNORECASE)
+                            if match:
+                                cobertura_info["valores"]["de"] = f"R$ {match.group(1)}"
+                                cobertura_info["valores"]["ate"] = f"R$ {match.group(2)}"
+                                break
+                    
+                    # Extrair benefícios usando o seletor específico identificado
+                    try:
+                        # Procurar por elementos de benefícios próximos ao card
+                        elementos_beneficios = page.locator("div.gap-3.flex.flex-col.pl-4.mt-3")
+                        if elementos_beneficios.count() > i:
+                            container_beneficios = elementos_beneficios.nth(i)
+                            beneficios_texto = container_beneficios.locator("p.text-sm.text-gray-100.font-normal")
+                            
+                            for j in range(beneficios_texto.count()):
+                                beneficio_texto = beneficios_texto.nth(j).text_content().strip()
+                                if beneficio_texto:
+                                    cobertura_info["beneficios"].append({
+                                        "nome": beneficio_texto,
+                                        "status": "incluido"
+                                    })
+                    except:
+                        pass
+                    
+                    # Fallback: procurar por benefícios conhecidos no texto do card
+                    if not cobertura_info["beneficios"]:
+                        beneficios_conhecidos = [
+                            "Colisão e Acidentes", "Roubo e Furto", "Incêndio", "Danos a terceiros",
+                            "Assistência 24h", "Carro Reserva", "Vidros", "Roubo", "Furto",
+                            "Danos parciais em tentativas de roubo", "Danos materiais a terceiros",
+                            "Danos corporais a terceiro", "Assistência", "Carro reserva",
+                            "Vidros", "Acidentes", "Colisão", "Terceiros", "Materiais", "Corporais"
+                        ]
+                        
+                        for beneficio in beneficios_conhecidos:
+                            if beneficio.lower() in card_text.lower():
+                                cobertura_info["beneficios"].append({
+                                    "nome": beneficio,
+                                    "status": "incluido"
+                                })
+                    
+                    # Se encontrou dados válidos, adicionar à lista
+                    if cobertura_info["nome_cobertura"] or cobertura_info["valores"]["de"]:
+                        dados_carrossel["coberturas_detalhadas"].append(cobertura_info)
+                        
+                        # Conta valores encontrados
+                        if cobertura_info["valores"]["de"]:
+                            dados_carrossel["valores_encontrados"] += 1
+                        
+                        exibir_mensagem(f"📋 Card {i + 1}: {cobertura_info['nome_cobertura']} - De {cobertura_info['valores']['de']} até {cobertura_info['valores']['ate']}")
+                        
+                except Exception as e:
+                    exibir_mensagem(f"⚠️ Erro ao processar card {i + 1}: {str(e)}")
+                    continue
+        
+        # Procurar por valores monetários gerais (fallback)
+        valores_monetarios = page.locator("text=R$")
+        dados_carrossel["valores_encontrados"] = max(dados_carrossel["valores_encontrados"], valores_monetarios.count())
+        
+        # Procurar por benefícios gerais na página
+        beneficios_gerais = [
+            "Colisão e Acidentes", "Roubo e Furto", "Incêndio", "Danos a terceiros",
+            "Assistência 24h", "Carro Reserva", "Vidros", "Roubo", "Furto",
+            "Danos parciais em tentativas de roubo", "Danos materiais a terceiros",
+            "Danos corporais a terceiro"
+        ]
+        
+        for beneficio in beneficios_gerais:
+            elementos = page.locator(f"text={beneficio}")
+            if elementos.count() > 0:
+                dados_carrossel["beneficios_gerais"].append({
+                    "nome": beneficio,
+                    "encontrado": True,
+                    "quantidade_elementos": elementos.count()
+                })
+        
+        # Procurar por seguradoras
+        seguradoras_texto = [
+            "Seguradora", "seguradora", "Seguro", "seguro",
+            "Allianz", "allianz", "Porto", "porto", "SulAmérica", "sulamerica",
+            "Bradesco", "bradesco", "Itaú", "itau", "Santander", "santander"
+        ]
+        
+        for seguradora in seguradoras_texto:
+            elementos = page.locator(f"text={seguradora}")
+            if elementos.count() > 0:
+                for j in range(min(elementos.count(), 3)):  # Limitar a 3 elementos
+                    texto = elementos.nth(j).text_content().strip()
+                    if texto and len(texto) > 2:
+                        dados_carrossel["seguradoras"].append({
+                            "nome": texto,
+                            "seletor": "texto_contido"
+                        })
+        
+        # Procurar por elementos específicos do carrossel
+        elementos_carrossel = page.locator("[class*='carousel'], [class*='slider'], [class*='swiper']")
+        if elementos_carrossel.count() > 0:
+            dados_carrossel["elementos_detectados"].append("carrossel_detectado")
+        
+        # Capturar texto completo da página para análise
+        page_content = page.content()
+        page_text = page_content.lower() if page_content else ""
+        
+        # Verificar presença de palavras-chave
+        palavras_chave = ["estimativa", "carrossel", "cobertura", "preço", "valor", "plano"]
+        for palavra in palavras_chave:
+            if palavra in page_text:
+                dados_carrossel["elementos_detectados"].append(f"palavra_chave: {palavra}")
+        
+        # Salvar dados em arquivo temporário
+        temp_dir = "temp/captura_carrossel"
+        os.makedirs(temp_dir, exist_ok=True)
+        
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        json_path = f"{temp_dir}/carrossel_estimativas_{timestamp}.json"
+        
+        with open(json_path, 'w', encoding='utf-8') as f:
+            json.dump(dados_carrossel, f, indent=2, ensure_ascii=False)
+        
+        exibir_mensagem(f"💾 DADOS SALVOS: {json_path}")
+        exibir_mensagem(f"📊 RESUMO: {len(dados_carrossel['coberturas_detalhadas'])} coberturas detalhadas, {len(dados_carrossel['beneficios_gerais'])} benefícios gerais")
+        
+        return dados_carrossel
+        
+    except Exception as e:
+        exibir_mensagem(f"❌ ERRO na captura de dados: {str(e)}")
+        return None
 
 def capturar_dados_planos_seguro(page: Page) -> Dict[str, Any]:
     """
@@ -663,7 +2234,7 @@ def capturar_dados_planos_seguro(page: Page) -> Dict[str, Any]:
         exibir_mensagem("📊 CAPTURANDO DADOS DOS PLANOS DE SEGURO - ABORDAGEM HÍBRIDA")
         exibir_mensagem("=" * 70)
         
-        # Aguardar carregamento dos planos
+        # Aguardar carregamento dos planos (estratégia simples)
         time.sleep(3)
         
         dados_planos = {
@@ -1130,1188 +2701,6 @@ def capturar_dados_planos_seguro(page: Page) -> Dict[str, Any]:
             "plano_recomendado": {"erro": "Falha na captura"},
             "plano_alternativo": {"erro": "Falha na captura"}
         }
-
-def navegar_tela_8_playwright(page: Page, uso_veiculo: str) -> bool:
-    """
-    TELA 8: Finalidade do veículo (Uso do veículo)
-    """
-    try:
-        exception_handler.definir_tela_atual("TELA_8")
-        exibir_mensagem("📱 TELA 8: Aguardando carregamento...")
-        
-        max_tentativas = 20
-        tentativa = 0
-        
-        while tentativa < max_tentativas:
-            elementos_tela8 = page.locator("xpath=//*[contains(text(), 'finalidade') or contains(text(), 'Finalidade') or contains(text(), 'uso') or contains(text(), 'Uso') or contains(text(), 'veículo')]")
-            if elementos_tela8.count() > 0:
-                break
-            time.sleep(1)
-            tentativa += 1
-        
-        if tentativa >= max_tentativas:
-            exception_handler.capturar_warning("Tela 8 não carregou", "TELA_8")
-            return False
-        
-        exibir_mensagem("✅ Tela 8 carregada com sucesso")
-        exibir_mensagem(f"📱 TELA 8: Selecionando uso do veículo...")
-        
-        mapeamento_uso = {
-            "Pessoal": "Particular",
-            "Profissional": "Profissional", 
-            "Motorista de aplicativo": "Motorista de App",
-            "Motorista de App": "Motorista de App",
-            "Taxi": "Taxi",
-            "Táxi": "Taxi"
-        }
-        
-        valor_radio = mapeamento_uso.get(uso_veiculo, uso_veiculo)
-        seletor_radio = f'input[value="{valor_radio}"][name="finalidadeVeiculoTelaUsoVeiculo"]'
-        radio_button = page.locator(seletor_radio).first
-        
-        if radio_button.is_visible():
-            radio_button.click()
-            exibir_mensagem(f"✅ Uso '{uso_veiculo}' selecionado com sucesso")
-        else:
-            exception_handler.capturar_warning(f"Radio button para '{uso_veiculo}' não está visível", "TELA_8")
-        
-        botao_continuar = page.locator("#gtm-telaUsoVeiculoContinuar").first
-        botao_continuar.click()
-        exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
-        time.sleep(3)
-        return True
-        
-    except Exception as e:
-        exception_handler.capturar_excecao(e, "TELA_8", f"Erro ao selecionar uso do veículo: {uso_veiculo}")
-        return False
-
-def navegar_tela_9_playwright(page: Page, nome: str, cpf: str, data_nascimento: str, sexo: str, estado_civil: str, email: str, celular: str) -> bool:
-    """
-    TELA 9: Dados pessoais do segurado
-    """
-    try:
-        exception_handler.definir_tela_atual("TELA_9")
-        exibir_mensagem("📱 TELA 9: Aguardando carregamento...")
-        
-        for tentativa in range(20):
-            try:
-                elementos_tela = page.locator("xpath=//*[contains(text(), 'dados pessoais') or contains(text(), 'Dados pessoais')]")
-                if elementos_tela.count() > 0:
-                    exibir_mensagem("✅ Tela 9 carregada com sucesso")
-                    break
-            except:
-                pass
-            
-            if tentativa == 19:
-                exception_handler.capturar_warning("Tela 9 não foi detectada após 20 segundos", "TELA_9")
-                return False
-            
-            time.sleep(1)
-        
-        # Preencher Nome Completo
-        exibir_mensagem("📱 TELA 9: Preenchendo nome...")
-        try:
-            nome_campo = page.locator("#nomeTelaSegurado")
-            nome_campo.click()
-            nome_campo.fill(nome)
-            exibir_mensagem(f"✅ Nome preenchido: {nome}")
-        except Exception as e:
-            exception_handler.capturar_warning(f"Erro ao preencher nome: {str(e)}", "TELA_9")
-        
-        # Preencher CPF
-        exibir_mensagem("📱 TELA 9: Preenchendo CPF...")
-        try:
-            cpf_campo = page.locator("#cpfTelaSegurado")
-            cpf_campo.click()
-            cpf_campo.fill(cpf)
-            exibir_mensagem(f"✅ CPF preenchido: {cpf}")
-        except Exception as e:
-            exception_handler.capturar_warning(f"Erro ao preencher CPF: {str(e)}", "TELA_9")
-        
-        # Preencher Data de Nascimento
-        exibir_mensagem("📱 TELA 9: Preenchendo data de nascimento...")
-        try:
-            data_campo = page.locator("#dataNascimentoTelaSegurado")
-            data_campo.click()
-            data_campo.fill(data_nascimento)
-            exibir_mensagem(f"✅ Data de nascimento preenchida: {data_nascimento}")
-        except Exception as e:
-            exception_handler.capturar_warning(f"Erro ao preencher data de nascimento: {str(e)}", "TELA_9")
-        
-        # Selecionar Sexo
-        exibir_mensagem("📱 TELA 9: Selecionando sexo...")
-        try:
-            campo_sexo = page.locator("#sexoTelaSegurado")
-            if campo_sexo.is_visible():
-                campo_sexo.click()
-                time.sleep(1)
-                
-                opcao_sexo = page.locator(f"text={sexo}").first
-                if opcao_sexo.is_visible():
-                    opcao_sexo.click()
-                    exibir_mensagem(f"✅ Sexo selecionado: {sexo}")
-                else:
-                    exception_handler.capturar_warning(f"Opção de sexo '{sexo}' não encontrada", "TELA_9")
-            else:
-                exception_handler.capturar_warning("Campo de sexo não está visível", "TELA_9")
-        except Exception as e:
-            exception_handler.capturar_warning(f"Erro ao selecionar sexo: {str(e)}", "TELA_9")
-        
-        # Selecionar Estado Civil
-        exibir_mensagem("📱 TELA 9: Selecionando estado civil...")
-        try:
-            campo_estado_civil = page.locator("#estadoCivilTelaSegurado")
-            if campo_estado_civil.is_visible():
-                campo_estado_civil.click()
-                time.sleep(1)
-                
-                # Mapear estado civil do JSON para possíveis variações na tela
-                mapeamento_estado_civil = {
-                    "Casado ou Uniao Estavel": ["Casado ou União Estável", "Casado ou Uniao Estavel", "Casado ou União Estavel", "Casado ou Uniao Estável"],
-                    "Solteiro": ["Solteiro", "Solteiro(a)"],
-                    "Divorciado": ["Divorciado", "Divorciado(a)"],
-                    "Viuvo": ["Viúvo", "Viuvo", "Viúvo(a)", "Viuvo(a)"],
-                    "Separado": ["Separado", "Separado(a)"]
-                }
-                
-                # Obter possíveis variações para o estado civil
-                variacoes_estado_civil = mapeamento_estado_civil.get(estado_civil, [estado_civil])
-                
-                # Aguardar até 5 segundos para o dropdown aparecer
-                estado_civil_selecionado = False
-                for tentativa in range(5):
-                    try:
-                        # Tentar cada variação possível
-                        for variacao in variacoes_estado_civil:
-                            opcoes_estado_civil = page.locator("xpath=//li[contains(text(), '" + variacao + "')]")
-                            if opcoes_estado_civil.count() > 0:
-                                opcoes_estado_civil.first.click()
-                                exibir_mensagem(f"✅ Estado civil selecionado: {estado_civil} (encontrado como '{variacao}')")
-                                estado_civil_selecionado = True
-                                break
-                        
-                        if estado_civil_selecionado:
-                            break
-                    except:
-                        pass
-                    
-                    if tentativa == 4 and not estado_civil_selecionado:
-                        exception_handler.capturar_warning(f"Estado civil '{estado_civil}' não encontrado no dropdown (tentou: {', '.join(variacoes_estado_civil)})", "TELA_9")
-                    
-                    time.sleep(1)
-                
-                # Aguardar fechamento do dropdown antes de prosseguir
-                time.sleep(2)
-            else:
-                exception_handler.capturar_warning("Campo de estado civil não está visível", "TELA_9")
-        except Exception as e:
-            exception_handler.capturar_warning(f"Erro ao selecionar estado civil: {str(e)}", "TELA_9")
-        
-        # Preencher Email
-        exibir_mensagem("📱 TELA 9: Preenchendo email...")
-        try:
-            email_campo = page.locator("#emailTelaSegurado")
-            email_campo.click()
-            email_campo.fill(email)
-            exibir_mensagem(f"✅ Email preenchido: {email}")
-        except Exception as e:
-            exception_handler.capturar_warning(f"Erro ao preencher email: {str(e)}", "TELA_9")
-        
-        # Preencher Celular
-        exibir_mensagem("📱 TELA 9: Preenchendo celular...")
-        try:
-            celular_campo = page.locator("#celularTelaSegurado")
-            celular_campo.click()
-            
-            # Limpar o campo primeiro
-            celular_campo.clear()
-            time.sleep(0.5)
-            
-            # Preencher caractere por caractere para evitar problemas com máscara
-            for digito in celular:
-                celular_campo.type(digito)
-                time.sleep(0.1)
-            
-            # Aguardar um pouco para a máscara processar
-            time.sleep(1)
-            
-            # Verificar se foi preenchido corretamente
-            valor_preenchido = celular_campo.input_value()
-            exibir_mensagem(f"✅ Celular preenchido: {celular} (valor no campo: {valor_preenchido})")
-            
-            if valor_preenchido != celular:
-                exception_handler.capturar_warning(f"ATENÇÃO: Valor no campo ({valor_preenchido}) diferente do esperado ({celular})", "TELA_9")
-                
-        except Exception as e:
-            exception_handler.capturar_warning(f"Erro ao preencher celular: {str(e)}", "TELA_9")
-        
-        # Clicar em Continuar
-        botao_continuar = page.locator("#gtm-telaDadosSeguradoContinuar").first
-        botao_continuar.click()
-        exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
-        time.sleep(3)
-        return True
-        
-    except Exception as e:
-        exception_handler.capturar_excecao(e, "TELA_9", "Erro ao preencher dados pessoais")
-        return False
-
-def navegar_tela_10_playwright(page, condutor_principal, nome_condutor=None, cpf_condutor=None, data_nascimento_condutor=None, sexo_condutor=None, estado_civil_condutor=None):
-    """
-    TELA 10: Condutor principal
-    
-    DESCRIÇÃO:
-        Navega para a Tela 10 e configura se o segurado é o condutor principal do veículo.
-        Se não for condutor principal, preenche os dados do condutor (nome, CPF, data nascimento, sexo, estado civil).
-        
-    ELEMENTOS IDENTIFICADOS:
-        - Radio Sim (Condutor Principal): input[value="sim"][name="condutorPrincipalTelaCondutorPrincipal"]
-        - Radio Não (Não Condutor Principal): input[value="nao"][name="condutorPrincipalTelaCondutorPrincipal"]
-        - Campo Nome: #nomeTelaCondutorPrincipal
-        - Campo CPF: #cpfTelaCondutorPrincipal
-        - Campo Data Nascimento: #dataNascimentoTelaCondutorPrincipal
-        - Campo Sexo: #sexoTelaCondutorPrincipal
-        - Campo Estado Civil: #estadoCivilTelaCondutorPrincipal
-        - Botão Continuar: #gtm-telaCondutorPrincipalContinuar
-        
-    PARÂMETROS:
-        - condutor_principal: bool - Se o segurado é o condutor principal
-        - nome_condutor: str - Nome do condutor (se não for condutor principal)
-        - cpf_condutor: str - CPF do condutor (se não for condutor principal)
-        - data_nascimento_condutor: str - Data de nascimento do condutor (se não for condutor principal)
-        - sexo_condutor: str - Sexo do condutor (se não for condutor principal)
-        - estado_civil_condutor: str - Estado civil do condutor (se não for condutor principal)
-    """
-    try:
-        exibir_mensagem("\n" + "="*50)
-        exibir_mensagem("🎯 TELA 10: CONDUTOR PRINCIPAL")
-        exibir_mensagem("="*50)
-        
-        # Aguarda o carregamento da Tela 10
-        exibir_mensagem("⏳ Aguardando carregamento da Tela 10...")
-        page.wait_for_selector("#gtm-telaCondutorPrincipalContinuar", timeout=10000)
-        time.sleep(2)  # Aguarda estabilização
-        
-        exibir_mensagem("✅ Tela 10 carregada - condutor principal detectado!")
-        
-        # PASSO 1: Selecionar se é condutor principal ou não
-        if condutor_principal:
-            exibir_mensagem("👤 Selecionando 'Sim' - segurado é condutor principal")
-            radio_sim = page.locator('input[value="sim"][name="condutorPrincipalTelaCondutorPrincipal"]')
-            if radio_sim.is_visible():
-                radio_sim.click()
-                exibir_mensagem("✅ Radio 'Sim' selecionado com sucesso")
-            else:
-                exception_handler.capturar_warning("Radio 'Sim' não encontrado", "TELA_10")
-        else:
-            exibir_mensagem("👤 Selecionando 'Não' - segurado não é condutor principal")
-            radio_nao = page.locator('input[value="nao"][name="condutorPrincipalTelaCondutorPrincipal"]')
-            if radio_nao.is_visible():
-                radio_nao.click()
-                exibir_mensagem("✅ Radio 'Não' selecionado com sucesso")
-                
-                # Aguardar campos do condutor aparecerem
-                time.sleep(2)
-                
-                # PASSO 2: Preencher dados do condutor
-                exibir_mensagem("📝 Preenchendo dados do condutor...")
-                
-                # Nome do condutor
-                if nome_condutor:
-                    nome_campo = page.locator("#nomeTelaCondutorPrincipal")
-                    if nome_campo.is_visible():
-                        nome_campo.fill(nome_condutor)
-                        exibir_mensagem(f"✅ Nome do condutor: {nome_condutor}")
-                    else:
-                        exception_handler.capturar_warning("Campo nome não encontrado", "TELA_10")
-                
-                # CPF do condutor
-                if cpf_condutor:
-                    cpf_campo = page.locator("#cpfTelaCondutorPrincipal")
-                    if cpf_campo.is_visible():
-                        cpf_campo.fill(cpf_condutor)
-                        exibir_mensagem(f"✅ CPF do condutor: {cpf_condutor}")
-                    else:
-                        exception_handler.capturar_warning("Campo CPF não encontrado", "TELA_10")
-                
-                # Data de nascimento do condutor
-                if data_nascimento_condutor:
-                    data_campo = page.locator("#dataNascimentoTelaCondutorPrincipal")
-                    if data_campo.is_visible():
-                        data_campo.fill(data_nascimento_condutor)
-                        exibir_mensagem(f"✅ Data de nascimento: {data_nascimento_condutor}")
-                    else:
-                        exception_handler.capturar_warning("Campo data de nascimento não encontrado", "TELA_10")
-                
-                # Sexo do condutor
-                if sexo_condutor:
-                    sexo_campo = page.locator("#sexoTelaCondutorPrincipal")
-                    if sexo_campo.is_visible():
-                        sexo_campo.click()
-                        time.sleep(1)
-                        
-                        try:
-                            page.wait_for_selector("ul", timeout=5000)
-                            opcao_sexo = page.locator(f'xpath=//li[contains(text(), "{sexo_condutor}")]')
-                            if opcao_sexo.is_visible():
-                                opcao_sexo.click()
-                                exibir_mensagem(f"✅ Sexo do condutor: {sexo_condutor}")
-                            else:
-                                exception_handler.capturar_warning(f"Opção de sexo '{sexo_condutor}' não encontrada", "TELA_10")
-                        except:
-                            exception_handler.capturar_warning("Erro ao selecionar sexo", "TELA_10")
-                    else:
-                        exception_handler.capturar_warning("Campo sexo não encontrado", "TELA_10")
-                
-                # Estado civil do condutor
-                if estado_civil_condutor:
-                    estado_civil_campo = page.locator("#estadoCivilTelaCondutorPrincipal")
-                    if estado_civil_campo.is_visible():
-                        estado_civil_campo.click()
-                        time.sleep(1)
-                        
-                        try:
-                            page.wait_for_selector("ul", timeout=5000)
-                            
-                            # Mapeamento para variações de acento
-                            mapeamento_estado_civil = {
-                                "Casado ou Uniao Estavel": "Casado ou União Estável"
-                            }
-                            
-                            texto_busca = mapeamento_estado_civil.get(estado_civil_condutor, estado_civil_condutor)
-                            opcao_estado_civil = page.locator(f'xpath=//li[contains(text(), "{texto_busca}")]')
-                            
-                            if opcao_estado_civil.is_visible():
-                                opcao_estado_civil.click()
-                                exibir_mensagem(f"✅ Estado civil do condutor: {estado_civil_condutor}")
-                            else:
-                                exception_handler.capturar_warning(f"Opção de estado civil '{estado_civil_condutor}' não encontrada", "TELA_10")
-                        except:
-                            exception_handler.capturar_warning("Erro ao selecionar estado civil", "TELA_10")
-                    else:
-                        exception_handler.capturar_warning("Campo estado civil não encontrado", "TELA_10")
-            else:
-                exception_handler.capturar_warning("Radio 'Não' não encontrado", "TELA_10")
-        
-        # Aguardar estabilização
-        time.sleep(2)
-        
-        # PASSO 3: Clicar em Continuar
-        exibir_mensagem("⏳ Clicando em 'Continuar'...")
-        botao_continuar = page.locator("#gtm-telaCondutorPrincipalContinuar")
-        if botao_continuar.is_visible():
-            botao_continuar.click()
-            exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
-            time.sleep(3)
-            return True
-        else:
-            exception_handler.capturar_warning("Botão 'Continuar' não encontrado", "TELA_10")
-            return False
-        
-    except Exception as e:
-        exception_handler.capturar_excecao(e, "TELA_10", "Erro ao processar condutor principal")
-        return False
-
-def navegar_tela_11_playwright(page, local_de_trabalho, estacionamento_proprio_local_de_trabalho, local_de_estudo, estacionamento_proprio_local_de_estudo):
-    """
-    TELA 11: Atividade do veículo
-    
-    DESCRIÇÃO:
-        Navega para a Tela 11 e seleciona se o veículo é utilizado para ir ao local de trabalho e/ou estudo.
-        Se selecionar local de trabalho, aparece checkbox de estacionamento próprio do trabalho.
-        Se selecionar local de estudo, aparece checkbox de estacionamento próprio do estudo.
-        
-    ELEMENTOS IDENTIFICADOS:
-        - Checkbox Local de Trabalho: input[type="checkbox"][value="trabalho"]
-        - Checkbox Local de Estudo: input[type="checkbox"][value="estudo"]
-        - Checkbox Estacionamento Local de Trabalho: input[type="checkbox"][data-gtm-form-interact-field-id="10"]
-        - Checkbox Estacionamento Local de Estudo: input[type="checkbox"][data-gtm-form-interact-field-id="11"]
-        - Botão Continuar: #gtm-telaAtividadeVeiculoContinuar
-        
-    PARÂMETROS:
-        - local_de_trabalho: bool - Se o veículo é usado para ir ao trabalho
-        - estacionamento_proprio_local_de_trabalho: bool - Se há estacionamento próprio no trabalho
-        - local_de_estudo: bool - Se o veículo é usado para ir ao estudo
-        - estacionamento_proprio_local_de_estudo: bool - Se há estacionamento próprio no estudo
-    """
-    try:
-        exibir_mensagem("\n" + "="*50)
-        exibir_mensagem("🎯 TELA 11: ATIVIDADE DO VEÍCULO")
-        exibir_mensagem("="*50)
-        
-        # Aguarda o carregamento da Tela 11
-        exibir_mensagem("⏳ Aguardando carregamento da Tela 11...")
-        page.wait_for_selector("#gtm-telaAtividadeVeiculoContinuar", timeout=10000)
-        time.sleep(2)  # Aguarda estabilização
-        
-        exibir_mensagem("✅ Tela 11 carregada - atividade do veículo detectada!")
-        
-        # PASSO 1: Seleciona checkbox Local de Trabalho se necessário
-        if local_de_trabalho:
-            exibir_mensagem("📋 Marcando checkbox 'Local de Trabalho'...")
-            checkbox_trabalho = page.locator('input[type="checkbox"][value="trabalho"]')
-            if not checkbox_trabalho.is_checked():
-                checkbox_trabalho.check()
-                exibir_mensagem("✅ Checkbox 'Local de Trabalho' marcado!")
-                time.sleep(1)  # Aguarda aparecimento do checkbox de estacionamento
-            else:
-                exibir_mensagem("ℹ️ Checkbox 'Local de Trabalho' já estava marcado")
-        else:
-            exibir_mensagem("ℹ️ Local de Trabalho: Não selecionado")
-        
-        # PASSO 2: Seleciona checkbox Local de Estudo se necessário
-        if local_de_estudo:
-            exibir_mensagem("📋 Marcando checkbox 'Local de Estudo'...")
-            checkbox_estudo = page.locator('input[type="checkbox"][value="estudo"]')
-            if not checkbox_estudo.is_checked():
-                checkbox_estudo.check()
-                exibir_mensagem("✅ Checkbox 'Local de Estudo' marcado!")
-                time.sleep(1)  # Aguarda aparecimento do checkbox de estacionamento
-            else:
-                exibir_mensagem("ℹ️ Checkbox 'Local de Estudo' já estava marcado")
-        else:
-            exibir_mensagem("ℹ️ Local de Estudo: Não selecionado")
-        
-        # PASSO 3: Configurar estacionamento do trabalho (se local_de_trabalho = true)
-        if local_de_trabalho:
-            exibir_mensagem("🅿️ Configurando estacionamento do trabalho...")
-            try:
-                checkbox_estacionamento_trabalho = page.locator('input[type="checkbox"][data-gtm-form-interact-field-id="10"]')
-                if checkbox_estacionamento_trabalho.is_visible():
-                    if estacionamento_proprio_local_de_trabalho and not checkbox_estacionamento_trabalho.is_checked():
-                        checkbox_estacionamento_trabalho.check()
-                        exibir_mensagem("✅ Estacionamento próprio do trabalho: MARCADO")
-                    elif not estacionamento_proprio_local_de_trabalho and checkbox_estacionamento_trabalho.is_checked():
-                        checkbox_estacionamento_trabalho.uncheck()
-                        exibir_mensagem("✅ Estacionamento próprio do trabalho: DESMARCADO")
-                    else:
-                        estado = "MARCADO" if estacionamento_proprio_local_de_trabalho else "DESMARCADO"
-                        exibir_mensagem(f"✅ Estacionamento próprio do trabalho: {estado} (já estava correto)")
-                else:
-                    exibir_mensagem("⚠️ Checkbox estacionamento do trabalho não encontrado")
-            except Exception as e:
-                exibir_mensagem(f"⚠️ Erro ao configurar estacionamento do trabalho: {str(e)}")
-        
-        # PASSO 4: Configurar estacionamento do estudo (se local_de_estudo = true)
-        if local_de_estudo:
-            exibir_mensagem("🅿️ Configurando estacionamento do estudo...")
-            try:
-                checkbox_estacionamento_estudo = page.locator('input[type="checkbox"][data-gtm-form-interact-field-id="11"]')
-                if checkbox_estacionamento_estudo.is_visible():
-                    if estacionamento_proprio_local_de_estudo and not checkbox_estacionamento_estudo.is_checked():
-                        checkbox_estacionamento_estudo.check()
-                        exibir_mensagem("✅ Estacionamento próprio do estudo: MARCADO")
-                    elif not estacionamento_proprio_local_de_estudo and checkbox_estacionamento_estudo.is_checked():
-                        checkbox_estacionamento_estudo.uncheck()
-                        exibir_mensagem("✅ Estacionamento próprio do estudo: DESMARCADO")
-                    else:
-                        estado = "MARCADO" if estacionamento_proprio_local_de_estudo else "DESMARCADO"
-                        exibir_mensagem(f"✅ Estacionamento próprio do estudo: {estado} (já estava correto)")
-                else:
-                    exibir_mensagem("⚠️ Checkbox estacionamento do estudo não encontrado")
-            except Exception as e:
-                exibir_mensagem(f"⚠️ Erro ao configurar estacionamento do estudo: {str(e)}")
-        
-        # PASSO 5: Aguardar estabilização após todas as configurações
-        time.sleep(2)
-        
-        # PASSO 6: Clica no botão Continuar
-        exibir_mensagem("🔄 Clicando em 'Continuar'...")
-        botao_continuar = page.locator("#gtm-telaAtividadeVeiculoContinuar")
-        botao_continuar.click()
-        
-        # PASSO 7: Aguarda navegação
-        time.sleep(2)
-        exibir_mensagem("✅ Navegação para próxima tela realizada!")
-        
-        return True
-        
-    except Exception as e:
-        exibir_mensagem(f"❌ ERRO na Tela 11: {str(e)}")
-        return False
-
-def navegar_tela_12_playwright(page, garagem_residencia, portao_eletronico):
-    """
-    TELA 12: Garagem na Residência
-    
-    DESCRIÇÃO:
-        Navega para a Tela 12 e seleciona se possui garagem na residência e tipo de portão.
-        
-    ELEMENTOS IDENTIFICADOS:
-        - Radio Sim: input[value="sim"][name="possuiGaragemTelaGaragemResidencia"]
-        - Radio Não: input[value="nao"][name="possuiGaragemTelaGaragemResidencia"]
-        - Radio Eletrônico: input[value="eletronico"][name="tipoPortaoTelaGaragemResidencia"]
-        - Radio Manual: input[value="manual"][name="tipoPortaoTelaGaragemResidencia"]
-        - Botão Continuar: p.font-semibold.font-workSans.cursor-pointer (texto "Continuar")
-        
-    PARÂMETROS:
-        - garagem_residencia: bool - Se possui garagem na residência
-        - portao_eletronico: str - Tipo de portão ("Eletronico", "Manual", "Não possui")
-    """
-    try:
-        exibir_mensagem("\n" + "="*50)
-        exibir_mensagem("🏠 TELA 12: GARAGEM NA RESIDÊNCIA")
-        exibir_mensagem("="*50)
-        
-        # Aguarda o carregamento da Tela 12
-        exibir_mensagem("⏳ Aguardando carregamento da Tela 12...")
-        page.wait_for_selector('p.font-semibold.font-workSans.cursor-pointer', timeout=10000)
-        time.sleep(2)  # Aguarda estabilização
-        
-        exibir_mensagem("✅ Tela 12 carregada - garagem na residência detectada!")
-        
-        # Seleciona Sim ou Não para garagem
-        if garagem_residencia:
-            exibir_mensagem("📋 Selecionando 'Sim' para garagem na residência...")
-            
-            # Localizar e clicar no radio button "Sim"
-            radio_sim = page.locator('input[value="sim"][name="possuiGaragemTelaGaragemResidencia"]')
-            if radio_sim.is_visible():
-                radio_sim.click()
-                exibir_mensagem("✅ Radio 'Sim' para garagem selecionado com sucesso")
-            else:
-                exibir_mensagem("⚠️ Radio 'Sim' para garagem não encontrado")
-                return False
-            
-            # Aguarda campo de portão aparecer
-            exibir_mensagem("⏳ Aguardando campo de portão aparecer...")
-            time.sleep(2)
-            
-            # Seleciona tipo de portão
-            if portao_eletronico == "Eletronico":
-                exibir_mensagem("📋 Selecionando 'Eletrônico' para portão...")
-                
-                radio_eletronico = page.locator('input[value="eletronico"][name="tipoPortaoTelaGaragemResidencia"]')
-                if radio_eletronico.is_visible():
-                    radio_eletronico.click()
-                    exibir_mensagem("✅ Radio 'Eletrônico' para portão selecionado com sucesso")
-                else:
-                    exibir_mensagem("⚠️ Radio 'Eletrônico' para portão não encontrado")
-                    return False
-                    
-            elif portao_eletronico == "Manual":
-                exibir_mensagem("📋 Selecionando 'Manual' para portão...")
-                
-                radio_manual = page.locator('input[value="manual"][name="tipoPortaoTelaGaragemResidencia"]')
-                if radio_manual.is_visible():
-                    radio_manual.click()
-                    exibir_mensagem("✅ Radio 'Manual' para portão selecionado com sucesso")
-                else:
-                    exibir_mensagem("⚠️ Radio 'Manual' para portão não encontrado")
-                    return False
-            else:
-                exibir_mensagem("ℹ️ Tipo de portão: Não possui")
-        else:
-            exibir_mensagem("📋 Selecionando 'Não' para garagem na residência...")
-            
-            # Localizar e clicar no radio button "Não"
-            radio_nao = page.locator('input[value="nao"][name="possuiGaragemTelaGaragemResidencia"]')
-            if radio_nao.is_visible():
-                radio_nao.click()
-                exibir_mensagem("✅ Radio 'Não' para garagem selecionado com sucesso")
-            else:
-                exibir_mensagem("⚠️ Radio 'Não' para garagem não encontrado")
-                return False
-        
-        # Aguarda estabilização após seleções
-        time.sleep(2)
-        
-        # Clica no botão Continuar
-        exibir_mensagem("🔄 Clicando em 'Continuar'...")
-        botao_continuar = page.locator('p.font-semibold.font-workSans.cursor-pointer:has-text("Continuar")')
-        if botao_continuar.is_visible():
-            botao_continuar.click()
-            exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
-        else:
-            exibir_mensagem("⚠️ Botão 'Continuar' não encontrado")
-            return False
-        
-        # Aguarda navegação
-        time.sleep(2)
-        exibir_mensagem("✅ Navegação para próxima tela realizada!")
-        
-        return True
-        
-    except Exception as e:
-        exibir_mensagem(f"❌ ERRO na Tela 12: {str(e)}")
-        return False
-
-def navegar_tela_13_playwright(page, reside_18_26, sexo_do_menor, faixa_etaria_menor_mais_novo):
-    """
-    TELA 13: Residência com Menores de 18-26 anos
-    
-    DESCRIÇÃO:
-        Navega para a Tela 13 e seleciona se reside com alguém entre 18 e 26 anos.
-        Se sim, seleciona o sexo e faixa etária do mais novo.
-        
-    ELEMENTOS IDENTIFICADOS (baseado na gravação):
-        - Radio principal: Você reside com alguém entre 18 e 26 anos?
-            - Não
-            - Sim, mas não utilizam o veículo
-            - Sim e utilizam o veículo
-        - Radio condicional Sexo (só aparece se "Sim e utilizam o veículo"):
-            - Feminino
-            - Masculino
-            - Ambos
-        - Radio condicional Faixa etária (só aparece se "Sim e utilizam o veículo"):
-            - 18 a 24 anos
-            - 25 anos
-        - Botão Continuar: p.font-semibold.font-workSans.cursor-pointer:has-text("Continuar")
-        
-    PARÂMETROS:
-        - reside_18_26: str - Resposta principal ("Não", "Sim, mas não utilizam o veículo", "Sim e utilizam o veículo")
-        - sexo_do_menor: str - Sexo do menor ("Feminino", "Masculino", "Ambos", "N/A")
-        - faixa_etaria_menor_mais_novo: str - Faixa etária ("18 a 24 anos", "25 anos", "N/A")
-    """
-    try:
-        exibir_mensagem("\n" + "="*50)
-        exibir_mensagem("👥 TELA 13: RESIDÊNCIA COM MENORES DE 18-26 ANOS")
-        exibir_mensagem("="*50)
-        
-        # PASSO 1: Aguardar carregamento da tela
-        exibir_mensagem("⏳ Aguardando carregamento da Tela 13...")
-        page.wait_for_selector("p.font-semibold.font-workSans.cursor-pointer:has-text('Continuar')", timeout=10000)
-        exibir_mensagem("✅ Tela 13 carregada - residência com menores detectada!")
-        
-        # PASSO 2: Selecionar resposta principal
-        exibir_mensagem(f"👥 Selecionando resposta principal: '{reside_18_26}'...")
-        
-        # Mapear valores para os selectors da gravação
-        if reside_18_26 == "Não":
-            # Selecionar "Não"
-            page.locator("input[type='radio'][value='nao']").first.check()
-            exibir_mensagem("✅ Radio 'Não' selecionado com sucesso")
-            
-        elif reside_18_26 == "Sim, mas não utilizam o veículo":
-            # Selecionar "Sim, mas não utilizam o veículo"
-            page.locator("input[type='radio'][value='sim_nao_utilizam']").check()
-            exibir_mensagem("✅ Radio 'Sim, mas não utilizam o veículo' selecionado com sucesso")
-            
-        elif reside_18_26 == "Sim e utilizam o veículo":
-            # Selecionar "Sim e utilizam o veículo"
-            page.locator("input[type='radio'][value='sim_utilizam']").check()
-            exibir_mensagem("✅ Radio 'Sim e utilizam o veículo' selecionado com sucesso")
-            
-            # PASSO 3: Se "Sim e utilizam o veículo", selecionar campos condicionais
-            if sexo_do_menor != "N/A":
-                exibir_mensagem(f"👤 Selecionando sexo do menor: '{sexo_do_menor}'...")
-                
-                if sexo_do_menor == "Feminino":
-                    page.locator("input[type='radio'][value='feminino']").check()
-                    exibir_mensagem("✅ Radio 'Feminino' para sexo selecionado com sucesso")
-                elif sexo_do_menor == "Masculino":
-                    page.locator("input[type='radio'][value='masculino']").check()
-                    exibir_mensagem("✅ Radio 'Masculino' para sexo selecionado com sucesso")
-                elif sexo_do_menor == "Ambos":
-                    page.locator("input[type='radio'][value='ambos']").check()
-                    exibir_mensagem("✅ Radio 'Ambos' para sexo selecionado com sucesso")
-            
-            if faixa_etaria_menor_mais_novo != "N/A":
-                exibir_mensagem(f"📅 Selecionando faixa etária: '{faixa_etaria_menor_mais_novo}'...")
-                
-                if faixa_etaria_menor_mais_novo == "18 a 24 anos":
-                    page.locator("input[type='radio'][value='18_24']").check()
-                    exibir_mensagem("✅ Radio '18 a 24 anos' para faixa etária selecionado com sucesso")
-                elif faixa_etaria_menor_mais_novo == "25 anos":
-                    page.locator("input[type='radio'][value='25']").check()
-                    exibir_mensagem("✅ Radio '25 anos' para faixa etária selecionado com sucesso")
-        else:
-            exibir_mensagem("⚠️ Resposta não reconhecida, usando 'Não'")
-            page.locator("input[type='radio'][value='nao']").first.check()
-        
-        # PASSO 4: Clicar no botão Continuar
-        exibir_mensagem("⏳ Aguardando botão 'Continuar'...")
-        page.wait_for_selector("p.font-semibold.font-workSans.cursor-pointer:has-text('Continuar')", timeout=5000)
-        
-        exibir_mensagem("🔄 Clicando no botão 'Continuar'...")
-        page.locator("p.font-semibold.font-workSans.cursor-pointer:has-text('Continuar')").click()
-        exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
-        
-        # PASSO 5: Aguardar transição para próxima tela
-        exibir_mensagem("⏳ Aguardando transição para próxima tela...")
-        time.sleep(2)
-        exibir_mensagem("✅ TELA 13 CONCLUÍDA!")
-        
-        return True
-        
-    except Exception as e:
-        exibir_mensagem(f"❌ ERRO na Tela 13: {str(e)}")
-        return False
-
-def navegar_tela_14_playwright(page, continuar_com_corretor_anterior):
-    """
-    TELA 14: Corretor Anterior (CONDICIONAL)
-    
-    DESCRIÇÃO:
-        Tela condicional que só aparece quando já existe uma cotação para o cliente.
-        Pergunta se deseja continuar com o corretor anterior ou não.
-        
-    ELEMENTOS IDENTIFICADOS (baseado na gravação):
-        - Botão Continuar: id=gtm-telaCorretorAnteriorContinuar
-        - Elementos de seleção: css=.flex > .min-h-[39rem] .mb-6 > .flex > .flex > .text-primary
-        - Checkbox/Radio: css=.flex > .md\3Aw-80 > div:nth-child(2) > .flex > .flex .text-primary:nth-child(1)
-        
-    CARACTERÍSTICAS IMPORTANTES:
-        - Tela condicional: Só aparece quando já existe uma cotação para o cliente
-        - Lógica de detecção: Precisa verificar se a tela aparece antes de processar
-        - Elementos simples: Parece ser uma tela de confirmação/opção
-        
-    PARÂMETROS:
-        - continuar_com_corretor_anterior: bool - Se deve continuar com o corretor anterior
-    """
-    try:
-        exibir_mensagem("\n" + "="*50)
-        exibir_mensagem("👨‍💼 TELA 14: CORRETOR ANTERIOR (CONDICIONAL)")
-        exibir_mensagem("="*50)
-        
-        # PASSO 1: Verificar se a Tela 14 aparece (é condicional)
-        exibir_mensagem("🔍 Verificando se a Tela 14 (Corretor Anterior) aparece...")
-        
-        # Aguardar um tempo para ver se a tela aparece
-        time.sleep(3)
-        
-        # Tentar localizar elementos da Tela 14
-        try:
-            # Tentar encontrar o botão da Tela 14
-            botao_tela14 = page.locator("#gtm-telaCorretorAnteriorContinuar")
-            if botao_tela14.count() > 0 and botao_tela14.first.is_visible():
-                exibir_mensagem("✅ Tela 14 detectada - Corretor Anterior aparece!")
-                
-                # PASSO 2: Processar a Tela 14
-                exibir_mensagem(f"👨‍💼 Processando Tela 14: continuar_com_corretor_anterior = {continuar_com_corretor_anterior}")
-                
-                # Selecionar opção baseada no parâmetro
-                if continuar_com_corretor_anterior:
-                    exibir_mensagem("✅ Selecionando 'Continuar com corretor anterior'...")
-                    # Tentar seletores mais simples e robustos
-                    try:
-                        # Primeiro tentar por texto
-                        page.locator("text=Continuar com corretor anterior").first.click()
-                        exibir_mensagem("✅ Opção 'Continuar com corretor anterior' selecionada por texto")
-                    except:
-                        try:
-                            # Tentar por radio button
-                            page.locator("input[type='radio'][value='sim']").first.click()
-                            exibir_mensagem("✅ Opção 'Continuar com corretor anterior' selecionada por radio")
-                        except:
-                            # Tentar por label
-                            page.locator("label:has-text('Continuar')").first.click()
-                            exibir_mensagem("✅ Opção 'Continuar com corretor anterior' selecionada por label")
-                else:
-                    exibir_mensagem("✅ Selecionando 'Não continuar com corretor anterior'...")
-                    try:
-                        # Primeiro tentar por texto
-                        page.locator("text=Não continuar com corretor anterior").first.click()
-                        exibir_mensagem("✅ Opção 'Não continuar com corretor anterior' selecionada por texto")
-                    except:
-                        try:
-                            # Tentar por radio button
-                            page.locator("input[type='radio'][value='nao']").first.click()
-                            exibir_mensagem("✅ Opção 'Não continuar com corretor anterior' selecionada por radio")
-                        except:
-                            # Tentar por label
-                            page.locator("label:has-text('Não')").first.click()
-                            exibir_mensagem("✅ Opção 'Não continuar com corretor anterior' selecionada por label")
-                
-                # PASSO 3: Clicar no botão Continuar
-                exibir_mensagem("🔄 Clicando no botão 'Continuar'...")
-                botao_continuar = page.locator('p.font-semibold.font-workSans.cursor-pointer.text-sm.leading-6:has-text("Continuar")')
-                if botao_continuar.is_visible():
-                    botao_continuar.click()
-                    exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
-                else:
-                    exibir_mensagem("⚠️ Botão 'Continuar' não encontrado")
-                    return False
-                
-                # PASSO 4: Aguardar transição para próxima tela
-                exibir_mensagem("⏳ Aguardando transição para próxima tela...")
-                time.sleep(2)
-                exibir_mensagem("✅ TELA 14 CONCLUÍDA!")
-                
-                return True
-            else:
-                exibir_mensagem("ℹ️ Tela 14 não aparece - não há cotação anterior para este cliente")
-                exibir_mensagem("ℹ️ Pulando para próxima tela...")
-                return True  # Retorna True mesmo não aparecendo, pois é condicional
-                
-        except Exception as e:
-            exibir_mensagem(f"ℹ️ Tela 14 não detectada: {str(e)}")
-            exibir_mensagem("ℹ️ Pulando para próxima tela...")
-            return True  # Retorna True mesmo não aparecendo, pois é condicional
-        
-    except Exception as e:
-        exibir_mensagem(f"❌ ERRO na Tela 14: {str(e)}")
-        return False
-
-def navegar_tela_15_playwright(page, email_login, senha_login):
-    """
-    TELA 15: Resultado Final (DUAS FASES)
-    
-    DESCRIÇÃO:
-        Implementa as duas fases da Tela 15:
-        FASE 1: Mapa + Timer regressivo (2:43 minutos)
-        FASE 2: Tela de cálculo + Modal de login + Modal CPF divergente
-        
-    ELEMENTOS IDENTIFICADOS:
-        FASE 1:
-        - Modal timer: text=Por favor, aguarde. Estamos buscando o corretor ideal para você!
-        - Timer: text=Tempo estimado em 02:43
-        
-        FASE 2:
-        - Modal login: MuiBackdrop-root
-        - Email: #emailTelaLogin
-        - Senha: #senhaTelaLogin
-        - Botão Acessar: #gtm-telaLoginBotaoAcessar
-        - Modal CPF divergente: text=CPF informado não corresponde à conta
-        - Botão "Logar com outra conta": #logarComOutraContaModalAssociarUsuario
-        
-    PARÂMETROS:
-        page: Objeto page do Playwright
-        email_login: Email para login
-        senha_login: Senha para login
-        
-    RETORNO:
-        bool: True se sucesso, False se falha
-    """
-    try:
-        exibir_mensagem("\n" + "="*50)
-        exibir_mensagem("🎯 TELA 15: RESULTADO FINAL (DUAS FASES)")
-        exibir_mensagem("="*50)
-        
-        # ========================================
-        # FASE 1: MAPA + TIMER REGRESSIVO
-        # ========================================
-        exibir_mensagem("🔄 FASE 1: Aguardando mapa e timer regressivo...")
-        
-        # PASSO 1: Aguardar modal com timer aparecer
-        exibir_mensagem("⏳ Aguardando modal com timer...")
-        
-        try:
-            # Aguardar até 30 segundos para o modal aparecer
-            modal_timer = page.locator("text=Por favor, aguarde. Estamos buscando o corretor ideal para você!")
-            modal_timer.wait_for(timeout=30000)
-            exibir_mensagem("✅ Modal com timer detectado!")
-        except Exception as e:
-            exibir_mensagem(f"⚠️ Modal com timer não detectado: {str(e)}")
-            exibir_mensagem("ℹ️ Continuando para Fase 2...")
-        
-        # PASSO 2: Aguardar timer regressivo (aproximadamente 2:43 minutos)
-        exibir_mensagem("⏳ Aguardando timer regressivo (2:43 minutos)...")
-        
-        # Aguardar aproximadamente 2:43 minutos (163 segundos)
-        tempo_timer = 163
-        tempo_inicio_timer = time.time()
-        
-        while (time.time() - tempo_inicio_timer) < tempo_timer:
-            try:
-                # Verificar se ainda está no timer
-                timer_atual = page.locator("text=Tempo estimado em")
-                if timer_atual.count() > 0:
-                    tempo_decorrido = int(time.time() - tempo_inicio_timer)
-                    tempo_restante = tempo_timer - tempo_decorrido
-                    exibir_mensagem(f"⏳ Timer em andamento... ({tempo_restante}s restantes)")
-                else:
-                    exibir_mensagem("✅ Timer concluído!")
-                    break
-            except:
-                pass
-            
-            time.sleep(10)  # Verificar a cada 10 segundos
-        
-        exibir_mensagem("✅ FASE 1 CONCLUÍDA!")
-        
-        # ========================================
-        # FASE 2: TELA DE CÁLCULO + MODAL LOGIN
-        # ========================================
-        exibir_mensagem("🔄 FASE 2: Aguardando tela de cálculo e modal de login...")
-        
-        # PASSO 3: Aguardar tela de cálculo aparecer
-        exibir_mensagem("⏳ Aguardando tela de cálculo...")
-        time.sleep(5)
-        
-        # PASSO 4: Aguardar modal de login aparecer
-        exibir_mensagem("⏳ Aguardando modal de login...")
-        
-        try:
-            # Aguardar até 30 segundos para o modal de login aparecer
-            modal_login = page.locator("text=Acesse sua conta para visualizar o resultado final")
-            modal_login.wait_for(timeout=30000)
-            exibir_mensagem("✅ Modal de login detectado!")
-        except Exception as e:
-            exibir_mensagem(f"⚠️ Modal de login não detectado: {str(e)}")
-            return False
-        
-        # PASSO 5: Preencher email
-        exibir_mensagem("📧 Preenchendo email...")
-        
-        try:
-            campo_email = page.locator("#emailTelaLogin")
-            campo_email.fill(email_login)
-            exibir_mensagem(f"✅ Email preenchido: {email_login}")
-        except Exception as e:
-            exibir_mensagem(f"❌ Erro ao preencher email: {str(e)}")
-            return False
-        
-        # PASSO 6: Preencher senha
-        exibir_mensagem("🔒 Preenchendo senha...")
-        
-        try:
-            campo_senha = page.locator("#senhaTelaLogin")
-            campo_senha.fill(senha_login)
-            exibir_mensagem("✅ Senha preenchida")
-        except Exception as e:
-            exibir_mensagem(f"❌ Erro ao preencher senha: {str(e)}")
-            return False
-        
-        # PASSO 7: CAPTURA DE TELA E LOGS DETALHADOS DO MODAL
-        exibir_mensagem("📸 CAPTURANDO TELA DO MODAL DE LOGIN...")
-        
-        try:
-            # Capturar screenshot do modal
-            timestamp = time.strftime('%Y%m%d_%H%M%S')
-            screenshot_path = f"modal_login_{timestamp}.png"
-            page.screenshot(path=screenshot_path, full_page=True)
-            exibir_mensagem(f"📸 Screenshot salvo: {screenshot_path}")
-            
-            # Verificar se os campos estão realmente preenchidos
-            valor_email_campo = campo_email.input_value()
-            valor_senha_campo = campo_senha.input_value()
-            
-            exibir_mensagem(f"🔍 VERIFICAÇÃO DOS CAMPOS:")
-            exibir_mensagem(f"   📧 Email no campo: '{valor_email_campo}'")
-            exibir_mensagem(f"   🔒 Senha no campo: '{valor_senha_campo}'")
-            exibir_mensagem(f"   📧 Email esperado: '{email_login}'")
-            exibir_mensagem(f"   🔒 Senha esperada: '{senha_login}'")
-            
-            # Verificar se os campos estão corretos
-            if valor_email_campo == email_login:
-                exibir_mensagem("✅ Email preenchido corretamente!")
-            else:
-                exibir_mensagem("❌ Email NÃO foi preenchido corretamente!")
-            
-            if valor_senha_campo == senha_login:
-                exibir_mensagem("✅ Senha preenchida corretamente!")
-            else:
-                exibir_mensagem("❌ Senha NÃO foi preenchida corretamente!")
-            
-            # Verificar se o botão "Acessar" está visível
-            botao_acessar = page.locator("#gtm-telaLoginBotaoAcessar")
-            if botao_acessar.is_visible():
-                exibir_mensagem("✅ Botão 'Acessar' está visível e pronto para clicar!")
-                texto_botao = botao_acessar.text_content()
-                exibir_mensagem(f"   📝 Texto do botão: '{texto_botao}'")
-            else:
-                exibir_mensagem("❌ Botão 'Acessar' NÃO está visível!")
-            
-            # Verificar se o modal está realmente presente
-            modal_presente = page.locator("text=Acesse sua conta para visualizar o resultado final")
-            if modal_presente.count() > 0:
-                exibir_mensagem("✅ Modal de login está presente na tela!")
-            else:
-                exibir_mensagem("❌ Modal de login NÃO está presente na tela!")
-            
-            # Capturar HTML do modal para debug
-            try:
-                modal_html = page.locator(".MuiBackdrop-root").inner_html()
-                exibir_mensagem(f"🔍 HTML do modal capturado (primeiros 200 chars): {modal_html[:200]}...")
-            except Exception as e:
-                exibir_mensagem(f"⚠️ Erro ao capturar HTML do modal: {str(e)}")
-            
-        except Exception as e:
-            exibir_mensagem(f"❌ Erro durante captura de tela/logs: {str(e)}")
-        
-        # PASSO 8: Clicar em "Acessar"
-        exibir_mensagem("🔄 Clicando em 'Acessar'...")
-        
-        try:
-            botao_acessar = page.locator("#gtm-telaLoginBotaoAcessar")
-            if botao_acessar.is_visible():
-                botao_acessar.click()
-                exibir_mensagem("✅ Botão 'Acessar' clicado com sucesso!")
-                
-                # Aguardar possível redirecionamento ou modal CPF divergente
-                exibir_mensagem("⏳ Aguardando resposta do login...")
-                time.sleep(5)
-                
-                # Verificar se apareceu modal CPF divergente
-                try:
-                    modal_cpf = page.locator("text=CPF informado não corresponde à conta")
-                    if modal_cpf.count() > 0:
-                        exibir_mensagem("✅ Modal CPF divergente detectado!")
-                        
-                        # Clicar no botão "Manter Login atual"
-                        try:
-                            exibir_mensagem("🔍 Procurando botão 'Manter Login atual'...")
-                            
-                            # Tentar pelo ID específico
-                            botao_manter_login = page.locator("#manterLoginAtualModalAssociarUsuario")
-                            if botao_manter_login.is_visible():
-                                botao_manter_login.click()
-                                exibir_mensagem("✅ Botão 'Manter Login atual' clicado pelo ID!")
-                                time.sleep(3)
-                            else:
-                                # Tentar pelo texto
-                                botao_manter_login = page.locator("text=Manter Login atual")
-                                if botao_manter_login.is_visible():
-                                    botao_manter_login.click()
-                                    exibir_mensagem("✅ Botão 'Manter Login atual' clicado pelo texto!")
-                                    time.sleep(3)
-                                else:
-                                    exibir_mensagem("⚠️ Botão 'Manter Login atual' não encontrado")
-                        except Exception as e:
-                            exibir_mensagem(f"⚠️ Erro ao clicar no botão 'Manter Login atual': {str(e)}")
-                    else:
-                        exibir_mensagem("ℹ️ Modal CPF divergente não apareceu - login pode ter sido bem-sucedido")
-                except Exception as e:
-                    exibir_mensagem(f"⚠️ Erro ao verificar modal CPF: {str(e)}")
-                
-            else:
-                exibir_mensagem("❌ Botão 'Acessar' não está visível!")
-                return False
-        except Exception as e:
-            exibir_mensagem(f"❌ Erro ao clicar em 'Acessar': {str(e)}")
-            return False
-        
-        exibir_mensagem("✅ LOGIN CONCLUÍDO!")
-        
-        # ========================================
-        # CAPTURA DE DADOS DOS PLANOS DE SEGURO
-        # ========================================
-        exibir_mensagem("📊 INICIANDO CAPTURA DE DADOS DOS PLANOS...")
-        
-        # Aguardar carregamento dos planos
-        time.sleep(5)
-        
-        # Capturar dados dos planos
-        dados_planos = capturar_dados_planos_seguro(page)
-        
-        if dados_planos:
-            exibir_mensagem("✅ DADOS DOS PLANOS CAPTURADOS COM SUCESSO!")
-            exibir_mensagem("📋 RESUMO DOS DADOS CAPTURADOS:")
-            exibir_mensagem(f"   📊 Plano Recomendado: {dados_planos['plano_recomendado'].get('valor', 'N/A')}")
-            exibir_mensagem(f"   📊 Plano Alternativo: {dados_planos['plano_alternativo'].get('valor', 'N/A')}")
-        else:
-            exibir_mensagem("⚠️ FALHA NA CAPTURA DE DADOS DOS PLANOS")
-        
-        exibir_mensagem("🎯 TELA 15 FINALIZADA COM SUCESSO!")
-        
-        return True
-        
-    except Exception as e:
-        exibir_mensagem(f"❌ ERRO na Tela 15: {str(e)}")
-        return False
-        max_tentativas = 180  # 3 minutos
-        tentativa = 0
-        
-        while tentativa < max_tentativas:
-            try:
-                # Procurar por elementos que indicam o timer
-                elementos_timer = page.locator("xpath=//*[contains(text(), 'Tempo estimado') or contains(text(), 'aguarde') or contains(text(), 'Aguarde')]")
-                if elementos_timer.count() > 0:
-                    time.sleep(1)
-                    tentativa += 1
-                    continue
-                
-                # Se não encontrou timer, pode ter passado para a próxima fase
-                break
-            except:
-                pass
-            
-            time.sleep(1)
-            tentativa += 1
-        
-        exibir_mensagem("✅ Timer regressivo concluído")
-        
-        # FASE 2: Aguardar carregamento da tela de cálculo
-        exibir_mensagem("📱 TELA 15 - FASE 2: Aguardando carregamento da tela de cálculo...")
-        max_tentativas = 30
-        tentativa = 0
-        
-        while tentativa < max_tentativas:
-            try:
-                # Procurar por elementos que indicam a tela de cálculo
-                elementos_calculo = page.locator("xpath=//*[contains(text(), 'Plano recomendado') or contains(text(), 'plano') or contains(text(), 'Plano')]")
-                if elementos_calculo.count() > 0:
-                    exibir_mensagem("✅ Tela de cálculo carregada com sucesso")
-                    break
-            except:
-                pass
-            
-            time.sleep(1)
-            tentativa += 1
-        
-        if tentativa >= max_tentativas:
-            exception_handler.capturar_warning("Tela de cálculo não carregou", "TELA_15")
-            return False
-        
-        # FASE 3: Aguardar modal de login
-        exibir_mensagem("📱 TELA 15 - FASE 3: Aguardando modal de login...")
-        max_tentativas = 10
-        tentativa = 0
-        
-        while tentativa < max_tentativas:
-            try:
-                modal_login = page.locator("xpath=//*[contains(text(), 'Acesse sua conta') or contains(text(), 'acesse') or contains(text(), 'Acesse')]")
-                if modal_login.count() > 0:
-                    exibir_mensagem("✅ Modal de login detectado")
-                    break
-            except:
-                pass
-            
-            time.sleep(1)
-            tentativa += 1
-        
-        if tentativa >= max_tentativas:
-            exception_handler.capturar_warning("Modal de login não apareceu", "TELA_15")
-            return False
-        
-        # FASE 4: Preencher credenciais de login
-        exibir_mensagem("📱 TELA 15 - FASE 4: Preenchendo credenciais de login...")
-        try:
-            # Preencher email
-            email_campo = page.locator("#emailTelaLogin")
-            email_campo.click()
-            email_campo.fill(email_login)
-            exibir_mensagem(f"✅ Email preenchido: {email_login}")
-            
-            # Preencher senha
-            senha_campo = page.locator("#senhaTelaLogin")
-            senha_campo.click()
-            senha_campo.fill(senha_login)
-            exibir_mensagem(f"✅ Senha preenchida")
-            
-            # Clicar em Acessar
-            botao_acessar = page.locator("#gtm-telaLoginAcessar").first
-            botao_acessar.click()
-            exibir_mensagem("✅ Botão 'Acessar' clicado com sucesso")
-            
-        except Exception as e:
-            exception_handler.capturar_excecao(e, "TELA_15", "Erro ao preencher credenciais de login")
-            return False
-        
-        # FASE 5: Verificar se apareceu modal "CPF divergente"
-        exibir_mensagem("📱 TELA 15 - FASE 5: Verificando modal CPF divergente...")
-        time.sleep(3)
-        
-        try:
-            modal_cpf_divergente = page.locator("#manterLoginAtualModalAssociarUsuario")
-            if modal_cpf_divergente.is_visible():
-                exibir_mensagem("📱 TELA 15: Modal CPF divergente detectado")
-                modal_cpf_divergente.click()
-                exibir_mensagem("✅ Botão 'Manter Login atual' clicado com sucesso")
-                time.sleep(2)
-            else:
-                exibir_mensagem("✅ Modal CPF divergente não apareceu")
-        except Exception as e:
-            exception_handler.capturar_warning(f"Erro ao verificar modal CPF divergente: {str(e)}", "TELA_15")
-        
-        exibir_mensagem("✅ TELA 15 CONCLUÍDA COM SUCESSO!")
-        time.sleep(3)
-        return True
-        
-    except Exception as e:
-        exception_handler.capturar_excecao(e, "TELA_15", "Erro na Tela 15 - Resultado Final")
-        return False
 
 # ========================================
 # FUNÇÃO PRINCIPAL
