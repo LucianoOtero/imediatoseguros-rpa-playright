@@ -17,7 +17,7 @@
 ## 🏆 **SISTEMA DE RETORNO ESTRUTURADO IMPLEMENTADO - v3.1.0**
 
 ### ✅ **Nova Versão Principal**: v3.1.0
-- **Commit**: `[Aguardando commit]`
+- **Commit**: `e043313`
 - **Data**: 02/09/2025
 - **Status**: ✅ **SISTEMA DE RETORNO ESTRUTURADO IMPLEMENTADO**
 - **Funcionalidades**: 
@@ -52,7 +52,7 @@
 ## 📊 Versões Disponíveis
 
 ### **Versão Mais Recente**: v3.1.0
-- **Commit**: `[Aguardando commit]`
+- **Commit**: `e043313`
 - **Data**: 02/09/2025
 - **Funcionalidades**: 
   - ✅ **SISTEMA DE RETORNO ESTRUTURADO IMPLEMENTADO**
