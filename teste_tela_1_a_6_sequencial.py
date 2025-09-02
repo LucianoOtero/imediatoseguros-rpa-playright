@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-TESTE TELAS 1 A 9 SEQUENCIAL - IMPLEMENTAÇÃO COMPLETA
-Teste das Telas 1-9 usando Playwright com implementação da Tela 9
+TESTE TELAS 1 A 10 SEQUENCIAL - IMPLEMENTAÇÃO COMPLETA
+Teste das Telas 1-10 usando Playwright com implementação da Tela 10
 
 DESCRIÇÃO:
 - Tela 1: Seleção do tipo de seguro (Carro)
@@ -13,11 +13,12 @@ DESCRIÇÃO:
 - Tela 7: Endereço de pernoite (CEP)
 - Tela 8: Finalidade do veículo (uso do veículo)
 - Tela 9: Dados pessoais do segurado
+- Tela 10: Condutor principal
 
 AUTOR: Luciano Otero
 DATA: 2025-09-02
-VERSÃO: 1.3.0
-STATUS: Implementação completa das Telas 1-9
+VERSÃO: 1.4.0
+STATUS: Implementação completa das Telas 1-10
 """
 
 import json
@@ -971,6 +972,199 @@ def navegar_tela_9_playwright(page, nome, cpf, data_nascimento, sexo, estado_civ
         exibir_mensagem(f"❌ ERRO na Tela 9: {str(e)}")
         return False
 
+def navegar_tela_10_playwright(page, condutor_principal, nome_condutor=None, cpf_condutor=None, data_nascimento_condutor=None, sexo_condutor=None, estado_civil_condutor=None):
+    """
+    TELA 10: Condutor principal
+    
+    DESCRIÇÃO:
+        Navega para a Tela 10 e seleciona se será o condutor principal ou não.
+        Se não for o condutor principal, preenche os dados do condutor.
+    
+    ELEMENTOS IDENTIFICADOS:
+        - Radio Sim: input[value="sim"][name="condutorPrincipalTelaCondutorPrincipal"]
+        - Radio Não: input[value="nao"][name="condutorPrincipalTelaCondutorPrincipal"]
+        - Botão Continuar: #gtm-telaCondutorPrincipalContinuar
+        - Nome Condutor: #nomeTelaCondutorPrincipal (quando "Não" selecionado)
+        - CPF Condutor: #cpfTelaCondutorPrincipal (quando "Não" selecionado)
+        - Data Nascimento: #dataNascimentoTelaCondutorPrincipal (quando "Não" selecionado)
+        - Sexo Condutor: #sexoTelaCondutorPrincipal (quando "Não" selecionado)
+        - Estado Civil: #estadoCivilTelaCondutorPrincipal (quando "Não" selecionado)
+    
+    IMPLEMENTAÇÃO:
+        1. Aguarda carregamento da Tela 10
+        2. Seleciona radio button baseado no parâmetro condutor_principal
+        3. Se "Não" selecionado, preenche campos adicionais do condutor
+        4. Clica em "Continuar"
+        5. Aguarda transição para próxima tela
+    
+    PARÂMETROS:
+        page: Objeto page do Playwright
+        condutor_principal: bool - True se será condutor principal, False se não
+        nome_condutor: str - Nome do condutor (quando condutor_principal=False)
+        cpf_condutor: str - CPF do condutor (quando condutor_principal=False)
+        data_nascimento_condutor: str - Data de nascimento (quando condutor_principal=False)
+        sexo_condutor: str - Sexo do condutor (quando condutor_principal=False)
+        estado_civil_condutor: str - Estado civil do condutor (quando condutor_principal=False)
+    
+    RETORNO:
+        bool: True se sucesso, False se falha
+    
+    LOGS ESPERADOS:
+        - "👥 TELA 10: Condutor principal..."
+        - "✅ Tela 10 carregada - condutor principal detectado!"
+        - "⏳ Selecionando 'Sim' para condutor principal..."
+        - "⏳ Selecionando 'Não' para não condutor principal..."
+        - "⏳ Preenchendo dados do condutor..."
+        - "✅ TELA 10 IMPLEMENTADA COM SUCESSO!"
+        - "❌ ERRO na Tela 10: {erro}" (se exceção)
+    """
+    try:
+        # PASSO 1: Exibir mensagem de início da Tela 10
+        exibir_mensagem("👥 TELA 10: Condutor principal...")
+        
+        # PASSO 2: Aguardar carregamento da Tela 10
+        # Aguardar o botão continuar da Tela 10 aparecer
+        page.wait_for_selector("#gtm-telaCondutorPrincipalContinuar", timeout=20000)
+        exibir_mensagem("✅ Tela 10 carregada - condutor principal detectado!")
+        
+        # PASSO 3: Aguardar estabilização da página
+        time.sleep(2)
+        
+        # PASSO 4: Selecionar opção baseada no parâmetro condutor_principal
+        if condutor_principal:
+            # CENÁRIO 1: Selecionar "Sim" (Condutor Principal)
+            exibir_mensagem("⏳ Selecionando 'Sim' para condutor principal...")
+            
+            # Localizar e clicar no radio button "Sim"
+            radio_sim = page.locator('input[value="sim"][name="condutorPrincipalTelaCondutorPrincipal"]')
+            if radio_sim.is_visible():
+                radio_sim.click()
+                exibir_mensagem("✅ Radio 'Sim' selecionado com sucesso")
+            else:
+                exibir_mensagem("⚠️ Radio 'Sim' não encontrado - tentando prosseguir...")
+        else:
+            # CENÁRIO 2: Selecionar "Não" (Não Condutor Principal)
+            exibir_mensagem("⏳ Selecionando 'Não' para não condutor principal...")
+            
+            # Localizar e clicar no radio button "Não"
+            radio_nao = page.locator('input[value="nao"][name="condutorPrincipalTelaCondutorPrincipal"]')
+            if radio_nao.is_visible():
+                radio_nao.click()
+                exibir_mensagem("✅ Radio 'Não' selecionado com sucesso")
+                
+                # PASSO 5: Aguardar campos do condutor aparecerem
+                time.sleep(2)
+                
+                # PASSO 6: Preencher campos do condutor
+                exibir_mensagem("⏳ Preenchendo dados do condutor...")
+                
+                # Nome do condutor
+                if nome_condutor:
+                    nome_campo = page.locator("#nomeTelaCondutorPrincipal")
+                    if nome_campo.is_visible():
+                        nome_campo.fill(nome_condutor)
+                        exibir_mensagem(f"✅ Nome do condutor preenchido: {nome_condutor}")
+                    else:
+                        exibir_mensagem("⚠️ Campo nome do condutor não encontrado")
+                
+                # CPF do condutor
+                if cpf_condutor:
+                    cpf_campo = page.locator("#cpfTelaCondutorPrincipal")
+                    if cpf_campo.is_visible():
+                        cpf_campo.fill(cpf_condutor)
+                        exibir_mensagem(f"✅ CPF do condutor preenchido: {cpf_condutor}")
+                    else:
+                        exibir_mensagem("⚠️ Campo CPF do condutor não encontrado")
+                
+                # Data de nascimento do condutor
+                if data_nascimento_condutor:
+                    data_campo = page.locator("#dataNascimentoTelaCondutorPrincipal")
+                    if data_campo.is_visible():
+                        data_campo.fill(data_nascimento_condutor)
+                        exibir_mensagem(f"✅ Data de nascimento do condutor preenchida: {data_nascimento_condutor}")
+                    else:
+                        exibir_mensagem("⚠️ Campo data de nascimento do condutor não encontrado")
+                
+                # Sexo do condutor (dropdown MUI)
+                if sexo_condutor:
+                    sexo_campo = page.locator("#sexoTelaCondutorPrincipal")
+                    if sexo_campo.is_visible():
+                        # Clicar no campo para abrir o dropdown
+                        sexo_campo.click()
+                        time.sleep(1)
+                        
+                        # Aguardar a lista aparecer e clicar na opção
+                        try:
+                            page.wait_for_selector("ul", timeout=5000)
+                            opcao_sexo = page.locator(f'xpath=//li[contains(text(), "{sexo_condutor}")]')
+                            if opcao_sexo.is_visible():
+                                opcao_sexo.click()
+                                exibir_mensagem(f"✅ Sexo do condutor selecionado: {sexo_condutor}")
+                            else:
+                                exibir_mensagem(f"⚠️ Opção de sexo '{sexo_condutor}' não encontrada")
+                        except:
+                            exibir_mensagem("⚠️ Erro ao selecionar sexo do condutor")
+                    else:
+                        exibir_mensagem("⚠️ Campo sexo do condutor não encontrado")
+                
+                # Estado civil do condutor (dropdown MUI)
+                if estado_civil_condutor:
+                    estado_civil_campo = page.locator("#estadoCivilTelaCondutorPrincipal")
+                    if estado_civil_campo.is_visible():
+                        # Clicar no campo para abrir o dropdown
+                        estado_civil_campo.click()
+                        time.sleep(1)
+                        
+                        # Aguardar a lista aparecer e clicar na opção
+                        try:
+                            page.wait_for_selector("ul", timeout=5000)
+                            
+                            # Mapeamento para variações de acento
+                            mapeamento_estado_civil = {
+                                "Casado ou Uniao Estavel": "Casado ou União Estável"
+                            }
+                            
+                            texto_busca = mapeamento_estado_civil.get(estado_civil_condutor, estado_civil_condutor)
+                            opcao_estado_civil = page.locator(f'xpath=//li[contains(text(), "{texto_busca}")]')
+                            
+                            if opcao_estado_civil.is_visible():
+                                opcao_estado_civil.click()
+                                exibir_mensagem(f"✅ Estado civil do condutor selecionado: {estado_civil_condutor}")
+                            else:
+                                exibir_mensagem(f"⚠️ Opção de estado civil '{estado_civil_condutor}' não encontrada")
+                        except:
+                            exibir_mensagem("⚠️ Erro ao selecionar estado civil do condutor")
+                    else:
+                        exibir_mensagem("⚠️ Campo estado civil do condutor não encontrado")
+            else:
+                exibir_mensagem("⚠️ Radio 'Não' não encontrado - tentando prosseguir...")
+        
+        # PASSO 7: Aguardar estabilização após seleção
+        time.sleep(2)
+        
+        # PASSO 8: Clicar em "Continuar"
+        exibir_mensagem("⏳ Clicando em 'Continuar'...")
+        
+        botao_continuar = page.locator("#gtm-telaCondutorPrincipalContinuar")
+        if botao_continuar.is_visible():
+            botao_continuar.click()
+            exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
+            
+            # PASSO 9: Aguardar transição para próxima tela
+            time.sleep(3)
+            
+            # PASSO 10: Confirmar sucesso
+            exibir_mensagem("✅ TELA 10 IMPLEMENTADA COM SUCESSO!")
+            return True
+        else:
+            exibir_mensagem("❌ Botão 'Continuar' não encontrado")
+            return False
+            
+    except Exception as e:
+        exibir_mensagem(f"❌ ERRO na Tela 10: {str(e)}")
+        return False
+
+
 def main():
     """
     Função principal que executa o teste das Telas 1-9 sequencialmente
@@ -1096,10 +1290,19 @@ def main():
                 exibir_mensagem("❌ TELA 9 FALHOU!")
                 return 1
             
+            # TELA 10
+            exibir_mensagem("\n" + "="*50)
+            if navegar_tela_10_playwright(page, parametros['condutor_principal'], parametros['nome_condutor'], parametros['cpf_condutor'], parametros['data_nascimento_condutor'], parametros['sexo_condutor'], parametros['estado_civil_condutor']):
+                telas_executadas += 1
+                exibir_mensagem("✅ TELA 10 CONCLUÍDA!")
+            else:
+                exibir_mensagem("❌ TELA 10 FALHOU!")
+                return 1
+            
             # Resultado final
             exibir_mensagem("\n" + "="*60)
-            exibir_mensagem("🎉 TESTE TELAS 1 A 9 CONCLUÍDO COM SUCESSO!")
-            exibir_mensagem(f"✅ Total de telas executadas: {telas_executadas}/9")
+            exibir_mensagem("🎉 TESTE TELAS 1 A 10 CONCLUÍDO COM SUCESSO!")
+            exibir_mensagem(f"✅ Total de telas executadas: {telas_executadas}/10")
             exibir_mensagem("✅ Todas as telas funcionaram corretamente")
             exibir_mensagem("✅ Navegação sequencial realizada com sucesso")
             

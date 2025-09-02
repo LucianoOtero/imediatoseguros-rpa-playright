@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-TESTE TELAS 1 A 10 SEQUENCIAL - IMPLEMENTAÇÃO COMPLETA
-Teste das Telas 1-10 usando Playwright com implementação da Tela 10
+TESTE TELAS 1 A 11 SEQUENCIAL - IMPLEMENTAÇÃO COMPLETA
+Teste das Telas 1-11 usando Playwright com implementação da Tela 11
 
 DESCRIÇÃO:
 - Tela 1: Seleção do tipo de seguro (Carro)
@@ -14,11 +14,12 @@ DESCRIÇÃO:
 - Tela 8: Finalidade do veículo (uso do veículo)
 - Tela 9: Dados pessoais do segurado
 - Tela 10: Condutor principal
+- Tela 11: Atividade do veículo (local de trabalho/estudo)
 
 AUTOR: Luciano Otero
 DATA: 2025-09-02
-VERSÃO: 1.4.0
-STATUS: Implementação completa das Telas 1-10
+VERSÃO: 1.5.0
+STATUS: Implementação completa das Telas 1-11
 """
 
 import json
@@ -1164,6 +1165,124 @@ def navegar_tela_10_playwright(page, condutor_principal, nome_condutor=None, cpf
         exibir_mensagem(f"❌ ERRO na Tela 10: {str(e)}")
         return False
 
+def navegar_tela_11_playwright(page, local_de_trabalho, estacionamento_proprio_local_de_trabalho, local_de_estudo, estacionamento_proprio_local_de_estudo):
+    """
+    TELA 11: Atividade do veículo
+    
+    DESCRIÇÃO:
+        Navega para a Tela 11 e seleciona se o veículo é utilizado para ir ao local de trabalho e/ou estudo.
+        Se selecionar local de trabalho, aparece checkbox de estacionamento próprio do trabalho.
+        Se selecionar local de estudo, aparece checkbox de estacionamento próprio do estudo.
+        
+    ELEMENTOS IDENTIFICADOS:
+        - Checkbox Local de Trabalho: input[type="checkbox"][value="trabalho"]
+        - Checkbox Local de Estudo: input[type="checkbox"][value="estudo"]
+        - Checkbox Estacionamento Local de Trabalho: input[type="checkbox"][data-gtm-form-interact-field-id="10"]
+        - Checkbox Estacionamento Local de Estudo: input[type="checkbox"][data-gtm-form-interact-field-id="11"]
+        - Botão Continuar: #gtm-telaAtividadeVeiculoContinuar
+        
+    PARÂMETROS:
+        - local_de_trabalho: bool - Se o veículo é usado para ir ao trabalho
+        - estacionamento_proprio_local_de_trabalho: bool - Se há estacionamento próprio no trabalho
+        - local_de_estudo: bool - Se o veículo é usado para ir ao estudo
+        - estacionamento_proprio_local_de_estudo: bool - Se há estacionamento próprio no estudo
+    """
+    try:
+        exibir_mensagem("\n" + "="*50)
+        exibir_mensagem("🎯 TELA 11: ATIVIDADE DO VEÍCULO")
+        exibir_mensagem("="*50)
+        
+        # Aguarda o carregamento da Tela 11
+        exibir_mensagem("⏳ Aguardando carregamento da Tela 11...")
+        page.wait_for_selector("#gtm-telaAtividadeVeiculoContinuar", timeout=10000)
+        time.sleep(2)  # Aguarda estabilização
+        
+        exibir_mensagem("✅ Tela 11 carregada - atividade do veículo detectada!")
+        
+        # PASSO 1: Seleciona checkbox Local de Trabalho se necessário
+        if local_de_trabalho:
+            exibir_mensagem("📋 Marcando checkbox 'Local de Trabalho'...")
+            checkbox_trabalho = page.locator('input[type="checkbox"][value="trabalho"]')
+            if not checkbox_trabalho.is_checked():
+                checkbox_trabalho.check()
+                exibir_mensagem("✅ Checkbox 'Local de Trabalho' marcado!")
+                time.sleep(1)  # Aguarda aparecimento do checkbox de estacionamento
+            else:
+                exibir_mensagem("ℹ️ Checkbox 'Local de Trabalho' já estava marcado")
+        else:
+            exibir_mensagem("ℹ️ Local de Trabalho: Não selecionado")
+        
+        # PASSO 2: Seleciona checkbox Local de Estudo se necessário
+        if local_de_estudo:
+            exibir_mensagem("📋 Marcando checkbox 'Local de Estudo'...")
+            checkbox_estudo = page.locator('input[type="checkbox"][value="estudo"]')
+            if not checkbox_estudo.is_checked():
+                checkbox_estudo.check()
+                exibir_mensagem("✅ Checkbox 'Local de Estudo' marcado!")
+                time.sleep(1)  # Aguarda aparecimento do checkbox de estacionamento
+            else:
+                exibir_mensagem("ℹ️ Checkbox 'Local de Estudo' já estava marcado")
+        else:
+            exibir_mensagem("ℹ️ Local de Estudo: Não selecionado")
+        
+        # PASSO 3: Configurar estacionamento do trabalho (se local_de_trabalho = true)
+        if local_de_trabalho:
+            exibir_mensagem("🅿️ Configurando estacionamento do trabalho...")
+            try:
+                checkbox_estacionamento_trabalho = page.locator('input[type="checkbox"][data-gtm-form-interact-field-id="10"]')
+                if checkbox_estacionamento_trabalho.is_visible():
+                    if estacionamento_proprio_local_de_trabalho and not checkbox_estacionamento_trabalho.is_checked():
+                        checkbox_estacionamento_trabalho.check()
+                        exibir_mensagem("✅ Estacionamento próprio do trabalho: MARCADO")
+                    elif not estacionamento_proprio_local_de_trabalho and checkbox_estacionamento_trabalho.is_checked():
+                        checkbox_estacionamento_trabalho.uncheck()
+                        exibir_mensagem("✅ Estacionamento próprio do trabalho: DESMARCADO")
+                    else:
+                        estado = "MARCADO" if estacionamento_proprio_local_de_trabalho else "DESMARCADO"
+                        exibir_mensagem(f"✅ Estacionamento próprio do trabalho: {estado} (já estava correto)")
+                else:
+                    exibir_mensagem("⚠️ Checkbox estacionamento do trabalho não encontrado")
+            except Exception as e:
+                exibir_mensagem(f"⚠️ Erro ao configurar estacionamento do trabalho: {str(e)}")
+        
+        # PASSO 4: Configurar estacionamento do estudo (se local_de_estudo = true)
+        if local_de_estudo:
+            exibir_mensagem("🅿️ Configurando estacionamento do estudo...")
+            try:
+                checkbox_estacionamento_estudo = page.locator('input[type="checkbox"][data-gtm-form-interact-field-id="11"]')
+                if checkbox_estacionamento_estudo.is_visible():
+                    if estacionamento_proprio_local_de_estudo and not checkbox_estacionamento_estudo.is_checked():
+                        checkbox_estacionamento_estudo.check()
+                        exibir_mensagem("✅ Estacionamento próprio do estudo: MARCADO")
+                    elif not estacionamento_proprio_local_de_estudo and checkbox_estacionamento_estudo.is_checked():
+                        checkbox_estacionamento_estudo.uncheck()
+                        exibir_mensagem("✅ Estacionamento próprio do estudo: DESMARCADO")
+                    else:
+                        estado = "MARCADO" if estacionamento_proprio_local_de_estudo else "DESMARCADO"
+                        exibir_mensagem(f"✅ Estacionamento próprio do estudo: {estado} (já estava correto)")
+                else:
+                    exibir_mensagem("⚠️ Checkbox estacionamento do estudo não encontrado")
+            except Exception as e:
+                exibir_mensagem(f"⚠️ Erro ao configurar estacionamento do estudo: {str(e)}")
+        
+        # PASSO 5: Aguardar estabilização após todas as configurações
+        time.sleep(2)
+        
+        # PASSO 6: Clica no botão Continuar
+        exibir_mensagem("🔄 Clicando em 'Continuar'...")
+        botao_continuar = page.locator("#gtm-telaAtividadeVeiculoContinuar")
+        botao_continuar.click()
+        
+        # PASSO 7: Aguarda navegação
+        time.sleep(2)
+        exibir_mensagem("✅ Navegação para próxima tela realizada!")
+        
+        return True
+        
+    except Exception as e:
+        exibir_mensagem(f"❌ ERRO na Tela 11: {str(e)}")
+        return False
+
 
 def main():
     """
@@ -1299,10 +1418,19 @@ def main():
                 exibir_mensagem("❌ TELA 10 FALHOU!")
                 return 1
             
+            # TELA 11
+            exibir_mensagem("\n" + "="*50)
+            if navegar_tela_11_playwright(page, parametros['local_de_trabalho'], parametros['estacionamento_proprio_local_de_trabalho'], parametros['local_de_estudo'], parametros['estacionamento_proprio_local_de_estudo']):
+                telas_executadas += 1
+                exibir_mensagem("✅ TELA 11 CONCLUÍDA!")
+            else:
+                exibir_mensagem("❌ TELA 11 FALHOU!")
+                return 1
+            
             # Resultado final
             exibir_mensagem("\n" + "="*60)
-            exibir_mensagem("🎉 TESTE TELAS 1 A 10 CONCLUÍDO COM SUCESSO!")
-            exibir_mensagem(f"✅ Total de telas executadas: {telas_executadas}/10")
+            exibir_mensagem("🎉 TESTE TELAS 1 A 11 CONCLUÍDO COM SUCESSO!")
+            exibir_mensagem(f"✅ Total de telas executadas: {telas_executadas}/11")
             exibir_mensagem("✅ Todas as telas funcionaram corretamente")
             exibir_mensagem("✅ Navegação sequencial realizada com sucesso")
             
