@@ -907,6 +907,200 @@ logs/
 
 ---
 
+## 📊 **ANÁLISE DETALHADA DOS PARÂMETROS DE CONFIGURAÇÃO**
+
+### 🔍 **FUNÇÃO DE CADA PARÂMETRO NO CÓDIGO SELENIUM:**
+
+#### **1. `"log": true`**
+- **Função**: **Controle principal** do sistema de logging
+- **Implementação**: Controla se o sistema de logging está **totalmente ativo**
+- **Comportamento**: 
+  - `true`: Sistema de logging **completamente ativo**
+  - `false`: Sistema de logging **desabilitado**
+- **Localização**: `utils/logger_rpa.py` linha 290+
+- **Status no Playwright**: ❌ **NÃO IMPLEMENTADO**
+
+#### **2. `"display": true`**
+- **Função**: **Controle de exibição** de mensagens no terminal
+- **Implementação**: Controla se mensagens são exibidas na tela durante a execução
+- **Comportamento**:
+  - `true`: Mensagens exibidas no terminal
+  - `false`: Execução silenciosa (apenas logs em arquivo)
+- **Localização**: `utils/logger_rpa.py` linha 290+
+- **Status no Playwright**: ❌ **NÃO IMPLEMENTADO**
+
+#### **3. `"log_rotacao_dias": 90`**
+- **Função**: **Rotação automática** de arquivos de log
+- **Implementação**: Remove logs mais antigos que X dias automaticamente
+- **Comportamento**:
+  - `90`: Mantém logs dos últimos 90 dias
+  - Remove arquivos `.log` antigos automaticamente
+- **Localização**: `utils/logger_rpa.py` linhas 194, 238
+- **Status no Playwright**: ❌ **NÃO IMPLEMENTADO**
+
+#### **4. `"log_nivel": "INFO"`**
+- **Função**: **Nível de detalhamento** dos logs
+- **Implementação**: Controla quais mensagens são registradas
+- **Comportamento**:
+  - `"DEBUG"`: Logs mais detalhados
+  - `"INFO"`: Logs informativos (padrão)
+  - `"WARNING"`: Apenas avisos e erros
+  - `"ERROR"`: Apenas erros
+  - `"CRITICAL"`: Apenas erros críticos
+- **Localização**: `utils/logger_rpa.py` linha 225
+- **Status no Playwright**: ❌ **NÃO IMPLEMENTADO**
+
+#### **5. `"tempo_estabilizacao": 1`**
+- **Função**: **Tempo de espera** para estabilização do DOM
+- **Implementação**: Usado em `aguardar_estabilizacao()` para detectar quando a página parou de carregar
+- **Comportamento**:
+  - `1`: Aguarda 1 segundo de estabilidade
+  - Usado com MutationObserver para páginas React/Next.js
+- **Localização**: `executar_rpa_imediato.py` linha 2446
+- **Status no Playwright**: ❌ **NÃO IMPLEMENTADO**
+
+#### **6. `"tempo_carregamento": 10`**
+- **Função**: **Timeout de carregamento** de páginas
+- **Implementação**: Tempo máximo para aguardar carregamento de elementos
+- **Comportamento**:
+  - `10`: Timeout de 10 segundos para carregamento
+  - Usado em `aguardar_carregamento_pagina()`
+- **Localização**: `executar_rpa_imediato.py` linha 1213
+- **Status no Playwright**: ❌ **NÃO IMPLEMENTADO**
+
+#### **7. `"inserir_log": true`**
+- **Função**: **Controle de log em arquivo**
+- **Implementação**: Controla se logs são salvos em arquivo
+- **Comportamento**:
+  - `true`: Logs salvos em arquivo `logs/rpa_execucao_YYYYMMDD_HHMMSS.log`
+  - `false`: Logs apenas no terminal
+- **Localização**: `executar_rpa_imediato.py` linha 224
+- **Status no Playwright**: ❌ **NÃO IMPLEMENTADO**
+
+#### **8. `"visualizar_mensagens": true`**
+- **Função**: **Controle de exibição** de mensagens no terminal
+- **Implementação**: Controla se `exibir_mensagem()` mostra mensagens
+- **Comportamento**:
+  - `true`: Mensagens exibidas no terminal
+  - `false`: Execução silenciosa
+- **Localização**: `executar_rpa_imediato.py` linha 225
+- **Status no Playwright**: ❌ **NÃO IMPLEMENTADO**
+
+#### **9. `"eliminar_tentativas_inuteis": true`**
+- **Função**: **Otimização de performance**
+- **Implementação**: Elimina tentativas que sempre falham para acelerar execução
+- **Comportamento**:
+  - `true`: Pula elementos que sempre falham (checkboxes, radios específicos)
+  - `false`: Tenta todos os elementos
+- **Localização**: `executar_rpa_imediato.py` linhas 6200+
+- **Status no Playwright**: ❌ **NÃO IMPLEMENTADO**
+
+---
+
+### 🎯 **OBSERVAÇÕES SOBRE NECESSIDADE DE IMPLEMENTAÇÃO:**
+
+#### **🔴 PARÂMETROS CRÍTICOS (IMPLEMENTAR PRIMEIRO):**
+
+1. **`inserir_log`** e **`visualizar_mensagens`**
+   - **Prioridade**: 🔴 **ALTA**
+   - **Motivo**: Controle básico de logging já identificado como problema
+   - **Impacto**: Funcionalidade essencial para debugging
+
+2. **`tempo_estabilizacao`** e **`tempo_carregamento`**
+   - **Prioridade**: 🔴 **ALTA**
+   - **Motivo**: Controle de timeouts e estabilização
+   - **Impacto**: Performance e confiabilidade
+
+#### **🟡 PARÂMETROS IMPORTANTES (IMPLEMENTAR SEGUNDO):**
+
+3. **`log_nivel`**
+   - **Prioridade**: 🟡 **MÉDIA**
+   - **Motivo**: Controle de detalhamento dos logs
+   - **Impacto**: Flexibilidade de debugging
+
+4. **`log_rotacao_dias`**
+   - **Prioridade**: 🟡 **MÉDIA**
+   - **Motivo**: Manutenção automática de logs
+   - **Impacto**: Gestão de arquivos
+
+#### **🟢 PARÂMETROS COMPLEMENTARES (IMPLEMENTAR TERCEIRO):**
+
+5. **`log`** e **`display`**
+   - **Prioridade**: 🟢 **BAIXA**
+   - **Motivo**: Redundantes com `inserir_log` e `visualizar_mensagens`
+   - **Impacto**: Compatibilidade com código Selenium
+
+6. **`eliminar_tentativas_inuteis`**
+   - **Prioridade**: 🟢 **BAIXA**
+   - **Motivo**: Otimização específica do Selenium
+   - **Impacto**: Performance (menor impacto no Playwright)
+
+---
+
+### 📋 **PLANO DE IMPLEMENTAÇÃO RECOMENDADO:**
+
+#### **FASE 1: Controles Básicos (Críticos)**
+```json
+{
+  "configuracao": {
+    "inserir_log": true,
+    "visualizar_mensagens": true,
+    "tempo_estabilizacao": 1,
+    "tempo_carregamento": 10
+  }
+}
+```
+
+#### **FASE 2: Controles Avançados (Importantes)**
+```json
+{
+  "configuracao": {
+    "log_nivel": "INFO",
+    "log_rotacao_dias": 90
+  }
+}
+```
+
+#### **FASE 3: Controles de Compatibilidade (Complementares)**
+```json
+{
+  "configuracao": {
+    "log": true,
+    "display": true,
+    "eliminar_tentativas_inuteis": true
+  }
+}
+```
+
+---
+
+### 📊 **STATUS ATUAL DOS PARÂMETROS:**
+
+| Parâmetro | Status | Prioridade | Implementação Necessária |
+|-----------|--------|------------|-------------------------|
+| `log` | ❌ Não implementado | 🟢 Baixa | Fase 3 |
+| `display` | ❌ Não implementado | 🟢 Baixa | Fase 3 |
+| `log_rotacao_dias` | ❌ Não implementado | 🟡 Média | Fase 2 |
+| `log_nivel` | ❌ Não implementado | 🟡 Média | Fase 2 |
+| `tempo_estabilizacao` | ❌ Não implementado | 🔴 Alta | Fase 1 |
+| `tempo_carregamento` | ❌ Não implementado | 🔴 Alta | Fase 1 |
+| `inserir_log` | ❌ Não implementado | 🔴 Alta | Fase 1 |
+| `visualizar_mensagens` | ❌ Não implementado | 🔴 Alta | Fase 1 |
+| `eliminar_tentativas_inuteis` | ❌ Não implementado | 🟢 Baixa | Fase 3 |
+
+**Progresso Geral**: **0% dos parâmetros implementados** ❌
+
+---
+
+### 🎯 **CONCLUSÃO:**
+
+**Todos os 9 parâmetros** são **funcionalmente importantes** e devem ser implementados para manter **100% de compatibilidade** com o código Selenium original. A ordem de implementação deve seguir a **prioridade crítica** para garantir que as funcionalidades essenciais sejam implementadas primeiro.
+
+**Status Atual**: ❌ **0% dos parâmetros implementados** no Playwright  
+**Meta**: ✅ **100% dos parâmetros implementados** com funcionalidade idêntica
+
+---
+
 ## 📊 **MÉTRICAS DE PROJETO**
 
 ### **📈 Progresso Geral:**
