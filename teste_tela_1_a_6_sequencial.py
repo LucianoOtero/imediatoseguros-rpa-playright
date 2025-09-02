@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-TESTE TELAS 1 A 7 SEQUENCIAL - IMPLEMENTAÇÃO COMPLETA
-Teste das Telas 1-7 usando Playwright com implementação da Tela 7
+TESTE TELAS 1 A 8 SEQUENCIAL - IMPLEMENTAÇÃO COMPLETA
+Teste das Telas 1-8 usando Playwright com implementação da Tela 8
 
 DESCRIÇÃO:
 - Tela 1: Seleção do tipo de seguro (Carro)
@@ -11,11 +11,12 @@ DESCRIÇÃO:
 - Tela 5: Estimativa inicial (captura de dados)
 - Tela 6: Itens do carro (combustível e checkboxes)
 - Tela 7: Endereço de pernoite (CEP)
+- Tela 8: Finalidade do veículo (uso do veículo)
 
 AUTOR: Luciano Otero
 DATA: 2025-09-02
-VERSÃO: 1.1.0
-STATUS: Implementação completa das Telas 1-7
+VERSÃO: 1.2.0
+STATUS: Implementação completa das Telas 1-8
 """
 
 import json
@@ -638,14 +639,121 @@ def navegar_tela_7_playwright(page, cep):
         exibir_mensagem(f"❌ ERRO na Tela 7: {str(e)}")
         return False
 
+def navegar_tela_8_playwright(page, uso_veiculo):
+    """
+    TELA 8: Finalidade do veículo (Uso do veículo)
+    
+    DESCRIÇÃO:
+        Seleciona o tipo de uso do veículo baseado no parâmetro e clica em "Continuar"
+    
+    ELEMENTOS IDENTIFICADOS (baseado na gravação e Selenium):
+        - Detecção da tela: XPATH com texto "finalidade", "Finalidade", "uso", "Uso", "veículo"
+        - Botão continuar: id=gtm-telaUsoVeiculoContinuar
+        - Radio buttons: Seleção baseada no parâmetro uso_veiculo
+    
+    IMPLEMENTAÇÃO:
+        1. Aguarda carregamento da Tela 8
+        2. Detecta elementos da tela usando XPATH
+        3. Seleciona o tipo de uso baseado no parâmetro
+        4. Clica no botão "Continuar"
+        5. Aguarda transição
+    
+    PARÂMETROS:
+        page: Objeto page do Playwright
+        uso_veiculo (str): Tipo de uso do veículo ("Pessoal", "Profissional", "Motorista de aplicativo", "Taxi")
+    
+    RETORNO:
+        bool: True se sucesso, False se falha
+    
+    LOGS ESPERADOS:
+        - "📱 TELA 8: Aguardando carregamento..."
+        - "✅ Tela 8 carregada com sucesso"
+        - "📱 TELA 8: Selecionando uso do veículo..."
+        - "✅ Uso '{uso_veiculo}' selecionado com sucesso"
+        - "✅ Botão 'Continuar' clicado com sucesso"
+        - "❌ Tela 8 não carregou" (se falhar)
+        - "❌ ERRO na Tela 8: {erro}" (se exceção)
+    """
+    try:
+        # PASSO 1: Exibir mensagem de início da Tela 8
+        exibir_mensagem("📱 TELA 8: Aguardando carregamento...")
+        
+        # PASSO 2: Aguardar carregamento da Tela 8 (máximo 20 segundos)
+        max_tentativas = 20
+        tentativa = 0
+        
+        while tentativa < max_tentativas:
+            # Procurar por elementos que indicam a Tela 8
+            elementos_tela8 = page.locator("xpath=//*[contains(text(), 'finalidade') or contains(text(), 'Finalidade') or contains(text(), 'uso') or contains(text(), 'Uso') or contains(text(), 'veículo')]")
+            if elementos_tela8.count() > 0:
+                break
+            time.sleep(1)
+            tentativa += 1
+        
+        # PASSO 3: Verificar se encontrou elementos da Tela 8
+        if tentativa >= max_tentativas:
+            exibir_mensagem("❌ Tela 8 não carregou")
+            return False
+        
+        # PASSO 4: Confirmar carregamento
+        exibir_mensagem("✅ Tela 8 carregada com sucesso")
+        
+        # PASSO 5: Selecionar uso do veículo
+        exibir_mensagem(f"📱 TELA 8: Selecionando uso do veículo...")
+        
+        # PASSO 6: Selecionar o radio button baseado no parâmetro
+        try:
+            # Mapear uso_veiculo para os valores corretos dos radio buttons
+            mapeamento_uso = {
+                "Pessoal": "Particular",
+                "Profissional": "Profissional", 
+                "Motorista de aplicativo": "Motorista de App",
+                "Motorista de App": "Motorista de App",
+                "Taxi": "Taxi",
+                "Táxi": "Taxi"  # Alternativa com acento
+            }
+            
+            valor_radio = mapeamento_uso.get(uso_veiculo, uso_veiculo)
+            
+            # Localizar e clicar no radio button específico
+            seletor_radio = f'input[value="{valor_radio}"][name="finalidadeVeiculoTelaUsoVeiculo"]'
+            radio_button = page.locator(seletor_radio).first
+            
+            if radio_button.is_visible():
+                radio_button.click()
+                exibir_mensagem(f"✅ Uso '{uso_veiculo}' selecionado com sucesso (valor={valor_radio})")
+            else:
+                exibir_mensagem(f"⚠️ Radio button para '{uso_veiculo}' (valor={valor_radio}) não está visível")
+                
+        except Exception as e:
+            exibir_mensagem(f"⚠️ Erro ao selecionar uso do veículo: {str(e)}")
+        
+        # PASSO 7: Localizar e clicar no botão "Continuar"
+        botao_continuar = page.locator("#gtm-telaUsoVeiculoContinuar").first
+        botao_continuar.click()
+        
+        # PASSO 8: Confirmar clique
+        exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
+        
+        # PASSO 9: Aguardar transição
+        time.sleep(3)
+        
+        # PASSO 10: Retornar sucesso
+        return True
+        
+    except Exception as e:
+        # PASSO 11: Tratar exceções
+        exibir_mensagem(f"❌ ERRO na Tela 8: {str(e)}")
+        return False
+
 def main():
     """
-    Função principal que executa o teste das Telas 1-7 sequencialmente
+    Função principal que executa o teste das Telas 1-8 sequencialmente
     
     FLUXO:
         1. Carrega parâmetros do JSON
         2. Configura browser Playwright
-        3. Executa Tela 1 → Tela 2 → Tela 3 → Tela 4 → Tela 5 → Tela 6 → Tela 7
+        3. Executa Tela 1 → Tela 2 → Tela 3 → Tela 4 → Tela 5 → Tela 6 → Tela 7 → Tela 8
         4. Exibe resultados de cada tela
         5. Fecha browser
     
@@ -657,7 +765,7 @@ def main():
         with open('config/parametros.json', 'r', encoding='utf-8') as f:
             parametros = json.load(f)
         
-        exibir_mensagem("🚀 INICIANDO TESTE TELAS 1 A 7 SEQUENCIAL")
+        exibir_mensagem("🚀 INICIANDO TESTE TELAS 1 A 8 SEQUENCIAL")
         exibir_mensagem("=" * 60)
         exibir_mensagem(f"🚗 Placa: {parametros['placa']}")
         exibir_mensagem(f"📋 Veículo segurado: {parametros['veiculo_segurado']}")
@@ -745,10 +853,19 @@ def main():
                 exibir_mensagem("❌ TELA 7 FALHOU!")
                 return 1
             
+            # TELA 8
+            exibir_mensagem("\n" + "="*50)
+            if navegar_tela_8_playwright(page, parametros['uso_veiculo']):
+                telas_executadas += 1
+                exibir_mensagem("✅ TELA 8 CONCLUÍDA!")
+            else:
+                exibir_mensagem("❌ TELA 8 FALHOU!")
+                return 1
+            
             # Resultado final
             exibir_mensagem("\n" + "="*60)
-            exibir_mensagem("🎉 TESTE TELAS 1 A 7 CONCLUÍDO COM SUCESSO!")
-            exibir_mensagem(f"✅ Total de telas executadas: {telas_executadas}/7")
+            exibir_mensagem("🎉 TESTE TELAS 1 A 8 CONCLUÍDO COM SUCESSO!")
+            exibir_mensagem(f"✅ Total de telas executadas: {telas_executadas}/8")
             exibir_mensagem("✅ Todas as telas funcionaram corretamente")
             exibir_mensagem("✅ Navegação sequencial realizada com sucesso")
             
