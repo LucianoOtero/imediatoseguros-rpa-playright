@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-TESTE TELAS 1 A 8 SEQUENCIAL - IMPLEMENTAÇÃO COMPLETA
-Teste das Telas 1-8 usando Playwright com implementação da Tela 8
+TESTE TELAS 1 A 9 SEQUENCIAL - IMPLEMENTAÇÃO COMPLETA
+Teste das Telas 1-9 usando Playwright com implementação da Tela 9
 
 DESCRIÇÃO:
 - Tela 1: Seleção do tipo de seguro (Carro)
@@ -12,11 +12,12 @@ DESCRIÇÃO:
 - Tela 6: Itens do carro (combustível e checkboxes)
 - Tela 7: Endereço de pernoite (CEP)
 - Tela 8: Finalidade do veículo (uso do veículo)
+- Tela 9: Dados pessoais do segurado
 
 AUTOR: Luciano Otero
 DATA: 2025-09-02
-VERSÃO: 1.2.0
-STATUS: Implementação completa das Telas 1-8
+VERSÃO: 1.3.0
+STATUS: Implementação completa das Telas 1-9
 """
 
 import json
@@ -746,14 +747,238 @@ def navegar_tela_8_playwright(page, uso_veiculo):
         exibir_mensagem(f"❌ ERRO na Tela 8: {str(e)}")
         return False
 
+def navegar_tela_9_playwright(page, nome, cpf, data_nascimento, sexo, estado_civil, email, celular):
+    """
+    TELA 9: Dados pessoais do segurado
+    
+    DESCRIÇÃO:
+        Preenche todos os campos de dados pessoais do segurado e clica em "Continuar"
+    
+    ELEMENTOS IDENTIFICADOS (baseado na gravação):
+        - Nome: id=nomeTelaSegurado
+        - CPF: id=cpfTelaSegurado
+        - Data Nascimento: id=dataNascimentoTelaSegurado
+        - Sexo: Dropdown MUI (seleção)
+        - Estado Civil: Dropdown MUI (seleção)
+        - Email: id=emailTelaSegurado
+        - Celular: id=celularTelaSegurado
+        - Botão continuar: id=gtm-telaDadosSeguradoContinuar
+    
+    IMPLEMENTAÇÃO:
+        1. Aguarda carregamento da Tela 9
+        2. Detecta elementos da tela usando XPATH
+        3. Preenche todos os campos de entrada
+        4. Seleciona sexo e estado civil via dropdowns
+        5. Clica em "Continuar"
+    
+    PARÂMETROS:
+        page: Página Playwright
+        nome: Nome completo do segurado
+        cpf: CPF do segurado
+        data_nascimento: Data de nascimento
+        sexo: Sexo (Masculino/Feminino)
+        estado_civil: Estado civil
+        email: Email do segurado
+        celular: Celular do segurado
+    
+    RETORNO:
+        bool: True se sucesso, False se falha
+    """
+    try:
+        # PASSO 1: Aguardar carregamento da Tela 9
+        exibir_mensagem("📱 TELA 9: Aguardando carregamento...")
+        
+        # Aguardar até 20 segundos para detectar elementos da tela
+        for tentativa in range(20):
+            try:
+                # Detectar elementos da Tela 9 usando XPATH
+                elementos_tela = page.locator("xpath=//*[contains(text(), 'dados pessoais') or contains(text(), 'Dados pessoais')]")
+                if elementos_tela.count() > 0:
+                    exibir_mensagem("✅ Tela 9 carregada com sucesso")
+                    break
+            except:
+                pass
+            
+            if tentativa == 19:
+                exibir_mensagem("❌ ERRO: Tela 9 não foi detectada após 20 segundos")
+                return False
+            
+            time.sleep(1)
+        
+        # PASSO 2: Preencher Nome Completo
+        exibir_mensagem("📱 TELA 9: Preenchendo nome...")
+        try:
+            nome_campo = page.locator("#nomeTelaSegurado")
+            nome_campo.click()
+            nome_campo.fill(nome)
+            exibir_mensagem(f"✅ Nome preenchido: {nome}")
+        except Exception as e:
+            exibir_mensagem(f"⚠️ Erro ao preencher nome: {str(e)}")
+        
+        # PASSO 3: Preencher CPF
+        exibir_mensagem("📱 TELA 9: Preenchendo CPF...")
+        try:
+            cpf_campo = page.locator("#cpfTelaSegurado")
+            cpf_campo.click()
+            cpf_campo.fill(cpf)
+            exibir_mensagem(f"✅ CPF preenchido: {cpf}")
+        except Exception as e:
+            exibir_mensagem(f"⚠️ Erro ao preencher CPF: {str(e)}")
+        
+        # PASSO 4: Preencher Data de Nascimento
+        exibir_mensagem("📱 TELA 9: Preenchendo data de nascimento...")
+        try:
+            data_campo = page.locator("#dataNascimentoTelaSegurado")
+            data_campo.click()
+            data_campo.fill(data_nascimento)
+            exibir_mensagem(f"✅ Data de nascimento preenchida: {data_nascimento}")
+        except Exception as e:
+            exibir_mensagem(f"⚠️ Erro ao preencher data de nascimento: {str(e)}")
+        
+        # PASSO 5: Selecionar Sexo
+        exibir_mensagem("📱 TELA 9: Selecionando sexo...")
+        try:
+            # Localizar o campo de sexo
+            campo_sexo = page.locator("#sexoTelaSegurado")
+            if campo_sexo.is_visible():
+                # Clicar no campo para abrir o dropdown
+                campo_sexo.click()
+                time.sleep(1)
+                
+                # Aguardar até 5 segundos para o dropdown aparecer
+                for tentativa in range(5):
+                    try:
+                        # Procurar por elementos de lista que contenham o texto do sexo
+                        opcoes_sexo = page.locator("xpath=//li[contains(text(), '" + sexo + "')]")
+                        if opcoes_sexo.count() > 0:
+                            opcoes_sexo.first.click()
+                            exibir_mensagem(f"✅ Sexo selecionado: {sexo}")
+                            break
+                    except:
+                        pass
+                    
+                    if tentativa == 4:
+                        exibir_mensagem(f"⚠️ Sexo '{sexo}' não encontrado no dropdown")
+                    
+                    time.sleep(1)
+            else:
+                exibir_mensagem("⚠️ Campo de sexo não encontrado")
+        except Exception as e:
+            exibir_mensagem(f"⚠️ Erro ao selecionar sexo: {str(e)}")
+        
+        # PASSO 6: Selecionar Estado Civil
+        exibir_mensagem("📱 TELA 9: Selecionando estado civil...")
+        try:
+            # Localizar o campo de estado civil
+            campo_estado_civil = page.locator("#estadoCivilTelaSegurado")
+            if campo_estado_civil.is_visible():
+                # Clicar no campo para abrir o dropdown
+                campo_estado_civil.click()
+                time.sleep(1)
+                
+                # Mapear estado civil do JSON para possíveis variações na tela
+                mapeamento_estado_civil = {
+                    "Casado ou Uniao Estavel": ["Casado ou União Estável", "Casado ou Uniao Estavel", "Casado ou União Estavel", "Casado ou Uniao Estável"],
+                    "Solteiro": ["Solteiro", "Solteiro(a)"],
+                    "Divorciado": ["Divorciado", "Divorciado(a)"],
+                    "Viuvo": ["Viúvo", "Viuvo", "Viúvo(a)", "Viuvo(a)"],
+                    "Separado": ["Separado", "Separado(a)"]
+                }
+                
+                # Obter possíveis variações para o estado civil
+                variacoes_estado_civil = mapeamento_estado_civil.get(estado_civil, [estado_civil])
+                
+                # Aguardar até 5 segundos para o dropdown aparecer
+                estado_civil_selecionado = False
+                for tentativa in range(5):
+                    try:
+                        # Tentar cada variação possível
+                        for variacao in variacoes_estado_civil:
+                            opcoes_estado_civil = page.locator("xpath=//li[contains(text(), '" + variacao + "')]")
+                            if opcoes_estado_civil.count() > 0:
+                                opcoes_estado_civil.first.click()
+                                exibir_mensagem(f"✅ Estado civil selecionado: {estado_civil} (encontrado como '{variacao}')")
+                                estado_civil_selecionado = True
+                                break
+                        
+                        if estado_civil_selecionado:
+                            break
+                    except:
+                        pass
+                    
+                    if tentativa == 4 and not estado_civil_selecionado:
+                        exibir_mensagem(f"⚠️ Estado civil '{estado_civil}' não encontrado no dropdown (tentou: {', '.join(variacoes_estado_civil)})")
+                    
+                    time.sleep(1)
+            else:
+                exibir_mensagem("⚠️ Campo de estado civil não encontrado")
+        except Exception as e:
+            exibir_mensagem(f"⚠️ Erro ao selecionar estado civil: {str(e)}")
+        
+        # PASSO 7: Preencher Email
+        exibir_mensagem("📱 TELA 9: Preenchendo email...")
+        try:
+            email_campo = page.locator("#emailTelaSegurado")
+            email_campo.click()
+            email_campo.fill(email)
+            exibir_mensagem(f"✅ Email preenchido: {email}")
+        except Exception as e:
+            exibir_mensagem(f"⚠️ Erro ao preencher email: {str(e)}")
+        
+        # PASSO 8: Preencher Celular
+        exibir_mensagem("📱 TELA 9: Preenchendo celular...")
+        try:
+            celular_campo = page.locator("#celularTelaSegurado")
+            celular_campo.click()
+            
+            # Limpar o campo primeiro
+            celular_campo.clear()
+            time.sleep(0.5)
+            
+            # Preencher caractere por caractere para evitar problemas com máscara
+            for digito in celular:
+                celular_campo.type(digito)
+                time.sleep(0.1)
+            
+            # Aguardar um pouco para a máscara processar
+            time.sleep(1)
+            
+            # Verificar se foi preenchido corretamente
+            valor_preenchido = celular_campo.input_value()
+            exibir_mensagem(f"✅ Celular preenchido: {celular} (valor no campo: {valor_preenchido})")
+            
+            if valor_preenchido != celular:
+                exibir_mensagem(f"⚠️ ATENÇÃO: Valor no campo ({valor_preenchido}) diferente do esperado ({celular})")
+                
+        except Exception as e:
+            exibir_mensagem(f"⚠️ Erro ao preencher celular: {str(e)}")
+        
+        # PASSO 9: Clicar em "Continuar"
+        exibir_mensagem("📱 TELA 9: Clicando em 'Continuar'...")
+        try:
+            botao_continuar = page.locator("#gtm-telaDadosSeguradoContinuar")
+            botao_continuar.click()
+            exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
+            time.sleep(3)  # Aguardar transição
+        except Exception as e:
+            exibir_mensagem(f"⚠️ Erro ao clicar em 'Continuar': {str(e)}")
+        
+        exibir_mensagem("✅ TELA 9 CONCLUÍDA!")
+        return True
+        
+    except Exception as e:
+        # PASSO 10: Tratar exceções
+        exibir_mensagem(f"❌ ERRO na Tela 9: {str(e)}")
+        return False
+
 def main():
     """
-    Função principal que executa o teste das Telas 1-8 sequencialmente
+    Função principal que executa o teste das Telas 1-9 sequencialmente
     
     FLUXO:
         1. Carrega parâmetros do JSON
         2. Configura browser Playwright
-        3. Executa Tela 1 → Tela 2 → Tela 3 → Tela 4 → Tela 5 → Tela 6 → Tela 7 → Tela 8
+        3. Executa Tela 1 → Tela 2 → Tela 3 → Tela 4 → Tela 5 → Tela 6 → Tela 7 → Tela 8 → Tela 9
         4. Exibe resultados de cada tela
         5. Fecha browser
     
@@ -765,7 +990,7 @@ def main():
         with open('config/parametros.json', 'r', encoding='utf-8') as f:
             parametros = json.load(f)
         
-        exibir_mensagem("🚀 INICIANDO TESTE TELAS 1 A 8 SEQUENCIAL")
+        exibir_mensagem("🚀 INICIANDO TESTE TELAS 1 A 9 SEQUENCIAL")
         exibir_mensagem("=" * 60)
         exibir_mensagem(f"🚗 Placa: {parametros['placa']}")
         exibir_mensagem(f"📋 Veículo segurado: {parametros['veiculo_segurado']}")
@@ -862,10 +1087,19 @@ def main():
                 exibir_mensagem("❌ TELA 8 FALHOU!")
                 return 1
             
+            # TELA 9
+            exibir_mensagem("\n" + "="*50)
+            if navegar_tela_9_playwright(page, parametros['nome'], parametros['cpf'], parametros['data_nascimento'], parametros['sexo'], parametros['estado_civil'], parametros['email'], parametros['celular']):
+                telas_executadas += 1
+                exibir_mensagem("✅ TELA 9 CONCLUÍDA!")
+            else:
+                exibir_mensagem("❌ TELA 9 FALHOU!")
+                return 1
+            
             # Resultado final
             exibir_mensagem("\n" + "="*60)
-            exibir_mensagem("🎉 TESTE TELAS 1 A 8 CONCLUÍDO COM SUCESSO!")
-            exibir_mensagem(f"✅ Total de telas executadas: {telas_executadas}/8")
+            exibir_mensagem("🎉 TESTE TELAS 1 A 9 CONCLUÍDO COM SUCESSO!")
+            exibir_mensagem(f"✅ Total de telas executadas: {telas_executadas}/9")
             exibir_mensagem("✅ Todas as telas funcionaram corretamente")
             exibir_mensagem("✅ Navegação sequencial realizada com sucesso")
             

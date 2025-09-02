@@ -1,0 +1,557 @@
+{
+  "id": "a1f564cb-c5c6-4fff-b2a2-d83443bca76b",
+  "version": "2.0",
+  "name": "ate o fim com email e conta logada",
+  "url": "https://www.app.tosegurado.com.br",
+  "tests": [{
+    "id": "004dc37e-11db-4635-b921-fb797e818f4e",
+    "name": "GRAVACAO ATE A ULTIMA TELA COM EMAIL E CONFIRMACAO DE CONTA",
+    "commands": [{
+      "id": "dc283320-b8a9-40aa-92ff-6d5f087394e3",
+      "comment": "",
+      "command": "open",
+      "target": "/imediatoseguros",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "a2818696-3d1a-4111-874c-6bd24933aee3",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1139x1375",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "d970c8eb-9dc9-440d-bea7-f3a2f5b510f2",
+      "comment": "",
+      "command": "click",
+      "target": "css=.group:nth-child(1)",
+      "targets": [
+        ["css=.group:nth-child(1)", "css:finder"],
+        ["xpath=//button", "xpath:position"],
+        ["xpath=//button[contains(.,'Carro')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "38b569ac-c8b2-475d-b885-c03c85301f8f",
+      "comment": "",
+      "command": "click",
+      "target": "id=placaTelaDadosPlaca",
+      "targets": [
+        ["id=placaTelaDadosPlaca", "id"],
+        ["name=plate", "name"],
+        ["css=#placaTelaDadosPlaca", "css:finder"],
+        ["xpath=//input[@id='placaTelaDadosPlaca']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "cb108914-ba5f-41ba-915a-1001896cb3cc",
+      "comment": "",
+      "command": "type",
+      "target": "id=placaTelaDadosPlaca",
+      "targets": [
+        ["id=placaTelaDadosPlaca", "id"],
+        ["name=plate", "name"],
+        ["css=#placaTelaDadosPlaca", "css:finder"],
+        ["xpath=//input[@id='placaTelaDadosPlaca']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "EED-3D56"
+    }, {
+      "id": "2dceea48-1ee5-480f-a2c7-fd96796d9b58",
+      "comment": "",
+      "command": "click",
+      "target": "id=gtm-telaDadosAutoCotarComPlacaContinuar",
+      "targets": [
+        ["id=gtm-telaDadosAutoCotarComPlacaContinuar", "id"],
+        ["css=#gtm-telaDadosAutoCotarComPlacaContinuar", "css:finder"],
+        ["xpath=//button[@id='gtm-telaDadosAutoCotarComPlacaContinuar']", "xpath:attributes"],
+        ["xpath=//button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Continuar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "71768147-0b93-4872-a01a-fd603baa8504",
+      "comment": "",
+      "command": "click",
+      "target": "id=gtm-telaInfosAutoContinuar",
+      "targets": [
+        ["id=gtm-telaInfosAutoContinuar", "id"],
+        ["css=#gtm-telaInfosAutoContinuar", "css:finder"],
+        ["xpath=//button[@id='gtm-telaInfosAutoContinuar']", "xpath:attributes"],
+        ["xpath=//button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Continuar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "340fc40c-668a-4fcf-8eed-c5c9e5aaeed6",
+      "comment": "",
+      "command": "click",
+      "target": "id=gtm-telaRenovacaoVeiculoContinuar",
+      "targets": [
+        ["id=gtm-telaRenovacaoVeiculoContinuar", "id"],
+        ["css=#gtm-telaRenovacaoVeiculoContinuar", "css:finder"],
+        ["xpath=//button[@id='gtm-telaRenovacaoVeiculoContinuar']", "xpath:attributes"],
+        ["xpath=//button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Continuar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "76e465e3-51bc-48f6-9477-d1269a3d8eb4",
+      "comment": "",
+      "command": "click",
+      "target": "id=gtm-telaEstimativaContinuarParaCotacaoFinal",
+      "targets": [
+        ["id=gtm-telaEstimativaContinuarParaCotacaoFinal", "id"],
+        ["css=#gtm-telaEstimativaContinuarParaCotacaoFinal", "css:finder"],
+        ["xpath=//button[@id='gtm-telaEstimativaContinuarParaCotacaoFinal']", "xpath:attributes"],
+        ["xpath=//div[2]/div/div/div/button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Continuar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "8c286c45-9f39-40ec-8cb1-ddf732732992",
+      "comment": "",
+      "command": "click",
+      "target": "id=gtm-telaItensAutoContinuar",
+      "targets": [
+        ["id=gtm-telaItensAutoContinuar", "id"],
+        ["css=#gtm-telaItensAutoContinuar", "css:finder"],
+        ["xpath=//button[@id='gtm-telaItensAutoContinuar']", "xpath:attributes"],
+        ["xpath=//button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Continuar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "98ed944d-0010-409c-b7df-48778e7257b2",
+      "comment": "",
+      "command": "click",
+      "target": "id=enderecoTelaEndereco",
+      "targets": [
+        ["id=enderecoTelaEndereco", "id"],
+        ["css=#enderecoTelaEndereco", "css:finder"],
+        ["xpath=//input[@id='enderecoTelaEndereco']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "e23d58f9-b956-4c3b-8550-4b899af2812d",
+      "comment": "",
+      "command": "click",
+      "target": "css=.overflow-hidden",
+      "targets": [
+        ["css=.overflow-hidden", "css:finder"],
+        ["xpath=//div[@id='enderecoTelaEndereco-option-0']/div/div/div/p", "xpath:idRelative"],
+        ["xpath=//ul/div/div/div/div/p", "xpath:position"],
+        ["xpath=//p[contains(.,'Rua Serra de Botucatu - Tatuapé')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "dc5d6720-5034-42ba-8afb-bd39548357d3",
+      "comment": "",
+      "command": "type",
+      "target": "id=enderecoTelaEndereco",
+      "targets": [
+        ["id=enderecoTelaEndereco", "id"],
+        ["css=#enderecoTelaEndereco", "css:finder"],
+        ["xpath=//input[@id='enderecoTelaEndereco']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "Rua Serra de Botucatu, Tatuapé - São Paulo/SP"
+    }, {
+      "id": "5b89f5d2-4f14-43af-ac19-43d085e48006",
+      "comment": "",
+      "command": "click",
+      "target": "id=gtm-telaPernoiteVeiculoContinuar",
+      "targets": [
+        ["id=gtm-telaPernoiteVeiculoContinuar", "id"],
+        ["css=#gtm-telaPernoiteVeiculoContinuar", "css:finder"],
+        ["xpath=//button[@id='gtm-telaPernoiteVeiculoContinuar']", "xpath:attributes"],
+        ["xpath=//div[3]/div/div/div/button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Continuar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "7ee7134a-c0de-479a-8c21-4032e63cb4ec",
+      "comment": "",
+      "command": "click",
+      "target": "id=gtm-telaUsoVeiculoContinuar",
+      "targets": [
+        ["id=gtm-telaUsoVeiculoContinuar", "id"],
+        ["css=#gtm-telaUsoVeiculoContinuar", "css:finder"],
+        ["xpath=//button[@id='gtm-telaUsoVeiculoContinuar']", "xpath:attributes"],
+        ["xpath=//button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Continuar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "a63170d3-7c1f-42e7-8e7d-8fe23ecc2d02",
+      "comment": "",
+      "command": "click",
+      "target": "id=nomeTelaSegurado",
+      "targets": [
+        ["id=nomeTelaSegurado", "id"],
+        ["name=nome", "name"],
+        ["css=#nomeTelaSegurado", "css:finder"],
+        ["xpath=//input[@id='nomeTelaSegurado']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "f2329a0f-e84a-4876-8acf-ff1d06166823",
+      "comment": "",
+      "command": "click",
+      "target": "id=nomeTelaSegurado",
+      "targets": [
+        ["id=nomeTelaSegurado", "id"],
+        ["name=nome", "name"],
+        ["css=#nomeTelaSegurado", "css:finder"],
+        ["xpath=//input[@id='nomeTelaSegurado']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "b9b8032b-d0f6-4935-b9d1-317311a7cab3",
+      "comment": "",
+      "command": "type",
+      "target": "id=nomeTelaSegurado",
+      "targets": [
+        ["id=nomeTelaSegurado", "id"],
+        ["name=nome", "name"],
+        ["css=#nomeTelaSegurado", "css:finder"],
+        ["xpath=//input[@id='nomeTelaSegurado']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "ALEX KAMINSKI"
+    }, {
+      "id": "af6fee7c-01d3-4f27-a50e-05295f09ffd6",
+      "comment": "",
+      "command": "click",
+      "target": "id=cpfTelaSegurado",
+      "targets": [
+        ["id=cpfTelaSegurado", "id"],
+        ["css=#cpfTelaSegurado", "css:finder"],
+        ["xpath=//input[@id='cpfTelaSegurado']", "xpath:attributes"],
+        ["xpath=//div[2]/div/div/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "97287fe9-3b4b-457b-ba1a-e6c57245fc06",
+      "comment": "",
+      "command": "click",
+      "target": "id=cpfTelaSegurado",
+      "targets": [
+        ["id=cpfTelaSegurado", "id"],
+        ["css=#cpfTelaSegurado", "css:finder"],
+        ["xpath=//input[@id='cpfTelaSegurado']", "xpath:attributes"],
+        ["xpath=//div[2]/div/div/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "ecddd3ba-6aa0-40bd-bf2f-772feb5a738e",
+      "comment": "",
+      "command": "doubleClick",
+      "target": "id=cpfTelaSegurado",
+      "targets": [
+        ["id=cpfTelaSegurado", "id"],
+        ["css=#cpfTelaSegurado", "css:finder"],
+        ["xpath=//input[@id='cpfTelaSegurado']", "xpath:attributes"],
+        ["xpath=//div[2]/div/div/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "f74c2795-83ba-451b-b58a-ebb1a17f26a9",
+      "comment": "",
+      "command": "click",
+      "target": "id=cpfTelaSegurado",
+      "targets": [
+        ["id=cpfTelaSegurado", "id"],
+        ["css=#cpfTelaSegurado", "css:finder"],
+        ["xpath=//input[@id='cpfTelaSegurado']", "xpath:attributes"],
+        ["xpath=//div[2]/div/div/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "7f5754e3-7581-4f87-88e5-4cda2a606b25",
+      "comment": "",
+      "command": "click",
+      "target": "id=cpfTelaSegurado",
+      "targets": [
+        ["id=cpfTelaSegurado", "id"],
+        ["css=#cpfTelaSegurado", "css:finder"],
+        ["xpath=//input[@id='cpfTelaSegurado']", "xpath:attributes"],
+        ["xpath=//div[2]/div/div/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "9b27e3de-e072-4f81-bf7f-faabd34c96d8",
+      "comment": "",
+      "command": "type",
+      "target": "id=cpfTelaSegurado",
+      "targets": [
+        ["id=cpfTelaSegurado", "id"],
+        ["css=#cpfTelaSegurado", "css:finder"],
+        ["xpath=//input[@id='cpfTelaSegurado']", "xpath:attributes"],
+        ["xpath=//div[2]/div/div/input", "xpath:position"]
+      ],
+      "value": "971.371.897-68"
+    }, {
+      "id": "1aade9b2-ed6d-44f0-83b2-f17ec305a065",
+      "comment": "",
+      "command": "click",
+      "target": "id=dataNascimentoTelaSegurado",
+      "targets": [
+        ["id=dataNascimentoTelaSegurado", "id"],
+        ["css=#dataNascimentoTelaSegurado", "css:finder"],
+        ["xpath=//input[@id='dataNascimentoTelaSegurado']", "xpath:attributes"],
+        ["xpath=//div[3]/div/div/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "4da22cea-46e2-4145-8555-914a4e915c27",
+      "comment": "",
+      "command": "click",
+      "target": "id=dataNascimentoTelaSegurado",
+      "targets": [
+        ["id=dataNascimentoTelaSegurado", "id"],
+        ["css=#dataNascimentoTelaSegurado", "css:finder"],
+        ["xpath=//input[@id='dataNascimentoTelaSegurado']", "xpath:attributes"],
+        ["xpath=//div[3]/div/div/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "82395845-078c-4fbf-8013-099e96ccd90c",
+      "comment": "",
+      "command": "click",
+      "target": "id=dataNascimentoTelaSegurado",
+      "targets": [
+        ["id=dataNascimentoTelaSegurado", "id"],
+        ["css=#dataNascimentoTelaSegurado", "css:finder"],
+        ["xpath=//input[@id='dataNascimentoTelaSegurado']", "xpath:attributes"],
+        ["xpath=//div[3]/div/div/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "f255316e-1c1a-4900-b1dd-3d692114d4d4",
+      "comment": "",
+      "command": "type",
+      "target": "id=dataNascimentoTelaSegurado",
+      "targets": [
+        ["id=dataNascimentoTelaSegurado", "id"],
+        ["css=#dataNascimentoTelaSegurado", "css:finder"],
+        ["xpath=//input[@id='dataNascimentoTelaSegurado']", "xpath:attributes"],
+        ["xpath=//div[3]/div/div/input", "xpath:position"]
+      ],
+      "value": "02/05/1970"
+    }, {
+      "id": "a0b9e918-6b81-4d7e-a142-854f029df965",
+      "comment": "",
+      "command": "click",
+      "target": "css=.min-h-screen",
+      "targets": [
+        ["css=.min-h-screen", "css:finder"],
+        ["xpath=//body", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "4491c4cd-de41-4d24-b6cf-fe085958cd6e",
+      "comment": "",
+      "command": "click",
+      "target": "css=.MuiButtonBase-root:nth-child(1)",
+      "targets": [
+        ["css=.MuiButtonBase-root:nth-child(1)", "css:finder"],
+        ["xpath=//ul[@id=':r13:']/li", "xpath:idRelative"],
+        ["xpath=//li", "xpath:position"],
+        ["xpath=//li[contains(.,'Masculino')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "6d029515-54b3-41c1-899f-cd6505595104",
+      "comment": "",
+      "command": "click",
+      "target": "css=.min-h-screen",
+      "targets": [
+        ["css=.min-h-screen", "css:finder"],
+        ["xpath=//body", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "159004be-41fc-429e-b5a7-c0cd8430dedb",
+      "comment": "",
+      "command": "click",
+      "target": "css=.MuiButtonBase-root:nth-child(1)",
+      "targets": [
+        ["css=.MuiButtonBase-root:nth-child(1)", "css:finder"],
+        ["xpath=//ul[@id=':r14:']/li", "xpath:idRelative"],
+        ["xpath=//li", "xpath:position"],
+        ["xpath=//li[contains(.,'Casado ou União Estável')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "d59b9df8-3532-4e32-9761-c31fa629eca3",
+      "comment": "",
+      "command": "click",
+      "target": "css=.min-h-screen",
+      "targets": [
+        ["css=.min-h-screen", "css:finder"],
+        ["xpath=//body", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "b1f2042d-73ac-4537-864e-e7e75b3d771e",
+      "comment": "",
+      "command": "click",
+      "target": "css=.Mui-selected",
+      "targets": [
+        ["css=.Mui-selected", "css:finder"],
+        ["xpath=//ul[@id=':r14:']/li", "xpath:idRelative"],
+        ["xpath=//li", "xpath:position"],
+        ["xpath=//li[contains(.,'Casado ou União Estável')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "978a35ac-4f5e-428c-a3fc-a07573c2f095",
+      "comment": "",
+      "command": "click",
+      "target": "id=emailTelaSegurado",
+      "targets": [
+        ["id=emailTelaSegurado", "id"],
+        ["css=#emailTelaSegurado", "css:finder"],
+        ["xpath=//input[@id='emailTelaSegurado']", "xpath:attributes"],
+        ["xpath=//div[6]/div/div/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "8c3f90f7-7de8-4de4-b6b6-180f9a2c74c2",
+      "comment": "",
+      "command": "click",
+      "target": "id=emailTelaSegurado",
+      "targets": [
+        ["id=emailTelaSegurado", "id"],
+        ["css=#emailTelaSegurado", "css:finder"],
+        ["xpath=//input[@id='emailTelaSegurado']", "xpath:attributes"],
+        ["xpath=//div[6]/div/div/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "dc5a9071-c18f-4e17-bfc0-e450f988eee3",
+      "comment": "",
+      "command": "type",
+      "target": "id=emailTelaSegurado",
+      "targets": [
+        ["id=emailTelaSegurado", "id"],
+        ["css=#emailTelaSegurado", "css:finder"],
+        ["xpath=//input[@id='emailTelaSegurado']", "xpath:attributes"],
+        ["xpath=//div[6]/div/div/input", "xpath:position"]
+      ],
+      "value": "alex.kaminski@imediatoseguros.com.br"
+    }, {
+      "id": "54618817-c542-40a8-aa4f-82e47d37a0a6",
+      "comment": "",
+      "command": "click",
+      "target": "id=celularTelaSegurado",
+      "targets": [
+        ["id=celularTelaSegurado", "id"],
+        ["css=#celularTelaSegurado", "css:finder"],
+        ["xpath=//input[@id='celularTelaSegurado']", "xpath:attributes"],
+        ["xpath=//div[7]/div/div/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "5eab750a-0583-461d-b063-a1be7e73c337",
+      "comment": "",
+      "command": "mouseDownAt",
+      "target": "id=emailTelaSegurado",
+      "targets": [
+        ["id=emailTelaSegurado", "id"],
+        ["css=#emailTelaSegurado", "css:finder"],
+        ["xpath=//input[@id='emailTelaSegurado']", "xpath:attributes"],
+        ["xpath=//div[6]/div/div/input", "xpath:position"]
+      ],
+      "value": "-45,20"
+    }, {
+      "id": "624e90f7-688b-400c-a1b7-2153148bb66a",
+      "comment": "",
+      "command": "mouseMoveAt",
+      "target": "id=emailTelaSegurado",
+      "targets": [
+        ["id=emailTelaSegurado", "id"],
+        ["css=#emailTelaSegurado", "css:finder"],
+        ["xpath=//input[@id='emailTelaSegurado']", "xpath:attributes"],
+        ["xpath=//div[6]/div/div/input", "xpath:position"]
+      ],
+      "value": "-45,20"
+    }, {
+      "id": "2130a34b-c5fa-4810-a205-fadb451b90fa",
+      "comment": "",
+      "command": "mouseUpAt",
+      "target": "id=emailTelaSegurado",
+      "targets": [
+        ["id=emailTelaSegurado", "id"],
+        ["css=#emailTelaSegurado", "css:finder"],
+        ["xpath=//input[@id='emailTelaSegurado']", "xpath:attributes"],
+        ["xpath=//div[6]/div/div/input", "xpath:position"]
+      ],
+      "value": "-45,20"
+    }, {
+      "id": "a7739c65-e10f-4faf-b154-25fb0d5685e6",
+      "comment": "",
+      "command": "click",
+      "target": "id=emailTelaSegurado",
+      "targets": [
+        ["id=emailTelaSegurado", "id"],
+        ["css=#emailTelaSegurado", "css:finder"],
+        ["xpath=//input[@id='emailTelaSegurado']", "xpath:attributes"],
+        ["xpath=//div[6]/div/div/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "5d2e6eb1-d849-4929-971b-1822c7f5731c",
+      "comment": "",
+      "command": "click",
+      "target": "id=celularTelaSegurado",
+      "targets": [
+        ["id=celularTelaSegurado", "id"],
+        ["css=#celularTelaSegurado", "css:finder"],
+        ["xpath=//input[@id='celularTelaSegurado']", "xpath:attributes"],
+        ["xpath=//div[7]/div/div/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "3681ff06-7c74-46dd-aa09-6c73180de4d8",
+      "comment": "",
+      "command": "type",
+      "target": "id=celularTelaSegurado",
+      "targets": [
+        ["id=celularTelaSegurado", "id"],
+        ["css=#celularTelaSegurado", "css:finder"],
+        ["xpath=//input[@id='celularTelaSegurado']", "xpath:attributes"],
+        ["xpath=//div[7]/div/div/input", "xpath:position"]
+      ],
+      "value": "(11) 95328-8466"
+    }, {
+      "id": "4bc9d286-db3c-4c4a-8141-1aa22c50a669",
+      "comment": "",
+      "command": "click",
+      "target": "id=gtm-telaDadosSeguradoContinuar",
+      "targets": [
+        ["id=gtm-telaDadosSeguradoContinuar", "id"],
+        ["css=#gtm-telaDadosSeguradoContinuar", "css:finder"],
+        ["xpath=//button[@id='gtm-telaDadosSeguradoContinuar']", "xpath:attributes"],
+        ["xpath=//button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Continuar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }]
+  }],
+  "suites": [{
+    "id": "0f5a3b0c-aa9d-4177-ad13-fe433c3f04f5",
+    "name": "Default Suite",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": ["004dc37e-11db-4635-b921-fb797e818f4e"]
+  }],
+  "urls": ["https://www.app.tosegurado.com.br/"],
+  "plugins": []
+}
