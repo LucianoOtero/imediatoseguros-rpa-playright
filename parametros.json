@@ -19,7 +19,7 @@
     "senha_login": "Lrotero1$",
     "manter_login_atual": true
   },
-  "url": "https://www.app.tosegurado.com.br/imediatoseguros",
+  "url": "https://www.app.tosegurado.com.br/imediatosolucoes",
   "placa": "EED-3D56",
   "marca": "TOYOTA",
   "modelo": "COROLLA XEI 1.8/1.8 FLEX 16V MEC",
@@ -38,7 +38,7 @@
   "email": "alex.kaminski@imediatoseguros.com.br",
   "celular": "11953288466",
   "endereco": "Rua Serra de Botucatu, Tatuapé - São Paulo/SP",
-  "condutor_principal": false,
+  "condutor_principal": true,
   "nome_condutor": "SANDRA LOUREIRO",
   "cpf_condutor": "251.517.878-29",
   "data_nascimento_condutor": "28/08/1975",

@@ -170,3 +170,5 @@ if __name__ == "__main__":
     # Limpar processos
     print("\n📋 Limpeza de processos:")
     limpar_processos_python()
+
+

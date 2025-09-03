@@ -35,9 +35,6 @@ from utils.retorno_estruturado import (
     validar_retorno_estruturado
 )
 
-# Importar Sistema de Progresso em Tempo Real
-from utils.progress_realtime import ProgressTracker
-
 # ========================================
 # SISTEMA DE EXCEPTION HANDLER
 # ========================================
@@ -201,6 +198,13 @@ class ExceptionHandler:
 exception_handler = ExceptionHandler()
 
 # ========================================
+# VARIÁVEIS GLOBAIS
+# ========================================
+
+# Flag para controlar se a Tela 15 foi detectada diretamente da Tela 13
+tela_15_detectada = False
+
+# ========================================
 # FUNÇÕES AUXILIARES
 # ========================================
 
@@ -268,24 +272,18 @@ def obter_parametros_tempo(parametros: Dict[str, Any]) -> Dict[str, int]:
     tempo_carregamento = configuracao.get('tempo_carregamento', 10)
     tempo_estabilizacao_tela5 = configuracao.get('tempo_estabilizacao_tela5', 2)
     tempo_carregamento_tela5 = configuracao.get('tempo_carregamento_tela5', 5)
-    tempo_estabilizacao_tela15 = configuracao.get('tempo_estabilizacao_tela15', 3)
-    tempo_carregamento_tela15 = configuracao.get('tempo_carregamento_tela15', 5)
     
     exibir_mensagem(f"⚙️ Parâmetros de tempo carregados:")
     exibir_mensagem(f"   - Estabilização: {tempo_estabilizacao}s")
     exibir_mensagem(f"   - Carregamento: {tempo_carregamento}s")
     exibir_mensagem(f"   - Estabilização Tela 5: {tempo_estabilizacao_tela5}s")
     exibir_mensagem(f"   - Carregamento Tela 5: {tempo_carregamento_tela5}s")
-    exibir_mensagem(f"   - Estabilização Tela 15: {tempo_estabilizacao_tela15}s")
-    exibir_mensagem(f"   - Carregamento Tela 15: {tempo_carregamento_tela15}s")
     
     return {
         'tempo_estabilizacao': tempo_estabilizacao,
         'tempo_carregamento': tempo_carregamento,
         'tempo_estabilizacao_tela5': tempo_estabilizacao_tela5,
-        'tempo_carregamento_tela5': tempo_carregamento_tela5,
-        'tempo_estabilizacao_tela15': tempo_estabilizacao_tela15,
-        'tempo_carregamento_tela15': tempo_carregamento_tela15
+        'tempo_carregamento_tela5': tempo_carregamento_tela5
     }
 
 def validar_parametros_obrigatorios(parametros: Dict[str, Any]) -> bool:
@@ -1427,93 +1425,94 @@ def navegar_tela_12_playwright(page, garagem_residencia, portao_eletronico):
         exibir_mensagem("="*50)
         
         # Aguarda o carregamento da Tela 12
-        exibir_mensagem("⏳ Aguardando carregamento da Tela 12...")
+        exibir_mensagem("1️⃣ ⏳ Aguardando carregamento da Tela 12...")
         page.wait_for_selector('p.font-semibold.font-workSans.cursor-pointer', timeout=10000)
         page.wait_for_selector('input[name="possuiGaragemTelaGaragemResidencia"]', timeout=3000)
         
-        exibir_mensagem("✅ Tela 12 carregada - garagem na residência detectada!")
+        exibir_mensagem("2️⃣ ✅ Tela 12 carregada - garagem na residência detectada!")
         
         # Seleciona Sim ou Não para garagem
         if garagem_residencia:
-            exibir_mensagem("📋 Selecionando 'Sim' para garagem na residência...")
+            exibir_mensagem("3️⃣ 📋 Selecionando 'Sim' para garagem na residência...")
             
             # Localizar e clicar no radio button "Sim"
             radio_sim = page.locator('input[value="sim"][name="possuiGaragemTelaGaragemResidencia"]')
             if radio_sim.is_visible():
                 radio_sim.click()
-                exibir_mensagem("✅ Radio 'Sim' para garagem selecionado com sucesso")
+                exibir_mensagem("4️⃣ ✅ Radio 'Sim' para garagem selecionado com sucesso")
             else:
-                exibir_mensagem("⚠️ Radio 'Sim' para garagem não encontrado")
+                exibir_mensagem("4️⃣ ⚠️ Radio 'Sim' para garagem não encontrado")
                 return False
             
             # Aguarda campo de portão aparecer
-            exibir_mensagem("⏳ Aguardando campo de portão aparecer...")
+            exibir_mensagem("5️⃣ ⏳ Aguardando campo de portão aparecer...")
             page.wait_for_selector('input[name="tipoPortaoTelaGaragemResidencia"]', timeout=3000)
             
             # Seleciona tipo de portão
             if portao_eletronico == "Eletronico":
-                exibir_mensagem("📋 Selecionando 'Eletrônico' para portão...")
+                exibir_mensagem("6️⃣ 📋 Selecionando 'Eletrônico' para portão...")
                 
                 radio_eletronico = page.locator('input[value="eletronico"][name="tipoPortaoTelaGaragemResidencia"]')
                 if radio_eletronico.is_visible():
                     radio_eletronico.click()
-                    exibir_mensagem("✅ Radio 'Eletrônico' para portão selecionado com sucesso")
+                    exibir_mensagem("7️⃣ ✅ Radio 'Eletrônico' para portão selecionado com sucesso")
                 else:
-                    exibir_mensagem("⚠️ Radio 'Eletrônico' para portão não encontrado")
+                    exibir_mensagem("7️⃣ ⚠️ Radio 'Eletrônico' para portão não encontrado")
                     return False
                     
             elif portao_eletronico == "Manual":
-                exibir_mensagem("📋 Selecionando 'Manual' para portão...")
+                exibir_mensagem("6️⃣ 📋 Selecionando 'Manual' para portão...")
                 
                 radio_manual = page.locator('input[value="manual"][name="tipoPortaoTelaGaragemResidencia"]')
                 if radio_manual.is_visible():
                     radio_manual.click()
-                    exibir_mensagem("✅ Radio 'Manual' para portão selecionado com sucesso")
+                    exibir_mensagem("7️⃣ ✅ Radio 'Manual' para portão selecionado com sucesso")
                 else:
-                    exibir_mensagem("⚠️ Radio 'Manual' para portão não encontrado")
+                    exibir_mensagem("7️⃣ ⚠️ Radio 'Manual' para portão não encontrado")
                     return False
             else:
-                exibir_mensagem("ℹ️ Tipo de portão: Não possui")
+                exibir_mensagem("6️⃣ ℹ️ Tipo de portão: Não possui")
         else:
-            exibir_mensagem("📋 Selecionando 'Não' para garagem na residência...")
+            exibir_mensagem("3️⃣ 📋 Selecionando 'Não' para garagem na residência...")
             
             # Localizar e clicar no radio button "Não"
             radio_nao = page.locator('input[value="nao"][name="possuiGaragemTelaGaragemResidencia"]')
             if radio_nao.is_visible():
                 radio_nao.click()
-                exibir_mensagem("✅ Radio 'Não' para garagem selecionado com sucesso")
+                exibir_mensagem("4️⃣ ✅ Radio 'Não' para garagem selecionado com sucesso")
             else:
-                exibir_mensagem("⚠️ Radio 'Não' para garagem não encontrado")
+                exibir_mensagem("4️⃣ ⚠️ Radio 'Não' para garagem não encontrado")
                 return False
         
         # Aguarda estabilização após seleções
         page.wait_for_selector('p.font-semibold.font-workSans.cursor-pointer:has-text("Continuar")', timeout=3000)
         
         # Clica no botão Continuar
-        exibir_mensagem("🔄 Clicando em 'Continuar'...")
+        exibir_mensagem("8️⃣ 🔄 Clicando em 'Continuar'...")
         botao_continuar = page.locator('p.font-semibold.font-workSans.cursor-pointer:has-text("Continuar")')
         if botao_continuar.is_visible():
             botao_continuar.click()
-            exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
+            exibir_mensagem("9️⃣ ✅ Botão 'Continuar' clicado com sucesso")
         else:
-            exibir_mensagem("⚠️ Botão 'Continuar' não encontrado")
+            exibir_mensagem("9️⃣ ⚠️ Botão 'Continuar' não encontrado")
             return False
         
         # Aguarda navegação - verifica se chegou na próxima tela ou se ainda está na atual
         try:
             # Tenta aguardar elemento da próxima tela
-            page.wait_for_selector("input[name='resideMenoresTelaResidenciaMenores']", timeout=3000)
-            exibir_mensagem("✅ Navegação para próxima tela realizada!")
+#            page.wait_for_selector("input[name='resideMenoresTelaResidenciaMenores']", timeout=3000)
+            page.wait_for_selector("input[name='usoDependenteTelaUsoResidentes']", timeout=10000)
+            exibir_mensagem("🔟 ✅ Navegação para próxima tela realizada!")
         except:
             # Se não encontrar, verifica se ainda está na tela atual
             try:
                 page.wait_for_selector('p.font-semibold.font-workSans.cursor-pointer:has-text("Continuar")', timeout=2000)
-                exibir_mensagem("⚠️ Ainda na tela atual - tentando clicar novamente...")
+                exibir_mensagem("🔟 ⚠️ Ainda na tela atual - tentando clicar novamente...")
                 botao_continuar.click()
-                page.wait_for_selector("input[name='resideMenoresTelaResidenciaMenores']", timeout=5000)
-                exibir_mensagem("✅ Navegação para próxima tela realizada!")
+#                page.wait_for_selector("input[name='resideMenoresTelaResidenciaMenores']", timeout=5000)
+                exibir_mensagem("🔟 ✅ Navegação para próxima tela realizada!")
             except:
-                exibir_mensagem("✅ Navegação para próxima tela realizada!")
+                exibir_mensagem("🔟 ✅ Navegação para próxima tela realizada!")
         
         return True
         
@@ -1554,12 +1553,12 @@ def navegar_tela_13_playwright(page, reside_18_26, sexo_do_menor, faixa_etaria_m
         exibir_mensagem("="*50)
         
         # PASSO 1: Aguardar carregamento da tela
-        exibir_mensagem("⏳ Aguardando carregamento da Tela 13...")
+        exibir_mensagem("1️⃣ ⏳ Aguardando carregamento da Tela 13...")
         page.wait_for_selector("p.font-semibold.font-workSans.cursor-pointer:has-text('Continuar')", timeout=10000)
-        exibir_mensagem("✅ Tela 13 carregada - residência com menores detectada!")
+        exibir_mensagem("2️⃣ ✅ Tela 13 carregada - residência com menores detectada!")
         
         # PASSO 2: Selecionar resposta principal
-        exibir_mensagem(f"👥 Selecionando resposta principal: '{reside_18_26}'...")
+        exibir_mensagem(f"3️⃣ 👥 Selecionando resposta principal: '{reside_18_26}'...")
         
         # Mapear valores para os selectors da gravação
         if reside_18_26 == "Não":
@@ -1567,74 +1566,122 @@ def navegar_tela_13_playwright(page, reside_18_26, sexo_do_menor, faixa_etaria_m
             try:
                 # Primeira tentativa: usar o seletor original
                 page.locator("input[type='radio'][value='nao']").first.check()
-                exibir_mensagem("✅ Radio 'Não' selecionado com sucesso")
+                exibir_mensagem("4️⃣ ✅ Radio 'Não' selecionado com sucesso")
             except:
                 try:
                     # Segunda tentativa: usar texto
                     page.locator("text=Não").first.click()
-                    exibir_mensagem("✅ Radio 'Não' selecionado com sucesso (texto)")
+                    exibir_mensagem("4️⃣ ✅ Radio 'Não' selecionado com sucesso (texto)")
                 except:
                     # Terceira tentativa: usar label
                     page.locator("label:has-text('Não')").first.click()
-                    exibir_mensagem("✅ Radio 'Não' selecionado com sucesso (label)")
+                    exibir_mensagem("4️⃣ ✅ Radio 'Não' selecionado com sucesso (label)")
             
         elif reside_18_26 == "Sim, mas não utilizam o veículo":
             # Selecionar "Sim, mas não utilizam o veículo"
             try:
                 page.locator("input[type='radio'][value='sim_nao_utilizam']").check()
-                exibir_mensagem("✅ Radio 'Sim, mas não utilizam o veículo' selecionado com sucesso")
+                exibir_mensagem("4️⃣ ✅ Radio 'Sim, mas não utilizam o veículo' selecionado com sucesso")
             except:
                 page.locator("text=Sim, mas não utilizam o veículo").first.click()
-                exibir_mensagem("✅ Radio 'Sim, mas não utilizam o veículo' selecionado com sucesso (texto)")
+                exibir_mensagem("4️⃣ ✅ Radio 'Sim, mas não utilizam o veículo' selecionado com sucesso (texto)")
             
         elif reside_18_26 == "Sim e utilizam o veículo":
             # Selecionar "Sim e utilizam o veículo"
             try:
                 page.locator("input[type='radio'][value='sim_utilizam']").check()
-                exibir_mensagem("✅ Radio 'Sim e utilizam o veículo' selecionado com sucesso")
+                exibir_mensagem("4️⃣ ✅ Radio 'Sim e utilizam o veículo' selecionado com sucesso")
             except:
                 page.locator("text=Sim e utilizam o veículo").first.click()
-                exibir_mensagem("✅ Radio 'Sim e utilizam o veículo' selecionado com sucesso (texto)")
+                exibir_mensagem("4️⃣ ✅ Radio 'Sim e utilizam o veículo' selecionado com sucesso (texto)")
             
             # PASSO 3: Se "Sim e utilizam o veículo", selecionar campos condicionais
             if sexo_do_menor != "N/A":
-                exibir_mensagem(f"👤 Selecionando sexo do menor: '{sexo_do_menor}'...")
+                exibir_mensagem(f"5️⃣ 👤 Selecionando sexo do menor: '{sexo_do_menor}'...")
                 
                 if sexo_do_menor == "Feminino":
                     page.locator("input[type='radio'][value='feminino']").check()
-                    exibir_mensagem("✅ Radio 'Feminino' para sexo selecionado com sucesso")
+                    exibir_mensagem("6️⃣ ✅ Radio 'Feminino' para sexo selecionado com sucesso")
                 elif sexo_do_menor == "Masculino":
                     page.locator("input[type='radio'][value='masculino']").check()
-                    exibir_mensagem("✅ Radio 'Masculino' para sexo selecionado com sucesso")
+                    exibir_mensagem("6️⃣ ✅ Radio 'Masculino' para sexo selecionado com sucesso")
                 elif sexo_do_menor == "Ambos":
                     page.locator("input[type='radio'][value='ambos']").check()
-                    exibir_mensagem("✅ Radio 'Ambos' para sexo selecionado com sucesso")
+                    exibir_mensagem("6️⃣ ✅ Radio 'Ambos' para sexo selecionado com sucesso")
             
             if faixa_etaria_menor_mais_novo != "N/A":
-                exibir_mensagem(f"📅 Selecionando faixa etária: '{faixa_etaria_menor_mais_novo}'...")
+                exibir_mensagem(f"7️⃣ 📅 Selecionando faixa etária: '{faixa_etaria_menor_mais_novo}'...")
                 
                 if faixa_etaria_menor_mais_novo == "18 a 24 anos":
                     page.locator("input[type='radio'][value='18_24']").check()
-                    exibir_mensagem("✅ Radio '18 a 24 anos' para faixa etária selecionado com sucesso")
+                    exibir_mensagem("8️⃣ ✅ Radio '18 a 24 anos' para faixa etária selecionado com sucesso")
                 elif faixa_etaria_menor_mais_novo == "25 anos":
                     page.locator("input[type='radio'][value='25']").check()
-                    exibir_mensagem("✅ Radio '25 anos' para faixa etária selecionado com sucesso")
+                    exibir_mensagem("8️⃣ ✅ Radio '25 anos' para faixa etária selecionado com sucesso")
         else:
-            exibir_mensagem("⚠️ Resposta não reconhecida, usando 'Não'")
+            exibir_mensagem("4️⃣ ⚠️ Resposta não reconhecida, usando 'Não'")
             page.locator("input[type='radio'][value='nao']").first.check()
         
         # PASSO 4: Clicar no botão Continuar
-        exibir_mensagem("⏳ Aguardando botão 'Continuar'...")
+        exibir_mensagem("9️⃣ ⏳ Aguardando botão 'Continuar'...")
         page.wait_for_selector("p.font-semibold.font-workSans.cursor-pointer:has-text('Continuar')", timeout=5000)
         
-        exibir_mensagem("🔄 Clicando no botão 'Continuar'...")
+        exibir_mensagem("🔟 🔄 Clicando no botão 'Continuar'...")
         page.locator("p.font-semibold.font-workSans.cursor-pointer:has-text('Continuar')").click()
-        exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
+        exibir_mensagem("1️⃣1️⃣ ✅ Botão 'Continuar' clicado com sucesso")
         
         # PASSO 5: Aguardar transição para próxima tela
-        exibir_mensagem("⏳ Aguardando transição para próxima tela...")
-        page.wait_for_selector("#gtm-telaCorretorAnteriorContinuar", timeout=5000)
-        exibir_mensagem("✅ TELA 13 CONCLUÍDA!")
+        exibir_mensagem("1️⃣2️⃣ ⏳ Aguardando transição para próxima tela...")
+        exibir_mensagem("1️⃣3️⃣ 🔍 Iniciando sistema de detecção inteligente (Tela 14 → Tela 15)")
+        
+        # Tentar detectar Tela 14 primeiro
+        try:
+            exibir_mensagem("1️⃣4️⃣ 🎯 Tentativa 1: Detectando Tela 14...")
+            page.wait_for_selector("#gtm-telaCorretorAnteriorContinuar", timeout=5000)
+            exibir_mensagem("1️⃣5️⃣ ✅ Tela 14 detectada - transição bem-sucedida!")
+            exibir_mensagem("1️⃣6️⃣ 📋 Fluxo normal: Tela 13 → Tela 14 → Tela 15")
+        except Exception as e:
+            exibir_mensagem(f"1️⃣4️⃣ ⚠️ Tela 14 não detectada: {str(e)}")
+            exibir_mensagem("1️⃣5️⃣ 🔄 Ativando fallback: Tentando detectar Tela 15 diretamente...")
+            exibir_mensagem("1️⃣6️⃣ 📋 Fluxo otimizado: Tela 13 → Tela 15 (pulando Tela 14)")
+            
+            # Fallback: tentar detectar Tela 15
+            try:
+                exibir_mensagem("1️⃣7️⃣ 🎯 Tentativa 2: Detectando Tela 15 como fallback...")
+                
+                # Tentar detectar Tela 15 com diferentes textos possíveis
+                try:
+                    # Primeira tentativa: texto original (quando vai para Tela 14 primeiro)
+                    exibir_mensagem("1️⃣7️⃣a️⃣ 🎯 Tentativa 2a: Detectando Tela 15 (texto original)...")
+                    page.wait_for_selector("text=Por favor, aguarde. Estamos buscando o corretor ideal para você!", timeout=3000)
+                    exibir_mensagem("1️⃣7️⃣a️⃣ ✅ Tela 15 detectada com texto original!")
+                except:
+                    try:
+                        # Segunda tentativa: texto quando pula diretamente da Tela 13
+                        exibir_mensagem("1️⃣7️⃣b️⃣ 🎯 Tentativa 2b: Detectando Tela 15 (texto direto)...")
+                        page.wait_for_selector("text=Por favor, aguarde. Estamos realizando o cálculo para você!", timeout=3000)
+                        exibir_mensagem("1️⃣7️⃣b️⃣ ✅ Tela 15 detectada com texto direto!")
+                    except:
+                        # Terceira tentativa: texto final de sucesso
+                        exibir_mensagem("1️⃣7️⃣c️⃣ 🎯 Tentativa 2c: Detectando Tela 15 (texto final)...")
+                        page.wait_for_selector("text=Parabéns, chegamos ao resultado final da cotação!", timeout=180000)
+                        exibir_mensagem("1️⃣7️⃣c️⃣ ✅ Tela 15 detectada com texto final!")
+
+                exibir_mensagem("1️⃣8️⃣ ✅ Tela 15 detectada - transição bem-sucedida!")
+                exibir_mensagem("1️⃣9️⃣ 🚀 Fallback executado com sucesso!")
+                
+                # Definir variável global quando Tela 15 é detectada diretamente da Tela 13
+                global tela_15_detectada
+                tela_15_detectada = True
+                exibir_mensagem("2️⃣0️⃣ 🏷️ Flag global 'tela_15_detectada' definida como True")
+                exibir_mensagem("2️⃣1️⃣ 📊 Status atualizado: Tela 14 será pulada na próxima execução")
+                
+            except Exception as e2:
+                exibir_mensagem(f"1️⃣7️⃣ ❌ Tela 15 também não detectada: {str(e2)}")
+                exibir_mensagem("1️⃣8️⃣ ❌ ABEND: Falha na transição da Tela 13")
+                exibir_mensagem("1️⃣9️⃣ 🚫 Nenhuma tela subsequente foi detectada")
+                raise Exception("Falha na transição da Tela 13 - nem Tela 14 nem Tela 15 detectadas")
+        exibir_mensagem("2️⃣2️⃣ ✅ TELA 13 CONCLUÍDA!")
         
         return True
         
@@ -1669,7 +1716,7 @@ def navegar_tela_14_playwright(page, continuar_com_corretor_anterior):
         exibir_mensagem("="*50)
         
         # PASSO 1: Verificar se a Tela 14 aparece (é condicional)
-        exibir_mensagem("🔍 Verificando se a Tela 14 (Corretor Anterior) aparece...")
+        exibir_mensagem("1️⃣ 🔍 Verificando se a Tela 14 (Corretor Anterior) aparece...")
         
         # Aguardar um tempo para ver se a tela aparece
         page.wait_for_selector("#gtm-telaCorretorAnteriorContinuar", timeout=5000)
@@ -1679,68 +1726,68 @@ def navegar_tela_14_playwright(page, continuar_com_corretor_anterior):
             # Tentar encontrar o botão da Tela 14
             botao_tela14 = page.locator("#gtm-telaCorretorAnteriorContinuar")
             if botao_tela14.count() > 0 and botao_tela14.first.is_visible():
-                exibir_mensagem("✅ Tela 14 detectada - Corretor Anterior aparece!")
+                exibir_mensagem("2️⃣ ✅ Tela 14 detectada - Corretor Anterior aparece!")
                 
                 # PASSO 2: Processar a Tela 14
-                exibir_mensagem(f"👨‍💼 Processando Tela 14: continuar_com_corretor_anterior = {continuar_com_corretor_anterior}")
+                exibir_mensagem(f"3️⃣ 👨‍💼 Processando Tela 14: continuar_com_corretor_anterior = {continuar_com_corretor_anterior}")
                 
                 # Selecionar opção baseada no parâmetro
                 if continuar_com_corretor_anterior:
-                    exibir_mensagem("✅ Selecionando 'Continuar com corretor anterior'...")
+                    exibir_mensagem("4️⃣ ✅ Selecionando 'Continuar com corretor anterior'...")
                     # Tentar seletores mais simples e robustos
                     try:
                         # Primeiro tentar por texto
                         page.locator("text=Continuar com corretor anterior").first.click()
-                        exibir_mensagem("✅ Opção 'Continuar com corretor anterior' selecionada por texto")
+                        exibir_mensagem("5️⃣ ✅ Opção 'Continuar com corretor anterior' selecionada por texto")
                     except:
                         try:
                             # Tentar por radio button
                             page.locator("input[type='radio'][value='sim']").first.click()
-                            exibir_mensagem("✅ Opção 'Continuar com corretor anterior' selecionada por radio")
+                            exibir_mensagem("5️⃣ ✅ Opção 'Continuar com corretor anterior' selecionada por radio")
                         except:
                             # Tentar por label
                             page.locator("label:has-text('Continuar')").first.click()
-                            exibir_mensagem("✅ Opção 'Continuar com corretor anterior' selecionada por label")
+                            exibir_mensagem("5️⃣ ✅ Opção 'Continuar com corretor anterior' selecionada por label")
                 else:
-                    exibir_mensagem("✅ Selecionando 'Não continuar com corretor anterior'...")
+                    exibir_mensagem("4️⃣ ✅ Selecionando 'Não continuar com corretor anterior'...")
                     try:
                         # Primeiro tentar por texto
                         page.locator("text=Não continuar com corretor anterior").first.click()
-                        exibir_mensagem("✅ Opção 'Não continuar com corretor anterior' selecionada por texto")
+                        exibir_mensagem("5️⃣ ✅ Opção 'Não continuar com corretor anterior' selecionada por texto")
                     except:
                         try:
                             # Tentar por radio button
                             page.locator("input[type='radio'][value='nao']").first.click()
-                            exibir_mensagem("✅ Opção 'Não continuar com corretor anterior' selecionada por radio")
+                            exibir_mensagem("5️⃣ ✅ Opção 'Não continuar com corretor anterior' selecionada por radio")
                         except:
                             # Tentar por label
                             page.locator("label:has-text('Não')").first.click()
-                            exibir_mensagem("✅ Opção 'Não continuar com corretor anterior' selecionada por label")
+                            exibir_mensagem("5️⃣ ✅ Opção 'Não continuar com corretor anterior' selecionada por label")
                 
                 # PASSO 3: Clicar no botão Continuar
-                exibir_mensagem("🔄 Clicando no botão 'Continuar'...")
+                exibir_mensagem("6️⃣ 🔄 Clicando no botão 'Continuar'...")
                 botao_continuar = page.locator('p.font-semibold.font-workSans.cursor-pointer.text-sm.leading-6:has-text("Continuar")')
                 if botao_continuar.is_visible():
                     botao_continuar.click()
-                    exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
+                    exibir_mensagem("7️⃣ ✅ Botão 'Continuar' clicado com sucesso")
                 else:
-                    exibir_mensagem("⚠️ Botão 'Continuar' não encontrado")
+                    exibir_mensagem("7️⃣ ⚠️ Botão 'Continuar' não encontrado")
                     return False
                 
                 # PASSO 4: Aguardar transição para próxima tela
-                exibir_mensagem("⏳ Aguardando transição para próxima tela...")
+                exibir_mensagem("8️⃣ ⏳ Aguardando transição para próxima tela...")
                 page.wait_for_selector("text=Por favor, aguarde. Estamos buscando o corretor ideal para você!", timeout=5000)
-                exibir_mensagem("✅ TELA 14 CONCLUÍDA!")
+                exibir_mensagem("9️⃣ ✅ TELA 14 CONCLUÍDA!")
                 
                 return True
             else:
-                exibir_mensagem("ℹ️ Tela 14 não aparece - não há cotação anterior para este cliente")
-                exibir_mensagem("ℹ️ Pulando para próxima tela...")
+                exibir_mensagem("2️⃣ ℹ️ Tela 14 não aparece - não há cotação anterior para este cliente")
+                exibir_mensagem("3️⃣ ℹ️ Pulando para próxima tela...")
                 return True  # Retorna True mesmo não aparecendo, pois é condicional
                 
         except Exception as e:
-            exibir_mensagem(f"ℹ️ Tela 14 não detectada: {str(e)}")
-            exibir_mensagem("ℹ️ Pulando para próxima tela...")
+            exibir_mensagem(f"2️⃣ ℹ️ Tela 14 não detectada: {str(e)}")
+            exibir_mensagem("3️⃣ ℹ️ Pulando para próxima tela...")
             return True  # Retorna True mesmo não aparecendo, pois é condicional
         
     except Exception as e:
@@ -1945,7 +1992,7 @@ def navegar_tela_15_playwright(page, email_login, senha_login, parametros_tempo)
                 
                 # Aguardar possível redirecionamento ou modal CPF divergente
                 exibir_mensagem("⏳ Aguardando resposta do login...")
-                time.sleep(parametros_tempo['tempo_carregamento_tela15'])  # ESTRATÉGIA SIMPLES: time.sleep ao invés de waits complexos
+                time.sleep(parametros_tempo['tempo_carregamento'])  # ESTRATÉGIA SIMPLES: time.sleep ao invés de waits complexos
                 
                 # Verificar se apareceu modal CPF divergente
                 try:
@@ -1962,14 +2009,14 @@ def navegar_tela_15_playwright(page, email_login, senha_login, parametros_tempo)
                             if botao_manter_login.is_visible():
                                 botao_manter_login.click()
                                 exibir_mensagem("✅ Botão 'Manter Login atual' clicado pelo ID!")
-                                time.sleep(parametros_tempo['tempo_estabilizacao_tela15'])
+                                time.sleep(parametros_tempo['tempo_estabilizacao'])
                             else:
                                 # Tentar pelo texto
                                 botao_manter_login = page.locator("text=Manter Login atual")
                                 if botao_manter_login.is_visible():
                                     botao_manter_login.click()
                                     exibir_mensagem("✅ Botão 'Manter Login atual' clicado pelo texto!")
-                                    time.sleep(parametros_tempo['tempo_estabilizacao_tela15'])
+                                    time.sleep(parametros_tempo['tempo_estabilizacao'])
                                 else:
                                     exibir_mensagem("⚠️ Botão 'Manter Login atual' não encontrado")
                         except Exception as e:
@@ -1996,13 +2043,13 @@ def navegar_tela_15_playwright(page, email_login, senha_login, parametros_tempo)
         # Aguardar carregamento dos planos (aguardando botão específico)
         exibir_mensagem("⏳ Aguardando carregamento da página principal dos planos...")
         try:
-            # Aguardar pelo botão "Personalizar Coberturas" que indica que a página foi carregada
-            page.wait_for_selector("#personalizarCoberturasTelaPersonalizarCoberturas", timeout=10000)
+            # Aguardar pelo texto de sucesso final que indica que a página foi carregada
+            page.wait_for_selector("text=Parabéns, chegamos ao resultado final da cotação!", timeout=180000)
             exibir_mensagem("✅ Página principal dos planos carregada!")
         except Exception as e:
-            exibir_mensagem(f"⚠️ Botão 'Personalizar Coberturas' não encontrado: {str(e)}")
+            exibir_mensagem(f"⚠️ Texto de sucesso final não encontrado: {str(e)}")
             exibir_mensagem("ℹ️ Usando fallback com time.sleep...")
-            time.sleep(parametros_tempo['tempo_carregamento_tela15'])  # Fallback para time.sleep
+            time.sleep(parametros_tempo['tempo_carregamento'])  # Fallback para time.sleep
         
         # Capturar dados dos planos
         dados_planos = capturar_dados_planos_seguro(page, parametros_tempo)
@@ -2911,10 +2958,6 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
         exception_handler.limpar_erros()
         exception_handler.definir_tela_atual("INICIALIZACAO")
         
-        # Inicializar Sistema de Progresso em Tempo Real
-        progress_tracker = ProgressTracker(total_etapas=15)
-        progress_tracker.update_progress(0, "Iniciando RPA Playwright")
-        
         exibir_mensagem("🚀 INICIANDO RPA PLAYWRIGHT")
         exibir_mensagem("=" * 50)
         
@@ -2941,7 +2984,6 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             
             # TELA 1
             exibir_mensagem("\n" + "="*50)
-            progress_tracker.update_progress(1)  # "Selecionando Tipo de Veiculo"
             if navegar_tela_1_playwright(page):
                 telas_executadas += 1
                 resultado_telas["tela_1"] = True
@@ -2959,7 +3001,6 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             
             # TELA 2
             exibir_mensagem("\n" + "="*50)
-            progress_tracker.update_progress(2)  # "Selecionando veículo com a placa informada"
             if navegar_tela_2_playwright(page, parametros['placa']):
                 telas_executadas += 1
                 resultado_telas["tela_2"] = True
@@ -2977,7 +3018,6 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             
             # TELA 3
             exibir_mensagem("\n" + "="*50)
-            progress_tracker.update_progress(3)  # "Confirmando seleção do veículo"
             if navegar_tela_3_playwright(page):
                 telas_executadas += 1
                 resultado_telas["tela_3"] = True
@@ -2995,7 +3035,6 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             
             # TELA 4
             exibir_mensagem("\n" + "="*50)
-            progress_tracker.update_progress(4)  # "Calculando como novo Seguro"
             if navegar_tela_4_playwright(page, parametros['veiculo_segurado']):
                 telas_executadas += 1
                 resultado_telas["tela_4"] = True
@@ -3013,7 +3052,6 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             
             # TELA 5
             exibir_mensagem("\n" + "="*50)
-            progress_tracker.update_progress(5, details={"acao": "Capturando estimativas", "status": "Carregando carrossel"})  # "Elaborando estimativas"
             if navegar_tela_5_playwright(page, parametros_tempo):
                 telas_executadas += 1
                 resultado_telas["tela_5"] = True
@@ -3031,7 +3069,6 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             
             # TELA 6
             exibir_mensagem("\n" + "="*50)
-            progress_tracker.update_progress(6)  # "Seleção de detalhes do veículo"
             if navegar_tela_6_playwright(page, parametros['combustivel'], parametros.get('kit_gas', False), parametros.get('blindado', False), parametros.get('financiado', False)):
                 telas_executadas += 1
                 resultado_telas["tela_6"] = True
@@ -3049,7 +3086,6 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             
             # TELA 7
             exibir_mensagem("\n" + "="*50)
-            progress_tracker.update_progress(7)  # "Definição de local de pernoite com o CEP informado"
             if navegar_tela_7_playwright(page, parametros['cep']):
                 telas_executadas += 1
                 resultado_telas["tela_7"] = True
@@ -3067,7 +3103,6 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             
             # TELA 8
             exibir_mensagem("\n" + "="*50)
-            progress_tracker.update_progress(8)  # "Definição do uso do veículo"
             if navegar_tela_8_playwright(page, parametros['uso_veiculo']):
                 telas_executadas += 1
                 resultado_telas["tela_8"] = True
@@ -3085,7 +3120,6 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             
             # TELA 9
             exibir_mensagem("\n" + "="*50)
-            progress_tracker.update_progress(9)  # "Preenchimento dos dados pessoais"
             if navegar_tela_9_playwright(page, parametros['nome'], parametros['cpf'], parametros['data_nascimento'], parametros['sexo'], parametros['estado_civil'], parametros['email'], parametros['celular']):
                 telas_executadas += 1
                 resultado_telas["tela_9"] = True
@@ -3103,7 +3137,6 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             
             # TELA 10
             exibir_mensagem("\n" + "="*50)
-            progress_tracker.update_progress(10)  # "Definição do Condutor Principal"
             if navegar_tela_10_playwright(page, parametros['condutor_principal'], parametros['nome_condutor'], parametros['cpf_condutor'], parametros['data_nascimento_condutor'], parametros['sexo_condutor'], parametros['estado_civil_condutor']):
                 telas_executadas += 1
                 resultado_telas["tela_10"] = True
@@ -3121,7 +3154,6 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             
             # TELA 11
             exibir_mensagem("\n" + "="*50)
-            progress_tracker.update_progress(11)  # "Definição do uso do veículo"
             if navegar_tela_11_playwright(page, parametros['local_de_trabalho'], parametros['estacionamento_proprio_local_de_trabalho'], parametros['local_de_estudo'], parametros['estacionamento_proprio_local_de_estudo']):
                 telas_executadas += 1
                 resultado_telas["tela_11"] = True
@@ -3139,7 +3171,6 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             
             # TELA 12
             exibir_mensagem("\n" + "="*50)
-            progress_tracker.update_progress(12)  # "Definição do tipo de garagem"
             if navegar_tela_12_playwright(page, parametros['garagem_residencia'], parametros['portao_eletronico']):
                 telas_executadas += 1
                 resultado_telas["tela_12"] = True
@@ -3157,7 +3188,6 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             
             # TELA 13
             exibir_mensagem("\n" + "="*50)
-            progress_tracker.update_progress(13)  # "Definição de residentes"
             if navegar_tela_13_playwright(page, parametros['reside_18_26'], parametros['sexo_do_menor'], parametros['faixa_etaria_menor_mais_novo']):
                 telas_executadas += 1
                 resultado_telas["tela_13"] = True
@@ -3173,27 +3203,40 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                     exception_handler
                 )
             
-            # TELA 14 (CONDICIONAL)
+            # TELA 14 (CONDICIONAL) - Só executa se Tela 15 não foi detectada diretamente da Tela 13
             exibir_mensagem("\n" + "="*50)
-            progress_tracker.update_progress(14)  # "Definição do Corretor"
-            if navegar_tela_14_playwright(page, parametros['continuar_com_corretor_anterior']):
-                # Não incrementa telas_executadas pois é condicional
-                resultado_telas["tela_14"] = True
-                exibir_mensagem("✅ TELA 14 PROCESSADA!")
+            exibir_mensagem("🔍 ANALISANDO EXECUÇÃO DA TELA 14...")
+            exibir_mensagem(f"📊 Status da variável global 'tela_15_detectada': {tela_15_detectada}")
+            
+            if not tela_15_detectada:
+                exibir_mensagem("🔄 Executando Tela 14 (Tela 15 não foi detectada diretamente da Tela 13)")
+                exibir_mensagem("📋 Motivo: Fluxo normal - Tela 14 é necessária para continuar")
+                if navegar_tela_14_playwright(page, parametros['continuar_com_corretor_anterior']):
+                    # Não incrementa telas_executadas pois é condicional
+                    resultado_telas["tela_14"] = True
+                    exibir_mensagem("✅ TELA 14 PROCESSADA COM SUCESSO!")
+                    exibir_mensagem("📈 Navegação para Tela 15 será executada normalmente")
+                else:
+                    resultado_telas["tela_14"] = False
+                    exibir_mensagem("❌ TELA 14 FALHOU!")
+                    exibir_mensagem("🚫 RPA será interrompido devido à falha na Tela 14")
+                    return criar_retorno_erro(
+                        "Tela 14 falhou",
+                        "TELA_14",
+                        time.time() - inicio_execucao,
+                        parametros,
+                        exception_handler
+                    )
             else:
-                resultado_telas["tela_14"] = False
-                exibir_mensagem("❌ TELA 14 FALHOU!")
-                return criar_retorno_erro(
-                    "Tela 14 falhou",
-                    "TELA_14",
-                    time.time() - inicio_execucao,
-                    parametros,
-                    exception_handler
-                )
+                exibir_mensagem("⏭️ Pulando Tela 14 (Tela 15 já foi detectada diretamente da Tela 13)")
+                exibir_mensagem("📋 Motivo: Fluxo otimizado - Tela 14 não é necessária")
+                exibir_mensagem("🔗 Transição direta da Tela 13 para Tela 15 detectada")
+                resultado_telas["tela_14"] = True  # Considera como sucesso pois foi pulada intencionalmente
+                exibir_mensagem("✅ TELA 14 PULADA COM SUCESSO!")
+                exibir_mensagem("📈 Próximo passo: Executar Tela 15 diretamente")
             
             # TELA 15
             exibir_mensagem("\n" + "="*50)
-            progress_tracker.update_progress(15)  # "Aguardando cálculo completo"
             if navegar_tela_15_playwright(page, parametros['autenticacao']['email_login'], parametros['autenticacao']['senha_login'], parametros_tempo):
                 telas_executadas += 1
                 resultado_telas["tela_15"] = True
@@ -3215,9 +3258,6 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             exibir_mensagem(f"✅ Total de telas executadas: {telas_executadas}/14 (Tela 14 é condicional)")
             exibir_mensagem("✅ Todas as telas funcionaram corretamente")
             exibir_mensagem("✅ Navegação sequencial realizada com sucesso")
-            
-            # Atualizar progresso final
-            progress_tracker.update_progress(15, "RPA concluído com sucesso", {"telas_executadas": telas_executadas, "status": "concluido"})
             
             # Capturar dados finais
             dados_planos = capturar_dados_planos_seguro(page, parametros_tempo)
