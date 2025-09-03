@@ -442,7 +442,7 @@ def navegar_tela_5_playwright(page: Page) -> bool:
         # precisa calcular estimativas em tempo real
         page.wait_for_selector("div.bg-primary", timeout=10000)
         
-        max_tentativas = 30
+        max_tentativas = 60  # Aumentado de 30 para 60
         tentativa = 0
         
         while tentativa < max_tentativas:
@@ -452,7 +452,14 @@ def navegar_tela_5_playwright(page: Page) -> bool:
             elemento_estimativa = page.locator("div.bg-primary")
             if elemento_estimativa.count() > 0:
                 exibir_mensagem(f"✅ Elemento de estimativa encontrado: {elemento_estimativa.count()} cards")
-                break
+                
+                # Verificar se os cards ainda estão carregando (skeleton)
+                card_text = elemento_estimativa.first.text_content().strip() if elemento_estimativa.first.text_content() else ""
+                if "skeleton" not in card_text.lower() and len(card_text) > 10:
+                    exibir_mensagem("✅ Cards carregados completamente!")
+                    break
+                else:
+                    exibir_mensagem("⏳ Cards ainda carregando (skeleton detectado)...")
             
             # Verificar se há elementos com preços (fallback)
             elementos_preco = page.locator("text=R$")
@@ -468,29 +475,103 @@ def navegar_tela_5_playwright(page: Page) -> bool:
             
             # Aguardar elementos dinâmicos com espera específica
             try:
-                page.wait_for_selector("div.bg-primary", timeout=1000)
+                page.wait_for_selector("div.bg-primary", timeout=2000)  # Aumentado para 2 segundos
                 break
-            except:
+            except Exception:
                 try:
-                    page.wait_for_selector("text=R$", timeout=1000)
+                    page.wait_for_selector("text=R$", timeout=2000)
                     break
-                except:
+                except Exception:
                     try:
-                        page.wait_for_selector("#gtm-telaEstimativaContinuarParaCotacaoFinal", timeout=1000)
+                        page.wait_for_selector("#gtm-telaEstimativaContinuarParaCotacaoFinal", timeout=2000)
                         break
-                    except:
+                    except Exception:
+                        # Aguardar um pouco mais antes da próxima tentativa
+                        time.sleep(2)
                         continue
             
             tentativa += 1
         
         if tentativa >= max_tentativas:
-            exception_handler.capturar_warning("Elementos da estimativa não carregaram", "TELA_5")
-            return False
+            exception_handler.capturar_warning("Elementos da estimativa não carregaram completamente", "TELA_5")
+            # Não retornar False aqui, continuar mesmo sem dados completos
         
         exibir_mensagem("✅ Estimativa carregada com sucesso")
         
+        # Aguardar um pouco mais para garantir que os dados estão carregados
+        exibir_mensagem("⏳ Aguardando estabilização dos dados...")
+        time.sleep(5)
+        
         # CAPTURAR DADOS DO CARROSSEL DE ESTIMATIVAS
         dados_carrossel = capturar_dados_carrossel_estimativas_playwright(page)
+        
+        # ========================================
+        # JSON COMPREENSIVO - TELA 5
+        # ========================================
+        if dados_carrossel and dados_carrossel.get('coberturas_detalhadas') and len(dados_carrossel.get('coberturas_detalhadas', [])) > 0:
+            # Criar JSON compreensivo com todas as informações da estimativa inicial
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            
+            # Extrair valores únicos (remover duplicatas)
+            coberturas_unicas = {}
+            for cobertura in dados_carrossel['coberturas_detalhadas']:
+                nome = cobertura.get('nome_cobertura', '')
+                if nome not in coberturas_unicas:
+                    coberturas_unicas[nome] = cobertura
+            
+            # Criar estrutura do JSON compreensivo
+            json_compreensivo = {
+                "metadata": {
+                    "timestamp": datetime.now().isoformat(),
+                    "tela": 5,
+                    "nome_tela": "Estimativa Inicial",
+                    "url": page.url,
+                    "titulo_pagina": page.title(),
+                    "versao_rpa": "2.0.0",
+                    "autor": "Luciano Otero"
+                },
+                "resumo_executivo": {
+                    "total_coberturas": len(coberturas_unicas),
+                    "total_beneficios": len(dados_carrossel.get('beneficios_gerais', [])),
+                    "coberturas_disponiveis": list(coberturas_unicas.keys())
+                },
+                "coberturas_detalhadas": [
+                    {
+                        "nome": nome,
+                        "valores": cobertura.get('valores', {}),
+                        "beneficios": cobertura.get('beneficios', []),
+                        "total_beneficios": len(cobertura.get('beneficios', [])),
+                        "texto_completo": cobertura.get('texto_completo', '')
+                    }
+                    for nome, cobertura in coberturas_unicas.items()
+                ],
+                "beneficios_gerais": dados_carrossel.get('beneficios_gerais', []),
+                "dados_brutos": dados_carrossel
+            }
+            
+            # Salvar JSON compreensivo
+            json_compreensivo_path = f"temp/json_compreensivo_tela_5_{timestamp}.json"
+            with open(json_compreensivo_path, 'w', encoding='utf-8') as f:
+                json.dump(json_compreensivo, f, indent=2, ensure_ascii=False)
+            
+            # Exibir resumo do JSON compreensivo
+            print("\n" + "="*80)
+            print("🎯 JSON COMPREENSIVO - TELA 5 CRIADO COM SUCESSO!")
+            print("="*80)
+            print(f"📁 Arquivo: {json_compreensivo_path}")
+            print(f"📊 Total de Coberturas Únicas: {len(coberturas_unicas)}")
+            print(f"🎁 Total de Benefícios: {len(dados_carrossel.get('beneficios_gerais', []))}")
+            
+            # Exibir coberturas encontradas
+            for nome, cobertura in coberturas_unicas.items():
+                valores = cobertura.get('valores', {})
+                de = valores.get('de', 'N/A')
+                ate = valores.get('ate', 'N/A')
+                print(f"💰 {nome}: {de} até {ate}")
+            
+            print("="*80)
+            
+            exibir_mensagem(f"💾 **JSON COMPREENSIVO SALVO**: {json_compreensivo_path}")
         
         # RETORNO INTERMEDIÁRIO DOS DADOS DO CARROSSEL
         if dados_carrossel:
@@ -577,7 +658,7 @@ def navegar_tela_5_playwright(page: Page) -> bool:
         return True
         
     except Exception as e:
-        exception_handler.capturar_excecao(e, "TELA_5", "Erro ao carregar estimativa")
+        exception_handler.capturar_excecao(e, "TELA_5", "Erro ao processar Tela 5")
         return False
 
 def navegar_tela_6_playwright(page: Page, combustivel: str, kit_gas: bool, blindado: bool, financiado: bool) -> bool:
@@ -1997,58 +2078,20 @@ def capturar_dados_carrossel_estimativas_playwright(page: Page) -> Dict[str, Any
             "elementos_detectados": []                # Elementos especiais detectados
         }
         
-        # DEBUG: Verificar quais elementos estão na página
-        exibir_mensagem("🔍 DEBUG: Verificando elementos na página...")
+        # Captura os cards de cobertura usando o seletor específico identificado
+        cards_cobertura = page.locator("div.bg-primary")
         
-        # Testar diferentes seletores
-        cards_bg_primary = page.locator("div.bg-primary")
-        exibir_mensagem(f"🔍 DEBUG: div.bg-primary encontrados: {cards_bg_primary.count()}")
-        
-        cards_div_filter = page.locator("div").filter(has_text="Cobertura")
-        exibir_mensagem(f"🔍 DEBUG: div com 'Cobertura' encontrados: {cards_div_filter.count()}")
-        
-        cards_button = page.locator("button")
-        exibir_mensagem(f"🔍 DEBUG: buttons encontrados: {cards_button.count()}")
-        
-        cards_text_white = page.locator("p.text-white")
-        exibir_mensagem(f"🔍 DEBUG: p.text-white encontrados: {cards_text_white.count()}")
-        
-        # Se encontrou elementos com bg-primary, usar essa estratégia (como no arquivo de teste que funciona)
-        if cards_bg_primary.count() > 0:
-            exibir_mensagem(f"🔍 Encontrados {cards_bg_primary.count()} cards de cobertura (bg-primary)")
+        if cards_cobertura.count() > 0:
+            exibir_mensagem(f"🔍 Encontrados {cards_cobertura.count()} cards de cobertura (bg-primary)")
             
-            for i in range(cards_bg_primary.count()):
+            for i in range(cards_cobertura.count()):
                 try:
-                    card = cards_bg_primary.nth(i)
+                    card = cards_cobertura.nth(i)
                     
                     # Captura o texto completo do card
                     card_text = card.text_content().strip() if card.text_content() else ""
                     
-                    # DEBUG: Mostrar o texto do card
-                    exibir_mensagem(f"🔍 DEBUG: Card {i+1} texto: '{card_text[:100]}...' (tamanho: {len(card_text)})")
-                    
-                    # DEBUG: Verificar estrutura do elemento
-                    try:
-                        card_html = card.inner_html()
-                        exibir_mensagem(f"🔍 DEBUG: Card {i+1} HTML: '{card_html[:200]}...'")
-                    except Exception as e:
-                        exibir_mensagem(f"⚠️ DEBUG: Erro ao obter HTML do card {i+1}: {str(e)}")
-                    
-                    # DEBUG: Verificar se há elementos filhos
-                    try:
-                        filhos = card.locator("*")
-                        exibir_mensagem(f"🔍 DEBUG: Card {i+1} tem {filhos.count()} elementos filhos")
-                        
-                        for j in range(min(filhos.count(), 5)):  # Mostrar apenas os primeiros 5
-                            filho = filhos.nth(j)
-                            filho_text = filho.text_content().strip() if filho.text_content() else ""
-                            filho_tag = filho.evaluate("el => el.tagName.toLowerCase()")
-                            exibir_mensagem(f"🔍 DEBUG: Card {i+1} filho {j+1} ({filho_tag}): '{filho_text[:50]}...'")
-                    except Exception as e:
-                        exibir_mensagem(f"⚠️ DEBUG: Erro ao verificar filhos do card {i+1}: {str(e)}")
-                    
                     if not card_text or len(card_text) < 10:
-                        exibir_mensagem(f"⚠️ DEBUG: Card {i+1} ignorado - texto muito curto ou vazio")
                         continue
                     
                     cobertura_info = {
@@ -2069,13 +2112,11 @@ def capturar_dados_carrossel_estimativas_playwright(page: Page) -> Dict[str, Any
                         if nome_elemento.count() > 0:
                             nome_cobertura = nome_elemento.first.text_content().strip()
                             cobertura_info["nome_cobertura"] = nome_cobertura
-                            exibir_mensagem(f"🔍 DEBUG: Nome encontrado via button p.text-white: '{nome_cobertura}'")
-                    except Exception as e:
-                        exibir_mensagem(f"⚠️ DEBUG: Erro ao buscar nome via button p.text-white: {str(e)}")
+                    except:
+                        pass
                     
                     # Se não encontrou pelo seletor específico, tentar por regex
                     if not nome_cobertura:
-                        exibir_mensagem(f"🔍 DEBUG: Tentando extrair nome via regex...")
                         cobertura_patterns = [
                             r"Cobertura\s+([A-Za-zÀ-ÿ\s]+?)(?:\s|$)",
                             r"([A-Za-zÀ-ÿ\s]+?)\s+Cobertura",
@@ -2088,15 +2129,7 @@ def capturar_dados_carrossel_estimativas_playwright(page: Page) -> Dict[str, Any
                             match = re.search(pattern, card_text, re.IGNORECASE)
                             if match:
                                 cobertura_info["nome_cobertura"] = match.group(1).strip()
-                                exibir_mensagem(f"🔍 DEBUG: Nome encontrado via regex: '{cobertura_info['nome_cobertura']}'")
                                 break
-                    
-                    # Se ainda não encontrou nome, usar texto do card como fallback
-                    if not cobertura_info["nome_cobertura"]:
-                        # Pegar as primeiras palavras do card como nome
-                        palavras = card_text.split()[:3]  # Primeiras 3 palavras
-                        cobertura_info["nome_cobertura"] = " ".join(palavras)
-                        exibir_mensagem(f"🔍 DEBUG: Usando fallback para nome: '{cobertura_info['nome_cobertura']}'")
                     
                     # Buscar valores usando o seletor específico identificado
                     try:
@@ -2104,7 +2137,6 @@ def capturar_dados_carrossel_estimativas_playwright(page: Page) -> Dict[str, Any
                         elementos_preco = page.locator("p.text-primary.underline")
                         if elementos_preco.count() > i:
                             preco_text = elementos_preco.nth(i).text_content().strip()
-                            exibir_mensagem(f"🔍 DEBUG: Preço encontrado via p.text-primary.underline: '{preco_text}'")
                             
                             # Extrair valores "de" e "até" usando regex
                             valor_patterns = [
@@ -2118,14 +2150,12 @@ def capturar_dados_carrossel_estimativas_playwright(page: Page) -> Dict[str, Any
                                 if match:
                                     cobertura_info["valores"]["de"] = f"R$ {match.group(1)}"
                                     cobertura_info["valores"]["ate"] = f"R$ {match.group(2)}"
-                                    exibir_mensagem(f"🔍 DEBUG: Valores extraídos: De {cobertura_info['valores']['de']} até {cobertura_info['valores']['ate']}")
                                     break
-                    except Exception as e:
-                        exibir_mensagem(f"⚠️ DEBUG: Erro ao buscar preços via p.text-primary.underline: {str(e)}")
+                    except:
+                        pass
                     
                     # Se não encontrou valores específicos, tentar no texto do card
                     if not cobertura_info["valores"]["de"]:
-                        exibir_mensagem(f"🔍 DEBUG: Tentando extrair valores do texto do card...")
                         valor_patterns = [
                             r"De\s*R\$\s*([0-9.,]+)\s*até\s*R\$\s*([0-9.,]+)",
                             r"R\$\s*([0-9.,]+)\s*até\s*R\$\s*([0-9.,]+)",
@@ -2137,106 +2167,56 @@ def capturar_dados_carrossel_estimativas_playwright(page: Page) -> Dict[str, Any
                             if match:
                                 cobertura_info["valores"]["de"] = f"R$ {match.group(1)}"
                                 cobertura_info["valores"]["ate"] = f"R$ {match.group(2)}"
-                                exibir_mensagem(f"🔍 DEBUG: Valores extraídos do texto do card: De {cobertura_info['valores']['de']} até {cobertura_info['valores']['ate']}")
                                 break
                     
-                    # Extrair benefícios conhecidos do texto do card
-                    beneficios_conhecidos = [
-                        "Colisão e Acidentes", "Roubo e Furto", "Incêndio", "Danos a terceiros",
-                        "Assistência 24h", "Carro Reserva", "Vidros", "Roubo", "Furto",
-                        "Danos parciais em tentativas de roubo", "Danos materiais a terceiros",
-                        "Danos corporais a terceiro", "Assistência", "Carro reserva",
-                        "Vidros", "Acidentes", "Colisão", "Terceiros", "Materiais", "Corporais"
-                    ]
-                    
-                    for beneficio in beneficios_conhecidos:
-                        if beneficio.lower() in card_text.lower():
-                            cobertura_info["beneficios"].append({
-                                "nome": beneficio,
-                                "status": "incluido"
-                            })
-                    
-                    dados_carrossel["coberturas_detalhadas"].append(cobertura_info)
-                    exibir_mensagem(f"📋 Card {len(dados_carrossel['coberturas_detalhadas'])}: {cobertura_info['nome_cobertura']} - De {cobertura_info['valores']['de']} até {cobertura_info['valores']['ate']}")
-                    
-                except Exception as e:
-                    exibir_mensagem(f"⚠️ Erro ao processar card {i+1}: {str(e)}")
-                    continue
-        else:
-            # Fallback para a estratégia anterior (que não estava funcionando)
-            exibir_mensagem("⚠️ DEBUG: Nenhum card com bg-primary encontrado, tentando estratégia alternativa...")
-            
-            coberturas_esperadas = [
-                "Cobertura Compreensiva",
-                "Cobertura Roubo e Furto", 
-                "Cobertura RCF"
-            ]
-            
-            coberturas_encontradas = []
-            
-            for cobertura_nome in coberturas_esperadas:
-                try:
-                    # Usar o seletor correto baseado no Codegen: page.locator("div").filter(has_text=re.compile(f"^{cobertura_nome}$"))
-                    card_elemento = page.locator("div").filter(has_text=re.compile(f"^{cobertura_nome}$"))
-                    
-                    if card_elemento.count() > 0:
-                        card = card_elemento.first
-                        card_text = card.text_content().strip() if card.text_content() else ""
-                        
-                        if card_text:
-                            cobertura_info = {
-                                "indice": len(coberturas_encontradas) + 1,
-                                "nome_cobertura": cobertura_nome,
-                                "valores": {
-                                    "de": "",
-                                    "ate": ""
-                                },
-                                "beneficios": [],
-                                "texto_completo": card_text
-                            }
+                    # Extrair benefícios usando o seletor específico identificado
+                    try:
+                        # Procurar por elementos de benefícios próximos ao card
+                        elementos_beneficios = page.locator("div.gap-3.flex.flex-col.pl-4.mt-3")
+                        if elementos_beneficios.count() > i:
+                            container_beneficios = elementos_beneficios.nth(i)
+                            beneficios_texto = container_beneficios.locator("p.text-sm.text-gray-100.font-normal")
                             
-                            # Extrair valores "De R$ X até R$ Y" usando regex
-                            valor_patterns = [
-                                r"De\s*R\$\s*([0-9.,]+)\s*até\s*R\$\s*([0-9.,]+)",
-                                r"R\$\s*([0-9.,]+)\s*até\s*R\$\s*([0-9.,]+)",
-                                r"([0-9.,]+)\s*até\s*([0-9.,]+)"
-                            ]
-                            
-                            for pattern in valor_patterns:
-                                match = re.search(pattern, card_text, re.IGNORECASE)
-                                if match:
-                                    cobertura_info["valores"]["de"] = f"R$ {match.group(1)}"
-                                    cobertura_info["valores"]["ate"] = f"R$ {match.group(2)}"
-                                    break
-                            
-                            # Extrair benefícios conhecidos do texto do card
-                            beneficios_conhecidos = [
-                                "Colisão e Acidentes", "Roubo e Furto", "Incêndio", "Danos a terceiros",
-                                "Assistência 24h", "Carro Reserva", "Vidros", "Roubo", "Furto",
-                                "Danos parciais em tentativas de roubo", "Danos materiais a terceiros",
-                                "Danos corporais a terceiro", "Assistência", "Carro reserva",
-                                "Vidros", "Acidentes", "Colisão", "Terceiros", "Materiais", "Corporais"
-                            ]
-                            
-                            for beneficio in beneficios_conhecidos:
-                                if beneficio.lower() in card_text.lower():
+                            for j in range(beneficios_texto.count()):
+                                beneficio_texto = beneficios_texto.nth(j).text_content().strip()
+                                if beneficio_texto:
                                     cobertura_info["beneficios"].append({
-                                        "nome": beneficio,
+                                        "nome": beneficio_texto,
                                         "status": "incluido"
                                     })
-                            
-                            coberturas_encontradas.append(cobertura_info)
-                            exibir_mensagem(f"📋 Card {len(coberturas_encontradas)}: {cobertura_nome} - De {cobertura_info['valores']['de']} até {cobertura_info['valores']['ate']}")
-                            
+                    except:
+                        pass
+                    
+                    # Fallback: procurar por benefícios conhecidos no texto do card
+                    if not cobertura_info["beneficios"]:
+                        beneficios_conhecidos = [
+                            "Colisão e Acidentes", "Roubo e Furto", "Incêndio", "Danos a terceiros",
+                            "Assistência 24h", "Carro Reserva", "Vidros", "Roubo", "Furto",
+                            "Danos parciais em tentativas de roubo", "Danos materiais a terceiros",
+                            "Danos corporais a terceiro", "Assistência", "Carro reserva",
+                            "Vidros", "Acidentes", "Colisão", "Terceiros", "Materiais", "Corporais"
+                        ]
+                        
+                        for beneficio in beneficios_conhecidos:
+                            if beneficio.lower() in card_text.lower():
+                                cobertura_info["beneficios"].append({
+                                    "nome": beneficio,
+                                    "status": "incluido"
+                                })
+                    
+                    # Se encontrou dados válidos, adicionar à lista
+                    if cobertura_info["nome_cobertura"] or cobertura_info["valores"]["de"]:
+                        dados_carrossel["coberturas_detalhadas"].append(cobertura_info)
+                        
+                        # Conta valores encontrados
+                        if cobertura_info["valores"]["de"]:
+                            dados_carrossel["valores_encontrados"] += 1
+                        
+                        exibir_mensagem(f"📋 Card {i + 1}: {cobertura_info['nome_cobertura']} - De {cobertura_info['valores']['de']} até {cobertura_info['valores']['ate']}")
+                        
                 except Exception as e:
-                    exibir_mensagem(f"⚠️ Erro ao processar {cobertura_nome}: {str(e)}")
+                    exibir_mensagem(f"⚠️ Erro ao processar card {i + 1}: {str(e)}")
                     continue
-            
-            # Usar as coberturas encontradas
-            dados_carrossel["coberturas_detalhadas"] = coberturas_encontradas
-        
-        # Contar valores encontrados
-        dados_carrossel["valores_encontrados"] = len(dados_carrossel["coberturas_detalhadas"])
         
         # Procurar por valores monetários gerais (fallback)
         valores_monetarios = page.locator("text=R$")
