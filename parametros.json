@@ -8,6 +8,8 @@
     "tempo_carregamento": 1,
     "tempo_estabilizacao_tela5": 2,
     "tempo_carregamento_tela5": 5,
+    "tempo_estabilizacao_tela15": 3,
+    "tempo_carregamento_tela15": 5,
     "inserir_log": true,
     "visualizar_mensagens": true,
     "eliminar_tentativas_inuteis": true

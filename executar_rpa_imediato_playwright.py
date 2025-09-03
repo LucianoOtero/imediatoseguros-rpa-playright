@@ -35,6 +35,9 @@ from utils.retorno_estruturado import (
     validar_retorno_estruturado
 )
 
+# Importar Sistema de Progresso em Tempo Real
+from utils.progress_realtime import ProgressTracker
+
 # ========================================
 # SISTEMA DE EXCEPTION HANDLER
 # ========================================
@@ -265,18 +268,24 @@ def obter_parametros_tempo(parametros: Dict[str, Any]) -> Dict[str, int]:
     tempo_carregamento = configuracao.get('tempo_carregamento', 10)
     tempo_estabilizacao_tela5 = configuracao.get('tempo_estabilizacao_tela5', 2)
     tempo_carregamento_tela5 = configuracao.get('tempo_carregamento_tela5', 5)
+    tempo_estabilizacao_tela15 = configuracao.get('tempo_estabilizacao_tela15', 3)
+    tempo_carregamento_tela15 = configuracao.get('tempo_carregamento_tela15', 5)
     
     exibir_mensagem(f"⚙️ Parâmetros de tempo carregados:")
     exibir_mensagem(f"   - Estabilização: {tempo_estabilizacao}s")
     exibir_mensagem(f"   - Carregamento: {tempo_carregamento}s")
     exibir_mensagem(f"   - Estabilização Tela 5: {tempo_estabilizacao_tela5}s")
     exibir_mensagem(f"   - Carregamento Tela 5: {tempo_carregamento_tela5}s")
+    exibir_mensagem(f"   - Estabilização Tela 15: {tempo_estabilizacao_tela15}s")
+    exibir_mensagem(f"   - Carregamento Tela 15: {tempo_carregamento_tela15}s")
     
     return {
         'tempo_estabilizacao': tempo_estabilizacao,
         'tempo_carregamento': tempo_carregamento,
         'tempo_estabilizacao_tela5': tempo_estabilizacao_tela5,
-        'tempo_carregamento_tela5': tempo_carregamento_tela5
+        'tempo_carregamento_tela5': tempo_carregamento_tela5,
+        'tempo_estabilizacao_tela15': tempo_estabilizacao_tela15,
+        'tempo_carregamento_tela15': tempo_carregamento_tela15
     }
 
 def validar_parametros_obrigatorios(parametros: Dict[str, Any]) -> bool:
@@ -1936,7 +1945,7 @@ def navegar_tela_15_playwright(page, email_login, senha_login, parametros_tempo)
                 
                 # Aguardar possível redirecionamento ou modal CPF divergente
                 exibir_mensagem("⏳ Aguardando resposta do login...")
-                time.sleep(parametros_tempo['tempo_carregamento'])  # ESTRATÉGIA SIMPLES: time.sleep ao invés de waits complexos
+                time.sleep(parametros_tempo['tempo_carregamento_tela15'])  # ESTRATÉGIA SIMPLES: time.sleep ao invés de waits complexos
                 
                 # Verificar se apareceu modal CPF divergente
                 try:
@@ -1953,14 +1962,14 @@ def navegar_tela_15_playwright(page, email_login, senha_login, parametros_tempo)
                             if botao_manter_login.is_visible():
                                 botao_manter_login.click()
                                 exibir_mensagem("✅ Botão 'Manter Login atual' clicado pelo ID!")
-                                time.sleep(parametros_tempo['tempo_estabilizacao'])
+                                time.sleep(parametros_tempo['tempo_estabilizacao_tela15'])
                             else:
                                 # Tentar pelo texto
                                 botao_manter_login = page.locator("text=Manter Login atual")
                                 if botao_manter_login.is_visible():
                                     botao_manter_login.click()
                                     exibir_mensagem("✅ Botão 'Manter Login atual' clicado pelo texto!")
-                                    time.sleep(parametros_tempo['tempo_estabilizacao'])
+                                    time.sleep(parametros_tempo['tempo_estabilizacao_tela15'])
                                 else:
                                     exibir_mensagem("⚠️ Botão 'Manter Login atual' não encontrado")
                         except Exception as e:
@@ -1993,7 +2002,7 @@ def navegar_tela_15_playwright(page, email_login, senha_login, parametros_tempo)
         except Exception as e:
             exibir_mensagem(f"⚠️ Botão 'Personalizar Coberturas' não encontrado: {str(e)}")
             exibir_mensagem("ℹ️ Usando fallback com time.sleep...")
-            time.sleep(parametros_tempo['tempo_carregamento'])  # Fallback para time.sleep
+            time.sleep(parametros_tempo['tempo_carregamento_tela15'])  # Fallback para time.sleep
         
         # Capturar dados dos planos
         dados_planos = capturar_dados_planos_seguro(page, parametros_tempo)
@@ -2902,6 +2911,10 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
         exception_handler.limpar_erros()
         exception_handler.definir_tela_atual("INICIALIZACAO")
         
+        # Inicializar Sistema de Progresso em Tempo Real
+        progress_tracker = ProgressTracker(total_etapas=15)
+        progress_tracker.update_progress(0, "Iniciando RPA Playwright")
+        
         exibir_mensagem("🚀 INICIANDO RPA PLAYWRIGHT")
         exibir_mensagem("=" * 50)
         
@@ -2928,6 +2941,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             
             # TELA 1
             exibir_mensagem("\n" + "="*50)
+            progress_tracker.update_progress(1)  # "Selecionando Tipo de Veiculo"
             if navegar_tela_1_playwright(page):
                 telas_executadas += 1
                 resultado_telas["tela_1"] = True
@@ -2945,6 +2959,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             
             # TELA 2
             exibir_mensagem("\n" + "="*50)
+            progress_tracker.update_progress(2)  # "Selecionando veículo com a placa informada"
             if navegar_tela_2_playwright(page, parametros['placa']):
                 telas_executadas += 1
                 resultado_telas["tela_2"] = True
@@ -2962,6 +2977,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             
             # TELA 3
             exibir_mensagem("\n" + "="*50)
+            progress_tracker.update_progress(3)  # "Confirmando seleção do veículo"
             if navegar_tela_3_playwright(page):
                 telas_executadas += 1
                 resultado_telas["tela_3"] = True
@@ -2979,6 +2995,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             
             # TELA 4
             exibir_mensagem("\n" + "="*50)
+            progress_tracker.update_progress(4)  # "Calculando como novo Seguro"
             if navegar_tela_4_playwright(page, parametros['veiculo_segurado']):
                 telas_executadas += 1
                 resultado_telas["tela_4"] = True
@@ -2996,6 +3013,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             
             # TELA 5
             exibir_mensagem("\n" + "="*50)
+            progress_tracker.update_progress(5, details={"acao": "Capturando estimativas", "status": "Carregando carrossel"})  # "Elaborando estimativas"
             if navegar_tela_5_playwright(page, parametros_tempo):
                 telas_executadas += 1
                 resultado_telas["tela_5"] = True
@@ -3013,6 +3031,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             
             # TELA 6
             exibir_mensagem("\n" + "="*50)
+            progress_tracker.update_progress(6)  # "Seleção de detalhes do veículo"
             if navegar_tela_6_playwright(page, parametros['combustivel'], parametros.get('kit_gas', False), parametros.get('blindado', False), parametros.get('financiado', False)):
                 telas_executadas += 1
                 resultado_telas["tela_6"] = True
@@ -3030,6 +3049,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             
             # TELA 7
             exibir_mensagem("\n" + "="*50)
+            progress_tracker.update_progress(7)  # "Definição de local de pernoite com o CEP informado"
             if navegar_tela_7_playwright(page, parametros['cep']):
                 telas_executadas += 1
                 resultado_telas["tela_7"] = True
@@ -3047,6 +3067,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             
             # TELA 8
             exibir_mensagem("\n" + "="*50)
+            progress_tracker.update_progress(8)  # "Definição do uso do veículo"
             if navegar_tela_8_playwright(page, parametros['uso_veiculo']):
                 telas_executadas += 1
                 resultado_telas["tela_8"] = True
@@ -3064,6 +3085,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             
             # TELA 9
             exibir_mensagem("\n" + "="*50)
+            progress_tracker.update_progress(9)  # "Preenchimento dos dados pessoais"
             if navegar_tela_9_playwright(page, parametros['nome'], parametros['cpf'], parametros['data_nascimento'], parametros['sexo'], parametros['estado_civil'], parametros['email'], parametros['celular']):
                 telas_executadas += 1
                 resultado_telas["tela_9"] = True
@@ -3081,6 +3103,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             
             # TELA 10
             exibir_mensagem("\n" + "="*50)
+            progress_tracker.update_progress(10)  # "Definição do Condutor Principal"
             if navegar_tela_10_playwright(page, parametros['condutor_principal'], parametros['nome_condutor'], parametros['cpf_condutor'], parametros['data_nascimento_condutor'], parametros['sexo_condutor'], parametros['estado_civil_condutor']):
                 telas_executadas += 1
                 resultado_telas["tela_10"] = True
@@ -3098,6 +3121,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             
             # TELA 11
             exibir_mensagem("\n" + "="*50)
+            progress_tracker.update_progress(11)  # "Definição do uso do veículo"
             if navegar_tela_11_playwright(page, parametros['local_de_trabalho'], parametros['estacionamento_proprio_local_de_trabalho'], parametros['local_de_estudo'], parametros['estacionamento_proprio_local_de_estudo']):
                 telas_executadas += 1
                 resultado_telas["tela_11"] = True
@@ -3115,6 +3139,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             
             # TELA 12
             exibir_mensagem("\n" + "="*50)
+            progress_tracker.update_progress(12)  # "Definição do tipo de garagem"
             if navegar_tela_12_playwright(page, parametros['garagem_residencia'], parametros['portao_eletronico']):
                 telas_executadas += 1
                 resultado_telas["tela_12"] = True
@@ -3132,6 +3157,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             
             # TELA 13
             exibir_mensagem("\n" + "="*50)
+            progress_tracker.update_progress(13)  # "Definição de residentes"
             if navegar_tela_13_playwright(page, parametros['reside_18_26'], parametros['sexo_do_menor'], parametros['faixa_etaria_menor_mais_novo']):
                 telas_executadas += 1
                 resultado_telas["tela_13"] = True
@@ -3149,6 +3175,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             
             # TELA 14 (CONDICIONAL)
             exibir_mensagem("\n" + "="*50)
+            progress_tracker.update_progress(14)  # "Definição do Corretor"
             if navegar_tela_14_playwright(page, parametros['continuar_com_corretor_anterior']):
                 # Não incrementa telas_executadas pois é condicional
                 resultado_telas["tela_14"] = True
@@ -3166,6 +3193,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             
             # TELA 15
             exibir_mensagem("\n" + "="*50)
+            progress_tracker.update_progress(15)  # "Aguardando cálculo completo"
             if navegar_tela_15_playwright(page, parametros['autenticacao']['email_login'], parametros['autenticacao']['senha_login'], parametros_tempo):
                 telas_executadas += 1
                 resultado_telas["tela_15"] = True
@@ -3187,6 +3215,9 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             exibir_mensagem(f"✅ Total de telas executadas: {telas_executadas}/14 (Tela 14 é condicional)")
             exibir_mensagem("✅ Todas as telas funcionaram corretamente")
             exibir_mensagem("✅ Navegação sequencial realizada com sucesso")
+            
+            # Atualizar progresso final
+            progress_tracker.update_progress(15, "RPA concluído com sucesso", {"telas_executadas": telas_executadas, "status": "concluido"})
             
             # Capturar dados finais
             dados_planos = capturar_dados_planos_seguro(page, parametros_tempo)
