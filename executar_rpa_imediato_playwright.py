@@ -1997,37 +1997,135 @@ def capturar_dados_carrossel_estimativas_playwright(page: Page) -> Dict[str, Any
             "elementos_detectados": []                # Elementos especiais detectados
         }
         
-        # Captura os cards de cobertura usando seletores corretos baseados no Playwright Codegen
-        coberturas_esperadas = [
-            "Cobertura Compreensiva",
-            "Cobertura Roubo e Furto", 
-            "Cobertura RCF"
-        ]
+        # DEBUG: Verificar quais elementos estão na página
+        exibir_mensagem("🔍 DEBUG: Verificando elementos na página...")
         
-        coberturas_encontradas = []
+        # Testar diferentes seletores
+        cards_bg_primary = page.locator("div.bg-primary")
+        exibir_mensagem(f"🔍 DEBUG: div.bg-primary encontrados: {cards_bg_primary.count()}")
         
-        for cobertura_nome in coberturas_esperadas:
-            try:
-                # Usar o seletor correto baseado no Codegen: page.locator("div").filter(has_text=re.compile(f"^{cobertura_nome}$"))
-                card_elemento = page.locator("div").filter(has_text=re.compile(f"^{cobertura_nome}$"))
-                
-                if card_elemento.count() > 0:
-                    card = card_elemento.first
+        cards_div_filter = page.locator("div").filter(has_text="Cobertura")
+        exibir_mensagem(f"🔍 DEBUG: div com 'Cobertura' encontrados: {cards_div_filter.count()}")
+        
+        cards_button = page.locator("button")
+        exibir_mensagem(f"🔍 DEBUG: buttons encontrados: {cards_button.count()}")
+        
+        cards_text_white = page.locator("p.text-white")
+        exibir_mensagem(f"🔍 DEBUG: p.text-white encontrados: {cards_text_white.count()}")
+        
+        # Se encontrou elementos com bg-primary, usar essa estratégia (como no arquivo de teste que funciona)
+        if cards_bg_primary.count() > 0:
+            exibir_mensagem(f"🔍 Encontrados {cards_bg_primary.count()} cards de cobertura (bg-primary)")
+            
+            for i in range(cards_bg_primary.count()):
+                try:
+                    card = cards_bg_primary.nth(i)
+                    
+                    # Captura o texto completo do card
                     card_text = card.text_content().strip() if card.text_content() else ""
                     
-                    if card_text:
-                        cobertura_info = {
-                            "indice": len(coberturas_encontradas) + 1,
-                            "nome_cobertura": cobertura_nome,
-                            "valores": {
-                                "de": "",
-                                "ate": ""
-                            },
-                            "beneficios": [],
-                            "texto_completo": card_text
-                        }
+                    # DEBUG: Mostrar o texto do card
+                    exibir_mensagem(f"🔍 DEBUG: Card {i+1} texto: '{card_text[:100]}...' (tamanho: {len(card_text)})")
+                    
+                    # DEBUG: Verificar estrutura do elemento
+                    try:
+                        card_html = card.inner_html()
+                        exibir_mensagem(f"🔍 DEBUG: Card {i+1} HTML: '{card_html[:200]}...'")
+                    except Exception as e:
+                        exibir_mensagem(f"⚠️ DEBUG: Erro ao obter HTML do card {i+1}: {str(e)}")
+                    
+                    # DEBUG: Verificar se há elementos filhos
+                    try:
+                        filhos = card.locator("*")
+                        exibir_mensagem(f"🔍 DEBUG: Card {i+1} tem {filhos.count()} elementos filhos")
                         
-                        # Extrair valores "De R$ X até R$ Y" usando regex
+                        for j in range(min(filhos.count(), 5)):  # Mostrar apenas os primeiros 5
+                            filho = filhos.nth(j)
+                            filho_text = filho.text_content().strip() if filho.text_content() else ""
+                            filho_tag = filho.evaluate("el => el.tagName.toLowerCase()")
+                            exibir_mensagem(f"🔍 DEBUG: Card {i+1} filho {j+1} ({filho_tag}): '{filho_text[:50]}...'")
+                    except Exception as e:
+                        exibir_mensagem(f"⚠️ DEBUG: Erro ao verificar filhos do card {i+1}: {str(e)}")
+                    
+                    if not card_text or len(card_text) < 10:
+                        exibir_mensagem(f"⚠️ DEBUG: Card {i+1} ignorado - texto muito curto ou vazio")
+                        continue
+                    
+                    cobertura_info = {
+                        "indice": i + 1,
+                        "nome_cobertura": "",
+                        "valores": {
+                            "de": "",
+                            "ate": ""
+                        },
+                        "beneficios": [],
+                        "texto_completo": card_text
+                    }
+                    
+                    # Extrair nome da cobertura (texto dentro do button)
+                    nome_cobertura = ""
+                    try:
+                        nome_elemento = card.locator("button p.text-white")
+                        if nome_elemento.count() > 0:
+                            nome_cobertura = nome_elemento.first.text_content().strip()
+                            cobertura_info["nome_cobertura"] = nome_cobertura
+                            exibir_mensagem(f"🔍 DEBUG: Nome encontrado via button p.text-white: '{nome_cobertura}'")
+                    except Exception as e:
+                        exibir_mensagem(f"⚠️ DEBUG: Erro ao buscar nome via button p.text-white: {str(e)}")
+                    
+                    # Se não encontrou pelo seletor específico, tentar por regex
+                    if not nome_cobertura:
+                        exibir_mensagem(f"🔍 DEBUG: Tentando extrair nome via regex...")
+                        cobertura_patterns = [
+                            r"Cobertura\s+([A-Za-zÀ-ÿ\s]+?)(?:\s|$)",
+                            r"([A-Za-zÀ-ÿ\s]+?)\s+Cobertura",
+                            r"([A-Za-zÀ-ÿ\s]+?)\s+Compreensiva",
+                            r"([A-Za-zÀ-ÿ\s]+?)\s+Roubo",
+                            r"([A-Za-zÀ-ÿ\s]+?)\s+RCF"
+                        ]
+                        
+                        for pattern in cobertura_patterns:
+                            match = re.search(pattern, card_text, re.IGNORECASE)
+                            if match:
+                                cobertura_info["nome_cobertura"] = match.group(1).strip()
+                                exibir_mensagem(f"🔍 DEBUG: Nome encontrado via regex: '{cobertura_info['nome_cobertura']}'")
+                                break
+                    
+                    # Se ainda não encontrou nome, usar texto do card como fallback
+                    if not cobertura_info["nome_cobertura"]:
+                        # Pegar as primeiras palavras do card como nome
+                        palavras = card_text.split()[:3]  # Primeiras 3 palavras
+                        cobertura_info["nome_cobertura"] = " ".join(palavras)
+                        exibir_mensagem(f"🔍 DEBUG: Usando fallback para nome: '{cobertura_info['nome_cobertura']}'")
+                    
+                    # Buscar valores usando o seletor específico identificado
+                    try:
+                        # Procurar por elementos com valores usando o seletor correto
+                        elementos_preco = page.locator("p.text-primary.underline")
+                        if elementos_preco.count() > i:
+                            preco_text = elementos_preco.nth(i).text_content().strip()
+                            exibir_mensagem(f"🔍 DEBUG: Preço encontrado via p.text-primary.underline: '{preco_text}'")
+                            
+                            # Extrair valores "de" e "até" usando regex
+                            valor_patterns = [
+                                r"De\s*R\$\s*([0-9.,]+)\s*até\s*R\$\s*([0-9.,]+)",
+                                r"R\$\s*([0-9.,]+)\s*até\s*R\$\s*([0-9.,]+)",
+                                r"([0-9.,]+)\s*até\s*([0-9.,]+)"
+                            ]
+                            
+                            for pattern in valor_patterns:
+                                match = re.search(pattern, preco_text, re.IGNORECASE)
+                                if match:
+                                    cobertura_info["valores"]["de"] = f"R$ {match.group(1)}"
+                                    cobertura_info["valores"]["ate"] = f"R$ {match.group(2)}"
+                                    exibir_mensagem(f"🔍 DEBUG: Valores extraídos: De {cobertura_info['valores']['de']} até {cobertura_info['valores']['ate']}")
+                                    break
+                    except Exception as e:
+                        exibir_mensagem(f"⚠️ DEBUG: Erro ao buscar preços via p.text-primary.underline: {str(e)}")
+                    
+                    # Se não encontrou valores específicos, tentar no texto do card
+                    if not cobertura_info["valores"]["de"]:
+                        exibir_mensagem(f"🔍 DEBUG: Tentando extrair valores do texto do card...")
                         valor_patterns = [
                             r"De\s*R\$\s*([0-9.,]+)\s*até\s*R\$\s*([0-9.,]+)",
                             r"R\$\s*([0-9.,]+)\s*até\s*R\$\s*([0-9.,]+)",
@@ -2039,36 +2137,106 @@ def capturar_dados_carrossel_estimativas_playwright(page: Page) -> Dict[str, Any
                             if match:
                                 cobertura_info["valores"]["de"] = f"R$ {match.group(1)}"
                                 cobertura_info["valores"]["ate"] = f"R$ {match.group(2)}"
+                                exibir_mensagem(f"🔍 DEBUG: Valores extraídos do texto do card: De {cobertura_info['valores']['de']} até {cobertura_info['valores']['ate']}")
                                 break
+                    
+                    # Extrair benefícios conhecidos do texto do card
+                    beneficios_conhecidos = [
+                        "Colisão e Acidentes", "Roubo e Furto", "Incêndio", "Danos a terceiros",
+                        "Assistência 24h", "Carro Reserva", "Vidros", "Roubo", "Furto",
+                        "Danos parciais em tentativas de roubo", "Danos materiais a terceiros",
+                        "Danos corporais a terceiro", "Assistência", "Carro reserva",
+                        "Vidros", "Acidentes", "Colisão", "Terceiros", "Materiais", "Corporais"
+                    ]
+                    
+                    for beneficio in beneficios_conhecidos:
+                        if beneficio.lower() in card_text.lower():
+                            cobertura_info["beneficios"].append({
+                                "nome": beneficio,
+                                "status": "incluido"
+                            })
+                    
+                    dados_carrossel["coberturas_detalhadas"].append(cobertura_info)
+                    exibir_mensagem(f"📋 Card {len(dados_carrossel['coberturas_detalhadas'])}: {cobertura_info['nome_cobertura']} - De {cobertura_info['valores']['de']} até {cobertura_info['valores']['ate']}")
+                    
+                except Exception as e:
+                    exibir_mensagem(f"⚠️ Erro ao processar card {i+1}: {str(e)}")
+                    continue
+        else:
+            # Fallback para a estratégia anterior (que não estava funcionando)
+            exibir_mensagem("⚠️ DEBUG: Nenhum card com bg-primary encontrado, tentando estratégia alternativa...")
+            
+            coberturas_esperadas = [
+                "Cobertura Compreensiva",
+                "Cobertura Roubo e Furto", 
+                "Cobertura RCF"
+            ]
+            
+            coberturas_encontradas = []
+            
+            for cobertura_nome in coberturas_esperadas:
+                try:
+                    # Usar o seletor correto baseado no Codegen: page.locator("div").filter(has_text=re.compile(f"^{cobertura_nome}$"))
+                    card_elemento = page.locator("div").filter(has_text=re.compile(f"^{cobertura_nome}$"))
+                    
+                    if card_elemento.count() > 0:
+                        card = card_elemento.first
+                        card_text = card.text_content().strip() if card.text_content() else ""
                         
-                        # Extrair benefícios conhecidos do texto do card
-                        beneficios_conhecidos = [
-                            "Colisão e Acidentes", "Roubo e Furto", "Incêndio", "Danos a terceiros",
-                            "Assistência 24h", "Carro Reserva", "Vidros", "Roubo", "Furto",
-                            "Danos parciais em tentativas de roubo", "Danos materiais a terceiros",
-                            "Danos corporais a terceiro", "Assistência", "Carro reserva",
-                            "Vidros", "Acidentes", "Colisão", "Terceiros", "Materiais", "Corporais"
-                        ]
-                        
-                        for beneficio in beneficios_conhecidos:
-                            if beneficio.lower() in card_text.lower():
-                                cobertura_info["beneficios"].append({
-                                    "nome": beneficio,
-                                    "status": "incluido"
-                                })
-                        
-                        coberturas_encontradas.append(cobertura_info)
-                        exibir_mensagem(f"📋 Card {len(coberturas_encontradas)}: {cobertura_nome} - De {cobertura_info['valores']['de']} até {cobertura_info['valores']['ate']}")
-                        
-            except Exception as e:
-                exibir_mensagem(f"⚠️ Erro ao processar {cobertura_nome}: {str(e)}")
-                continue
-        
-        # Usar as coberturas encontradas
-        dados_carrossel["coberturas_detalhadas"] = coberturas_encontradas
+                        if card_text:
+                            cobertura_info = {
+                                "indice": len(coberturas_encontradas) + 1,
+                                "nome_cobertura": cobertura_nome,
+                                "valores": {
+                                    "de": "",
+                                    "ate": ""
+                                },
+                                "beneficios": [],
+                                "texto_completo": card_text
+                            }
+                            
+                            # Extrair valores "De R$ X até R$ Y" usando regex
+                            valor_patterns = [
+                                r"De\s*R\$\s*([0-9.,]+)\s*até\s*R\$\s*([0-9.,]+)",
+                                r"R\$\s*([0-9.,]+)\s*até\s*R\$\s*([0-9.,]+)",
+                                r"([0-9.,]+)\s*até\s*([0-9.,]+)"
+                            ]
+                            
+                            for pattern in valor_patterns:
+                                match = re.search(pattern, card_text, re.IGNORECASE)
+                                if match:
+                                    cobertura_info["valores"]["de"] = f"R$ {match.group(1)}"
+                                    cobertura_info["valores"]["ate"] = f"R$ {match.group(2)}"
+                                    break
+                            
+                            # Extrair benefícios conhecidos do texto do card
+                            beneficios_conhecidos = [
+                                "Colisão e Acidentes", "Roubo e Furto", "Incêndio", "Danos a terceiros",
+                                "Assistência 24h", "Carro Reserva", "Vidros", "Roubo", "Furto",
+                                "Danos parciais em tentativas de roubo", "Danos materiais a terceiros",
+                                "Danos corporais a terceiro", "Assistência", "Carro reserva",
+                                "Vidros", "Acidentes", "Colisão", "Terceiros", "Materiais", "Corporais"
+                            ]
+                            
+                            for beneficio in beneficios_conhecidos:
+                                if beneficio.lower() in card_text.lower():
+                                    cobertura_info["beneficios"].append({
+                                        "nome": beneficio,
+                                        "status": "incluido"
+                                    })
+                            
+                            coberturas_encontradas.append(cobertura_info)
+                            exibir_mensagem(f"📋 Card {len(coberturas_encontradas)}: {cobertura_nome} - De {cobertura_info['valores']['de']} até {cobertura_info['valores']['ate']}")
+                            
+                except Exception as e:
+                    exibir_mensagem(f"⚠️ Erro ao processar {cobertura_nome}: {str(e)}")
+                    continue
+            
+            # Usar as coberturas encontradas
+            dados_carrossel["coberturas_detalhadas"] = coberturas_encontradas
         
         # Contar valores encontrados
-        dados_carrossel["valores_encontrados"] = len(coberturas_encontradas)
+        dados_carrossel["valores_encontrados"] = len(dados_carrossel["coberturas_detalhadas"])
         
         # Procurar por valores monetários gerais (fallback)
         valores_monetarios = page.locator("text=R$")
