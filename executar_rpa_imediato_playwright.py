@@ -216,7 +216,7 @@ def exibir_mensagem(mensagem: str):
     timestamp = time.strftime('%H:%M:%S')
     print(f"[{timestamp}] {mensagem}")
 
-def carregar_parametros(arquivo_config: str = "config/parametros.json") -> Dict[str, Any]:
+def carregar_parametros(arquivo_config: str = "parametros.json") -> Dict[str, Any]:
     """
     Carrega parâmetros do arquivo JSON
     
@@ -248,6 +248,30 @@ def carregar_parametros(arquivo_config: str = "config/parametros.json") -> Dict[
     except Exception as e:
         erro = exception_handler.capturar_excecao(e, "CARREGAMENTO_PARAMETROS", "Erro genérico")
         raise RPAException("Erro ao carregar parâmetros", "CARREGAMENTO_PARAMETROS", e)
+
+def obter_parametros_tempo(parametros: Dict[str, Any]) -> Dict[str, int]:
+    """
+    Extrai parâmetros de tempo do arquivo de configuração
+    
+    PARÂMETROS:
+        parametros: dict - Parâmetros carregados
+        
+    RETORNO:
+        dict: Dicionário com parâmetros de tempo
+    """
+    configuracao = parametros.get('configuracao', {})
+    
+    tempo_estabilizacao = configuracao.get('tempo_estabilizacao', 1)
+    tempo_carregamento = configuracao.get('tempo_carregamento', 10)
+    
+    exibir_mensagem(f"⚙️ Parâmetros de tempo carregados:")
+    exibir_mensagem(f"   - Estabilização: {tempo_estabilizacao}s")
+    exibir_mensagem(f"   - Carregamento: {tempo_carregamento}s")
+    
+    return {
+        'tempo_estabilizacao': tempo_estabilizacao,
+        'tempo_carregamento': tempo_carregamento
+    }
 
 def validar_parametros_obrigatorios(parametros: Dict[str, Any]) -> bool:
     """
@@ -487,7 +511,7 @@ def navegar_tela_5_playwright(page: Page) -> bool:
                         break
                     except Exception:
                         # Aguardar um pouco mais antes da próxima tentativa
-                        time.sleep(2)
+                        time.sleep(parametros_tempo['tempo_estabilizacao'])
                         continue
             
             tentativa += 1
@@ -500,7 +524,7 @@ def navegar_tela_5_playwright(page: Page) -> bool:
         
         # Aguardar um pouco mais para garantir que os dados estão carregados
         exibir_mensagem("⏳ Aguardando estabilização dos dados...")
-        time.sleep(5)
+        time.sleep(parametros_tempo['tempo_carregamento'])
         
         # CAPTURAR DADOS DO CARROSSEL DE ESTIMATIVAS
         dados_carrossel = capturar_dados_carrossel_estimativas_playwright(page)
@@ -1708,7 +1732,7 @@ def navegar_tela_14_playwright(page, continuar_com_corretor_anterior):
         exibir_mensagem(f"❌ ERRO na Tela 14: {str(e)}")
         return False
 
-def navegar_tela_15_playwright(page, email_login, senha_login):
+def navegar_tela_15_playwright(page, email_login, senha_login, parametros_tempo):
     """
     TELA 15: Resultado Final (DUAS FASES)
     
@@ -1906,7 +1930,7 @@ def navegar_tela_15_playwright(page, email_login, senha_login):
                 
                 # Aguardar possível redirecionamento ou modal CPF divergente
                 exibir_mensagem("⏳ Aguardando resposta do login...")
-                time.sleep(5)  # ESTRATÉGIA SIMPLES: time.sleep ao invés de waits complexos
+                time.sleep(parametros_tempo['tempo_carregamento'])  # ESTRATÉGIA SIMPLES: time.sleep ao invés de waits complexos
                 
                 # Verificar se apareceu modal CPF divergente
                 try:
@@ -1923,14 +1947,14 @@ def navegar_tela_15_playwright(page, email_login, senha_login):
                             if botao_manter_login.is_visible():
                                 botao_manter_login.click()
                                 exibir_mensagem("✅ Botão 'Manter Login atual' clicado pelo ID!")
-                                time.sleep(3)
+                                time.sleep(parametros_tempo['tempo_estabilizacao'])
                             else:
                                 # Tentar pelo texto
                                 botao_manter_login = page.locator("text=Manter Login atual")
                                 if botao_manter_login.is_visible():
                                     botao_manter_login.click()
                                     exibir_mensagem("✅ Botão 'Manter Login atual' clicado pelo texto!")
-                                    time.sleep(3)
+                                    time.sleep(parametros_tempo['tempo_estabilizacao'])
                                 else:
                                     exibir_mensagem("⚠️ Botão 'Manter Login atual' não encontrado")
                         except Exception as e:
@@ -1963,10 +1987,10 @@ def navegar_tela_15_playwright(page, email_login, senha_login):
         except Exception as e:
             exibir_mensagem(f"⚠️ Botão 'Personalizar Coberturas' não encontrado: {str(e)}")
             exibir_mensagem("ℹ️ Usando fallback com time.sleep...")
-            time.sleep(5)  # Fallback para time.sleep
+            time.sleep(parametros_tempo['tempo_carregamento'])  # Fallback para time.sleep
         
         # Capturar dados dos planos
-        dados_planos = capturar_dados_planos_seguro(page)
+        dados_planos = capturar_dados_planos_seguro(page, parametros_tempo)
         
         if dados_planos:
             exibir_mensagem("✅ DADOS DOS PLANOS CAPTURADOS COM SUCESSO!")
@@ -2291,7 +2315,7 @@ def capturar_dados_carrossel_estimativas_playwright(page: Page) -> Dict[str, Any
         exibir_mensagem(f"❌ ERRO na captura de dados: {str(e)}")
         return None
 
-def capturar_dados_planos_seguro(page: Page) -> Dict[str, Any]:
+def capturar_dados_planos_seguro(page: Page, parametros_tempo) -> Dict[str, Any]:
     """
     CAPTURA DADOS DOS PLANOS DE SEGURO - ABORDAGEM HÍBRIDA
     
@@ -2316,7 +2340,7 @@ def capturar_dados_planos_seguro(page: Page) -> Dict[str, Any]:
         exibir_mensagem("=" * 70)
         
         # Aguardar carregamento dos planos (estratégia simples)
-        time.sleep(3)
+        time.sleep(parametros_tempo['tempo_estabilizacao'])
         
         dados_planos = {
             "plano_recomendado": {
@@ -2807,6 +2831,9 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
         exibir_mensagem("🚀 INICIANDO RPA PLAYWRIGHT")
         exibir_mensagem("=" * 50)
         
+        # Carregar parâmetros de tempo
+        parametros_tempo = obter_parametros_tempo(parametros)
+        
         # Validar parâmetros
         if not validar_parametros_obrigatorios(parametros):
             raise RPAException("Parâmetros obrigatórios inválidos", "VALIDACAO")
@@ -3065,7 +3092,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             
             # TELA 15
             exibir_mensagem("\n" + "="*50)
-            if navegar_tela_15_playwright(page, parametros['autenticacao']['email_login'], parametros['autenticacao']['senha_login']):
+            if navegar_tela_15_playwright(page, parametros['autenticacao']['email_login'], parametros['autenticacao']['senha_login'], parametros_tempo):
                 telas_executadas += 1
                 resultado_telas["tela_15"] = True
                 exibir_mensagem("✅ TELA 15 CONCLUÍDA!")
@@ -3088,7 +3115,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             exibir_mensagem("✅ Navegação sequencial realizada com sucesso")
             
             # Capturar dados finais
-            dados_planos = capturar_dados_planos_seguro(page)
+            dados_planos = capturar_dados_planos_seguro(page, parametros_tempo)
             
             # Salvar dados
             arquivo_dados = salvar_dados_planos(dados_planos)
