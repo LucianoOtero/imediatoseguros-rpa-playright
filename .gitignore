@@ -70,3 +70,24 @@ chromedriver/
 # Diretórios de output
 output/
 results/
+
+# PROTEÇÃO ESPECÍFICA PARA DEPLOYMENT SEGURO
+# Arquivos de dados temporários
+dados_planos_seguro_*.json
+modal_login_*.png
+
+# Arquivos de backup múltiplos
+executar_rpa_imediato_playwright_*.py
+executar_rpa_imediato_playwright_backup*.py
+
+# Diretórios de backup
+backup_pre_deployment/
+backup_*/
+
+# Arquivos de teste isolados
+teste_*.py
+tela_*_isolado.py
+
+# Arquivos de análise
+ANALISE_*.md
+INSTRUCOES_*.md
