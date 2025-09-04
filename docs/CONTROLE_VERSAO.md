@@ -14,35 +14,68 @@
 - **Commits**: ✅ Enviados
 - **Histórico**: ✅ Completo
 
-## 🏆 **SISTEMA DE LOGGER AVANÇADO IMPLEMENTADO - v3.1.4**
+## 🏆 **VALIDAÇÃO DE CELULAR SIMPLIFICADA IMPLEMENTADA - v3.1.6**
 
-### ✅ **Nova Versão Principal**: v3.1.4
-- **Commit**: `a1b2c3d`
+### ✅ **Nova Versão Principal**: v3.1.6
+- **Commit**: `b177b17`
 - **Data**: 04/09/2025
-- **Status**: ✅ **SISTEMA DE LOGGER AVANÇADO IMPLEMENTADO**
+- **Status**: ✅ **VALIDAÇÃO DE CELULAR SIMPLIFICADA IMPLEMENTADA**
 - **Funcionalidades**:
-  - ✅ Sistema de Logger Avançado implementado
-  - ✅ Logs estruturados em JSON com timestamp
-  - ✅ Níveis configuráveis (DEBUG, INFO, WARNING, ERROR)
-  - ✅ Rotação automática a cada 90 dias
-  - ✅ Integração segura sem modificar estrutura principal
-  - ✅ Logs por tela/etapa com dados estruturados
-  - ✅ Sistema de Comunicação Bidirecional (v3.1.3) mantido
+  - ✅ Validação de celular simplificada implementada
+  - ✅ Regex modificado para aceitar apenas 11 dígitos numéricos
+  - ✅ Removida formatação restritiva (parênteses, espaços, hífens)
+  - ✅ Atualizado parametros.json para formato simples
+  - ✅ Melhorada flexibilidade e praticidade para o usuário
+  - ✅ Sistema de Comunicação Bidirecional (v3.1.5) mantido
+  - ✅ Sistema de Validação de Parâmetros (v3.1.5) mantido
+  - ✅ Sistema de Logger Avançado (v3.1.4) mantido
   - ✅ Sistema de Timeout Inteligente (v3.1.2) mantido
   - ✅ Sistema de Progresso em Tempo Real (v3.1.1) mantido
   - ✅ Sistema de Retorno Estruturado (v3.1.0) mantido
   - ✅ Migração Selenium → Playwright mantida e estável
 
-### **Principais Conquistas da v3.1.4:**
-- **Sistema de Logger Avançado**: 100% implementado
-- **Logs Estruturados**: JSON com timestamp e dados extras
-- **Integração Segura**: Mínimas modificações no arquivo principal
-- **Configuração Flexível**: Via parametros.json
-- **Rotação Automática**: Limpeza de logs antigos
-- **Níveis Configuráveis**: DEBUG, INFO, WARNING, ERROR
+### **Principais Conquistas da v3.1.6:**
+- **Validação Simplificada**: Regex aceita apenas 11 dígitos
+- **Flexibilidade**: Removida formatação restritiva
+- **Praticidade**: Usuário pode inserir números simples
+- **Compatibilidade**: Mantida funcionalidade existente
+- **Testes**: Validação funcionando corretamente
 - **Performance**: Mantida e otimizada
 - **Estabilidade**: Excelente
 - **Captura de dados**: Robusta e confiável
+
+## 🏆 **SISTEMA DE COMUNICAÇÃO BIDIRECIONAL IMPLEMENTADO - v3.1.5**
+
+### ✅ **Versão Anterior**: v3.1.5
+- **Commit**: `c1bef58`
+- **Data**: 04/09/2025
+- **Status**: ✅ **SISTEMA DE COMUNICAÇÃO BIDIRECIONAL IMPLEMENTADO**
+- **Funcionalidades**:
+  - ✅ Sistema de Comunicação Bidirecional implementado
+  - ✅ Comunicação em tempo real entre PHP e Python via HTTP polling
+  - ✅ Controles remotos (PAUSE, RESUME, CANCEL) funcionais
+  - ✅ Status updates em tempo real
+  - ✅ Servidor HTTP em thread separada
+  - ✅ Configuração flexível via bidirectional_config.json
+  - ✅ Wrapper de integração segura sem modificar arquivo principal
+  - ✅ Sistema de Validação de Parâmetros (v3.1.5) mantido
+  - ✅ Sistema de Logger Avançado (v3.1.4) mantido
+  - ✅ Sistema de Timeout Inteligente (v3.1.2) mantido
+  - ✅ Sistema de Progresso em Tempo Real (v3.1.1) mantido
+  - ✅ Sistema de Retorno Estruturado (v3.1.0) mantido
+  - ✅ Migração Selenium → Playwright mantida e estável
+
+### **Principais Conquistas da v3.1.5:**
+- **Comunicação Bidirecional**: 100% implementada
+- **Controles Remotos**: PAUSE, RESUME, CANCEL funcionais
+- **Status em Tempo Real**: Atualizações via HTTP polling
+- **Integração Segura**: Wrapper sem modificar arquivo principal
+- **Configuração Flexível**: Via JSON
+- **Performance**: Mantida e otimizada
+- **Estabilidade**: Excelente
+- **Captura de dados**: Robusta e confiável
+
+## 🏆 **SISTEMA DE LOGGER AVANÇADO IMPLEMENTADO - v3.1.4**
 
 ## 🏆 **SISTEMA DE TIMEOUT INTELIGENTE IMPLEMENTADO - v3.1.2**
 
