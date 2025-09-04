@@ -14,6 +14,98 @@
 - **Commits**: ✅ Enviados
 - **Histórico**: ✅ Completo
 
+## 🏆 **PARÂMETROS DE TEMPO CONFIGURÁVEIS IMPLEMENTADOS - v3.4.0**
+
+### ✅ **Nova Versão Principal**: v3.4.0
+- **Commit**: `301059d`
+- **Data**: 03/09/2025
+- **Status**: ✅ **PARÂMETROS DE TEMPO CONFIGURÁVEIS IMPLEMENTADOS**
+- **Funcionalidades**:
+  - ✅ Função obter_parametros_tempo() implementada
+  - ✅ Substituição de time.sleep fixos por parâmetros JSON
+  - ✅ tempo_estabilizacao (1s): Delays curtos, loops, aguardar elementos
+  - ✅ tempo_carregamento (10s): Carregamento de página, fallbacks
+  - ✅ Assinaturas das funções atualizadas para receber parametros_tempo
+  - ✅ Compatibilidade mantida com arquivo parametros.json
+  - ✅ Validação de Veiculo_Segurado Padronizada (v3.1.7) mantida
+  - ✅ Validação de Celular Simplificada (v3.1.6) mantida
+  - ✅ Sistema de Comunicação Bidirecional (v3.1.5) mantido
+  - ✅ Sistema de Validação de Parâmetros (v3.1.5) mantido
+  - ✅ Sistema de Logger Avançado (v3.1.4) mantido
+  - ✅ Sistema de Timeout Inteligente (v3.1.2) mantido
+  - ✅ Sistema de Progresso em Tempo Real (v3.1.1) mantido
+  - ✅ Sistema de Retorno Estruturado (v3.1.0) mantido
+  - ✅ Migração Selenium → Playwright mantida e estável
+
+### **Principais Conquistas da v3.4.0:**
+- **Configurabilidade**: Parâmetros de tempo via JSON
+- **Flexibilidade**: Delays configuráveis por tipo de operação
+- **Otimização**: Tempos específicos para diferentes cenários
+- **Compatibilidade**: Sistema existente não afetado
+- **Performance**: Melhor controle de timeouts
+- **Estabilidade**: Excelente
+- **Captura de dados**: Robusta e confiável
+
+## 🏆 **MELHORIAS NA TELA 5 IMPLEMENTADAS - v3.3.0**
+
+### ✅ **Versão Anterior**: v3.3.0
+- **Commit**: `d470fa3`
+- **Data**: 03/09/2025
+- **Status**: ✅ **MELHORIAS NA TELA 5 IMPLEMENTADAS**
+- **Funcionalidades**:
+  - ✅ Substituição segura da função Tela 5 com melhorias
+  - ✅ Todas as outras funções mantidas intactas
+  - ✅ Detecção robusta de skeleton implementada
+  - ✅ JSON compreensivo e captura de dados preservados
+  - ✅ Problemas de carregamento dinâmico corrigidos
+  - ✅ Validação de Veiculo_Segurado Padronizada (v3.1.7) mantida
+  - ✅ Validação de Celular Simplificada (v3.1.6) mantida
+  - ✅ Sistema de Comunicação Bidirecional (v3.1.5) mantido
+  - ✅ Sistema de Validação de Parâmetros (v3.1.5) mantido
+  - ✅ Sistema de Logger Avançado (v3.1.4) mantido
+  - ✅ Sistema de Timeout Inteligente (v3.1.2) mantido
+  - ✅ Sistema de Progresso em Tempo Real (v3.1.1) mantido
+  - ✅ Sistema de Retorno Estruturado (v3.1.0) mantido
+  - ✅ Migração Selenium → Playwright mantida e estável
+
+### **Principais Conquistas da v3.3.0:**
+- **Robustez**: Detecção melhorada de elementos dinâmicos
+- **Confiabilidade**: Carregamento mais estável da Tela 5
+- **Compatibilidade**: Sistema existente preservado
+- **Performance**: Melhor handling de skeletons
+- **Estabilidade**: Excelente
+- **Captura de dados**: Robusta e confiável
+
+## 🏆 **JSON COMPREENSIVO TELA 5 IMPLEMENTADO - v3.2.0**
+
+### ✅ **Versão Anterior**: v3.2.0
+- **Commit**: `cf96eb3`
+- **Data**: 03/09/2025
+- **Status**: ✅ **JSON COMPREENSIVO TELA 5 IMPLEMENTADO**
+- **Funcionalidades**:
+  - ✅ Geração de JSON estruturado na Tela 5 (Estimativa Inicial)
+  - ✅ Seletores melhorados para captura de valores monetários
+  - ✅ Problemas de carregamento dinâmico (skeletons) corrigidos
+  - ✅ Integração com executar_rpa_imediato_playwright
+  - ✅ Validação de Veiculo_Segurado Padronizada (v3.1.7) mantida
+  - ✅ Validação de Celular Simplificada (v3.1.6) mantida
+  - ✅ Sistema de Comunicação Bidirecional (v3.1.5) mantido
+  - ✅ Sistema de Validação de Parâmetros (v3.1.5) mantido
+  - ✅ Sistema de Logger Avançado (v3.1.4) mantido
+  - ✅ Sistema de Timeout Inteligente (v3.1.2) mantido
+  - ✅ Sistema de Progresso em Tempo Real (v3.1.1) mantido
+  - ✅ Sistema de Retorno Estruturado (v3.1.0) mantido
+  - ✅ Migração Selenium → Playwright mantida e estável
+
+### **Principais Conquistas da v3.2.0:**
+- **Estruturação**: JSON compreensivo na Tela 5
+- **Precisão**: Captura melhorada de valores monetários
+- **Robustez**: Handling de carregamento dinâmico
+- **Integração**: Sistema unificado
+- **Performance**: Mantida e otimizada
+- **Estabilidade**: Excelente
+- **Captura de dados**: Robusta e confiável
+
 ## 🏆 **VALIDAÇÃO DE VEICULO_SEGURADO PADRONIZADA - v3.1.7**
 
 ### ✅ **Nova Versão Principal**: v3.1.7
@@ -148,53 +240,98 @@
 
 ## 📊 Versões Disponíveis
 
-### **Versão Mais Recente**: v3.1.4
-- **Commit**: `a1b2c3d`
-- **Data**: 04/09/2025
+### **Versão Mais Recente**: v3.4.0
+- **Commit**: `301059d`
+- **Data**: 03/09/2025
 - **Funcionalidades**:
-  - ✅ **SISTEMA DE LOGGER AVANÇADO IMPLEMENTADO**
-  - ✅ Logs estruturados em JSON com timestamp
-  - ✅ Níveis configuráveis (DEBUG, INFO, WARNING, ERROR)
-  - ✅ Rotação automática a cada 90 dias
-  - ✅ Integração segura sem modificar estrutura principal
-  - ✅ Logs por tela/etapa com dados estruturados
-  - ✅ Sistema de Comunicação Bidirecional (v3.1.3) mantido
+  - ✅ **PARÂMETROS DE TEMPO CONFIGURÁVEIS IMPLEMENTADOS**
+  - ✅ Função obter_parametros_tempo() para extrair configurações
+  - ✅ Substituição de time.sleep fixos por parâmetros do JSON
+  - ✅ tempo_estabilizacao (1s): Delays curtos, loops, aguardar elementos
+  - ✅ tempo_carregamento (10s): Carregamento de página, fallbacks
+  - ✅ Assinaturas das funções atualizadas para receber parametros_tempo
+  - ✅ Compatibilidade mantida com arquivo parametros.json
+  - ✅ Validação de Veiculo_Segurado Padronizada (v3.1.7) mantida
+  - ✅ Validação de Celular Simplificada (v3.1.6) mantida
+  - ✅ Sistema de Comunicação Bidirecional (v3.1.5) mantido
+  - ✅ Sistema de Validação de Parâmetros (v3.1.5) mantido
+  - ✅ Sistema de Logger Avançado (v3.1.4) mantido
   - ✅ Sistema de Timeout Inteligente (v3.1.2) mantido
   - ✅ Sistema de Progresso em Tempo Real (v3.1.1) mantido
   - ✅ Sistema de Retorno Estruturado (v3.1.0) mantido
   - ✅ Migração Selenium → Playwright mantida
-  - ✅ Sistema pronto para produção com logging avançado
+  - ✅ Sistema pronto para produção com parâmetros configuráveis
 
-### **Versão Anterior**: v3.1.3
-- **Commit**: `ef4a46a`
-- **Data**: 04/09/2025
+### **Versão Anterior**: v3.3.0
+- **Commit**: `d470fa3`
+- **Data**: 03/09/2025
 - **Funcionalidades**: 
-  - ✅ **SISTEMA DE TIMEOUT INTELIGENTE INTEGRADO**
-  - ✅ Timeout configurável por tela (Tela 5: 120s, Tela 15: 180s)
-  - ✅ Retry inteligente com backoff exponencial
-  - ✅ Wrapper seguro para todas as 15 telas
-  - ✅ Sistema de fallback automático
-  - ✅ Configuração JSON flexível
+  - ✅ **MELHORIAS NA TELA 5 IMPLEMENTADAS**
+  - ✅ Substituição segura da função Tela 5 com melhorias
+  - ✅ Todas as outras funções mantidas intactas
+  - ✅ Detecção robusta de skeleton implementada
+  - ✅ JSON compreensivo e captura de dados preservados
+  - ✅ Problemas de carregamento dinâmico corrigidos
+  - ✅ Validação de Veiculo_Segurado Padronizada (v3.1.7) mantida
+  - ✅ Validação de Celular Simplificada (v3.1.6) mantida
+  - ✅ Sistema de Comunicação Bidirecional (v3.1.5) mantido
+  - ✅ Sistema de Validação de Parâmetros (v3.1.5) mantido
+  - ✅ Sistema de Logger Avançado (v3.1.4) mantido
+  - ✅ Sistema de Timeout Inteligente (v3.1.2) mantido
   - ✅ Sistema de Progresso em Tempo Real (v3.1.1) mantido
   - ✅ Sistema de Retorno Estruturado (v3.1.0) mantido
   - ✅ Migração Selenium → Playwright mantida
-  - ✅ Sistema pronto para produção com timeout inteligente
+  - ✅ Sistema pronto para produção com melhorias na Tela 5
 
-### **Versão Anterior**: v3.1.1
-- **Commit**: `8daa6b2`
+### **Versão Anterior**: v3.2.0
+- **Commit**: `cf96eb3`
+- **Data**: 03/09/2025
+- **Funcionalidades**: 
+  - ✅ **JSON COMPREENSIVO TELA 5 IMPLEMENTADO**
+  - ✅ Geração de JSON estruturado na Tela 5 (Estimativa Inicial)
+  - ✅ Seletores melhorados para captura de valores monetários
+  - ✅ Problemas de carregamento dinâmico (skeletons) corrigidos
+  - ✅ Integração com executar_rpa_imediato_playwright
+  - ✅ Validação de Veiculo_Segurado Padronizada (v3.1.7) mantida
+  - ✅ Validação de Celular Simplificada (v3.1.6) mantida
+  - ✅ Sistema de Comunicação Bidirecional (v3.1.5) mantido
+  - ✅ Sistema de Validação de Parâmetros (v3.1.5) mantido
+  - ✅ Sistema de Logger Avançado (v3.1.4) mantido
+  - ✅ Sistema de Timeout Inteligente (v3.1.2) mantido
+  - ✅ Sistema de Progresso em Tempo Real (v3.1.1) mantido
+  - ✅ Sistema de Retorno Estruturado (v3.1.0) mantido
+  - ✅ Migração Selenium → Playwright mantida
+  - ✅ Sistema pronto para produção com JSON compreensivo
+
+### **Versão Anterior**: v3.1.7
+- **Commit**: `67b80ca`
 - **Data**: 04/09/2025
 - **Funcionalidades**: 
-  - ✅ **SISTEMA DE PROGRESSO EM TEMPO REAL INTEGRADO**
-  - ✅ Atualizações de progresso em todas as 15 telas
-  - ✅ Sistema de retorno estruturado (v3.1.0) mantido
-  - ✅ Integração com PHP via temp/progress_status.json
-  - ✅ Captura de dados intermediários da Tela 5
-  - ✅ Tratamento de erros robusto para progress tracker
+  - ✅ **VALIDAÇÃO DE VEICULO_SEGURADO PADRONIZADA**
+  - ✅ Removido 'Nao' (sem acento) dos valores permitidos
+  - ✅ Agora aceita apenas 'Sim' e 'Não' (com acento)
+  - ✅ Padronização para uso correto de acentuação
+  - ✅ Eliminação de ambiguidades na validação
+  - ✅ Validação de Celular Simplificada (v3.1.6) mantida
+  - ✅ Sistema de Comunicação Bidirecional (v3.1.5) mantido
+  - ✅ Sistema de Validação de Parâmetros (v3.1.5) mantido
+  - ✅ Sistema de Logger Avançado (v3.1.4) mantido
+  - ✅ Sistema de Timeout Inteligente (v3.1.2) mantido
+  - ✅ Sistema de Progresso em Tempo Real (v3.1.1) mantido
+  - ✅ Sistema de Retorno Estruturado (v3.1.0) mantido
   - ✅ Migração Selenium → Playwright mantida
-  - ✅ Sistema pronto para produção com monitoramento em tempo real
+  - ✅ Sistema pronto para produção com validação padronizada
 
 ### **Versões Principais**:
-- `v3.1.2`: **SISTEMA DE TIMEOUT INTELIGENTE INTEGRADO** (Atual)
+- `v3.4.0`: **PARÂMETROS DE TEMPO CONFIGURÁVEIS IMPLEMENTADOS** (Atual)
+- `v3.3.0`: **MELHORIAS NA TELA 5 IMPLEMENTADAS**
+- `v3.2.0`: **JSON COMPREENSIVO TELA 5 IMPLEMENTADO**
+- `v3.1.7`: **VALIDAÇÃO DE VEICULO_SEGURADO PADRONIZADA**
+- `v3.1.6`: **VALIDAÇÃO DE CELULAR SIMPLIFICADA**
+- `v3.1.5`: **SISTEMA DE COMUNICAÇÃO BIDIRECIONAL IMPLEMENTADO**
+- `v3.1.4`: **SISTEMA DE LOGGER AVANÇADO IMPLEMENTADO**
+- `v3.1.3`: **SISTEMA DE COMUNICAÇÃO BIDIRECIONAL IMPLEMENTADO**
+- `v3.1.2`: **SISTEMA DE TIMEOUT INTELIGENTE INTEGRADO**
 - `v3.1.1`: **SISTEMA DE PROGRESSO EM TEMPO REAL INTEGRADO**
 - `v3.1.0`: **SISTEMA DE RETORNO ESTRUTURADO IMPLEMENTADO**
 - `v3.0.0`: **MIGRAÇÃO COMPLETA SELENIUM → PLAYWRIGHT**
@@ -342,6 +479,6 @@ git push origin --tags
 
 ---
 
-**Status**: ✅ **VALIDAÇÃO DE VEICULO_SEGURADO PADRONIZADA IMPLEMENTADA - v3.1.7**
+**Status**: ✅ **PARÂMETROS DE TEMPO CONFIGURÁVEIS IMPLEMENTADOS - v3.4.0**
 **Última Atualização**: 04/09/2025
-**Próxima Versão**: v3.1.8 (quando implementar próximo componente pendente)
+**Próxima Versão**: v3.4.1 (quando implementar próximo componente pendente)
