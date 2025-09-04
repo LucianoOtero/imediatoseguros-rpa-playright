@@ -22,6 +22,7 @@ import re
 import os
 import sys
 import traceback
+import argparse
 from datetime import datetime
 from typing import Dict, Any, Optional, Union
 from playwright.sync_api import sync_playwright, Page, Browser, BrowserContext
@@ -37,6 +38,242 @@ from utils.retorno_estruturado import (
 
 # Importar Sistema de Progresso em Tempo Real
 from utils.progress_realtime import ProgressTracker
+
+
+# ========================================
+# SISTEMA DE ARGUMENTOS DE LINHA DE COMANDO
+# ========================================
+
+def processar_argumentos():
+    """
+    Processa argumentos de linha de comando de forma segura
+    """
+    parser = argparse.ArgumentParser(
+        description="EXECUTAR RPA IMEDIATO PLAYWRIGHT - VERSÃO PRODUÇÃO",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+EXEMPLOS DE USO:
+  python executar_rpa_imediato_playwright.py
+  python executar_rpa_imediato_playwright.py --help
+  python executar_rpa_imediato_playwright.py --version
+  python executar_rpa_imediato_playwright.py --docs completa
+  python executar_rpa_imediato_playwright.py --docs json
+  python executar_rpa_imediato_playwright.py --docs php
+  python executar_rpa_imediato_playwright.py --docs params
+
+DOCUMENTAÇÃO:
+  --docs completa: Documentação completa do sistema
+  --docs json: Documentação dos JSONs de saída
+  --docs php: Guia específico para desenvolvedores PHP
+  --docs params: Descrição dos parâmetros JSON
+
+ARQUIVOS GERADOS:
+  - temp/progress_status.json: Progresso em tempo real
+  - dados_planos_seguro_YYYYMMDD_HHMMSS.json: Dados finais
+  - temp/json_compreensivo_tela_5_*.json: Dados intermediários
+  - temp/retorno_intermediario_carrossel_*.json: Dados brutos Tela 5
+  - temp/dados_tela_5_*.json: Metadados da captura
+
+STATUS CODES:
+  - 9001: Sucesso completo
+  - 9002-9999: Códigos de erro específicos por tela
+        """
+    )
+    
+    parser.add_argument(
+        '--version', 
+        action='version', 
+        version='%(prog)s v3.1.1'
+    )
+    
+    parser.add_argument(
+        '--config', 
+        type=str, 
+        default='parametros.json',
+        help='Arquivo de configuração (padrão: parametros.json)'
+    )
+    
+    parser.add_argument(
+        '--docs',
+        type=str,
+        choices=['completa', 'json', 'php', 'params'],
+        help='Exibe documentação específica (completa/json/php/params)'
+    )
+    
+    return parser.parse_args()
+
+
+# ========================================
+# SISTEMA DE DOCUMENTAÇÃO
+# ========================================
+
+def exibir_documentacao(tipo: str = "completa"):
+    """
+    Exibe documentação baseada no tipo solicitado
+    """
+    if tipo == "completa":
+        print("""
+🚀 DOCUMENTAÇÃO COMPLETA - SISTEMA RPA IMEDIATO SEGUROS
+=======================================================
+
+📋 VISÃO GERAL DO SISTEMA
+=========================
+
+O Sistema RPA Imediato Seguros é uma automação completa para cotação de seguros
+automotivos no sistema Tô Segurado. Executa 15 telas sequencialmente, capturando
+dados em tempo real e gerando JSONs estruturados para integração com PHP.
+
+✅ FUNCIONALIDADES PRINCIPAIS
+=============================
+
+• AUTOMAÇÃO COMPLETA: Navegação em 15 telas, preenchimento automático
+• PROGRESSO EM TEMPO REAL: Monitoramento via temp/progress_status.json
+• DADOS ESTRUTURADOS: JSONs padronizados para integração
+• SISTEMA DE RETORNO: Códigos 9001-9999, estrutura consistente
+• INTEGRAÇÃO COM PHP: Arquivos prontos para consumo
+
+📊 ARQUIVOS GERADOS
+==================
+
+1. temp/progress_status.json - Monitoramento em tempo real
+2. dados_planos_seguro_*.json - Dados finais da cotação
+3. temp/json_compreensivo_tela_5_*.json - Dados intermediários
+4. temp/retorno_intermediario_carrossel_*.json - Dados brutos
+5. temp/dados_tela_5_*.json - Metadados
+
+🎯 STATUS CODES: 9001 (sucesso) - 9002-9999 (erros específicos)
+
+📝 EXEMPLOS DE USO:
+  python executar_rpa_imediato_playwright.py
+  python executar_rpa_imediato_playwright.py --docs json
+  python executar_rpa_imediato_playwright.py --docs php
+  python executar_rpa_imediato_playwright.py --docs params
+        """)
+    
+    elif tipo == "json":
+        print("""
+📊 DOCUMENTAÇÃO DOS JSONS DE SAÍDA
+==================================
+
+🎯 VISÃO GERAL DOS JSONS
+=======================
+
+O sistema gera 5 tipos de arquivos JSON para integração com PHP:
+
+1. temp/progress_status.json - PROGRESSO EM TEMPO REAL
+   Estrutura: timestamp, etapa_atual, percentual, status, tempo_decorrido
+
+2. dados_planos_seguro_*.json - DADOS FINAIS
+   Estrutura: plano_recomendado, plano_alternativo com valores e coberturas
+
+3. temp/json_compreensivo_tela_5_*.json - DADOS INTERMEDIÁRIOS
+   Estrutura: metadata, resumo_executivo, coberturas_detalhadas
+
+4. temp/retorno_intermediario_carrossel_*.json - DADOS BRUTOS
+   Estrutura: dados_brutos, metadados_captura
+
+5. temp/dados_tela_5_*.json - METADADOS
+   Estrutura: timestamp, tela, metadados
+
+🔧 EXEMPLO PHP BÁSICO:
+```php
+$progress = json_decode(file_get_contents('temp/progress_status.json'), true);
+$planos = json_decode(file_get_contents('dados_planos_seguro_*.json'), true);
+```
+        """)
+    
+    elif tipo == "php":
+        print("""
+�� GUIA DE INTEGRAÇÃO PHP
+=========================
+
+🎯 VISÃO GERAL PARA DESENVOLVEDORES PHP
+=======================================
+
+O sistema gera JSONs estruturados que podem ser consumidos diretamente
+por funções PHP nativas (json_decode).
+
+📋 ARQUIVOS PRINCIPAIS PARA PHP
+===============================
+
+1. temp/progress_status.json - Monitoramento em tempo real
+2. dados_planos_seguro_*.json - Dados finais da cotação
+3. temp/json_compreensivo_tela_5_*.json - Dados intermediários
+
+🔄 EXEMPLOS PRÁTICOS PHP
+=======================
+
+MONITORAMENTO:
+```php
+$progress = json_decode(file_get_contents('temp/progress_status.json'), true);
+echo "Etapa: {$progress['etapa_atual']}/15 ({$progress['percentual']}%)";
+```
+
+CAPTURA DE PLANOS:
+```php
+$planos = json_decode(file_get_contents('dados_planos_seguro_*.json'), true);
+$valor_recomendado = $planos['plano_recomendado']['valor'];
+```
+
+VERIFICAÇÃO DE STATUS:
+```php
+if ($progress['etapa_atual'] == 15 && $progress['percentual'] == 100.0) {
+    echo "RPA concluído com sucesso!";
+}
+```
+
+🔧 TRATAMENTO DE ERROS:
+```php
+$dados = json_decode($conteudo, true);
+if (json_last_error() !== JSON_ERROR_NONE) {
+    throw new Exception('JSON inválido: ' . json_last_error_msg());
+}
+```
+        """)
+    
+    elif tipo == "params":
+        print("""
+📋 DESCRIÇÃO DOS PARÂMETROS JSON
+================================
+
+O arquivo parametros.json contém todas as configurações necessárias:
+
+🔧 SEÇÃO: CONFIGURAÇÃO
+---------------------
+• log (boolean): Ativa/desativa logs
+• display (boolean): Exibe mensagens
+• tempo_estabilizacao (integer): Tempo de espera
+• tempo_carregamento (integer): Tempo de carregamento
+
+🔐 SEÇÃO: AUTENTICAÇÃO
+---------------------
+• email_login (string): Email de acesso
+• senha_login (string): Senha de acesso
+
+🚗 SEÇÃO: DADOS DO VEÍCULO
+-------------------------
+• placa (string): Placa do veículo
+• marca (string): Marca do veículo
+• modelo (string): Modelo do veículo
+• ano (string): Ano de fabricação
+
+👤 SEÇÃO: DADOS PESSOAIS
+-----------------------
+• nome (string): Nome completo
+• cpf (string): CPF do segurado
+• email (string): Email de contato
+• celular (string): Número de celular
+
+🏠 SEÇÃO: RESIDÊNCIA
+-------------------
+• cep (string): CEP do endereço
+• garagem_residencia (boolean): Garagem na residência
+• portao_eletronico (string): Tipo de portão
+
+📝 EXEMPLO DE USO:
+  python executar_rpa_imediato_playwright.py --config meu_parametros.json
+        """)
+
 
 # ========================================
 # SISTEMA DE EXCEPTION HANDLER
@@ -3357,10 +3594,18 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
 
 if __name__ == "__main__":
     try:
-        # Carregar parâmetros
-        parametros = carregar_parametros()
+        # Processar argumentos de linha de comando
+        args = processar_argumentos()
         
-        # Executar RPA
+        # Verificar se é para exibir documentação
+        if args.docs:
+            exibir_documentacao(args.docs)
+            sys.exit(0)
+        
+        # Carregar parâmetros (compatibilidade mantida)
+        parametros = carregar_parametros(args.config)
+        
+        # Executar RPA (ESTRUTURA ORIGINAL PRESERVADA)
         resultado = executar_rpa_playwright(parametros)
         
         # Exibir resultado
