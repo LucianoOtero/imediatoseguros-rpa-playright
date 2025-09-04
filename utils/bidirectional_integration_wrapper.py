@@ -148,3 +148,4 @@ if __name__ == "__main__":
         print(f"❌ Erro ao criar wrapper: {e}")
 
     print("✅ Wrapper de integração bidirecional testado com sucesso!")
+

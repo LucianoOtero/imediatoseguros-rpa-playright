@@ -382,3 +382,4 @@ if __name__ == "__main__":
     print(f"✅ Comandos verificados: {commands}")
 
     print("✅ Sistema de comunicação bidirecional testado com sucesso!")
+

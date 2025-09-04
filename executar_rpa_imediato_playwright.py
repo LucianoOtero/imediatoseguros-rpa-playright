@@ -55,6 +55,14 @@ except ImportError:
     LOGGER_SYSTEM_AVAILABLE = False
     print("⚠️ Sistema de logger não disponível - usando logs padrão")
 
+# Importar Sistema de Comunicação Bidirecional (opcional)
+try:
+    from utils.bidirectional_integration_wrapper import execute_rpa_with_bidirectional_control
+    BIDIRECTIONAL_SYSTEM_AVAILABLE = True
+except ImportError:
+    BIDIRECTIONAL_SYSTEM_AVAILABLE = False
+    print("⚠️ Sistema de comunicação bidirecional não disponível - executando sem controle remoto")
+
 
 # ========================================
 # SISTEMA DE ARGUMENTOS DE LINHA DE COMANDO
@@ -83,12 +91,19 @@ DOCUMENTAÇÃO:
   --docs php: Guia específico para desenvolvedores PHP
   --docs params: Descrição dos parâmetros JSON
 
+SISTEMA BIDIRECIONAL:
+  Controle remoto via HTTP disponível na porta 8080
+  Endpoints: /status (GET) e /command (POST)
+  Comandos: PAUSE, RESUME, CANCEL
+  Fallback automático se sistema não disponível
+
 ARQUIVOS GERADOS:
   - temp/progress_status.json: Progresso em tempo real
   - dados_planos_seguro_YYYYMMDD_HHMMSS.json: Dados finais
   - temp/json_compreensivo_tela_5_*.json: Dados intermediários
   - temp/retorno_intermediario_carrossel_*.json: Dados brutos Tela 5
   - temp/dados_tela_5_*.json: Metadados da captura
+  - logs/bidirectional.log: Logs do sistema bidirecional
 
 STATUS CODES:
   - 9001: Sucesso completo
@@ -3271,6 +3286,13 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
         else:
             logger = None
         
+        # Inicializar Sistema de Comunicação Bidirecional (opcional)
+        if BIDIRECTIONAL_SYSTEM_AVAILABLE:
+            print("✅ Sistema de comunicação bidirecional ativado")
+            # O sistema será usado via wrapper na execução
+        else:
+            print("⚠️ Executando sem comunicação bidirecional")
+        
         # Inicializar Exception Handler
         exception_handler.limpar_erros()
         exception_handler.definir_tela_atual("INICIALIZACAO")
@@ -3730,8 +3752,26 @@ if __name__ == "__main__":
         # Carregar parâmetros (compatibilidade mantida)
         parametros = carregar_parametros(args.config)
         
-        # Executar RPA (ESTRUTURA ORIGINAL PRESERVADA)
-        resultado = executar_rpa_playwright(parametros)
+        # EXECUÇÃO COM CONTROLE BIDIRECIONAL SEGURO
+        if BIDIRECTIONAL_SYSTEM_AVAILABLE:
+            # Executar RPA com controle bidirecional
+            resultado_wrapper = execute_rpa_with_bidirectional_control(
+                executar_rpa_playwright, 
+                parametros
+            )
+            
+            # Extrair resultado do wrapper
+            if resultado_wrapper["status"] == "success":
+                resultado = resultado_wrapper["result"]
+                bidirectional_used = resultado_wrapper.get("bidirectional_used", False)
+                print(f"✅ Comunicação bidirecional: {'Ativa' if bidirectional_used else 'Não utilizada'}")
+            else:
+                # Fallback para execução direta
+                resultado = executar_rpa_playwright(parametros)
+                print("⚠️ Fallback para execução direta devido a erro no sistema bidirecional")
+        else:
+            # Executar RPA (ESTRUTURA ORIGINAL PRESERVADA)
+            resultado = executar_rpa_playwright(parametros)
         
         # Exibir resultado
         print("\n" + "="*50)
