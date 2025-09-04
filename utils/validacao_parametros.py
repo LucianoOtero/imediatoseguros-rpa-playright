@@ -42,7 +42,7 @@ class ValidadorParametros:
         # Campos obrigatórios e seus tipos
         self.campos_obrigatorios = {
             "configuracao": dict,
-            "url_base": str,
+            "url": str,
             "placa": str,
             "marca": str,
             "modelo": str,
@@ -81,11 +81,11 @@ class ValidadorParametros:
         
         # Padrões de validação
         self.padroes = {
-            "placa": r"^[A-Z]{3}[0-9]{4}$",  # Formato: ABC1234
+            "placa": r"^[A-Z]{3}[0-9]{1}[A-Z0-9]{1}[0-9]{2}$",  # Formato: ABC1D23 ou FPG8D63
             "cpf": r"^\d{11}$",  # 11 dígitos
             "cep": r"^\d{5}-?\d{3}$",  # Formato: 12345-678 ou 12345678
             "email": r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
-            "celular": r"^\(\d{2}\)\s\d{4,5}-?\d{4}$",  # Formato: (11) 97668-7668
+            "celular": r"^\d{11}$",  # Apenas 11 dígitos
             "data_nascimento": r"^\d{2}/\d{2}/\d{4}$"  # Formato: DD/MM/AAAA
         }
         
@@ -121,6 +121,9 @@ class ValidadorParametros:
             
             # Validar campos customizados
             self.validar_campos_customizados(parametros)
+            
+            # Validar padrões de formato
+            self.validar_padroes(parametros)
             
             return parametros
             
@@ -275,6 +278,40 @@ class ValidadorParametros:
                 raise e
             raise ValueError("Data de nascimento inválida")
     
+    def validar_parametros(self, parametros: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Valida parâmetros diretamente (sem JSON string)
+        
+        Args:
+            parametros: Dicionário com parâmetros
+            
+        Returns:
+            Dicionário com os parâmetros validados
+            
+        Raises:
+            ValidacaoParametrosError: Se houver erro de validação
+        """
+        try:
+            # Validar estrutura e tipos
+            self.validar_estrutura(parametros)
+            
+            # Validar valores específicos
+            self.validar_valores(parametros)
+            
+            # Validar campos customizados
+            self.validar_campos_customizados(parametros)
+            
+            # Validar padrões de formato
+            self.validar_padroes(parametros)
+            
+            return parametros
+            
+        except Exception as e:
+            if isinstance(e, ValidacaoParametrosError):
+                raise e
+            else:
+                raise ValidacaoParametrosError(f"❌ Erro de validação: {str(e)}")
+
     def validar_padroes(self, parametros: Dict[str, Any]):
         """Valida padrões de formato para campos específicos"""
         
@@ -296,7 +333,7 @@ class ValidadorParametros:
                 "log_rotacao_dias": 90,
                 "log_nivel": "INFO"
             },
-            "url_base": "https://www.app.tosegurado.com.br/imediatoseguros",
+            "url": "https://www.app.tosegurado.com.br/imediatoseguros",
             "placa": "ABC1234",
             "marca": "FORD",
             "modelo": "ECOSPORT XLS 1.6 1.6 8V",
