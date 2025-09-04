@@ -35,6 +35,9 @@ from utils.retorno_estruturado import (
     validar_retorno_estruturado
 )
 
+# Importar Sistema de Progresso em Tempo Real
+from utils.progress_realtime import ProgressTracker
+
 # ========================================
 # SISTEMA DE EXCEPTION HANDLER
 # ========================================
@@ -2954,6 +2957,10 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
     inicio_execucao = time.time()
     
     try:
+        # Inicializar ProgressTracker
+        progress_tracker = ProgressTracker(total_etapas=15)
+        progress_tracker.update_progress(0, "Iniciando RPA")
+        
         # Inicializar Exception Handler
         exception_handler.limpar_erros()
         exception_handler.definir_tela_atual("INICIALIZACAO")
@@ -2983,13 +2990,16 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             resultado_telas = {}
             
             # TELA 1
+            progress_tracker.update_progress(1, "Selecionando Tipo de Veiculo")
             exibir_mensagem("\n" + "="*50)
             if navegar_tela_1_playwright(page):
                 telas_executadas += 1
                 resultado_telas["tela_1"] = True
+                progress_tracker.update_progress(1, "Tela 1 concluída")
                 exibir_mensagem("✅ TELA 1 CONCLUÍDA!")
             else:
                 resultado_telas["tela_1"] = False
+                progress_tracker.update_progress(1, "Tela 1 falhou")
                 exibir_mensagem("❌ TELA 1 FALHOU!")
                 return criar_retorno_erro(
                     "Tela 1 falhou",
@@ -3000,13 +3010,16 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                 )
             
             # TELA 2
+            progress_tracker.update_progress(2, "Selecionando veículo com a placa informada")
             exibir_mensagem("\n" + "="*50)
             if navegar_tela_2_playwright(page, parametros['placa']):
                 telas_executadas += 1
                 resultado_telas["tela_2"] = True
+                progress_tracker.update_progress(2, "Tela 2 concluída")
                 exibir_mensagem("✅ TELA 2 CONCLUÍDA!")
             else:
                 resultado_telas["tela_2"] = False
+                progress_tracker.update_progress(2, "Tela 2 falhou")
                 exibir_mensagem("❌ TELA 2 FALHOU!")
                 return criar_retorno_erro(
                     "Tela 2 falhou",
@@ -3017,13 +3030,16 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                 )
             
             # TELA 3
+            progress_tracker.update_progress(3, "Confirmando seleção do veículo")
             exibir_mensagem("\n" + "="*50)
             if navegar_tela_3_playwright(page):
                 telas_executadas += 1
                 resultado_telas["tela_3"] = True
+                progress_tracker.update_progress(3, "Tela 3 concluída")
                 exibir_mensagem("✅ TELA 3 CONCLUÍDA!")
             else:
                 resultado_telas["tela_3"] = False
+                progress_tracker.update_progress(3, "Tela 3 falhou")
                 exibir_mensagem("❌ TELA 3 FALHOU!")
                 return criar_retorno_erro(
                     "Tela 3 falhou",
@@ -3034,13 +3050,16 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                 )
             
             # TELA 4
+            progress_tracker.update_progress(4, "Calculando como novo Seguro")
             exibir_mensagem("\n" + "="*50)
             if navegar_tela_4_playwright(page, parametros['veiculo_segurado']):
                 telas_executadas += 1
                 resultado_telas["tela_4"] = True
+                progress_tracker.update_progress(4, "Tela 4 concluída")
                 exibir_mensagem("✅ TELA 4 CONCLUÍDA!")
             else:
                 resultado_telas["tela_4"] = False
+                progress_tracker.update_progress(4, "Tela 4 falhou")
                 exibir_mensagem("❌ TELA 4 FALHOU!")
                 return criar_retorno_erro(
                     "Tela 4 falhou",
@@ -3051,13 +3070,16 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                 )
             
             # TELA 5
+            progress_tracker.update_progress(5, "Elaborando estimativas")
             exibir_mensagem("\n" + "="*50)
             if navegar_tela_5_playwright(page, parametros_tempo):
                 telas_executadas += 1
                 resultado_telas["tela_5"] = True
+                progress_tracker.update_progress(5, "Tela 5 concluída")
                 exibir_mensagem("✅ TELA 5 CONCLUÍDA!")
             else:
                 resultado_telas["tela_5"] = False
+                progress_tracker.update_progress(5, "Tela 5 falhou")
                 exibir_mensagem("❌ TELA 5 FALHOU!")
                 return criar_retorno_erro(
                     "Tela 5 falhou",
@@ -3068,13 +3090,16 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                 )
             
             # TELA 6
+            progress_tracker.update_progress(6, "Seleção de detalhes do veículo")
             exibir_mensagem("\n" + "="*50)
             if navegar_tela_6_playwright(page, parametros['combustivel'], parametros.get('kit_gas', False), parametros.get('blindado', False), parametros.get('financiado', False)):
                 telas_executadas += 1
                 resultado_telas["tela_6"] = True
+                progress_tracker.update_progress(6, "Tela 6 concluída")
                 exibir_mensagem("✅ TELA 6 CONCLUÍDA!")
             else:
                 resultado_telas["tela_6"] = False
+                progress_tracker.update_progress(6, "Tela 6 falhou")
                 exibir_mensagem("❌ TELA 6 FALHOU!")
                 return criar_retorno_erro(
                     "Tela 6 falhou",
@@ -3085,13 +3110,16 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                 )
             
             # TELA 7
+            progress_tracker.update_progress(7, "Definição de local de pernoite com o CEP informado")
             exibir_mensagem("\n" + "="*50)
             if navegar_tela_7_playwright(page, parametros['cep']):
                 telas_executadas += 1
                 resultado_telas["tela_7"] = True
+                progress_tracker.update_progress(7, "Tela 7 concluída")
                 exibir_mensagem("✅ TELA 7 CONCLUÍDA!")
             else:
                 resultado_telas["tela_7"] = False
+                progress_tracker.update_progress(7, "Tela 7 falhou")
                 exibir_mensagem("❌ TELA 7 FALHOU!")
                 return criar_retorno_erro(
                     "Tela 7 falhou",
@@ -3102,13 +3130,16 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                 )
             
             # TELA 8
+            progress_tracker.update_progress(8, "Definição do uso do veículo")
             exibir_mensagem("\n" + "="*50)
             if navegar_tela_8_playwright(page, parametros['uso_veiculo']):
                 telas_executadas += 1
                 resultado_telas["tela_8"] = True
+                progress_tracker.update_progress(8, "Tela 8 concluída")
                 exibir_mensagem("✅ TELA 8 CONCLUÍDA!")
             else:
                 resultado_telas["tela_8"] = False
+                progress_tracker.update_progress(8, "Tela 8 falhou")
                 exibir_mensagem("❌ TELA 8 FALHOU!")
                 return criar_retorno_erro(
                     "Tela 8 falhou",
@@ -3119,13 +3150,16 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                 )
             
             # TELA 9
+            progress_tracker.update_progress(9, "Preenchimento dos dados pessoais")
             exibir_mensagem("\n" + "="*50)
             if navegar_tela_9_playwright(page, parametros['nome'], parametros['cpf'], parametros['data_nascimento'], parametros['sexo'], parametros['estado_civil'], parametros['email'], parametros['celular']):
                 telas_executadas += 1
                 resultado_telas["tela_9"] = True
+                progress_tracker.update_progress(9, "Tela 9 concluída")
                 exibir_mensagem("✅ TELA 9 CONCLUÍDA!")
             else:
                 resultado_telas["tela_9"] = False
+                progress_tracker.update_progress(9, "Tela 9 falhou")
                 exibir_mensagem("❌ TELA 9 FALHOU!")
                 return criar_retorno_erro(
                     "Tela 9 falhou",
@@ -3136,13 +3170,16 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                 )
             
             # TELA 10
+            progress_tracker.update_progress(10, "Definição do Condutor Principal")
             exibir_mensagem("\n" + "="*50)
             if navegar_tela_10_playwright(page, parametros['condutor_principal'], parametros['nome_condutor'], parametros['cpf_condutor'], parametros['data_nascimento_condutor'], parametros['sexo_condutor'], parametros['estado_civil_condutor']):
                 telas_executadas += 1
                 resultado_telas["tela_10"] = True
+                progress_tracker.update_progress(10, "Tela 10 concluída")
                 exibir_mensagem("✅ TELA 10 CONCLUÍDA!")
             else:
                 resultado_telas["tela_10"] = False
+                progress_tracker.update_progress(10, "Tela 10 falhou")
                 exibir_mensagem("❌ TELA 10 FALHOU!")
                 return criar_retorno_erro(
                     "Tela 10 falhou",
@@ -3153,13 +3190,16 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                 )
             
             # TELA 11
+            progress_tracker.update_progress(11, "Definição do uso do veículo")
             exibir_mensagem("\n" + "="*50)
             if navegar_tela_11_playwright(page, parametros['local_de_trabalho'], parametros['estacionamento_proprio_local_de_trabalho'], parametros['local_de_estudo'], parametros['estacionamento_proprio_local_de_estudo']):
                 telas_executadas += 1
                 resultado_telas["tela_11"] = True
+                progress_tracker.update_progress(11, "Tela 11 concluída")
                 exibir_mensagem("✅ TELA 11 CONCLUÍDA!")
             else:
                 resultado_telas["tela_11"] = False
+                progress_tracker.update_progress(11, "Tela 11 falhou")
                 exibir_mensagem("❌ TELA 11 FALHOU!")
                 return criar_retorno_erro(
                     "Tela 11 falhou",
@@ -3170,13 +3210,16 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                 )
             
             # TELA 12
+            progress_tracker.update_progress(12, "Definição do tipo de garagem")
             exibir_mensagem("\n" + "="*50)
             if navegar_tela_12_playwright(page, parametros['garagem_residencia'], parametros['portao_eletronico']):
                 telas_executadas += 1
                 resultado_telas["tela_12"] = True
+                progress_tracker.update_progress(12, "Tela 12 concluída")
                 exibir_mensagem("✅ TELA 12 CONCLUÍDA!")
             else:
                 resultado_telas["tela_12"] = False
+                progress_tracker.update_progress(12, "Tela 12 falhou")
                 exibir_mensagem("❌ TELA 12 FALHOU!")
                 return criar_retorno_erro(
                     "Tela 12 falhou",
@@ -3187,13 +3230,16 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                 )
             
             # TELA 13
+            progress_tracker.update_progress(13, "Definição de residentes")
             exibir_mensagem("\n" + "="*50)
             if navegar_tela_13_playwright(page, parametros['reside_18_26'], parametros['sexo_do_menor'], parametros['faixa_etaria_menor_mais_novo']):
                 telas_executadas += 1
                 resultado_telas["tela_13"] = True
+                progress_tracker.update_progress(13, "Tela 13 concluída")
                 exibir_mensagem("✅ TELA 13 CONCLUÍDA!")
             else:
                 resultado_telas["tela_13"] = False
+                progress_tracker.update_progress(13, "Tela 13 falhou")
                 exibir_mensagem("❌ TELA 13 FALHOU!")
                 return criar_retorno_erro(
                     "Tela 13 falhou",
@@ -3204,6 +3250,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                 )
             
             # TELA 14 (CONDICIONAL) - Só executa se Tela 15 não foi detectada diretamente da Tela 13
+            progress_tracker.update_progress(14, "Definição do Corretor")
             exibir_mensagem("\n" + "="*50)
             exibir_mensagem("🔍 ANALISANDO EXECUÇÃO DA TELA 14...")
             exibir_mensagem(f"📊 Status da variável global 'tela_15_detectada': {tela_15_detectada}")
@@ -3214,10 +3261,12 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                 if navegar_tela_14_playwright(page, parametros['continuar_com_corretor_anterior']):
                     # Não incrementa telas_executadas pois é condicional
                     resultado_telas["tela_14"] = True
+                    progress_tracker.update_progress(14, "Tela 14 concluída")
                     exibir_mensagem("✅ TELA 14 PROCESSADA COM SUCESSO!")
                     exibir_mensagem("📈 Navegação para Tela 15 será executada normalmente")
                 else:
                     resultado_telas["tela_14"] = False
+                    progress_tracker.update_progress(14, "Tela 14 falhou")
                     exibir_mensagem("❌ TELA 14 FALHOU!")
                     exibir_mensagem("🚫 RPA será interrompido devido à falha na Tela 14")
                     return criar_retorno_erro(
@@ -3232,17 +3281,21 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                 exibir_mensagem("📋 Motivo: Fluxo otimizado - Tela 14 não é necessária")
                 exibir_mensagem("🔗 Transição direta da Tela 13 para Tela 15 detectada")
                 resultado_telas["tela_14"] = True  # Considera como sucesso pois foi pulada intencionalmente
+                progress_tracker.update_progress(14, "Tela 14 pulada")
                 exibir_mensagem("✅ TELA 14 PULADA COM SUCESSO!")
                 exibir_mensagem("📈 Próximo passo: Executar Tela 15 diretamente")
             
             # TELA 15
+            progress_tracker.update_progress(15, "Aguardando cálculo completo")
             exibir_mensagem("\n" + "="*50)
             if navegar_tela_15_playwright(page, parametros['autenticacao']['email_login'], parametros['autenticacao']['senha_login'], parametros_tempo):
                 telas_executadas += 1
                 resultado_telas["tela_15"] = True
+                progress_tracker.update_progress(15, "Tela 15 concluída")
                 exibir_mensagem("✅ TELA 15 CONCLUÍDA!")
             else:
                 resultado_telas["tela_15"] = False
+                progress_tracker.update_progress(15, "Tela 15 falhou")
                 exibir_mensagem("❌ TELA 15 FALHOU!")
                 return criar_retorno_erro(
                     "Tela 15 falhou",
@@ -3253,6 +3306,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                 )
             
             # Resultado final
+            progress_tracker.update_progress(15, "RPA concluído com sucesso")
             exibir_mensagem("\n" + "="*60)
             exibir_mensagem("🎉 RPA TELAS 1 A 15 CONCLUÍDO COM SUCESSO!")
             exibir_mensagem(f"✅ Total de telas executadas: {telas_executadas}/14 (Tela 14 é condicional)")
@@ -3281,6 +3335,12 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             )
             
     except Exception as e:
+        # Atualizar progresso em caso de erro
+        try:
+            progress_tracker.update_progress(0, f"RPA interrompido por erro: {str(e)}")
+        except:
+            pass  # Não falhar se o progress tracker der erro
+        
         exception_handler.capturar_excecao(e, "EXECUCAO_PRINCIPAL", "Erro na execução principal")
         
         return criar_retorno_erro(
