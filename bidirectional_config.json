@@ -1,0 +1,41 @@
+{
+  "server": {
+    "host": "localhost",
+    "port": 8080,
+    "enable_server": true,
+    "description": "Servidor HTTP para comunicação com PHP"
+  },
+  "client": {
+    "php_endpoint": "http://localhost:8000/rpa_status",
+    "polling_interval": 2,
+    "enable_polling": true,
+    "description": "Configuração de comunicação com PHP"
+  },
+  "commands": {
+    "pause": "PAUSE",
+    "resume": "RESUME",
+    "cancel": "CANCEL",
+    "status": "STATUS",
+    "description": "Comandos disponíveis para PHP"
+  },
+  "status_codes": {
+    "running": "RUNNING",
+    "paused": "PAUSED",
+    "cancelled": "CANCELLED",
+    "completed": "COMPLETED",
+    "error": "ERROR",
+    "description": "Códigos de status do RPA"
+  },
+  "logging": {
+    "enabled": true,
+    "log_file": "logs/bidirectional.log",
+    "detailed_logging": true,
+    "description": "Configuração de logs"
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "created": "2025-09-04",
+    "description": "Configuração do sistema de comunicação bidirecional",
+    "author": "Luciano Otero"
+  }
+}

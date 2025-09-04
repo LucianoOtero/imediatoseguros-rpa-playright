@@ -102,38 +102,7 @@
   - Fallback para telas alternativas
   - Detecção de travamentos
 
-#### **📊 4. Tratamento Inteligente de Falha na Tela 15**
-- **Status**: ❌ **NÃO IMPLEMENTADO**
-- **Prioridade**: 🔴 **MÁXIMA**
-- **Arquivo**: `utils/tela15_fallback_handler.py`
-- **Descrição**: Tratamento inteligente quando a Tela 15 não carrega o cálculo
-- **Impacto na UX**: Usuário fica sem resposta quando o cálculo não é efetuado
-- **Implementação Necessária**:
-  - Detecção de telas alternativas à Tela 15 esperada
-  - Mensagem de retorno específica: "Cálculo não pode ser efetuado neste momento"
-  - Informação: "Será efetuado mais tarde por especialista da Imediato Seguros"
-  - Contato: "Enviado pelos meios de contato registrados"
-  - Retorno estruturado com código específico (ex: 9015)
-  - Fallback para captura de dados básicos se disponível
-  - Log detalhado da situação para análise posterior
-
-#### **🚗 5. Controle de Validação de Veículo por Placa**
-- **Status**: ❌ **NÃO IMPLEMENTADO**
-- **Prioridade**: 🔴 **MÁXIMA**
-- **Arquivo**: `utils/vehicle_validation.py`
-- **Descrição**: Verificação inteligente se o veículo informado pelo sistema (via placa) corresponde ao JSON
-- **Impacto na UX**: Previne erros de dados e garante precisão das informações
-- **Implementação Necessária**:
-  - Comparação aproximada entre dados do sistema e JSON
-  - Validação de marca, modelo, ano, combustível
-  - Algoritmo de similaridade para nomes de modelos
-  - Tratamento de variações de nomenclatura
-  - Alertas de divergência com sugestões de correção
-  - Log de validações para auditoria
-  - Fallback para confirmação manual se divergência crítica
-  - Integração com sistema de retorno estruturado
-
-#### **🔗 6. Sistema de Comunicação Bidirecional**
+#### **🔗 3. Sistema de Comunicação Bidirecional**
 - **Status**: ❌ **NÃO IMPLEMENTADO**
 - **Prioridade**: 🔴 **MÁXIMA**
 - **Arquivo**: `utils/bidirectional_communication.py`
@@ -145,6 +114,8 @@
   - Cancelamento em tempo real
   - Notificações de eventos críticos
   - API REST para controle
+
+### **🟡 PRIORIDADE ALTA - ROBUSTEZ E DEBUGGING**
 
 #### **📝 4. Sistema de Logger Avançado (REPRIORIZADO)**
 - **Status**: ❌ **NÃO IMPLEMENTADO**
@@ -185,13 +156,65 @@
   - Verificação de recursos do sistema
   - Diagnóstico prévio de problemas
 
+#### **📊 4. Tratamento Inteligente de Falha na Tela 15**
+- **Status**: ❌ **NÃO IMPLEMENTADO**
+- **Prioridade**: 🟡 **MÉDIA** (era MÁXIMA - movido para implementação posterior)
+- **Arquivo**: `utils/tela15_fallback_handler.py`
+- **Descrição**: Tratamento inteligente quando a Tela 15 não carrega o cálculo
+- **Impacto na UX**: Usuário fica sem resposta quando o cálculo não é efetuado
+- **Justificativa para Prioridade MÉDIA**: Erro tem chance pequena de acontecer, mas é crítico quando ocorre
+- **Estratégia de Implementação**: ✅ **ELABORADA E DOCUMENTADA**
+- **Implementação Necessária**:
+  - Detecção de telas alternativas à Tela 15 esperada
+  - Mensagem de retorno específica: "Cálculo não pode ser efetuado neste momento"
+  - Informação: "Será efetuado mais tarde por especialista da Imediato Seguros"
+  - Contato: "Enviado pelos meios de contato registrados"
+  - Retorno estruturado com código específico (ex: 9015)
+  - Fallback para captura de dados básicos se disponível
+  - Log detalhado da situação para análise posterior
+- **Estratégia Segura Documentada**:
+  - ✅ Implementação 100% modular (sem modificar arquivo principal)
+  - ✅ Handler isolado em `utils/tela15_fallback_handler.py`
+  - ✅ Configuração flexível via `tela15_fallback_config.json`
+  - ✅ Wrapper de integração em `utils/tela15_integration_wrapper.py`
+  - ✅ Códigos específicos: 9015 (cálculo indisponível), 9016 (fallback sucesso), 9017 (dados parciais)
+  - ✅ Logs detalhados para auditoria
+  - ✅ Zero impacto na funcionalidade existente
+  - ✅ Backup e rollback automático
+
 ---
 
 ---
 
 ### **🟡 PRIORIDADE MÉDIA - OTIMIZAÇÃO E MONITORAMENTO**
 
-#### **🔄 7. Conversor Unicode → ASCII Robusto**
+#### **📊 7. Tratamento Inteligente de Falha na Tela 15**
+- **Status**: ❌ **NÃO IMPLEMENTADO**
+- **Prioridade**: 🟡 **MÉDIA** (era MÁXIMA - movido para implementação posterior)
+- **Arquivo**: `utils/tela15_fallback_handler.py`
+- **Descrição**: Tratamento inteligente quando a Tela 15 não carrega o cálculo
+- **Impacto na UX**: Usuário fica sem resposta quando o cálculo não é efetuado
+- **Justificativa para Prioridade MÉDIA**: Erro tem chance pequena de acontecer, mas é crítico quando ocorre
+- **Estratégia de Implementação**: ✅ **ELABORADA E DOCUMENTADA**
+- **Implementação Necessária**:
+  - Detecção de telas alternativas à Tela 15 esperada
+  - Mensagem de retorno específica: "Cálculo não pode ser efetuado neste momento"
+  - Informação: "Será efetuado mais tarde por especialista da Imediato Seguros"
+  - Contato: "Enviado pelos meios de contato registrados"
+  - Retorno estruturado com código específico (ex: 9015)
+  - Fallback para captura de dados básicos se disponível
+  - Log detalhado da situação para análise posterior
+- **Estratégia Segura Documentada**:
+  - ✅ Implementação 100% modular (sem modificar arquivo principal)
+  - ✅ Handler isolado em `utils/tela15_fallback_handler.py`
+  - ✅ Configuração flexível via `tela15_fallback_config.json`
+  - ✅ Wrapper de integração em `utils/tela15_integration_wrapper.py`
+  - ✅ Códigos específicos: 9015 (cálculo indisponível), 9016 (fallback sucesso), 9017 (dados parciais)
+  - ✅ Logs detalhados para auditoria
+  - ✅ Zero impacto na funcionalidade existente
+  - ✅ Backup e rollback automático
+
+#### **🔄 8. Conversor Unicode → ASCII Robusto**
 - **Status**: ❌ **NÃO IMPLEMENTADO**
 - **Prioridade**: 🟡 **MÉDIA**
 - **Arquivo**: `utils/unicode_converter.py`
@@ -203,7 +226,7 @@
   - Fallback para caracteres não suportados
   - Mapeamento de emojis
 
-#### **💾 8. Sistema de Cache Inteligente**
+#### **💾 9. Sistema de Cache Inteligente**
 - **Status**: ❌ **NÃO IMPLEMENTADO**
 - **Prioridade**: 🟡 **MÉDIA**
 - **Arquivo**: `utils/smart_cache.py`
@@ -216,7 +239,7 @@
   - Compressão de dados
   - Cache distribuído
 
-#### **📈 9. Sistema de Métricas e Analytics**
+#### **📈 10. Sistema de Métricas e Analytics**
 - **Status**: ❌ **NÃO IMPLEMENTADO**
 - **Prioridade**: 🟡 **MÉDIA**
 - **Arquivo**: `utils/metrics_analytics.py`
@@ -229,7 +252,7 @@
   - Análise de bottlenecks
   - Relatórios de performance
 
-#### **⚙️ 10. Modo de Execução via Linha de Comando**
+#### **⚙️ 11. Modo de Execução via Linha de Comando**
 - **Status**: ❌ **NÃO IMPLEMENTADO**
 - **Prioridade**: 🟡 **MÉDIA**
 - **Arquivo**: `cli_rpa.py`
@@ -241,7 +264,7 @@
   - Configurações via CLI
   - Modo verbose/quiet
 
-#### **🔧 11. Sistema de Configuração Dinâmica**
+#### **🔧 12. Sistema de Configuração Dinâmica**
 - **Status**: ❌ **NÃO IMPLEMENTADO**
 - **Prioridade**: 🟡 **MÉDIA**
 - **Arquivo**: `utils/dynamic_config.py`
@@ -255,13 +278,13 @@
 
 ## ❌ **COMPONENTES QUE NÃO DEVEM SER IMPLEMENTADOS**
 
-### **🔧 12. Sistema de Helpers**
+### **🔧 13. Sistema de Helpers**
 - **Status**: ❌ **NÃO IMPLEMENTAR**
 - **Prioridade**: 🟢 **BAIXA**
 - **Motivo**: Específico do Selenium
 - **Observação**: Playwright já possui funcionalidades nativas equivalentes
 
-### **📊 13. Captura de Dados da Tela 5 (Carrossel de Estimativas)**
+### **📊 14. Captura de Dados da Tela 5 (Carrossel de Estimativas)**
 - **Status**: ✅ **JÁ IMPLEMENTADO**
 - **Prioridade**: 🟢 **BAIXA**
 - **Motivo**: Funcionalidade já implementada e funcionando
@@ -271,14 +294,14 @@
 
 ## 🤔 **COMPONENTES PARA ANÁLISE FUTURA**
 
-### **🔐 14. Sistema de Login Automático Completo**
+### **🔐 15. Sistema de Login Automático Completo**
 - **Status**: ❌ **ANALISAR MELHOR**
 - **Prioridade**: 🟡 **MÉDIA**
 - **Descrição**: Sistema de login automático
 - **Implementação Necessária**: Análise detalhada dos requisitos
 - **Considerações**: Segurança, tokens, sessões
 
-### **🔧 15. Configuração Avançada do Browser**
+### **🔧 16. Configuração Avançada do Browser**
 - **Status**: ❌ **ANALISAR MELHOR**
 - **Prioridade**: 🟡 **MÉDIA**
 - **Descrição**: Configurações avançadas do navegador
@@ -289,19 +312,19 @@
 
 ## ✅ **COMPONENTES JÁ IMPLEMENTADOS**
 
-### **16. Estrutura de Retorno JSON Padronizada**
+### **17. Estrutura de Retorno JSON Padronizada**
 - **Status**: ✅ **IMPLEMENTADO**
 - **Prioridade**: ✅ **CONCLUÍDO**
 - **Descrição**: Estrutura JSON padronizada para retorno
 - **Observação**: Já implementado e funcionando
 
-### **17. Sistema de Exception Handler**
+### **18. Sistema de Exception Handler**
 - **Status**: ✅ **IMPLEMENTADO**
 - **Prioridade**: ✅ **CONCLUÍDO**
 - **Descrição**: Tratamento robusto de exceções
 - **Observação**: Funcionando corretamente
 
-### **18. Sistema de Validação de Parâmetros (BÁSICO)**
+### **19. Sistema de Validação de Parâmetros (BÁSICO)**
 - **Status**: ✅ **IMPLEMENTADO**
 - **Prioridade**: ✅ **CONCLUÍDO**
 - **Descrição**: Validação básica de parâmetros de entrada
@@ -314,15 +337,15 @@
 ### **📈 Progresso Geral:**
 - **Telas implementadas**: 15/15 (100%)
 - **Funcionalidades críticas**: 100%
-- **Componentes pendentes**: 13/20 (65%)
-- **Componentes implementados**: 3/20 (15%)
-- **Componentes não implementar**: 2/20 (10%)
-- **Componentes para análise**: 2/20 (10%)
+- **Componentes pendentes**: 12/19 (63.2%)
+- **Componentes implementados**: 3/19 (15.8%)
+- **Componentes não implementar**: 2/19 (10.5%)
+- **Componentes para análise**: 2/19 (10.5%)
 
 ### **🎯 Análise por Prioridade:**
-- **Prioridade MÁXIMA**: 5/5 (0% implementado)
+- **Prioridade MÁXIMA**: 3/3 (0% implementado)
 - **Prioridade ALTA**: 3/3 (0% implementado)
-- **Prioridade MÉDIA**: 5/5 (0% implementado)
+- **Prioridade MÉDIA**: 6/6 (0% implementado)
 - **Prioridade BAIXA**: 2/2 (100% implementado)
 
 ### **⏱️ Tempos de Execução:**
@@ -349,19 +372,7 @@
    - Cancelamento automático em caso de travamento
    - Retry inteligente com backoff exponencial
 
-3. **Tratamento Inteligente de Falha na Tela 15** (Prioridade MÁXIMA)
-   - Detecção de telas alternativas
-   - Mensagem específica para cálculo não efetuado
-   - Retorno estruturado com código 9015
-   - Fallback para dados básicos
-
-4. **Controle de Validação de Veículo por Placa** (Prioridade MÁXIMA)
-   - Comparação aproximada entre dados do sistema e JSON
-   - Validação de marca, modelo, ano, combustível
-   - Algoritmo de similaridade para nomes de modelos
-   - Alertas de divergência com sugestões
-
-5. **Sistema de Comunicação Bidirecional** (Prioridade MÁXIMA)
+3. **Sistema de Comunicação Bidirecional** (Prioridade MÁXIMA)
    - WebSocket ou HTTP polling para status
    - Comandos de pausa/retomada
    - Cancelamento em tempo real
@@ -383,30 +394,32 @@
    - Teste de autenticação
 
 ### **FASE 3: OTIMIZAÇÃO E MONITORAMENTO (2-3 SEMANAS)**
-7. **Conversor Unicode → ASCII** (Prioridade MÉDIA)
+7. **Tratamento Inteligente de Falha na Tela 15** (Prioridade MÉDIA)
+   - Detecção de telas alternativas
+   - Mensagem específica para cálculo não efetuado
+   - Retorno estruturado com código 9015
+   - Fallback para dados básicos
+
+8. **Conversor Unicode → ASCII** (Prioridade MÉDIA)
    - Tratamento de acentuação
    - Compatibilidade com sistemas legados
 
-8. **Sistema de Cache Inteligente** (Prioridade MÉDIA)
+9. **Sistema de Cache Inteligente** (Prioridade MÉDIA)
    - Cache de dados de veículos
    - Cache de estimativas por perfil
    - Invalidação automática
 
-9. **Sistema de Métricas e Analytics** (Prioridade MÉDIA)
-   - Tempo de execução por tela
-   - Taxa de sucesso/erro
-   - Performance de selectors
-
-10. **Modo de Execução via Linha de Comando** (Prioridade MÉDIA)
-    - Argumentos de linha de comando
-    - Modo headless/headful
-    - Configurações via CLI
+10. **Sistema de Métricas e Analytics** (Prioridade MÉDIA)
+    - Tempo de execução por tela
+    - Taxa de sucesso/erro
+    - Performance de selectors
 
 ### **FASE 4: CONFIGURAÇÃO E AUTOMAÇÃO (3-4 SEMANAS)**
-11. **Sistema de Configuração Dinâmica** (Prioridade MÉDIA)
-12. **Análise dos componentes futuros** (Prioridade BAIXA)
-13. **Otimização de performance** (Prioridade BAIXA)
-14. **Expansão para outras seguradoras** (Prioridade BAIXA)
+11. **Modo de Execução via Linha de Comando** (Prioridade MÉDIA)
+12. **Sistema de Configuração Dinâmica** (Prioridade MÉDIA)
+13. **Análise dos componentes futuros** (Prioridade BAIXA)
+14. **Otimização de performance** (Prioridade BAIXA)
+15. **Expansão para outras seguradoras** (Prioridade BAIXA)
 
 ---
 
@@ -433,32 +446,10 @@
   3. Retry inteligente com backoff
   4. Integração no RPA principal
 
-### **📊 3. Tratamento Inteligente de Falha na Tela 15**
-- **Prioridade**: 🔴 **MÁXIMA**
-- **Tarefa**: Implementar `utils/tela15_fallback_handler.py`
-- **Tempo estimado**: 60 minutos
-- **Passos**:
-  1. Criar classe `Tela15FallbackHandler`
-  2. Detecção de telas alternativas
-  3. Mensagem específica para cálculo não efetuado
-  4. Retorno estruturado com código 9015
-  5. Fallback para dados básicos
-
-### **🚗 4. Controle de Validação de Veículo por Placa**
-- **Prioridade**: 🔴 **MÁXIMA**
-- **Tarefa**: Implementar `utils/vehicle_validation.py`
-- **Tempo estimado**: 90 minutos
-- **Passos**:
-  1. Criar classe `VehicleValidator`
-  2. Algoritmo de similaridade para nomes de modelos
-  3. Comparação aproximada entre dados do sistema e JSON
-  4. Alertas de divergência com sugestões
-  5. Integração com sistema de retorno estruturado
-
-### **🔗 5. Sistema de Comunicação Bidirecional**
+### **🔗 3. Sistema de Comunicação Bidirecional**
 - **Prioridade**: 🔴 **MÁXIMA**
 - **Tarefa**: Implementar comunicação PHP-Python
-- **Tempo estimado**: 120 minutos
+- **Tempo estimado**: 60 minutos
 - **Passos**:
   1. Criar `utils/bidirectional_communication.py`
   2. Implementar WebSocket ou HTTP polling
@@ -479,8 +470,6 @@
 
 ### **🎯 Próximo Item da Prioridade:**
 - **Integração do Sistema de Progresso** no RPA principal
-- **Tratamento Inteligente de Falha na Tela 15** (NOVO)
-- **Controle de Validação de Veículo por Placa** (NOVO)
 
 ### **📈 Status Geral:**
 - **Sistema RPA**: ✅ 100% Funcional
@@ -506,8 +495,6 @@
 ### **🔄 PENDENTE CRÍTICO (FASE 1):**
 - [ ] **Integração do Sistema de Progresso** no RPA principal
 - [ ] Sistema de Timeout Inteligente
-- [ ] **Tratamento Inteligente de Falha na Tela 15**
-- [ ] **Controle de Validação de Veículo por Placa**
 - [ ] Sistema de Comunicação Bidirecional
 
 ### **🔄 PENDENTE ALTO (FASE 2):**
@@ -516,6 +503,7 @@
 - [ ] Sistema de Health Check
 
 ### **🔄 PENDENTE MÉDIO (FASE 3-4):**
+- [ ] Tratamento Inteligente de Falha na Tela 15
 - [ ] Conversor Unicode → ASCII
 - [ ] Sistema de Cache Inteligente
 - [ ] Sistema de Métricas e Analytics
@@ -553,4 +541,4 @@
 **Documento consolidado em**: 04/09/2025  
 **Versão**: 3.1.2  
 **Autor**: Luciano Otero  
-**Última atualização**: Conquistas do dia 04/09/2025 - Sistema de Timeout Inteligente implementado + 2 novos itens prioritários adicionados
+**Última atualização**: Conquistas do dia 04/09/2025 - Sistema de Timeout Inteligente implementado + Tratamento Tela 15 movido para prioridade MÉDIA
