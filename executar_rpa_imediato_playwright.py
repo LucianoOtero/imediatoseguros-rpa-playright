@@ -47,6 +47,14 @@ except ImportError:
     TIMEOUT_SYSTEM_AVAILABLE = False
     print("⚠️ Sistema de timeout não disponível - usando timeouts padrão")
 
+# Importar Sistema de Logger Avançado (opcional)
+try:
+    from utils.logger_rpa import RPALogger, setup_logger, log_info, log_error, log_success
+    LOGGER_SYSTEM_AVAILABLE = True
+except ImportError:
+    LOGGER_SYSTEM_AVAILABLE = False
+    print("⚠️ Sistema de logger não disponível - usando logs padrão")
+
 
 # ========================================
 # SISTEMA DE ARGUMENTOS DE LINHA DE COMANDO
@@ -3254,12 +3262,28 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
         else:
             smart_timeout = None
         
+        # Inicializar Sistema de Logger Avançado (opcional)
+        if LOGGER_SYSTEM_AVAILABLE:
+            from utils.logger_rpa import RPALogger
+            logger = RPALogger()
+            log_info(logger, "Sistema de logger inicializado", {"versao": "3.1.3"})
+            print("✅ Sistema de logger avançado ativado")
+        else:
+            logger = None
+        
         # Inicializar Exception Handler
         exception_handler.limpar_erros()
         exception_handler.definir_tela_atual("INICIALIZACAO")
         
         exibir_mensagem("🚀 INICIANDO RPA PLAYWRIGHT")
         exibir_mensagem("=" * 50)
+        
+        # Log de início da execução
+        try:
+            if LOGGER_SYSTEM_AVAILABLE and 'logger' in locals() and logger:
+                log_info(logger, "RPA iniciado", {"versao": "3.1.3", "parametros": parametros})
+        except:
+            pass  # Não falhar se o logger der erro
         
         # Carregar parâmetros de tempo
         parametros_tempo = obter_parametros_tempo(parametros)
@@ -3285,15 +3309,38 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             # TELA 1
             progress_tracker.update_progress(1, "Selecionando Tipo de Veiculo")
             exibir_mensagem("\n" + "="*50)
+            
+            # Log de início da Tela 1
+            try:
+                if LOGGER_SYSTEM_AVAILABLE and 'logger' in locals() and logger:
+                    log_info(logger, "Executando Tela 1", {"tela": 1, "timestamp": datetime.now().isoformat()})
+            except:
+                pass  # Não falhar se o logger der erro
+            
             if executar_com_timeout(smart_timeout, 1, navegar_tela_1_playwright, page):
                 telas_executadas += 1
                 resultado_telas["tela_1"] = True
                 progress_tracker.update_progress(1, "Tela 1 concluída")
                 exibir_mensagem("✅ TELA 1 CONCLUÍDA!")
+                
+                # Log de sucesso da Tela 1
+                try:
+                    if LOGGER_SYSTEM_AVAILABLE and 'logger' in locals() and logger:
+                        log_success(logger, "Tela 1 concluída", {"tela": 1, "tempo": time.time() - inicio_execucao})
+                except:
+                    pass  # Não falhar se o logger der erro
             else:
                 resultado_telas["tela_1"] = False
                 progress_tracker.update_progress(1, "Tela 1 falhou")
                 exibir_mensagem("❌ TELA 1 FALHOU!")
+                
+                # Log de erro da Tela 1
+                try:
+                    if LOGGER_SYSTEM_AVAILABLE and 'logger' in locals() and logger:
+                        log_error(logger, "Tela 1 falhou", {"tela": 1, "erro": "Execução falhou"})
+                except:
+                    pass  # Não falhar se o logger der erro
+                
                 return criar_retorno_erro(
                     "Tela 1 falhou",
                     "TELA_1",
@@ -3618,6 +3665,17 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             # Calcular tempo de execução
             tempo_execucao = time.time() - inicio_execucao
             
+            # Log de conclusão bem-sucedida
+            try:
+                if LOGGER_SYSTEM_AVAILABLE and 'logger' in locals() and logger:
+                    log_success(logger, "RPA concluído com sucesso", {
+                        "tempo_total": tempo_execucao,
+                        "telas_executadas": telas_executadas,
+                        "arquivo_dados": arquivo_dados
+                    })
+            except:
+                pass  # Não falhar se o logger der erro
+            
             # Retorno estruturado
             return criar_retorno_sucesso(
                 resultado_telas,
@@ -3633,6 +3691,17 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             progress_tracker.update_progress(0, f"RPA interrompido por erro: {str(e)}")
         except:
             pass  # Não falhar se o progress tracker der erro
+        
+        # Log de erro principal (verificar se logger existe)
+        try:
+            if LOGGER_SYSTEM_AVAILABLE and 'logger' in locals() and logger:
+                log_error(logger, "Erro na execução principal", {
+                    "erro": str(e),
+                    "traceback": traceback.format_exc(),
+                    "tempo_execucao": time.time() - inicio_execucao
+                })
+        except:
+            pass  # Não falhar se o logger der erro
         
         exception_handler.capturar_excecao(e, "EXECUCAO_PRINCIPAL", "Erro na execução principal")
         
