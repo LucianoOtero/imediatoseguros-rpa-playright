@@ -63,6 +63,14 @@ except ImportError:
     BIDIRECTIONAL_SYSTEM_AVAILABLE = False
     print("⚠️ Sistema de comunicação bidirecional não disponível - executando sem controle remoto")
 
+# Importar Sistema de Validação de Parâmetros Avançado (opcional)
+try:
+    from utils.validacao_parametros import ValidadorParametros, ValidacaoParametrosError
+    VALIDATION_SYSTEM_AVAILABLE = True
+except ImportError:
+    VALIDATION_SYSTEM_AVAILABLE = False
+    print("⚠️ Sistema de validação avançado não disponível - usando validação básica")
+
 
 # ========================================
 # SISTEMA DE ARGUMENTOS DE LINHA DE COMANDO
@@ -97,6 +105,14 @@ SISTEMA BIDIRECIONAL:
   Comandos: PAUSE, RESUME, CANCEL
   Fallback automático se sistema não disponível
 
+VALIDAÇÃO RIGOROSA DE PARÂMETROS:
+  ⚠️ EXECUÇÃO INTERROMPIDA se parâmetros inválidos detectados
+  Validação de campos obrigatórios, tipos de dados e formatos
+  Validação de CPF, CEP, email, celular (11 dígitos), placa
+  Validação de valores permitidos (combustível, sexo, etc.)
+  Retorna erro detalhado com parâmetros inválidos identificados
+  Não há fallback - execução é interrompida imediatamente
+
 ARQUIVOS GERADOS:
   - temp/progress_status.json: Progresso em tempo real
   - dados_planos_seguro_YYYYMMDD_HHMMSS.json: Dados finais
@@ -114,7 +130,7 @@ STATUS CODES:
     parser.add_argument(
         '--version', 
         action='version', 
-        version='%(prog)s v3.1.1'
+        version='%(prog)s v3.1.6'
     )
     
     parser.add_argument(
@@ -3311,8 +3327,40 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
         parametros_tempo = obter_parametros_tempo(parametros)
         
         # Validar parâmetros
-        if not validar_parametros_obrigatorios(parametros):
-            raise RPAException("Parâmetros obrigatórios inválidos", "VALIDACAO")
+        if VALIDATION_SYSTEM_AVAILABLE:
+            try:
+                # Usar sistema de validação avançado
+                validador = ValidadorParametros()
+                parametros_validados = validador.validar_parametros(parametros)
+                print("✅ Validação avançada de parâmetros concluída")
+            except ValidacaoParametrosError as e:
+                # ❌ INTERROMPER EXECUÇÃO - Parâmetros inválidos detectados
+                erro_msg = f"❌ VALIDAÇÃO DE PARÂMETROS FALHOU: {str(e)}"
+                print(erro_msg)
+                print("🚫 Execução interrompida devido a parâmetros inválidos")
+                return criar_retorno_erro(
+                    f"Validação de parâmetros falhou: {str(e)}",
+                    "VALIDACAO",
+                    time.time() - inicio_execucao,
+                    parametros,
+                    exception_handler
+                )
+            except Exception as e:
+                # ❌ INTERROMPER EXECUÇÃO - Erro inesperado na validação
+                erro_msg = f"❌ ERRO INESPERADO NA VALIDAÇÃO: {str(e)}"
+                print(erro_msg)
+                print("🚫 Execução interrompida devido a erro na validação")
+                return criar_retorno_erro(
+                    f"Erro inesperado na validação: {str(e)}",
+                    "VALIDACAO",
+                    time.time() - inicio_execucao,
+                    parametros,
+                    exception_handler
+                )
+        else:
+            # Usar validação básica existente
+            if not validar_parametros_obrigatorios(parametros):
+                raise RPAException("Parâmetros obrigatórios inválidos", "VALIDACAO")
         
         # Inicializar Playwright
         with sync_playwright() as p:
