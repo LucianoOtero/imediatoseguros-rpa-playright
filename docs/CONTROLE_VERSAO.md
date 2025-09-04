@@ -14,18 +14,19 @@
 - **Commits**: ✅ Enviados
 - **Histórico**: ✅ Completo
 
-## 🏆 **VALIDAÇÃO DE CELULAR SIMPLIFICADA IMPLEMENTADA - v3.1.6**
+## 🏆 **VALIDAÇÃO DE VEICULO_SEGURADO PADRONIZADA - v3.1.7**
 
-### ✅ **Nova Versão Principal**: v3.1.6
-- **Commit**: `b177b17`
+### ✅ **Nova Versão Principal**: v3.1.7
+- **Commit**: `67b80ca`
 - **Data**: 04/09/2025
-- **Status**: ✅ **VALIDAÇÃO DE CELULAR SIMPLIFICADA IMPLEMENTADA**
+- **Status**: ✅ **VALIDAÇÃO DE VEICULO_SEGURADO PADRONIZADA**
 - **Funcionalidades**:
-  - ✅ Validação de celular simplificada implementada
-  - ✅ Regex modificado para aceitar apenas 11 dígitos numéricos
-  - ✅ Removida formatação restritiva (parênteses, espaços, hífens)
-  - ✅ Atualizado parametros.json para formato simples
-  - ✅ Melhorada flexibilidade e praticidade para o usuário
+  - ✅ Validação de veiculo_segurado padronizada implementada
+  - ✅ Removido 'Nao' (sem acento) dos valores permitidos
+  - ✅ Agora aceita apenas 'Sim' e 'Não' (com acento)
+  - ✅ Padronização para uso correto de acentuação
+  - ✅ Eliminação de ambiguidades na validação
+  - ✅ Validação de Celular Simplificada (v3.1.6) mantida
   - ✅ Sistema de Comunicação Bidirecional (v3.1.5) mantido
   - ✅ Sistema de Validação de Parâmetros (v3.1.5) mantido
   - ✅ Sistema de Logger Avançado (v3.1.4) mantido
@@ -34,15 +35,17 @@
   - ✅ Sistema de Retorno Estruturado (v3.1.0) mantido
   - ✅ Migração Selenium → Playwright mantida e estável
 
-### **Principais Conquistas da v3.1.6:**
-- **Validação Simplificada**: Regex aceita apenas 11 dígitos
-- **Flexibilidade**: Removida formatação restritiva
-- **Praticidade**: Usuário pode inserir números simples
-- **Compatibilidade**: Mantida funcionalidade existente
-- **Testes**: Validação funcionando corretamente
+### **Principais Conquistas da v3.1.7:**
+- **Padronização**: Uso correto de acentuação
+- **Eliminação de Ambiguidades**: Não há mais confusão entre "Nao" e "Não"
+- **Consistência**: Apenas valores corretos aceitos
+- **Precisão**: Sistema de validação mais preciso
+- **Compatibilidade**: Sistema existente não afetado
 - **Performance**: Mantida e otimizada
 - **Estabilidade**: Excelente
 - **Captura de dados**: Robusta e confiável
+
+## 🏆 **VALIDAÇÃO DE CELULAR SIMPLIFICADA IMPLEMENTADA - v3.1.6**
 
 ## 🏆 **SISTEMA DE COMUNICAÇÃO BIDIRECIONAL IMPLEMENTADO - v3.1.5**
 
