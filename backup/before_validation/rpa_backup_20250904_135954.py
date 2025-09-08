@@ -10,16 +10,10 @@ DESCRIÇÃO:
 - Captura de dados dos planos de seguro
 - Estrutura de retorno padronizada
 
-🔄 ATUALIZAÇÃO DE COMPATIBILIDADE REGIONAL (08/09/2025):
-- Substituição de seletores genéricos por específicos na Tela 13
-- Resolução de problema de falha em Portugal
-- Melhoria de estabilidade regional (Brasil + Portugal)
-- Documentação completa das mudanças realizadas
-
 AUTOR: Luciano Otero
 DATA: 2025-09-02
-VERSÃO: 1.1.0 (Compatibilidade Regional)
-STATUS: Implementação completa com Exception Handler + Compatibilidade Regional
+VERSÃO: 1.0.0
+STATUS: Implementação completa com Exception Handler
 """
 
 import json
@@ -69,14 +63,6 @@ except ImportError:
     BIDIRECTIONAL_SYSTEM_AVAILABLE = False
     print("⚠️ Sistema de comunicação bidirecional não disponível - executando sem controle remoto")
 
-# Importar Sistema de Validação de Parâmetros Avançado (opcional)
-try:
-    from utils.validacao_parametros import ValidadorParametros, ValidacaoParametrosError
-    VALIDATION_SYSTEM_AVAILABLE = True
-except ImportError:
-    VALIDATION_SYSTEM_AVAILABLE = False
-    print("⚠️ Sistema de validação avançado não disponível - usando validação básica")
-
 
 # ========================================
 # SISTEMA DE ARGUMENTOS DE LINHA DE COMANDO
@@ -111,14 +97,6 @@ SISTEMA BIDIRECIONAL:
   Comandos: PAUSE, RESUME, CANCEL
   Fallback automático se sistema não disponível
 
-VALIDAÇÃO RIGOROSA DE PARÂMETROS:
-  ⚠️ EXECUÇÃO INTERROMPIDA se parâmetros inválidos detectados
-  Validação de campos obrigatórios, tipos de dados e formatos
-  Validação de CPF, CEP, email, celular (11 dígitos), placa
-  Validação de valores permitidos (combustível, sexo, etc.)
-  Retorna erro detalhado com parâmetros inválidos identificados
-  Não há fallback - execução é interrompida imediatamente
-
 ARQUIVOS GERADOS:
   - temp/progress_status.json: Progresso em tempo real
   - dados_planos_seguro_YYYYMMDD_HHMMSS.json: Dados finais
@@ -136,7 +114,7 @@ STATUS CODES:
     parser.add_argument(
         '--version', 
         action='version', 
-        version='%(prog)s v3.1.6'
+        version='%(prog)s v3.1.1'
     )
     
     parser.add_argument(
@@ -1957,28 +1935,11 @@ def navegar_tela_13_playwright(page, reside_18_26, sexo_do_menor, faixa_etaria_m
             page.locator("input[type='radio'][value='nao']").first.check()
         
         # PASSO 4: Clicar no botão Continuar
-        # ========================================
-        # 🔄 MUDANÇA DE SELETOR - COMPATIBILIDADE REGIONAL
-        # ========================================
-        # ANTES (Seletor Genérico - Problemático em Portugal):
-        # page.wait_for_selector("p.font-semibold.font-workSans.cursor-pointer:has-text('Continuar')", timeout=5000)
-        # page.locator("p.font-semibold.font-workSans.cursor-pointer:has-text('Continuar')").click()
-        #
-        # DEPOIS (Seletor Específico - Funciona em Portugal):
-        # Motivo: Seletores genéricos baseados em classes CSS falham em Portugal devido a:
-        # - Problemas de timing e renderização CSS assíncrona
-        # - Carregamento mais lento de fontes e estilos
-        # - Dependência de múltiplas classes CSS aplicadas
-        # - Diferenças de infraestrutura regional (latência, CDN, cache)
-        #
-        # Solução: Usar ID específico que é sempre presente no HTML
-        # independente do estado de renderização CSS
-        # ========================================
         exibir_mensagem("9️⃣ ⏳ Aguardando botão 'Continuar'...")
-        page.wait_for_selector("#gtm-telaUsoResidentesContinuar", timeout=5000)
+        page.wait_for_selector("p.font-semibold.font-workSans.cursor-pointer:has-text('Continuar')", timeout=5000)
         
         exibir_mensagem("🔟 🔄 Clicando no botão 'Continuar'...")
-        page.locator("#gtm-telaUsoResidentesContinuar").click()
+        page.locator("p.font-semibold.font-workSans.cursor-pointer:has-text('Continuar')").click()
         exibir_mensagem("1️⃣1️⃣ ✅ Botão 'Continuar' clicado com sucesso")
         
         # PASSO 5: Aguardar transição para próxima tela
@@ -3350,40 +3311,8 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
         parametros_tempo = obter_parametros_tempo(parametros)
         
         # Validar parâmetros
-        if VALIDATION_SYSTEM_AVAILABLE:
-            try:
-                # Usar sistema de validação avançado
-                validador = ValidadorParametros()
-                parametros_validados = validador.validar_parametros(parametros)
-                print("✅ Validação avançada de parâmetros concluída")
-            except ValidacaoParametrosError as e:
-                # ❌ INTERROMPER EXECUÇÃO - Parâmetros inválidos detectados
-                erro_msg = f"❌ VALIDAÇÃO DE PARÂMETROS FALHOU: {str(e)}"
-                print(erro_msg)
-                print("🚫 Execução interrompida devido a parâmetros inválidos")
-                return criar_retorno_erro(
-                    f"Validação de parâmetros falhou: {str(e)}",
-                    "VALIDACAO",
-                    time.time() - inicio_execucao,
-                    parametros,
-                    exception_handler
-                )
-            except Exception as e:
-                # ❌ INTERROMPER EXECUÇÃO - Erro inesperado na validação
-                erro_msg = f"❌ ERRO INESPERADO NA VALIDAÇÃO: {str(e)}"
-                print(erro_msg)
-                print("🚫 Execução interrompida devido a erro na validação")
-                return criar_retorno_erro(
-                    f"Erro inesperado na validação: {str(e)}",
-                    "VALIDACAO",
-                    time.time() - inicio_execucao,
-                    parametros,
-                    exception_handler
-                )
-        else:
-            # Usar validação básica existente
-            if not validar_parametros_obrigatorios(parametros):
-                raise RPAException("Parâmetros obrigatórios inválidos", "VALIDACAO")
+        if not validar_parametros_obrigatorios(parametros):
+            raise RPAException("Parâmetros obrigatórios inválidos", "VALIDACAO")
         
         # Inicializar Playwright
         with sync_playwright() as p:

@@ -10,16 +10,10 @@ DESCRIÇÃO:
 - Captura de dados dos planos de seguro
 - Estrutura de retorno padronizada
 
-🔄 ATUALIZAÇÃO DE COMPATIBILIDADE REGIONAL (08/09/2025):
-- Substituição de seletores genéricos por específicos na Tela 13
-- Resolução de problema de falha em Portugal
-- Melhoria de estabilidade regional (Brasil + Portugal)
-- Documentação completa das mudanças realizadas
-
 AUTOR: Luciano Otero
 DATA: 2025-09-02
-VERSÃO: 1.1.0 (Compatibilidade Regional)
-STATUS: Implementação completa com Exception Handler + Compatibilidade Regional
+VERSÃO: 1.0.0
+STATUS: Implementação completa com Exception Handler
 """
 
 import json
@@ -44,38 +38,6 @@ from utils.retorno_estruturado import (
 
 # Importar Sistema de Progresso em Tempo Real
 from utils.progress_realtime import ProgressTracker
-
-# Importar Sistema de Timeout Inteligente (opcional)
-try:
-    from utils.smart_timeout import SmartTimeout
-    TIMEOUT_SYSTEM_AVAILABLE = True
-except ImportError:
-    TIMEOUT_SYSTEM_AVAILABLE = False
-    print("⚠️ Sistema de timeout não disponível - usando timeouts padrão")
-
-# Importar Sistema de Logger Avançado (opcional)
-try:
-    from utils.logger_rpa import RPALogger, setup_logger, log_info, log_error, log_success
-    LOGGER_SYSTEM_AVAILABLE = True
-except ImportError:
-    LOGGER_SYSTEM_AVAILABLE = False
-    print("⚠️ Sistema de logger não disponível - usando logs padrão")
-
-# Importar Sistema de Comunicação Bidirecional (opcional)
-try:
-    from utils.bidirectional_integration_wrapper import execute_rpa_with_bidirectional_control
-    BIDIRECTIONAL_SYSTEM_AVAILABLE = True
-except ImportError:
-    BIDIRECTIONAL_SYSTEM_AVAILABLE = False
-    print("⚠️ Sistema de comunicação bidirecional não disponível - executando sem controle remoto")
-
-# Importar Sistema de Validação de Parâmetros Avançado (opcional)
-try:
-    from utils.validacao_parametros import ValidadorParametros, ValidacaoParametrosError
-    VALIDATION_SYSTEM_AVAILABLE = True
-except ImportError:
-    VALIDATION_SYSTEM_AVAILABLE = False
-    print("⚠️ Sistema de validação avançado não disponível - usando validação básica")
 
 
 # ========================================
@@ -105,27 +67,12 @@ DOCUMENTAÇÃO:
   --docs php: Guia específico para desenvolvedores PHP
   --docs params: Descrição dos parâmetros JSON
 
-SISTEMA BIDIRECIONAL:
-  Controle remoto via HTTP disponível na porta 8080
-  Endpoints: /status (GET) e /command (POST)
-  Comandos: PAUSE, RESUME, CANCEL
-  Fallback automático se sistema não disponível
-
-VALIDAÇÃO RIGOROSA DE PARÂMETROS:
-  ⚠️ EXECUÇÃO INTERROMPIDA se parâmetros inválidos detectados
-  Validação de campos obrigatórios, tipos de dados e formatos
-  Validação de CPF, CEP, email, celular (11 dígitos), placa
-  Validação de valores permitidos (combustível, sexo, etc.)
-  Retorna erro detalhado com parâmetros inválidos identificados
-  Não há fallback - execução é interrompida imediatamente
-
 ARQUIVOS GERADOS:
   - temp/progress_status.json: Progresso em tempo real
   - dados_planos_seguro_YYYYMMDD_HHMMSS.json: Dados finais
   - temp/json_compreensivo_tela_5_*.json: Dados intermediários
   - temp/retorno_intermediario_carrossel_*.json: Dados brutos Tela 5
   - temp/dados_tela_5_*.json: Metadados da captura
-  - logs/bidirectional.log: Logs do sistema bidirecional
 
 STATUS CODES:
   - 9001: Sucesso completo
@@ -136,7 +83,7 @@ STATUS CODES:
     parser.add_argument(
         '--version', 
         action='version', 
-        version='%(prog)s v3.1.6'
+        version='%(prog)s v3.1.1'
     )
     
     parser.add_argument(
@@ -654,47 +601,6 @@ def salvar_dados_planos(dados_planos: Dict[str, Any], prefixo: str = "dados_plan
     except Exception as e:
         erro = exception_handler.capturar_excecao(e, "SALVAMENTO_DADOS", "Erro ao salvar dados")
         raise RPAException("Erro ao salvar dados dos planos", "SALVAMENTO_DADOS", e)
-
-# ========================================
-# FUNÇÃO WRAPPER DE TIMEOUT SEGURO
-# ========================================
-
-def executar_com_timeout(smart_timeout, tela_num, funcao_tela, *args, **kwargs):
-    """
-    Wrapper seguro para executar telas com timeout inteligente
-    Não modifica a lógica original, apenas adiciona controle de timeout
-    """
-    if smart_timeout and smart_timeout.is_available():
-        try:
-            # Iniciar timer para a tela
-            smart_timeout.start_timer(tela_num, f"Executando Tela {tela_num}")
-            
-            # Executar função original
-            resultado = funcao_tela(*args, **kwargs)
-            
-            # Limpar timer se sucesso
-            smart_timeout.clear_timer(tela_num)
-            return resultado
-            
-        except Exception as e:
-            # Verificar se foi timeout
-            if smart_timeout.check_timeout(tela_num):
-                timeout_info = smart_timeout.handle_timeout(tela_num, str(e))
-                exibir_mensagem(f"⚠️ Timeout detectado na Tela {tela_num}: {timeout_info['elapsed_seconds']:.1f}s")
-                
-                # Tentar retry se disponível
-                if smart_timeout.retry_with_backoff(tela_num):
-                    exibir_mensagem(f"🔄 Retry automático na Tela {tela_num} (tentativa {timeout_info['retries_remaining']})")
-                    return executar_com_timeout(smart_timeout, tela_num, funcao_tela, *args, **kwargs)
-                else:
-                    exibir_mensagem(f"❌ Máximo de retries atingido na Tela {tela_num}")
-            
-            # Re-raise a exceção original
-            raise e
-    else:
-        # Fallback: executar sem timeout se sistema não disponível
-        return funcao_tela(*args, **kwargs)
-
 
 # ========================================
 # FUNÇÕES DE NAVEGAÇÃO DAS TELAS
@@ -1957,28 +1863,11 @@ def navegar_tela_13_playwright(page, reside_18_26, sexo_do_menor, faixa_etaria_m
             page.locator("input[type='radio'][value='nao']").first.check()
         
         # PASSO 4: Clicar no botão Continuar
-        # ========================================
-        # 🔄 MUDANÇA DE SELETOR - COMPATIBILIDADE REGIONAL
-        # ========================================
-        # ANTES (Seletor Genérico - Problemático em Portugal):
-        # page.wait_for_selector("p.font-semibold.font-workSans.cursor-pointer:has-text('Continuar')", timeout=5000)
-        # page.locator("p.font-semibold.font-workSans.cursor-pointer:has-text('Continuar')").click()
-        #
-        # DEPOIS (Seletor Específico - Funciona em Portugal):
-        # Motivo: Seletores genéricos baseados em classes CSS falham em Portugal devido a:
-        # - Problemas de timing e renderização CSS assíncrona
-        # - Carregamento mais lento de fontes e estilos
-        # - Dependência de múltiplas classes CSS aplicadas
-        # - Diferenças de infraestrutura regional (latência, CDN, cache)
-        #
-        # Solução: Usar ID específico que é sempre presente no HTML
-        # independente do estado de renderização CSS
-        # ========================================
         exibir_mensagem("9️⃣ ⏳ Aguardando botão 'Continuar'...")
-        page.wait_for_selector("#gtm-telaUsoResidentesContinuar", timeout=5000)
+        page.wait_for_selector("p.font-semibold.font-workSans.cursor-pointer:has-text('Continuar')", timeout=5000)
         
         exibir_mensagem("🔟 🔄 Clicando no botão 'Continuar'...")
-        page.locator("#gtm-telaUsoResidentesContinuar").click()
+        page.locator("p.font-semibold.font-workSans.cursor-pointer:has-text('Continuar')").click()
         exibir_mensagem("1️⃣1️⃣ ✅ Botão 'Continuar' clicado com sucesso")
         
         # PASSO 5: Aguardar transição para próxima tela
@@ -3309,29 +3198,6 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
         progress_tracker = ProgressTracker(total_etapas=15)
         progress_tracker.update_progress(0, "Iniciando RPA")
         
-        # Inicializar Sistema de Timeout Inteligente (opcional)
-        if TIMEOUT_SYSTEM_AVAILABLE:
-            smart_timeout = SmartTimeout()
-            print("✅ Sistema de timeout inteligente ativado")
-        else:
-            smart_timeout = None
-        
-        # Inicializar Sistema de Logger Avançado (opcional)
-        if LOGGER_SYSTEM_AVAILABLE:
-            from utils.logger_rpa import RPALogger
-            logger = RPALogger()
-            log_info(logger, "Sistema de logger inicializado", {"versao": "3.1.3"})
-            print("✅ Sistema de logger avançado ativado")
-        else:
-            logger = None
-        
-        # Inicializar Sistema de Comunicação Bidirecional (opcional)
-        if BIDIRECTIONAL_SYSTEM_AVAILABLE:
-            print("✅ Sistema de comunicação bidirecional ativado")
-            # O sistema será usado via wrapper na execução
-        else:
-            print("⚠️ Executando sem comunicação bidirecional")
-        
         # Inicializar Exception Handler
         exception_handler.limpar_erros()
         exception_handler.definir_tela_atual("INICIALIZACAO")
@@ -3339,51 +3205,12 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
         exibir_mensagem("🚀 INICIANDO RPA PLAYWRIGHT")
         exibir_mensagem("=" * 50)
         
-        # Log de início da execução
-        try:
-            if LOGGER_SYSTEM_AVAILABLE and 'logger' in locals() and logger:
-                log_info(logger, "RPA iniciado", {"versao": "3.1.3", "parametros": parametros})
-        except:
-            pass  # Não falhar se o logger der erro
-        
         # Carregar parâmetros de tempo
         parametros_tempo = obter_parametros_tempo(parametros)
         
         # Validar parâmetros
-        if VALIDATION_SYSTEM_AVAILABLE:
-            try:
-                # Usar sistema de validação avançado
-                validador = ValidadorParametros()
-                parametros_validados = validador.validar_parametros(parametros)
-                print("✅ Validação avançada de parâmetros concluída")
-            except ValidacaoParametrosError as e:
-                # ❌ INTERROMPER EXECUÇÃO - Parâmetros inválidos detectados
-                erro_msg = f"❌ VALIDAÇÃO DE PARÂMETROS FALHOU: {str(e)}"
-                print(erro_msg)
-                print("🚫 Execução interrompida devido a parâmetros inválidos")
-                return criar_retorno_erro(
-                    f"Validação de parâmetros falhou: {str(e)}",
-                    "VALIDACAO",
-                    time.time() - inicio_execucao,
-                    parametros,
-                    exception_handler
-                )
-            except Exception as e:
-                # ❌ INTERROMPER EXECUÇÃO - Erro inesperado na validação
-                erro_msg = f"❌ ERRO INESPERADO NA VALIDAÇÃO: {str(e)}"
-                print(erro_msg)
-                print("🚫 Execução interrompida devido a erro na validação")
-                return criar_retorno_erro(
-                    f"Erro inesperado na validação: {str(e)}",
-                    "VALIDACAO",
-                    time.time() - inicio_execucao,
-                    parametros,
-                    exception_handler
-                )
-        else:
-            # Usar validação básica existente
-            if not validar_parametros_obrigatorios(parametros):
-                raise RPAException("Parâmetros obrigatórios inválidos", "VALIDACAO")
+        if not validar_parametros_obrigatorios(parametros):
+            raise RPAException("Parâmetros obrigatórios inválidos", "VALIDACAO")
         
         # Inicializar Playwright
         with sync_playwright() as p:
@@ -3402,38 +3229,15 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             # TELA 1
             progress_tracker.update_progress(1, "Selecionando Tipo de Veiculo")
             exibir_mensagem("\n" + "="*50)
-            
-            # Log de início da Tela 1
-            try:
-                if LOGGER_SYSTEM_AVAILABLE and 'logger' in locals() and logger:
-                    log_info(logger, "Executando Tela 1", {"tela": 1, "timestamp": datetime.now().isoformat()})
-            except:
-                pass  # Não falhar se o logger der erro
-            
-            if executar_com_timeout(smart_timeout, 1, navegar_tela_1_playwright, page):
+            if navegar_tela_1_playwright(page):
                 telas_executadas += 1
                 resultado_telas["tela_1"] = True
                 progress_tracker.update_progress(1, "Tela 1 concluída")
                 exibir_mensagem("✅ TELA 1 CONCLUÍDA!")
-                
-                # Log de sucesso da Tela 1
-                try:
-                    if LOGGER_SYSTEM_AVAILABLE and 'logger' in locals() and logger:
-                        log_success(logger, "Tela 1 concluída", {"tela": 1, "tempo": time.time() - inicio_execucao})
-                except:
-                    pass  # Não falhar se o logger der erro
             else:
                 resultado_telas["tela_1"] = False
                 progress_tracker.update_progress(1, "Tela 1 falhou")
                 exibir_mensagem("❌ TELA 1 FALHOU!")
-                
-                # Log de erro da Tela 1
-                try:
-                    if LOGGER_SYSTEM_AVAILABLE and 'logger' in locals() and logger:
-                        log_error(logger, "Tela 1 falhou", {"tela": 1, "erro": "Execução falhou"})
-                except:
-                    pass  # Não falhar se o logger der erro
-                
                 return criar_retorno_erro(
                     "Tela 1 falhou",
                     "TELA_1",
@@ -3445,7 +3249,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             # TELA 2
             progress_tracker.update_progress(2, "Selecionando veículo com a placa informada")
             exibir_mensagem("\n" + "="*50)
-            if executar_com_timeout(smart_timeout, 2, navegar_tela_2_playwright, page, parametros['placa']):
+            if navegar_tela_2_playwright(page, parametros['placa']):
                 telas_executadas += 1
                 resultado_telas["tela_2"] = True
                 progress_tracker.update_progress(2, "Tela 2 concluída")
@@ -3465,7 +3269,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             # TELA 3
             progress_tracker.update_progress(3, "Confirmando seleção do veículo")
             exibir_mensagem("\n" + "="*50)
-            if executar_com_timeout(smart_timeout, 3, navegar_tela_3_playwright, page):
+            if navegar_tela_3_playwright(page):
                 telas_executadas += 1
                 resultado_telas["tela_3"] = True
                 progress_tracker.update_progress(3, "Tela 3 concluída")
@@ -3485,7 +3289,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             # TELA 4
             progress_tracker.update_progress(4, "Calculando como novo Seguro")
             exibir_mensagem("\n" + "="*50)
-            if executar_com_timeout(smart_timeout, 4, navegar_tela_4_playwright, page, parametros['veiculo_segurado']):
+            if navegar_tela_4_playwright(page, parametros['veiculo_segurado']):
                 telas_executadas += 1
                 resultado_telas["tela_4"] = True
                 progress_tracker.update_progress(4, "Tela 4 concluída")
@@ -3505,7 +3309,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             # TELA 5
             progress_tracker.update_progress(5, "Elaborando estimativas")
             exibir_mensagem("\n" + "="*50)
-            if executar_com_timeout(smart_timeout, 5, navegar_tela_5_playwright, page, parametros_tempo):
+            if navegar_tela_5_playwright(page, parametros_tempo):
                 telas_executadas += 1
                 resultado_telas["tela_5"] = True
                 progress_tracker.update_progress(5, "Tela 5 concluída")
@@ -3525,7 +3329,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             # TELA 6
             progress_tracker.update_progress(6, "Seleção de detalhes do veículo")
             exibir_mensagem("\n" + "="*50)
-            if executar_com_timeout(smart_timeout, 6, navegar_tela_6_playwright, page, parametros['combustivel'], parametros.get('kit_gas', False), parametros.get('blindado', False), parametros.get('financiado', False)):
+            if navegar_tela_6_playwright(page, parametros['combustivel'], parametros.get('kit_gas', False), parametros.get('blindado', False), parametros.get('financiado', False)):
                 telas_executadas += 1
                 resultado_telas["tela_6"] = True
                 progress_tracker.update_progress(6, "Tela 6 concluída")
@@ -3545,7 +3349,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             # TELA 7
             progress_tracker.update_progress(7, "Definição de local de pernoite com o CEP informado")
             exibir_mensagem("\n" + "="*50)
-            if executar_com_timeout(smart_timeout, 7, navegar_tela_7_playwright, page, parametros['cep']):
+            if navegar_tela_7_playwright(page, parametros['cep']):
                 telas_executadas += 1
                 resultado_telas["tela_7"] = True
                 progress_tracker.update_progress(7, "Tela 7 concluída")
@@ -3565,7 +3369,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             # TELA 8
             progress_tracker.update_progress(8, "Definição do uso do veículo")
             exibir_mensagem("\n" + "="*50)
-            if executar_com_timeout(smart_timeout, 8, navegar_tela_8_playwright, page, parametros['uso_veiculo']):
+            if navegar_tela_8_playwright(page, parametros['uso_veiculo']):
                 telas_executadas += 1
                 resultado_telas["tela_8"] = True
                 progress_tracker.update_progress(8, "Tela 8 concluída")
@@ -3585,7 +3389,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             # TELA 9
             progress_tracker.update_progress(9, "Preenchimento dos dados pessoais")
             exibir_mensagem("\n" + "="*50)
-            if executar_com_timeout(smart_timeout, 9, navegar_tela_9_playwright, page, parametros['nome'], parametros['cpf'], parametros['data_nascimento'], parametros['sexo'], parametros['estado_civil'], parametros['email'], parametros['celular']):
+            if navegar_tela_9_playwright(page, parametros['nome'], parametros['cpf'], parametros['data_nascimento'], parametros['sexo'], parametros['estado_civil'], parametros['email'], parametros['celular']):
                 telas_executadas += 1
                 resultado_telas["tela_9"] = True
                 progress_tracker.update_progress(9, "Tela 9 concluída")
@@ -3605,7 +3409,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             # TELA 10
             progress_tracker.update_progress(10, "Definição do Condutor Principal")
             exibir_mensagem("\n" + "="*50)
-            if executar_com_timeout(smart_timeout, 10, navegar_tela_10_playwright, page, parametros['condutor_principal'], parametros['nome_condutor'], parametros['cpf_condutor'], parametros['data_nascimento_condutor'], parametros['sexo_condutor'], parametros['estado_civil_condutor']):
+            if navegar_tela_10_playwright(page, parametros['condutor_principal'], parametros['nome_condutor'], parametros['cpf_condutor'], parametros['data_nascimento_condutor'], parametros['sexo_condutor'], parametros['estado_civil_condutor']):
                 telas_executadas += 1
                 resultado_telas["tela_10"] = True
                 progress_tracker.update_progress(10, "Tela 10 concluída")
@@ -3625,7 +3429,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             # TELA 11
             progress_tracker.update_progress(11, "Definição do uso do veículo")
             exibir_mensagem("\n" + "="*50)
-            if executar_com_timeout(smart_timeout, 11, navegar_tela_11_playwright, page, parametros['local_de_trabalho'], parametros['estacionamento_proprio_local_de_trabalho'], parametros['local_de_estudo'], parametros['estacionamento_proprio_local_de_estudo']):
+            if navegar_tela_11_playwright(page, parametros['local_de_trabalho'], parametros['estacionamento_proprio_local_de_trabalho'], parametros['local_de_estudo'], parametros['estacionamento_proprio_local_de_estudo']):
                 telas_executadas += 1
                 resultado_telas["tela_11"] = True
                 progress_tracker.update_progress(11, "Tela 11 concluída")
@@ -3645,7 +3449,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             # TELA 12
             progress_tracker.update_progress(12, "Definição do tipo de garagem")
             exibir_mensagem("\n" + "="*50)
-            if executar_com_timeout(smart_timeout, 12, navegar_tela_12_playwright, page, parametros['garagem_residencia'], parametros['portao_eletronico']):
+            if navegar_tela_12_playwright(page, parametros['garagem_residencia'], parametros['portao_eletronico']):
                 telas_executadas += 1
                 resultado_telas["tela_12"] = True
                 progress_tracker.update_progress(12, "Tela 12 concluída")
@@ -3665,7 +3469,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             # TELA 13
             progress_tracker.update_progress(13, "Definição de residentes")
             exibir_mensagem("\n" + "="*50)
-            if executar_com_timeout(smart_timeout, 13, navegar_tela_13_playwright, page, parametros['reside_18_26'], parametros['sexo_do_menor'], parametros['faixa_etaria_menor_mais_novo']):
+            if navegar_tela_13_playwright(page, parametros['reside_18_26'], parametros['sexo_do_menor'], parametros['faixa_etaria_menor_mais_novo']):
                 telas_executadas += 1
                 resultado_telas["tela_13"] = True
                 progress_tracker.update_progress(13, "Tela 13 concluída")
@@ -3691,7 +3495,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             if not tela_15_detectada:
                 exibir_mensagem("🔄 Executando Tela 14 (Tela 15 não foi detectada diretamente da Tela 13)")
                 exibir_mensagem("📋 Motivo: Fluxo normal - Tela 14 é necessária para continuar")
-                if executar_com_timeout(smart_timeout, 14, navegar_tela_14_playwright, page, parametros['continuar_com_corretor_anterior']):
+                if navegar_tela_14_playwright(page, parametros['continuar_com_corretor_anterior']):
                     # Não incrementa telas_executadas pois é condicional
                     resultado_telas["tela_14"] = True
                     progress_tracker.update_progress(14, "Tela 14 concluída")
@@ -3721,7 +3525,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             # TELA 15
             progress_tracker.update_progress(15, "Aguardando cálculo completo")
             exibir_mensagem("\n" + "="*50)
-            if executar_com_timeout(smart_timeout, 15, navegar_tela_15_playwright, page, parametros['autenticacao']['email_login'], parametros['autenticacao']['senha_login'], parametros_tempo):
+            if navegar_tela_15_playwright(page, parametros['autenticacao']['email_login'], parametros['autenticacao']['senha_login'], parametros_tempo):
                 telas_executadas += 1
                 resultado_telas["tela_15"] = True
                 progress_tracker.update_progress(15, "Tela 15 concluída")
@@ -3758,17 +3562,6 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             # Calcular tempo de execução
             tempo_execucao = time.time() - inicio_execucao
             
-            # Log de conclusão bem-sucedida
-            try:
-                if LOGGER_SYSTEM_AVAILABLE and 'logger' in locals() and logger:
-                    log_success(logger, "RPA concluído com sucesso", {
-                        "tempo_total": tempo_execucao,
-                        "telas_executadas": telas_executadas,
-                        "arquivo_dados": arquivo_dados
-                    })
-            except:
-                pass  # Não falhar se o logger der erro
-            
             # Retorno estruturado
             return criar_retorno_sucesso(
                 resultado_telas,
@@ -3784,17 +3577,6 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             progress_tracker.update_progress(0, f"RPA interrompido por erro: {str(e)}")
         except:
             pass  # Não falhar se o progress tracker der erro
-        
-        # Log de erro principal (verificar se logger existe)
-        try:
-            if LOGGER_SYSTEM_AVAILABLE and 'logger' in locals() and logger:
-                log_error(logger, "Erro na execução principal", {
-                    "erro": str(e),
-                    "traceback": traceback.format_exc(),
-                    "tempo_execucao": time.time() - inicio_execucao
-                })
-        except:
-            pass  # Não falhar se o logger der erro
         
         exception_handler.capturar_excecao(e, "EXECUCAO_PRINCIPAL", "Erro na execução principal")
         
@@ -3823,26 +3605,8 @@ if __name__ == "__main__":
         # Carregar parâmetros (compatibilidade mantida)
         parametros = carregar_parametros(args.config)
         
-        # EXECUÇÃO COM CONTROLE BIDIRECIONAL SEGURO
-        if BIDIRECTIONAL_SYSTEM_AVAILABLE:
-            # Executar RPA com controle bidirecional
-            resultado_wrapper = execute_rpa_with_bidirectional_control(
-                executar_rpa_playwright, 
-                parametros
-            )
-            
-            # Extrair resultado do wrapper
-            if resultado_wrapper["status"] == "success":
-                resultado = resultado_wrapper["result"]
-                bidirectional_used = resultado_wrapper.get("bidirectional_used", False)
-                print(f"✅ Comunicação bidirecional: {'Ativa' if bidirectional_used else 'Não utilizada'}")
-            else:
-                # Fallback para execução direta
-                resultado = executar_rpa_playwright(parametros)
-                print("⚠️ Fallback para execução direta devido a erro no sistema bidirecional")
-        else:
-            # Executar RPA (ESTRUTURA ORIGINAL PRESERVADA)
-            resultado = executar_rpa_playwright(parametros)
+        # Executar RPA (ESTRUTURA ORIGINAL PRESERVADA)
+        resultado = executar_rpa_playwright(parametros)
         
         # Exibir resultado
         print("\n" + "="*50)

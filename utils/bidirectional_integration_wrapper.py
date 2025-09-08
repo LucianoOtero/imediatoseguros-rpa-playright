@@ -149,3 +149,4 @@ if __name__ == "__main__":
 
     print("✅ Wrapper de integração bidirecional testado com sucesso!")
 
+
