@@ -18,7 +18,7 @@ DESCRIÇÃO:
 
 AUTOR: Luciano Otero
 DATA: 2025-09-02
-VERSÃO: 1.1.0 (Compatibilidade Regional)
+VERSÃO: 3.5.0 (Compatibilidade Regional)
 STATUS: Implementação completa com Exception Handler + Compatibilidade Regional
 """
 
@@ -1856,7 +1856,7 @@ def navegar_tela_12_playwright(page, garagem_residencia, portao_eletronico):
 
 def navegar_tela_13_playwright(page, reside_18_26, sexo_do_menor, faixa_etaria_menor_mais_novo):
     """
-    TELA 13: Residência com Menores de 18-26 anos
+    a versão ntir : Residência com Menores de 18-26 anos
     
     DESCRIÇÃO:
         Navega para a Tela 13 e seleciona se reside com alguém entre 18 e 26 anos.
