@@ -77,6 +77,14 @@ except ImportError:
     VALIDATION_SYSTEM_AVAILABLE = False
     print("⚠️ Sistema de validação avançado não disponível - usando validação básica")
 
+# Importar Sistema de Health Check Ultra-Conservador (opcional)
+try:
+    from utils.health_check_conservative import ConservativeHealthChecker
+    HEALTH_CHECK_AVAILABLE = True
+except ImportError:
+    HEALTH_CHECK_AVAILABLE = False
+    print("⚠️ Sistema de health check não disponível - continuando sem verificação")
+
 
 # ========================================
 # SISTEMA DE ARGUMENTOS DE LINHA DE COMANDO
@@ -3822,6 +3830,21 @@ if __name__ == "__main__":
         
         # Carregar parâmetros (compatibilidade mantida)
         parametros = carregar_parametros(args.config)
+        
+        # SISTEMA DE HEALTH CHECK ULTRA-CONSERVADOR (opcional)
+        if HEALTH_CHECK_AVAILABLE:
+            try:
+                health_checker = ConservativeHealthChecker()
+                environment = health_checker.get_environment()
+                print(f"🔍 Ambiente detectado: {environment}")
+                
+                if health_checker.is_system_ready():
+                    print(f"✅ Health Check {environment}: Sistema pronto")
+                else:
+                    print(f"⚠️ Health Check {environment}: Problemas detectados - continuando mesmo assim")
+                    
+            except Exception as e:
+                print(f"⚠️ Erro no health check: {e} - continuando sem verificação")
         
         # EXECUÇÃO COM CONTROLE BIDIRECIONAL SEGURO
         if BIDIRECTIONAL_SYSTEM_AVAILABLE:
