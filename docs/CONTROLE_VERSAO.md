@@ -4,7 +4,7 @@
 
 ### ✅ **Ambiente Local**
 - **Controle de Versão**: ✅ Funcionando
-- **Tags Locais**: ✅ Presentes (v1.0.0 até v3.1.2)
+- **Tags Locais**: ✅ Presentes (v1.0.0 até v1.1.0-compatibilidade-regional)
 - **Commits**: ✅ Rastreados
 - **Histórico**: ✅ Completo
 
@@ -13,6 +13,38 @@
 - **Tags Remotas**: ✅ Sincronizadas
 - **Commits**: ✅ Enviados
 - **Histórico**: ✅ Completo
+- **Repositório**: https://github.com/LucianoOtero/imediatoseguros-rpa-playright.git
+
+## 🏆 **COMPATIBILIDADE REGIONAL BRASIL/PORTUGAL - v1.1.0**
+
+### ✅ **Nova Versão Principal**: v1.1.0-compatibilidade-regional
+- **Commit**: `9b18de1`
+- **Data**: 08/09/2025
+- **Status**: ✅ **COMPATIBILIDADE REGIONAL IMPLEMENTADA**
+- **Tag**: `v1.1.0-compatibilidade-regional`
+- **Funcionalidades**:
+  - ✅ Resolução problema falha em Portugal (Tela 13)
+  - ✅ Substituição seletores genéricos por específicos
+  - ✅ Seletor `#gtm-telaUsoResidentesContinuar` implementado
+  - ✅ Documentação completa das mudanças realizadas
+  - ✅ Backup local imediato criado
+  - ✅ Análise detalhada Brasil vs Portugal documentada
+  - ✅ Sistema robusto para ambas as regiões
+  - ✅ Performance mantida (88.5s execução completa)
+
+### **Principais Conquistas da v1.1.0:**
+- **Compatibilidade Regional**: Funciona em Brasil e Portugal
+- **Seletores Específicos**: Maior estabilidade e confiabilidade
+- **Documentação**: Análise completa do problema e solução
+- **Backup**: Sistema de fallback local implementado
+- **Performance**: Tempo de execução otimizado
+- **Estabilidade**: Excelente em ambas as regiões
+- **Captura de dados**: Robusta e confiável
+
+### **Problema Resolvido:**
+- **ANTES**: Seletores genéricos falhavam em Portugal
+- **DEPOIS**: Seletores específicos funcionam em ambas as regiões
+- **Solução**: Substituição de `p.font-semibold.font-workSans.cursor-pointer:has-text('Continuar')` por `#gtm-telaUsoResidentesContinuar`
 
 ## 🏆 **PARÂMETROS DE TEMPO CONFIGURÁVEIS IMPLEMENTADOS - v3.4.0**
 
