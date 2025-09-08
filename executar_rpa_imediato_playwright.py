@@ -119,6 +119,13 @@ SISTEMA BIDIRECIONAL:
   Comandos: PAUSE, RESUME, CANCEL
   Fallback automático se sistema não disponível
 
+SISTEMA DE HEALTH CHECK:
+  Verificação automática de saúde do sistema antes da execução
+  Validação de arquivos essenciais, Python, recursos e configuração
+  Detecção automática de ambiente (Windows/Linux)
+  Execução não-bloqueante com fallback garantido
+  Documentação completa: docs/HEALTH_CHECK_IMPLEMENTATION_REPORT.md
+
 VALIDAÇÃO RIGOROSA DE PARÂMETROS:
   ⚠️ EXECUÇÃO INTERROMPIDA se parâmetros inválidos detectados
   Validação de campos obrigatórios, tipos de dados e formatos
@@ -192,6 +199,7 @@ dados em tempo real e gerando JSONs estruturados para integração com PHP.
 • DADOS ESTRUTURADOS: JSONs padronizados para integração
 • SISTEMA DE RETORNO: Códigos 9001-9999, estrutura consistente
 • INTEGRAÇÃO COM PHP: Arquivos prontos para consumo
+• HEALTH CHECK: Verificação automática de saúde do sistema
 
 📊 ARQUIVOS GERADOS
 ==================
@@ -201,6 +209,21 @@ dados em tempo real e gerando JSONs estruturados para integração com PHP.
 3. temp/json_compreensivo_tela_5_*.json - Dados intermediários
 4. temp/retorno_intermediario_carrossel_*.json - Dados brutos
 5. temp/dados_tela_5_*.json - Metadados
+
+🛡️ SISTEMA DE HEALTH CHECK
+==========================
+
+O sistema inclui verificação automática de saúde antes da execução:
+
+• VERIFICAÇÃO DE ARQUIVOS: Validação de arquivos essenciais
+• VERIFICAÇÃO PYTHON: Versão mínima 3.8 e módulos necessários
+• VERIFICAÇÃO RECURSOS: Espaço em disco e permissões de escrita
+• VERIFICAÇÃO CONFIGURAÇÃO: Validação do parametros.json
+• DETECÇÃO AMBIENTE: Identificação automática Windows/Linux
+• EXECUÇÃO NÃO-BLOQUEANTE: Fallback garantido se problemas detectados
+
+📖 DOCUMENTAÇÃO COMPLETA:
+  docs/HEALTH_CHECK_IMPLEMENTATION_REPORT.md
 
 🎯 STATUS CODES: 9001 (sucesso) - 9002-9999 (erros específicos)
 
