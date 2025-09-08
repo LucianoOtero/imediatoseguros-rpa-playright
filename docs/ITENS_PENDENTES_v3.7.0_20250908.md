@@ -151,7 +151,7 @@
 
 ### **2. Validação por Aproximação do Veículo na Tela 3** 
 **Prioridade**: Média  
-**Status**: ❌ Pendente  
+**Status**: ❌ Pendente
 **Data de Identificação**: 08/09/2025
 
 #### **Problema Identificado:**
@@ -187,7 +187,55 @@
 - `docs/VALIDACAO_VEICULO_TELA3_REPORT.md` - Documentação a ser criada
 
 ---
-### **3. Captura de Dados da Tela 5 (Melhorias)**
+### **3. Parametrização do Headless via JSON** 
+**Prioridade**: Baixa  
+**Status**: ❌ Pendente  
+**Data de Identificação**: 08/09/2025
+
+#### **Problema Identificado:**
+- Headless está hardcoded como `headless=False` no código
+- Não há flexibilidade para alternar entre modo visual e headless
+- Necessidade de controle via parâmetros JSON para diferentes ambientes
+
+#### **Funcionalidades a Implementar:**
+- 🔧 Adicionar parâmetro `headless` na seção `configuracao` do JSON
+- 🔄 Modificar `browser.launch()` para usar parâmetro do JSON
+- 📊 Validação do parâmetro (boolean: true/false)
+- ⚙️ Valor padrão: `false` (mostrar tela) para compatibilidade
+- 📝 Documentação do novo parâmetro
+- 🛡️ Fallback para valor padrão se parâmetro inválido
+
+#### **Benefícios Esperados:**
+- ✅ Flexibilidade para execução em diferentes ambientes
+- ✅ Controle via JSON sem modificar código
+- ✅ Suporte a execução headless em servidores
+- ✅ Compatibilidade mantida com configurações existentes
+- ✅ Facilita debugging e produção
+
+#### **Estratégia de Implementação:**
+- Implementação conservadora com valor padrão seguro
+- Validação robusta do parâmetro boolean
+- Preservação de 100% da funcionalidade existente
+- Integração com sistema de validação de parâmetros
+
+#### **Arquivos Relacionados:**
+- `executar_rpa_imediato_playwright.py` - Linha 3421 (browser.launch)
+- `utils/validacao_parametros.py` - Validação do novo parâmetro
+- `docs/PARAMETRIZACAO_HEADLESS_REPORT.md` - Documentação a ser criada
+
+#### **Exemplo de JSON:**
+```json
+{
+  "configuracao": {
+    "headless": true,
+    "tempo_estabilizacao": 1,
+    "tempo_carregamento": 10
+  }
+}
+```
+
+---
+### **4. Captura de Dados da Tela 5 (Melhorias)**
 **Prioridade**: Média  
 **Status**: ❌ Pendente
 
@@ -197,7 +245,7 @@
 - ✅ Otimização dos seletores
 - ✅ Tratamento de casos edge
 
-### **4. Sistema de Screenshots de Debug**
+### **5. Sistema de Screenshots de Debug**
 **Prioridade**: Baixa  
 **Status**: ❌ Pendente
 
@@ -207,7 +255,7 @@
 - ✅ Debugging visual
 - ✅ Integração com sistema de logs
 
-### **5. Modo de Execução via Linha de Comando**
+### **6. Modo de Execução via Linha de Comando**
 **Prioridade**: Baixa  
 **Status**: ❌ Pendente
 
@@ -217,7 +265,7 @@
 - ✅ Opções de configuração
 - ✅ Modo interativo
 
-### **6. Conversor Unicode → ASCII Robusto**
+### **7. Conversor Unicode → ASCII Robusto**
 **Prioridade**: Baixa  
 **Status**: ❌ Pendente
 
@@ -227,7 +275,7 @@
 - ✅ Preservação de dados importantes
 - ✅ Tratamento de caracteres especiais
 
-### **7. Configuração Avançada de Browser**
+### **8. Configuração Avançada de Browser**
 **Prioridade**: Baixa  
 **Status**: ❌ Pendente
 
@@ -237,7 +285,7 @@
 - ✅ Configurações de proxy
 - ✅ Configurações de segurança
 
-### **8. Tratamento Inteligente de Falha na Tela 15**
+### **9. Tratamento Inteligente de Falha na Tela 15**
 **Prioridade**: Baixa (movido para último)  
 **Status**: ❌ Pendente
 
@@ -273,8 +321,8 @@
 | **Categoria** | **Pendentes** | **Prioridade** |
 |---|---|---|
 | **Sistemas Principais** | 1 | Alta |
-| **Melhorias Específicas** | 7 | Baixa/Média |
-| **Total Geral** | 8 | - |
+| **Melhorias Específicas** | 8 | Baixa/Média |
+| **Total Geral** | 9 | - |
 
 **🎯 ITEM PRIORITÁRIO**: Substituição de Seletores Genéricos por Específicos (PRIORIDADE ALTA)
 
@@ -290,11 +338,12 @@
 3. Captura de Dados da Tela 5 (Melhorias)
 
 ### **Fase 3: Melhorias Específicas (Prioridade Baixa)**
-4. Sistema de Screenshots de Debug
-5. Modo de Execução via Linha de Comando
-6. Conversor Unicode → ASCII Robusto
-7. Configuração Avançada de Browser
-8. Tratamento Inteligente de Falha na Tela 15 (PRIORIDADE BAIXA - movido para último)
+4. Parametrização do Headless via JSON
+5. Sistema de Screenshots de Debug
+6. Modo de Execução via Linha de Comando
+7. Conversor Unicode → ASCII Robusto
+8. Configuração Avançada de Browser
+9. Tratamento Inteligente de Falha na Tela 15 (PRIORIDADE BAIXA - movido para último)
 
 ---
 
