@@ -149,7 +149,45 @@
 
 ## 🔧 **MELHORIAS ESPECÍFICAS PENDENTES**
 
-### **2. Captura de Dados da Tela 5 (Melhorias)**
+### **2. Validação por Aproximação do Veículo na Tela 3** 
+**Prioridade**: Média  
+**Status**: ❌ Pendente  
+**Data de Identificação**: 08/09/2025
+
+#### **Problema Identificado:**
+- Tela 3 não valida se o veículo retornado corresponde ao informado no JSON
+- Pequenas diferenças na grafia podem causar inconsistências
+- Necessidade de validação por aproximação para maior robustez
+
+#### **Funcionalidades a Implementar:**
+- 🔍 Captura dos dados do veículo retornado na Tela 3 após inserção da placa
+- 🔄 Comparação por aproximação com os parâmetros JSON (marca, modelo, ano)
+- 📊 Algoritmo de similaridade para lidar com diferenças de grafia
+- ⚠️ Tratamento de divergências encontradas (warnings/erros)
+- 📝 Log detalhado das comparações realizadas
+- 🛡️ Fallback para continuar execução mesmo com pequenas divergências
+
+#### **Benefícios Esperados:**
+- ✅ Validação robusta de consistência dos dados
+- ✅ Detecção de problemas de grafia/abreviações
+- ✅ Maior confiabilidade na identificação do veículo
+- ✅ Prevenção de erros por dados inconsistentes
+- ✅ Logs detalhados para auditoria
+
+#### **Estratégia de Implementação:**
+- Implementação conservadora com captura de dados
+- Algoritmo de similaridade configurável
+- Threshold de aceitação ajustável
+- Preservação de 100% da funcionalidade existente
+- Integração com sistema de exception handler
+
+#### **Arquivos Relacionados:**
+- `executar_rpa_imediato_playwright.py` - Função `navegar_tela_3_playwright()`
+- `utils/validacao_veiculo_aproximacao.py` - Módulo a ser criado
+- `docs/VALIDACAO_VEICULO_TELA3_REPORT.md` - Documentação a ser criada
+
+---
+### **3. Captura de Dados da Tela 5 (Melhorias)**
 **Prioridade**: Média  
 **Status**: ❌ Pendente
 
@@ -159,7 +197,7 @@
 - ✅ Otimização dos seletores
 - ✅ Tratamento de casos edge
 
-### **3. Sistema de Screenshots de Debug**
+### **4. Sistema de Screenshots de Debug**
 **Prioridade**: Baixa  
 **Status**: ❌ Pendente
 
@@ -169,7 +207,7 @@
 - ✅ Debugging visual
 - ✅ Integração com sistema de logs
 
-### **4. Modo de Execução via Linha de Comando**
+### **5. Modo de Execução via Linha de Comando**
 **Prioridade**: Baixa  
 **Status**: ❌ Pendente
 
@@ -179,7 +217,7 @@
 - ✅ Opções de configuração
 - ✅ Modo interativo
 
-### **5. Conversor Unicode → ASCII Robusto**
+### **6. Conversor Unicode → ASCII Robusto**
 **Prioridade**: Baixa  
 **Status**: ❌ Pendente
 
@@ -189,7 +227,7 @@
 - ✅ Preservação de dados importantes
 - ✅ Tratamento de caracteres especiais
 
-### **6. Configuração Avançada de Browser**
+### **7. Configuração Avançada de Browser**
 **Prioridade**: Baixa  
 **Status**: ❌ Pendente
 
@@ -199,7 +237,7 @@
 - ✅ Configurações de proxy
 - ✅ Configurações de segurança
 
-### **7. Tratamento Inteligente de Falha na Tela 15**
+### **8. Tratamento Inteligente de Falha na Tela 15**
 **Prioridade**: Baixa (movido para último)  
 **Status**: ❌ Pendente
 
@@ -235,8 +273,8 @@
 | **Categoria** | **Pendentes** | **Prioridade** |
 |---|---|---|
 | **Sistemas Principais** | 1 | Alta |
-| **Melhorias Específicas** | 6 | Baixa/Média |
-| **Total Geral** | 7 | - |
+| **Melhorias Específicas** | 7 | Baixa/Média |
+| **Total Geral** | 8 | - |
 
 **🎯 ITEM PRIORITÁRIO**: Substituição de Seletores Genéricos por Específicos (PRIORIDADE ALTA)
 
@@ -248,14 +286,15 @@
 1. Substituição de Seletores Genéricos por Específicos
 
 ### **Fase 2: Melhorias Específicas (Prioridade Média)**
-2. Captura de Dados da Tela 5 (Melhorias)
+2. Validação por Aproximação do Veículo na Tela 3
+3. Captura de Dados da Tela 5 (Melhorias)
 
 ### **Fase 3: Melhorias Específicas (Prioridade Baixa)**
-3. Sistema de Screenshots de Debug
-4. Modo de Execução via Linha de Comando
-5. Conversor Unicode → ASCII Robusto
-6. Configuração Avançada de Browser
-7. Tratamento Inteligente de Falha na Tela 15 (PRIORIDADE BAIXA - movido para último)
+4. Sistema de Screenshots de Debug
+5. Modo de Execução via Linha de Comando
+6. Conversor Unicode → ASCII Robusto
+7. Configuração Avançada de Browser
+8. Tratamento Inteligente de Falha na Tela 15 (PRIORIDADE BAIXA - movido para último)
 
 ---
 
