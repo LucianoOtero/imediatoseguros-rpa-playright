@@ -149,9 +149,69 @@
 
 ## 🔧 **MELHORIAS ESPECÍFICAS PENDENTES**
 
-### **2. Validação por Aproximação do Veículo na Tela 3** 
+### **2. Otimização de Performance**
+**Prioridade**: Alta  
+**Status**: ❌ Pendente  
+**Data de Identificação**: 08/09/2025
+
+#### **Problema Identificado:**
+- Tempo de execução atual: 105-120 segundos (muito lento)
+- Uso excessivo de recursos (CPU, memória, disco)
+- Timeouts excessivos e esperas desnecessárias
+- Loops redundantes e verificações repetitivas
+- Operações de I/O ineficientes
+
+#### **Funcionalidades a Implementar:**
+- 🕐 **Otimização de Timeouts**: Reduzir timeouts de 10000ms para 3000ms
+- 🔄 **Otimização de Loops**: Reduzir tentativas de 60 para 15
+- 📱 **Otimização de Seletores**: Implementar cache e seletores específicos
+- 💾 **Otimização de I/O**: Buffer em memória e operações otimizadas
+- 🔍 **Otimização de Verificações**: Reduzir consultas redundantes ao DOM
+- 📊 **Otimização de Captura**: JavaScript nativo para captura de dados
+- 🚀 **Otimização de Browser**: Configurações otimizadas e headless
+- 🔄 **Otimização de Fluxo**: Execução paralela quando possível
+
+#### **Benefícios Esperados:**
+- ✅ **Redução de 30-40% no tempo de execução** (60-75 segundos)
+- ✅ **Redução de 25-30% no uso de CPU**
+- ✅ **Redução de 20-25% no uso de memória**
+- ✅ **Redução de 40-50% no uso de disco**
+- ✅ **Maior estabilidade e confiabilidade**
+- ✅ **Melhor suporte a execuções múltiplas**
+
+#### **Estratégia de Implementação:**
+- **Fase 1**: Otimizações críticas (20-25% de redução)
+- **Fase 2**: Otimizações médias (10-15% adicional)
+- **Fase 3**: Otimizações finas (5-10% adicional)
+- Implementação conservadora com mitigação de riscos
+- Preservação de 100% da funcionalidade existente
+- Testes extensivos de performance e compatibilidade
+
+#### **Arquivos Relacionados:**
+- `executar_rpa_imediato_playwright.py` - Arquivo principal a ser otimizado
+- `docs/OTIMIZACAO_PERFORMANCE_STRATEGY_REPORT.md` - Documentação completa da estratégia
+- `utils/performance_optimizer.py` - Módulo de otimização a ser criado
+- `tests/performance_tests.py` - Testes de performance a ser criado
+
+#### **Riscos Identificados:**
+- **RISCO ALTO**: Timeouts reduzidos podem causar falhas
+- **RISCO ALTO**: Loops reduzidos podem não carregar elementos
+- **RISCO MÉDIO**: Seletores específicos podem quebrar com mudanças na UI
+- **RISCO MÉDIO**: Headless pode causar problemas de renderização
+- **RISCO BAIXO**: Otimizações menores com impacto incremental
+
+#### **Mitigação de Riscos:**
+- Implementação gradual por fases
+- Sistema de fallback para cada otimização
+- Testes extensivos em diferentes ambientes
+- Monitoramento contínuo de métricas
+- Rollback automático em caso de problemas
+
+---
+
+### **3. Validação por Aproximação do Veículo na Tela 3**
 **Prioridade**: Média  
-**Status**: ❌ Pendente
+**Status**: ❌ Pendente  
 **Data de Identificação**: 08/09/2025
 
 #### **Problema Identificado:**
@@ -187,7 +247,7 @@
 - `docs/VALIDACAO_VEICULO_TELA3_REPORT.md` - Documentação a ser criada
 
 ---
-### **3. Parametrização do Headless via JSON** 
+### **4. Parametrização do Headless via JSON** 
 **Prioridade**: Baixa  
 **Status**: ❌ Pendente  
 **Data de Identificação**: 08/09/2025
@@ -235,7 +295,7 @@
 ```
 
 ---
-### **4. Captura de Dados da Tela 5 (Melhorias)**
+### **5. Captura de Dados da Tela 5 (Melhorias)**
 **Prioridade**: Média  
 **Status**: ❌ Pendente
 
@@ -245,7 +305,7 @@
 - ✅ Otimização dos seletores
 - ✅ Tratamento de casos edge
 
-### **5. Sistema de Screenshots de Debug**
+### **6. Sistema de Screenshots de Debug**
 **Prioridade**: Baixa  
 **Status**: ❌ Pendente
 
@@ -255,7 +315,7 @@
 - ✅ Debugging visual
 - ✅ Integração com sistema de logs
 
-### **6. Modo de Execução via Linha de Comando**
+### **7. Modo de Execução via Linha de Comando**
 **Prioridade**: Baixa  
 **Status**: ❌ Pendente
 
@@ -265,7 +325,7 @@
 - ✅ Opções de configuração
 - ✅ Modo interativo
 
-### **7. Conversor Unicode → ASCII Robusto**
+### **8. Conversor Unicode → ASCII Robusto**
 **Prioridade**: Baixa  
 **Status**: ❌ Pendente
 
@@ -275,7 +335,7 @@
 - ✅ Preservação de dados importantes
 - ✅ Tratamento de caracteres especiais
 
-### **8. Configuração Avançada de Browser**
+### **9. Configuração Avançada de Browser**
 **Prioridade**: Baixa  
 **Status**: ❌ Pendente
 
@@ -285,7 +345,7 @@
 - ✅ Configurações de proxy
 - ✅ Configurações de segurança
 
-### **9. Tratamento Inteligente de Falha na Tela 15**
+### **10. Tratamento Inteligente de Falha na Tela 15**
 **Prioridade**: Baixa (movido para último)  
 **Status**: ❌ Pendente
 
@@ -321,8 +381,8 @@
 | **Categoria** | **Pendentes** | **Prioridade** |
 |---|---|---|
 | **Sistemas Principais** | 1 | Alta |
-| **Melhorias Específicas** | 8 | Baixa/Média |
-| **Total Geral** | 9 | - |
+| **Melhorias Específicas** | 9 | Baixa/Média |
+| **Total Geral** | 10 | - |
 
 **🎯 ITEM PRIORITÁRIO**: Substituição de Seletores Genéricos por Específicos (PRIORIDADE ALTA)
 
@@ -334,16 +394,17 @@
 1. Substituição de Seletores Genéricos por Específicos
 
 ### **Fase 2: Melhorias Específicas (Prioridade Média)**
-2. Validação por Aproximação do Veículo na Tela 3
-3. Captura de Dados da Tela 5 (Melhorias)
+2. Otimização de Performance
+3. Validação por Aproximação do Veículo na Tela 3
+4. Captura de Dados da Tela 5 (Melhorias)
 
 ### **Fase 3: Melhorias Específicas (Prioridade Baixa)**
-4. Parametrização do Headless via JSON
-5. Sistema de Screenshots de Debug
-6. Modo de Execução via Linha de Comando
-7. Conversor Unicode → ASCII Robusto
-8. Configuração Avançada de Browser
-9. Tratamento Inteligente de Falha na Tela 15 (PRIORIDADE BAIXA - movido para último)
+5. Parametrização do Headless via JSON
+6. Sistema de Screenshots de Debug
+7. Modo de Execução via Linha de Comando
+8. Conversor Unicode → ASCII Robusto
+9. Configuração Avançada de Browser
+10. Tratamento Inteligente de Falha na Tela 15 (PRIORIDADE BAIXA - movido para último)
 
 ---
 
