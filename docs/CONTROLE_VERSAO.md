@@ -4,7 +4,7 @@
 
 ### ✅ **Ambiente Local**
 - **Controle de Versão**: ✅ Funcionando
-- **Tags Locais**: ✅ Presentes (v1.0.0 até v1.1.0-compatibilidade-regional)
+- **Tags Locais**: ✅ Presentes (v1.0.0 até v3.5.0-compatibilidade-regional)
 - **Commits**: ✅ Rastreados
 - **Histórico**: ✅ Completo
 
@@ -15,13 +15,13 @@
 - **Histórico**: ✅ Completo
 - **Repositório**: https://github.com/LucianoOtero/imediatoseguros-rpa-playright.git
 
-## 🏆 **COMPATIBILIDADE REGIONAL BRASIL/PORTUGAL - v1.1.0**
+## 🏆 **COMPATIBILIDADE REGIONAL BRASIL/PORTUGAL - v3.5.0**
 
-### ✅ **Nova Versão Principal**: v1.1.0-compatibilidade-regional
+### ✅ **Nova Versão Principal**: v3.5.0-compatibilidade-regional
 - **Commit**: `9b18de1`
 - **Data**: 08/09/2025
 - **Status**: ✅ **COMPATIBILIDADE REGIONAL IMPLEMENTADA**
-- **Tag**: `v1.1.0-compatibilidade-regional`
+- **Tag**: `v3.5.0-compatibilidade-regional`
 - **Funcionalidades**:
   - ✅ Resolução problema falha em Portugal (Tela 13)
   - ✅ Substituição seletores genéricos por específicos
@@ -32,7 +32,7 @@
   - ✅ Sistema robusto para ambas as regiões
   - ✅ Performance mantida (88.5s execução completa)
 
-### **Principais Conquistas da v1.1.0:**
+### **Principais Conquistas da v3.5.0:**
 - **Compatibilidade Regional**: Funciona em Brasil e Portugal
 - **Seletores Específicos**: Maior estabilidade e confiabilidade
 - **Documentação**: Análise completa do problema e solução

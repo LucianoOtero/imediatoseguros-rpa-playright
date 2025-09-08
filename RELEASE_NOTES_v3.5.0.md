@@ -1,10 +1,10 @@
-# 🚀 RELEASE NOTES - Versão 1.1.0 (Compatibilidade Regional)
+# 🚀 RELEASE NOTES - Versão 3.5.0 (Compatibilidade Regional)
 
 ## 📅 **Informações da Release**
-- **Versão**: 1.1.0-compatibilidade-regional
+- **Versão**: 3.5.0-compatibilidade-regional
 - **Data**: 08/09/2025
 - **Commit**: `9b18de1`
-- **Tag**: `v1.1.0-compatibilidade-regional`
+- **Tag**: `v3.5.0-compatibilidade-regional`
 - **Status**: ✅ **PRODUÇÃO**
 
 ---
@@ -130,7 +130,7 @@ page.locator("#gtm-telaUsoResidentesContinuar").click()
 ## 🔗 **LINKS ÚTEIS**
 
 - **Repositório GitHub**: https://github.com/LucianoOtero/imediatoseguros-rpa-playright.git
-- **Tag da Versão**: `v1.1.0-compatibilidade-regional`
+- **Tag da Versão**: `v3.5.0-compatibilidade-regional`
 - **Commit**: `9b18de1`
 - **Documentação**: `docs/ANALISE_PROBLEMA_BRASIL_PORTUGAL_v1.0.0_20250908.md`
 
@@ -145,4 +145,4 @@ Para questões relacionadas a esta versão:
 
 ---
 
-**🎉 Versão 1.1.0 - Compatibilidade Regional implementada com sucesso!**
+**🎉 Versão 3.5.0 - Compatibilidade Regional implementada com sucesso!**
