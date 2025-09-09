@@ -13,11 +13,11 @@
 
 ### **📊 ESTATÍSTICAS GERAIS**
 - **Total de Seletores Genéricos Identificados**: 47
-- **Seletores Implementados**: 3 ✅
-- **Seletores Pendentes**: 44
+- **Seletores Implementados**: 4 ✅
+- **Seletores Pendentes**: 43
 - **Telas Afetadas**: 15 (todas as telas)
 - **Tipos de Seletores Genéricos**: 8 categorias
-- **Risco de Falha**: 🔴 **ALTO** → 🟡 **REDUZIDO** (3 implementados)
+- **Risco de Falha**: 🔴 **ALTO** → 🟡 **REDUZIDO** (4 implementados)
 
 ### **🚨 PROBLEMAS CRÍTICOS IDENTIFICADOS**
 1. **Seletores baseados em classes CSS** - Falham em diferentes regiões
@@ -159,8 +159,9 @@
 1. **`xpath=//*[contains(text(), 'finalidade') or contains(text(), 'uso')]`** (Linha 1250)
    - **Finalidade**: Detectar elementos da tela
    - **Problema**: XPath baseado em texto
-   - **Risco**: 🔴 **ALTO**
-   - **Alternativa Sugerida**: `[data-testid="tela-uso-veiculo"]`
+   - **Risco**: 🟢 **RESOLVIDO**
+   - **Status**: ✅ **IMPLEMENTADO v3.7.0.4**
+   - **Alternativa Implementada**: `#finalidadeVeiculoTelaUsoVeiculo` + `[role="radiogroup"]` + `p:has-text("Qual é o uso do veículo?")`
 
 2. **`xpath=//*[contains(text(), 'finalidade') or contains(text(), 'Finalidade') or contains(text(), 'uso') or contains(text(), 'Uso') or contains(text(), 'veículo')]`** (Linha 1269)
    - **Finalidade**: Detectar elementos da tela
@@ -615,6 +616,17 @@ page.locator("#radio-condutor-principal-sim")
 - **Teste**: ✅ Execução completa bem-sucedida (103.48s)
 - **Sugestões**: ✅ Funcionamento perfeito das sugestões de endereço
 - **Commit**: `ec9703e`
+
+##### **✅ IMPLEMENTAÇÃO v3.7.0.4 - Detecção Tela 8 (Finalidade Veículo) - CONCLUÍDA**
+- **Tela**: 8
+- **Seletor**: `xpath=//*[contains(text(), 'finalidade') or contains(text(), 'uso')]` → `#finalidadeVeiculoTelaUsoVeiculo`
+- **Prioridade**: Alta
+- **Data Implementação**: 09/09/2025
+- **Status**: ✅ **IMPLEMENTADO E TESTADO COM SUCESSO**
+- **Estratégia**: Híbrida com 4 níveis de fallback
+- **Teste**: ✅ Execução completa bem-sucedida (151.91s)
+- **Detecção**: ✅ Funcionamento perfeito da detecção da Tela 8
+- **Commit**: `efd8634`
 
 ##### **IMPLEMENTAÇÃO v3.7.0.4 - Otimização de Timeouts (Telas 14-15)**
 - **Problema**: Timeouts excessivos prejudicam experiência do usuário

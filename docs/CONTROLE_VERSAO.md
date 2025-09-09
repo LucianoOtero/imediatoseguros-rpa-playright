@@ -15,17 +15,18 @@
 - **Histórico**: ✅ Completo
 - **Repositório**: https://github.com/LucianoOtero/imediatoseguros-rpa-playright.git
 
-## 🏆 **IMPLEMENTAÇÕES COMPLETAS NO ARQUIVO PRINCIPAL - v3.7.0.3-main**
+## 🏆 **IMPLEMENTAÇÕES COMPLETAS NO ARQUIVO PRINCIPAL - v3.7.0.4**
 
-### ✅ **Nova Versão Principal**: v3.7.0.3-main
-- **Commit**: `ec9703e`
+### ✅ **Nova Versão Principal**: v3.7.0.4
+- **Commit**: `efd8634`
 - **Data**: 09/09/2025
-- **Status**: ✅ **TODAS AS IMPLEMENTAÇÕES v3.7.0.1, v3.7.0.2 E v3.7.0.3 NO ARQUIVO PRINCIPAL**
-- **Tag**: `v3.7.0.3-main`
+- **Status**: ✅ **TODAS AS IMPLEMENTAÇÕES v3.7.0.1, v3.7.0.2, v3.7.0.3 E v3.7.0.4 NO ARQUIVO PRINCIPAL**
+- **Tag**: `v3.7.0.4`
 - **Funcionalidades**:
   - ✅ Implementação completa v3.7.0.1: Seletor específico Botão Carro (Tela 1)
   - ✅ Implementação completa v3.7.0.2: Seletor específico Cards Estimativa (Tela 5)
   - ✅ Implementação completa v3.7.0.3: Seletor específico Sugestões Endereço (Tela 7)
+  - ✅ Implementação completa v3.7.0.4: Seletor específico Detecção Tela 8 (Finalidade Veículo)
   - ✅ Sistema de fallback robusto com múltiplas estratégias
   - ✅ Estratégia híbrida: específico + fallbacks de compatibilidade
   - ✅ Funções auxiliares: `aguardar_cards_estimativa_playwright()`, `localizar_cards_estimativa_playwright()`, `aguardar_sugestao_endereco_playwright()`, `localizar_sugestao_endereco_playwright()`
@@ -43,6 +44,16 @@
 - **Funções Auxiliares**: Código mais modular e reutilizável
 - **Documentação**: Implementação completamente documentada
 - **Testes**: Validação completa com execução bem-sucedida
+- **Performance**: Mantida e otimizada
+- **Estabilidade**: Excelente
+
+### **Principais Conquistas da v3.7.0.4:**
+- **Detecção Tela 8**: Seletor específico `#finalidadeVeiculoTelaUsoVeiculo` implementado
+- **Estratégia Híbrida**: 4 níveis de fallback para máxima robustez
+- **Funções Auxiliares**: `aguardar_tela_8_playwright()` e `localizar_tela_8_playwright()`
+- **Compatibilidade**: Funciona em todas as versões do site
+- **Documentação**: Implementação completamente documentada
+- **Testes**: Validação completa com execução bem-sucedida (151.91s)
 - **Performance**: Mantida e otimizada
 - **Estabilidade**: Excelente
 
@@ -547,7 +558,7 @@ git push origin --tags
 ### **Componentes Já Implementados:**
 ✅ **Sistema de Login Automático** (v3.0.0) - 100% implementado e funcionando
 ✅ **Sistema de Validação de Parâmetros** (v3.1.7) - 100% implementado e funcionando
-✅ **Implementações Completas v3.7.0.1, v3.7.0.2 e v3.7.0.3** (v3.7.0.3-main) - 100% implementado e funcionando
+✅ **Implementações Completas v3.7.0.1, v3.7.0.2, v3.7.0.3 e v3.7.0.4** (v3.7.0.4) - 100% implementado e funcionando
 ✅ **Sistema de Comunicação Bidirecional** (v3.1.5) - 100% implementado e funcionando
 ✅ **Sistema de Logger Avançado** (v3.1.4) - 100% implementado e funcionando
 ✅ **Sistema de Timeout Inteligente** (v3.1.2) - 100% implementado e funcionando
