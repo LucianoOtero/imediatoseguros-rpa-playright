@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-EXECUTAR RPA IMEDIATO PLAYWRIGHT - VERSÃO PRODUÇÃO
+EXECUTAR RPA IMEDIATO PLAYWRIGHT - VERSÃO v3.7.0.2
 Implementação completa do RPA usando Playwright com Sistema de Exception Handler
 
 DESCRIÇÃO:
@@ -10,6 +10,21 @@ DESCRIÇÃO:
 - Captura de dados dos planos de seguro
 - Estrutura de retorno padronizada
 
+🎯 IMPLEMENTAÇÃO SELETOR ESPECÍFICO CARDS ESTIMATIVA (09/09/2025):
+- Substituição div.bg-primary por div[role="group"][aria-roledescription="slide"]
+- Sistema de fallback robusto com múltiplas estratégias
+- Estratégia híbrida: específico + fallbacks de compatibilidade
+- Funções auxiliares: aguardar_cards_estimativa_playwright() e localizar_cards_estimativa_playwright()
+- Melhoria de estabilidade regional (Brasil + Portugal)
+- Documentação completa da implementação
+
+🔄 IMPLEMENTAÇÃO SELETOR ESPECÍFICO BOTÃO CARRO (09/09/2025):
+- Substituição button.group por button:has(img[alt="Icone car"])
+- Sistema de fallback robusto com múltiplas estratégias
+- Estratégia híbrida: específico + fallbacks de compatibilidade
+- Teste completo bem-sucedido (dados gerados às 14:20)
+- Documentação completa da implementação
+
 🔄 ATUALIZAÇÃO DE COMPATIBILIDADE REGIONAL (08/09/2025):
 - Substituição de seletores genéricos por específicos na Tela 13
 - Resolução de problema de falha em Portugal
@@ -17,9 +32,9 @@ DESCRIÇÃO:
 - Documentação completa das mudanças realizadas
 
 AUTOR: Luciano Otero
-DATA: 2025-09-02
-VERSÃO: 3.5.0 (Compatibilidade Regional)
-STATUS: Implementação completa com Exception Handler + Compatibilidade Regional
+DATA: 2025-09-09
+VERSÃO: v3.7.0.2 (Seletor Específico Cards Estimativa)
+STATUS: Implementação completa com Exception Handler + Compatibilidade Regional + Seletores Específicos
 """
 
 import json
@@ -870,6 +885,68 @@ def navegar_tela_4_playwright(page: Page, veiculo_segurado: str) -> bool:
         exception_handler.capturar_excecao(e, "TELA_4", f"Erro ao responder veículo segurado: {veiculo_segurado}")
         return False
 
+def aguardar_cards_estimativa_playwright(page: Page, timeout: int = 10000) -> bool:
+    """
+    Aguarda carregamento dos cards de estimativa com estratégia híbrida robusta
+    
+    ESTRATÉGIA HÍBRIDA v3.7.0.2:
+    1. div[role="group"][aria-roledescription="slide"] - ESPECÍFICO (semântico)
+    2. div:has(p:has-text("Cobertura")):has(span:has-text("R$")) - CONTEÚDO
+    3. div.border-primary.rounded-xl:has(.bg-primary) - LAYOUT
+    4. div.bg-primary - FALLBACK ATUAL (compatibilidade)
+    """
+    seletores_prioridade = [
+        'div[role="group"][aria-roledescription="slide"]',  # ← ESPECÍFICO
+        'div:has(p:has-text("Cobertura")):has(span:has-text("R$"))',  # ← CONTEÚDO
+        'div.border-primary.rounded-xl:has(.bg-primary)',  # ← LAYOUT
+        'div.bg-primary'  # ← FALLBACK ATUAL
+    ]
+    
+    timeout_por_seletor = timeout // len(seletores_prioridade)
+    
+    for i, seletor in enumerate(seletores_prioridade):
+        try:
+            exibir_mensagem(f"🔍 Tentativa {i+1}/{len(seletores_prioridade)} - Seletor: {seletor}")
+            page.wait_for_selector(seletor, timeout=timeout_por_seletor)
+            exibir_mensagem(f"✅ Cards encontrados com seletor: {seletor}")
+            return True
+        except Exception as e:
+            exibir_mensagem(f"⚠️ Seletor {i+1} falhou: {str(e)}")
+            continue
+    
+    exibir_mensagem("❌ Nenhum seletor funcionou para encontrar os cards")
+    return False
+
+def localizar_cards_estimativa_playwright(page: Page):
+    """
+    Localiza cards de estimativa com estratégia híbrida robusta
+    
+    ESTRATÉGIA HÍBRIDA v3.7.0.2:
+    1. div[role="group"][aria-roledescription="slide"] - ESPECÍFICO (semântico)
+    2. div:has(p:has-text("Cobertura")):has(span:has-text("R$")) - CONTEÚDO
+    3. div.border-primary.rounded-xl:has(.bg-primary) - LAYOUT
+    4. div.bg-primary - FALLBACK ATUAL (compatibilidade)
+    """
+    seletores_prioridade = [
+        'div[role="group"][aria-roledescription="slide"]',  # ← ESPECÍFICO
+        'div:has(p:has-text("Cobertura")):has(span:has-text("R$"))',  # ← CONTEÚDO
+        'div.border-primary.rounded-xl:has(.bg-primary)',  # ← LAYOUT
+        'div.bg-primary'  # ← FALLBACK ATUAL
+    ]
+    
+    for i, seletor in enumerate(seletores_prioridade):
+        try:
+            elemento = page.locator(seletor)
+            if elemento.count() > 0:
+                exibir_mensagem(f"✅ Cards localizados com seletor: {seletor} ({elemento.count()} encontrados)")
+                return elemento
+        except Exception as e:
+            exibir_mensagem(f"⚠️ Seletor {i+1} falhou: {str(e)}")
+            continue
+    
+    exibir_mensagem("❌ Nenhum seletor funcionou para localizar os cards")
+    return None
+
 def navegar_tela_5_playwright(page: Page, parametros_tempo) -> bool:
     """
     TELA 5: Estimativa inicial - CAPTURA DE DADOS E RETORNO INTERMEDIÁRIO
@@ -881,7 +958,10 @@ def navegar_tela_5_playwright(page: Page, parametros_tempo) -> bool:
         # Aguardar carregamento inicial da página
         # Este delay é maior que as outras telas porque a Tela 5
         # precisa calcular estimativas em tempo real
-        page.wait_for_selector("div.bg-primary", timeout=10000)
+        # v3.7.0.2: Estratégia híbrida robusta para aguardar cards
+        if not aguardar_cards_estimativa_playwright(page, 10000):
+            exibir_mensagem("❌ Falha ao aguardar carregamento dos cards de estimativa")
+            return False
         
         max_tentativas = 60  # Aumentado de 30 para 60
         tentativa = 0
@@ -890,8 +970,9 @@ def navegar_tela_5_playwright(page: Page, parametros_tempo) -> bool:
             exibir_mensagem(f"🔄 Tentativa {tentativa + 1}/{max_tentativas} - Aguardando cards de cobertura...")
             
             # Verificar se os cards de cobertura apareceram
-            elemento_estimativa = page.locator("div.bg-primary")
-            if elemento_estimativa.count() > 0:
+            # v3.7.0.2: Estratégia híbrida robusta para localizar cards
+            elemento_estimativa = localizar_cards_estimativa_playwright(page)
+            if elemento_estimativa is not None and elemento_estimativa.count() > 0:
                 exibir_mensagem(f"✅ Elemento de estimativa encontrado: {elemento_estimativa.count()} cards")
                 
                 # Verificar se os cards ainda estão carregando (skeleton)
@@ -915,9 +996,10 @@ def navegar_tela_5_playwright(page: Page, parametros_tempo) -> bool:
                 break
             
             # Aguardar elementos dinâmicos com espera específica
+            # v3.7.0.2: Estratégia híbrida robusta para aguardar cards
             try:
-                page.wait_for_selector("div.bg-primary", timeout=2000)  # Aumentado para 2 segundos
-                break
+                if aguardar_cards_estimativa_playwright(page, 2000):  # Aumentado para 2 segundos
+                    break
             except Exception:
                 try:
                     page.wait_for_selector("text=R$", timeout=2000)
@@ -2691,8 +2773,12 @@ def capturar_dados_carrossel_estimativas_playwright(page: Page) -> Dict[str, Any
             exibir_mensagem("🔍 DEBUG: Estratégia 1.2 - Tentando seletores específicos...")
             
             # Tentar diferentes seletores para encontrar os cards
+            # v3.7.0.2: Estratégia híbrida robusta para seletores de cards
             seletores_cards = [
-                "div.bg-primary",
+                'div[role="group"][aria-roledescription="slide"]',  # ← NOVO PRINCIPAL
+                'div:has(p:has-text("Cobertura")):has(span:has-text("R$"))',  # ← NOVO CONTEÚDO
+                'div.border-primary.rounded-xl:has(.bg-primary)',  # ← NOVO LAYOUT
+                "div.bg-primary",  # ← FALLBACK ATUAL
                 "div[class*='bg-primary']",
                 "div[class*='card']",
                 "div[class*='cobertura']",
