@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-EXECUTAR RPA IMEDIATO PLAYWRIGHT - VERSÃO v3.7.0.3
+EXECUTAR RPA IMEDIATO PLAYWRIGHT - VERSÃO v3.7.0.4
 Implementação completa do RPA usando Playwright com Sistema de Exception Handler
 
 DESCRIÇÃO:
@@ -26,6 +26,14 @@ DESCRIÇÃO:
 - Melhoria de estabilidade regional (Brasil + Portugal)
 - Documentação completa da implementação
 
+🎯 IMPLEMENTAÇÃO SELETOR ESPECÍFICO TELA 8 (09/09/2025):
+- Substituição xpath genérico por #finalidadeVeiculoTelaUsoVeiculo
+- Sistema de fallback robusto com múltiplas estratégias
+- Estratégia híbrida: específico + semântico + conteúdo + fallback de compatibilidade
+- Funções auxiliares: aguardar_tela_8_playwright() e localizar_tela_8_playwright()
+- Melhoria de estabilidade regional (Brasil + Portugal)
+- Documentação completa da implementação
+
 🔄 IMPLEMENTAÇÃO SELETOR ESPECÍFICO BOTÃO CARRO (09/09/2025):
 - Substituição button.group por button:has(img[alt="Icone car"])
 - Sistema de fallback robusto com múltiplas estratégias
@@ -41,7 +49,7 @@ DESCRIÇÃO:
 
 AUTOR: Luciano Otero
 DATA: 2025-09-09
-VERSÃO: v3.7.0.2 (Seletor Específico Cards Estimativa)
+VERSÃO: v3.7.0.4 (Implementações Completas v3.7.0.1, v3.7.0.2, v3.7.0.3 e v3.7.0.4)
 STATUS: Implementação completa com Exception Handler + Compatibilidade Regional + Seletores Específicos
 """
 
@@ -1437,12 +1445,55 @@ def navegar_tela_7_playwright(page: Page, cep: str) -> bool:
         
         exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
         # Aguardar transição para a próxima tela
-        page.wait_for_selector("xpath=//*[contains(text(), 'finalidade') or contains(text(), 'uso')]", timeout=5000)
+        aguardar_tela_8_playwright(page, 5000)
         return True
         
     except Exception as e:
         exception_handler.capturar_excecao(e, "TELA_7", f"Erro ao preencher CEP {cep}")
         return False
+
+def aguardar_tela_8_playwright(page: Page, timeout: int = 5000) -> bool:
+    """
+    ESTRATÉGIA HÍBRIDA v3.7.0.4:
+    1. #finalidadeVeiculoTelaUsoVeiculo - ESPECÍFICO (ID)
+    2. [role="radiogroup"] - SEMÂNTICO (ARIA)
+    3. p:has-text("Qual é o uso do veículo?") - CONTEÚDO (título)
+    4. xpath=//*[contains(text(), 'finalidade') or contains(text(), 'uso')] - FALLBACK ATUAL
+    """
+    seletores = [
+        '#finalidadeVeiculoTelaUsoVeiculo',  # ← PRINCIPAL
+        '[role="radiogroup"]',                # ← SECUNDÁRIO
+        'p:has-text("Qual é o uso do veículo?")',  # ← TERCIÁRIO
+        'xpath=//*[contains(text(), "finalidade") or contains(text(), "uso")]'  # ← FALLBACK
+    ]
+    
+    for seletor in seletores:
+        try:
+            if page.wait_for_selector(seletor, timeout=timeout):
+                return True
+        except:
+            continue
+    return False
+
+def localizar_tela_8_playwright(page: Page):
+    """
+    Localiza elementos da Tela 8 usando estratégia híbrida
+    """
+    seletores = [
+        '#finalidadeVeiculoTelaUsoVeiculo',  # ← PRINCIPAL
+        '[role="radiogroup"]',                # ← SECUNDÁRIO
+        'p:has-text("Qual é o uso do veículo?")',  # ← TERCIÁRIO
+        'xpath=//*[contains(text(), "finalidade") or contains(text(), "uso")]'  # ← FALLBACK
+    ]
+    
+    for seletor in seletores:
+        try:
+            elementos = page.locator(seletor)
+            if elementos.count() > 0:
+                return elementos
+        except:
+            continue
+    return None
 
 def navegar_tela_8_playwright(page: Page, uso_veiculo: str) -> bool:
     """
@@ -1456,13 +1507,13 @@ def navegar_tela_8_playwright(page: Page, uso_veiculo: str) -> bool:
         tentativa = 0
         
         while tentativa < max_tentativas:
-            elementos_tela8 = page.locator("xpath=//*[contains(text(), 'finalidade') or contains(text(), 'Finalidade') or contains(text(), 'uso') or contains(text(), 'Uso') or contains(text(), 'veículo')]")
-            if elementos_tela8.count() > 0:
+            elementos_tela8 = localizar_tela_8_playwright(page)
+            if elementos_tela8 is not None and elementos_tela8.count() > 0:
                 break
             # Aguardar carregamento da tela
             try:
-                page.wait_for_selector("xpath=//*[contains(text(), 'finalidade') or contains(text(), 'uso')]", timeout=1000)
-                break
+                if aguardar_tela_8_playwright(page, 1000):
+                    break
             except:
                 continue
             tentativa += 1
@@ -1496,7 +1547,7 @@ def navegar_tela_8_playwright(page: Page, uso_veiculo: str) -> bool:
         botao_continuar = page.locator("#gtm-telaUsoVeiculoContinuar").first
         botao_continuar.click()
         exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
-        page.wait_for_selector("xpath=//*[contains(text(), 'dados pessoais') or contains(text(), 'Dados pessoais')]", timeout=5000)
+        aguardar_tela_8_playwright(page, 5000)
         return True
         
     except Exception as e:
