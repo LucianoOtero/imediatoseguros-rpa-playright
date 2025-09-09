@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-EXECUTAR RPA IMEDIATO PLAYWRIGHT - VERSÃO v3.7.0.2
+EXECUTAR RPA IMEDIATO PLAYWRIGHT - VERSÃO v3.7.0.3
 Implementação completa do RPA usando Playwright com Sistema de Exception Handler
 
 DESCRIÇÃO:
@@ -15,6 +15,14 @@ DESCRIÇÃO:
 - Sistema de fallback robusto com múltiplas estratégias
 - Estratégia híbrida: específico + fallbacks de compatibilidade
 - Funções auxiliares: aguardar_cards_estimativa_playwright() e localizar_cards_estimativa_playwright()
+- Melhoria de estabilidade regional (Brasil + Portugal)
+- Documentação completa da implementação
+
+🎯 IMPLEMENTAÇÃO SELETOR ESPECÍFICO SUGESTÕES ENDEREÇO (09/09/2025):
+- Substituição .overflow-hidden por [data-testid="sugestao-endereco"]
+- Sistema de fallback robusto com múltiplas estratégias
+- Estratégia híbrida: específico + semântico + fallback de compatibilidade
+- Funções auxiliares: aguardar_sugestao_endereco_playwright() e localizar_sugestao_endereco_playwright()
 - Melhoria de estabilidade regional (Brasil + Portugal)
 - Documentação completa da implementação
 
@@ -1309,6 +1317,64 @@ def navegar_tela_6_playwright(page: Page, combustivel: str, kit_gas: bool, blind
         exception_handler.capturar_excecao(e, "TELA_6", "Erro ao configurar itens do carro")
         return False
 
+def aguardar_sugestao_endereco_playwright(page: Page, timeout: int = 8000) -> bool:
+    """
+    Aguarda carregamento das sugestões de endereço com estratégia híbrida robusta
+    
+    ESTRATÉGIA HÍBRIDA v3.7.0.3:
+    1. [data-testid="sugestao-endereco"] - ESPECÍFICO (teste)
+    2. .MuiAutocomplete-option - SEMÂNTICO (Material-UI)
+    3. .overflow-hidden - FALLBACK ATUAL (compatibilidade)
+    """
+    seletores_prioridade = [
+        '[data-testid="sugestao-endereco"]',  # ← PRINCIPAL
+        '.MuiAutocomplete-option',            # ← SECUNDÁRIO
+        '.overflow-hidden'                    # ← FALLBACK
+    ]
+    
+    timeout_por_seletor = timeout // len(seletores_prioridade)
+    
+    for i, seletor in enumerate(seletores_prioridade):
+        try:
+            exibir_mensagem(f"🔍 Tentativa {i+1}/{len(seletores_prioridade)} - Seletor: {seletor}")
+            page.wait_for_selector(seletor, timeout=timeout_por_seletor)
+            exibir_mensagem(f"✅ Sugestões encontradas com seletor: {seletor}")
+            return True
+        except Exception as e:
+            exibir_mensagem(f"⚠️ Seletor {i+1} falhou: {str(e)}")
+            continue
+    
+    exibir_mensagem("❌ Nenhum seletor funcionou para encontrar as sugestões")
+    return False
+
+def localizar_sugestao_endereco_playwright(page: Page):
+    """
+    Localiza sugestões de endereço com estratégia híbrida robusta
+    
+    ESTRATÉGIA HÍBRIDA v3.7.0.3:
+    1. [data-testid="sugestao-endereco"] - ESPECÍFICO (teste)
+    2. .MuiAutocomplete-option - SEMÂNTICO (Material-UI)
+    3. .overflow-hidden - FALLBACK ATUAL (compatibilidade)
+    """
+    seletores_prioridade = [
+        '[data-testid="sugestao-endereco"]',  # ← PRINCIPAL
+        '.MuiAutocomplete-option',            # ← SECUNDÁRIO
+        '.overflow-hidden'                    # ← FALLBACK
+    ]
+    
+    for i, seletor in enumerate(seletores_prioridade):
+        try:
+            elemento = page.locator(seletor)
+            if elemento.count() > 0:
+                exibir_mensagem(f"✅ Sugestões localizadas com seletor: {seletor} ({elemento.count()} encontradas)")
+                return elemento
+        except Exception as e:
+            exibir_mensagem(f"⚠️ Seletor {i+1} falhou: {str(e)}")
+            continue
+    
+    exibir_mensagem("❌ Nenhum seletor funcionou para localizar as sugestões")
+    return None
+
 def navegar_tela_7_playwright(page: Page, cep: str) -> bool:
     """
     TELA 7: Endereço de pernoite (CEP)
@@ -1347,16 +1413,19 @@ def navegar_tela_7_playwright(page: Page, cep: str) -> bool:
         
         # Aguardar carregamento do endereço
         exibir_mensagem("⏳ Aguardando carregamento do endereço...")
-        page.wait_for_selector(".overflow-hidden", timeout=8000)
+        if not aguardar_sugestao_endereco_playwright(page, 8000):
+            return False
         
         # Tentar selecionar endereço sugerido
         try:
-            sugestao_endereco = page.locator(".overflow-hidden").first
-            if sugestao_endereco.is_visible():
-                sugestao_endereco.click()
-                exibir_mensagem("✅ Endereço sugerido selecionado")
-                # Aguardar estabilização da seleção
-                page.wait_for_function("document.querySelector('.overflow-hidden').classList.contains('selected')", timeout=2000)
+            sugestao_endereco = localizar_sugestao_endereco_playwright(page)
+            if sugestao_endereco is not None and sugestao_endereco.count() > 0:
+                sugestao_endereco = sugestao_endereco.first
+                if sugestao_endereco.is_visible():
+                    sugestao_endereco.click()
+                    exibir_mensagem("✅ Endereço sugerido selecionado")
+                    # Aguardar estabilização da seleção
+                    page.wait_for_function("document.querySelector('[data-testid=\"sugestao-endereco\"]').classList.contains('selected')", timeout=2000)
             else:
                 exception_handler.capturar_warning("Endereço sugerido não encontrado", "TELA_7")
         except Exception as e:
