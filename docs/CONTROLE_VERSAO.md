@@ -15,29 +15,31 @@
 - **Histórico**: ✅ Completo
 - **Repositório**: https://github.com/LucianoOtero/imediatoseguros-rpa-playright.git
 
-## 🏆 **SELETOR ESPECÍFICO BOTÃO CARRO IMPLEMENTADO - v3.7.0.1**
+## 🏆 **SELETOR ESPECÍFICO CARDS ESTIMATIVA IMPLEMENTADO - v3.7.0.2**
 
-### ✅ **Nova Versão Principal**: v3.7.0.1
+### ✅ **Nova Versão Principal**: v3.7.0.2
 - **Commit**: `[PENDENTE]`
 - **Data**: 09/09/2025
-- **Status**: ✅ **SELETOR ESPECÍFICO BOTÃO CARRO IMPLEMENTADO**
-- **Tag**: `v3.7.0.1`
+- **Status**: ✅ **SELETOR ESPECÍFICO CARDS ESTIMATIVA IMPLEMENTADO**
+- **Tag**: `v3.7.0.2`
 - **Funcionalidades**:
-  - ✅ Implementação seletor específico botão Carro (Tela 1)
-  - ✅ Substituição `button.group` por `button:has(img[alt="Icone car"])`
+  - ✅ Implementação seletor específico Cards Estimativa (Tela 5)
+  - ✅ Substituição `div.bg-primary` por `div[role="group"][aria-roledescription="slide"]`
   - ✅ Sistema de fallback robusto com múltiplas estratégias
   - ✅ Estratégia híbrida: específico + fallbacks de compatibilidade
-  - ✅ Teste completo bem-sucedido (dados gerados às 14:20)
+  - ✅ Funções auxiliares: `aguardar_cards_estimativa_playwright()`, `localizar_cards_estimativa_playwright()`
   - ✅ Documentação completa da implementação
   - ✅ Auditoria de seletores atualizada
   - ✅ Compatibilidade Regional (v3.5.0) mantida
+  - ✅ Seletor Botão Carro (v3.7.0.1) mantido
   - ✅ Performance mantida e otimizada
   - ✅ Estabilidade excelente
 
-### **Principais Conquistas da v3.7.0.1:**
+### **Principais Conquistas da v3.7.0.2:**
 - **Seletores Específicos**: Maior precisão e confiabilidade
 - **Robustez**: Sistema de fallback múltiplo implementado
 - **Compatibilidade**: Funciona em todas as versões do site
+- **Funções Auxiliares**: Código mais modular e reutilizável
 - **Documentação**: Implementação completamente documentada
 - **Testes**: Validação completa com execução bem-sucedida
 - **Performance**: Mantida e otimizada
@@ -305,7 +307,7 @@
 
 ## 📊 Versões Disponíveis
 
-### **Versão Mais Recente**: v3.7.0.1
+### **Versão Mais Recente**: v3.7.0.2
 - **Commit**: `[PENDENTE]`
 - **Data**: 09/09/2025
 - **Funcionalidades**:

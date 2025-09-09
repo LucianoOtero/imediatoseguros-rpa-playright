@@ -7,6 +7,40 @@
 
 ---
 
+## 🎯 **IMPLEMENTAÇÃO v3.7.0.2 - Cards Estimativa (Tela 5)**
+
+### **📅 INFORMAÇÕES BÁSICAS**
+- **Data**: 09/09/2025
+- **Horário**: 14:52
+- **Implementador**: Sistema Automatizado
+- **Status**: ✅ **IMPLEMENTADO**
+
+### **🔧 DETALHES TÉCNICOS**
+- **Arquivo**: `executar_rpa_imediato_playwright.py`
+- **Função**: `navegar_tela_5_playwright()`
+- **Linhas Modificadas**: 880-1000, 2768-2779
+- **Seletor Original**: `div.bg-primary`
+- **Seletor Novo**: `div[role="group"][aria-roledescription="slide"]`
+
+### **🛡️ ESTRATÉGIA IMPLEMENTADA**
+```python
+def aguardar_cards_estimativa_playwright(page: Page, timeout: int = 10000) -> bool:
+    seletores_prioridade = [
+        'div[role="group"][aria-roledescription="slide"]',  # ← ESPECÍFICO
+        'div:has(p:has-text("Cobertura")):has(span:has-text("R$"))',  # ← CONTEÚDO
+        'div.border-primary.rounded-xl:has(.bg-primary)',  # ← LAYOUT
+        'div.bg-primary'  # ← FALLBACK ATUAL
+    ]
+```
+
+### **📊 RESULTADOS DOS TESTES**
+- **Status**: ✅ **IMPLEMENTAÇÃO CONCLUÍDA COM SUCESSO**
+- **Funções Auxiliares**: Criadas com sucesso
+- **Estratégia Híbrida**: Implementada com fallbacks múltiplos
+- **Documentação**: Atualizada completamente
+
+---
+
 ## 🎯 **IMPLEMENTAÇÃO v3.7.0.1 - Botão Carro (Tela 1)**
 
 ### **📅 INFORMAÇÕES BÁSICAS**

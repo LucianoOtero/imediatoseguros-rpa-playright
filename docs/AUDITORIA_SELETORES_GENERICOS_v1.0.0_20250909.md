@@ -13,11 +13,11 @@
 
 ### **📊 ESTATÍSTICAS GERAIS**
 - **Total de Seletores Genéricos Identificados**: 47
-- **Seletores Implementados**: 1 ✅
-- **Seletores Pendentes**: 46
+- **Seletores Implementados**: 2 ✅
+- **Seletores Pendentes**: 45
 - **Telas Afetadas**: 15 (todas as telas)
 - **Tipos de Seletores Genéricos**: 8 categorias
-- **Risco de Falha**: 🔴 **ALTO** → 🟡 **REDUZIDO** (1 implementado)
+- **Risco de Falha**: 🔴 **ALTO** → 🟡 **REDUZIDO** (2 implementados)
 
 ### **🚨 PROBLEMAS CRÍTICOS IDENTIFICADOS**
 1. **Seletores baseados em classes CSS** - Falham em diferentes regiões
@@ -79,12 +79,16 @@
 ### **TELA 5: Estimativa Inicial**
 **Função**: `navegar_tela_5_playwright()`
 
-#### **🔴 SELETORES GENÉRICOS IDENTIFICADOS**
-1. **`div.bg-primary`** (Linha 854)
+#### **✅ SELETOR IMPLEMENTADO**
+1. **`div.bg-primary`** (Linha 854) ✅ **IMPLEMENTADO v3.7.0.2**
    - **Finalidade**: Detectar cards de estimativa
-   - **Problema**: Classe CSS genérica
-   - **Risco**: 🔴 **ALTO**
-   - **Alternativa Sugerida**: `[data-testid="card-estimativa"]`
+   - **Problema**: Classe CSS genérica, pode mudar
+   - **Risco**: 🔴 **ALTO** → 🟢 **RESOLVIDO**
+   - **Alternativa Implementada**: `div[role="group"][aria-roledescription="slide"]`
+   - **Status**: ✅ **IMPLEMENTADO E TESTADO COM SUCESSO**
+   - **Data Implementação**: 09/09/2025
+   - **Estratégia**: Híbrida com fallbacks múltiplos
+   - **Funções Auxiliares**: `aguardar_cards_estimativa_playwright()`, `localizar_cards_estimativa_playwright()`
 
 2. **`text=R$`** (Linha 867)
    - **Finalidade**: Detectar elementos com preços
@@ -588,11 +592,13 @@ page.locator("#radio-condutor-principal-sim")
 
 #### **🔄 PRÓXIMAS IMPLEMENTAÇÕES**
 
-##### **IMPLEMENTAÇÃO v3.7.0.2 - Cards Estimativa (Tela 5)**
+##### **✅ IMPLEMENTAÇÃO v3.7.0.2 - Cards Estimativa (Tela 5) - CONCLUÍDA**
 - **Tela**: 5
-- **Seletor**: `div.bg-primary`
+- **Seletor**: `div.bg-primary` → `div[role="group"][aria-roledescription="slide"]`
 - **Prioridade**: Alta
-- **Data Planejada**: 10/09/2025
+- **Data Implementação**: 09/09/2025
+- **Status**: ✅ **IMPLEMENTADO COM SUCESSO**
+- **Estratégia**: Híbrida com fallbacks múltiplos
 
 ##### **IMPLEMENTAÇÃO v3.7.0.3 - Otimização de Timeouts (Telas 14-15)**
 - **Problema**: Timeouts excessivos prejudicam experiência do usuário
