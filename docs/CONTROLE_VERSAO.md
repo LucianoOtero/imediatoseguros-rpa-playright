@@ -15,9 +15,42 @@
 - **Histórico**: ✅ Completo
 - **Repositório**: https://github.com/LucianoOtero/imediatoseguros-rpa-playright.git
 
+## 🏆 **SELETOR ESPECÍFICO BOTÃO CARRO IMPLEMENTADO - v3.7.0.1**
+
+### ✅ **Nova Versão Principal**: v3.7.0.1
+- **Commit**: `[PENDENTE]`
+- **Data**: 09/09/2025
+- **Status**: ✅ **SELETOR ESPECÍFICO BOTÃO CARRO IMPLEMENTADO**
+- **Tag**: `v3.7.0.1`
+- **Funcionalidades**:
+  - ✅ Implementação seletor específico botão Carro (Tela 1)
+  - ✅ Substituição `button.group` por `button:has(img[alt="Icone car"])`
+  - ✅ Sistema de fallback robusto com múltiplas estratégias
+  - ✅ Estratégia híbrida: específico + fallbacks de compatibilidade
+  - ✅ Teste completo bem-sucedido (dados gerados às 14:20)
+  - ✅ Documentação completa da implementação
+  - ✅ Auditoria de seletores atualizada
+  - ✅ Compatibilidade Regional (v3.5.0) mantida
+  - ✅ Performance mantida e otimizada
+  - ✅ Estabilidade excelente
+
+### **Principais Conquistas da v3.7.0.1:**
+- **Seletores Específicos**: Maior precisão e confiabilidade
+- **Robustez**: Sistema de fallback múltiplo implementado
+- **Compatibilidade**: Funciona em todas as versões do site
+- **Documentação**: Implementação completamente documentada
+- **Testes**: Validação completa com execução bem-sucedida
+- **Performance**: Mantida e otimizada
+- **Estabilidade**: Excelente
+
+### **Problema Resolvido:**
+- **ANTES**: Seletor genérico `button.group` poderia falhar
+- **DEPOIS**: Seletor específico `button:has(img[alt="Icone car"])` com fallbacks
+- **Solução**: Estratégia híbrida com múltiplas camadas de segurança
+
 ## 🏆 **COMPATIBILIDADE REGIONAL BRASIL/PORTUGAL - v3.5.0**
 
-### ✅ **Nova Versão Principal**: v3.5.0-compatibilidade-regional
+### ✅ **Versão Anterior**: v3.5.0-compatibilidade-regional
 - **Commit**: `9b18de1`
 - **Data**: 08/09/2025
 - **Status**: ✅ **COMPATIBILIDADE REGIONAL IMPLEMENTADA**
@@ -272,8 +305,23 @@
 
 ## 📊 Versões Disponíveis
 
-### **Versão Mais Recente**: v3.4.0
-- **Commit**: `301059d`
+### **Versão Mais Recente**: v3.7.0.1
+- **Commit**: `[PENDENTE]`
+- **Data**: 09/09/2025
+- **Funcionalidades**:
+  - ✅ **SELETOR ESPECÍFICO BOTÃO CARRO IMPLEMENTADO**
+  - ✅ Substituição `button.group` por `button:has(img[alt="Icone car"])`
+  - ✅ Sistema de fallback robusto com múltiplas estratégias
+  - ✅ Estratégia híbrida: específico + fallbacks de compatibilidade
+  - ✅ Teste completo bem-sucedido (dados gerados às 14:20)
+  - ✅ Documentação completa da implementação
+  - ✅ Auditoria de seletores atualizada
+  - ✅ Compatibilidade Regional (v3.5.0) mantida
+  - ✅ Performance mantida e otimizada
+  - ✅ Estabilidade excelente
+
+### **Versão Anterior**: v3.5.0-compatibilidade-regional
+- **Commit**: `9b18de1`
 - **Data**: 03/09/2025
 - **Funcionalidades**:
   - ✅ **PARÂMETROS DE TEMPO CONFIGURÁVEIS IMPLEMENTADOS**

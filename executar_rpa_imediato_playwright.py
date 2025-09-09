@@ -734,24 +734,63 @@ def executar_com_timeout(smart_timeout, tela_num, funcao_tela, *args, **kwargs):
 def navegar_tela_1_playwright(page: Page) -> bool:
     """
     TELA 1: Seleção do tipo de seguro (Carro)
+    
+    VERSÃO: v3.7.0.1
+    IMPLEMENTAÇÃO: Substituição de seletor genérico por específico
+    DATA: 09/09/2025
+    STATUS: ✅ IMPLEMENTADO
     """
     try:
         exception_handler.definir_tela_atual("TELA_1")
-        exibir_mensagem("📱 TELA 1: Selecionando Carro...")
+        exibir_mensagem("📱 TELA 1: Selecionando tipo de seguro...")
         
         # Aguardar carregamento inicial da página
-        page.wait_for_selector("button.group", timeout=5000)
+        page.wait_for_selector("button", timeout=5000)
         
-        botao_carro = page.locator("button.group").first
+        # ESTRATÉGIA HÍBRIDA: Específico + Fallback
+        seletores_carro = [
+            # PRIMÁRIO: Seletor específico por alt da imagem (NOVO)
+            'button:has(img[alt="Icone car"])',
+            
+            # SECUNDÁRIO: Seletor específico por src da imagem
+            'button:has(img[src="/insurance-icons/car.svg"])',
+            
+            # TERCIÁRIO: Seletor específico por texto
+            'button:has-text("Carro")',
+            
+            # FALLBACK: Seletor genérico original (COMPATIBILIDADE)
+            'button.group'
+        ]
         
-        if botao_carro.is_visible():
+        botao_carro = None
+        seletor_usado = None
+        
+        # Tentar cada seletor em ordem de prioridade
+        for seletor in seletores_carro:
+            try:
+                botao_carro = page.locator(seletor).first
+                if botao_carro.is_visible():
+                    seletor_usado = seletor
+                    exibir_mensagem(f"✅ Botão 'Carro' encontrado com seletor: {seletor}")
+                    break
+            except Exception as e:
+                continue
+        
+        if botao_carro and botao_carro.is_visible():
             botao_carro.click()
             exibir_mensagem("✅ Botão 'Carro' clicado com sucesso")
+            
+            # Log do seletor usado para monitoramento
+            if seletor_usado.startswith('button:has'):
+                exibir_mensagem(f"🎯 Seletor específico usado: {seletor_usado}")
+            else:
+                exibir_mensagem(f"⚠️ Fallback usado: {seletor_usado}")
+            
             # Aguardar transição para a próxima tela
             page.wait_for_selector("#placaTelaDadosPlaca", timeout=5000)
             return True
         else:
-            exception_handler.capturar_warning("Botão 'Carro' não está visível", "TELA_1")
+            exception_handler.capturar_warning("Botão 'Carro' não encontrado com nenhum seletor", "TELA_1")
             return False
             
     except Exception as e:
