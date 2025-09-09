@@ -80,7 +80,7 @@
 **Função**: `navegar_tela_5_playwright()`
 
 #### **✅ SELETOR IMPLEMENTADO**
-1. **`div.bg-primary`** (Linha 854) ✅ **IMPLEMENTADO v3.7.0.2**
+1. **`div.bg-primary`** (Linha 854) ✅ **IMPLEMENTADO v3.7.0.2-main**
    - **Finalidade**: Detectar cards de estimativa
    - **Problema**: Classe CSS genérica, pode mudar
    - **Risco**: 🔴 **ALTO** → 🟢 **RESOLVIDO**

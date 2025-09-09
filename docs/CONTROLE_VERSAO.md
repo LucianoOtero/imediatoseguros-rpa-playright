@@ -15,13 +15,13 @@
 - **Histórico**: ✅ Completo
 - **Repositório**: https://github.com/LucianoOtero/imediatoseguros-rpa-playright.git
 
-## 🏆 **SELETOR ESPECÍFICO CARDS ESTIMATIVA IMPLEMENTADO - v3.7.0.2**
+## 🏆 **SELETOR ESPECÍFICO CARDS ESTIMATIVA IMPLEMENTADO - v3.7.0.2-main**
 
-### ✅ **Nova Versão Principal**: v3.7.0.2
-- **Commit**: `0e8df2a`
+### ✅ **Nova Versão Principal**: v3.7.0.2-main
+- **Commit**: `be6fdc8`
 - **Data**: 09/09/2025
-- **Status**: ✅ **SELETOR ESPECÍFICO CARDS ESTIMATIVA IMPLEMENTADO**
-- **Tag**: `v3.7.0.2`
+- **Status**: ✅ **SELETOR ESPECÍFICO CARDS ESTIMATIVA IMPLEMENTADO NO ARQUIVO PRINCIPAL**
+- **Tag**: `v3.7.0.2-main`
 - **Funcionalidades**:
   - ✅ Implementação seletor específico Cards Estimativa (Tela 5)
   - ✅ Substituição `div.bg-primary` por `div[role="group"][aria-roledescription="slide"]`
