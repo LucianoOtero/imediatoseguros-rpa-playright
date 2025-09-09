@@ -18,7 +18,7 @@
 ## 🏆 **SELETOR ESPECÍFICO CARDS ESTIMATIVA IMPLEMENTADO - v3.7.0.2**
 
 ### ✅ **Nova Versão Principal**: v3.7.0.2
-- **Commit**: `[PENDENTE]`
+- **Commit**: `0e8df2a`
 - **Data**: 09/09/2025
 - **Status**: ✅ **SELETOR ESPECÍFICO CARDS ESTIMATIVA IMPLEMENTADO**
 - **Tag**: `v3.7.0.2`
@@ -308,7 +308,7 @@
 ## 📊 Versões Disponíveis
 
 ### **Versão Mais Recente**: v3.7.0.2
-- **Commit**: `[PENDENTE]`
+- **Commit**: `0e8df2a`
 - **Data**: 09/09/2025
 - **Funcionalidades**:
   - ✅ **SELETOR ESPECÍFICO BOTÃO CARRO IMPLEMENTADO**
