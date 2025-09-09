@@ -138,13 +138,13 @@
 **Função**: `navegar_tela_7_playwright()`
 
 #### **🔴 SELETORES GENÉRICOS IDENTIFICADOS**
-1. **`.overflow-hidden`** (Linha 1233) ✅ **IMPLEMENTADO v3.7.0.3**
+1. **`.overflow-hidden`** (Linha 1233) ✅ **IMPLEMENTADO v3.7.0.3-main**
    - **Finalidade**: Selecionar endereço sugerido
    - **Problema**: Classe CSS genérica
    - **Risco**: 🔴 **ALTO** → 🟢 **RESOLVIDO**
    - **Alternativa Implementada**: `[data-testid="sugestao-endereco"]`
 
-2. **`document.querySelector('.overflow-hidden').classList.contains('selected')`** (Linha 1238) ✅ **IMPLEMENTADO v3.7.0.3**
+2. **`document.querySelector('.overflow-hidden').classList.contains('selected')`** (Linha 1238) ✅ **IMPLEMENTADO v3.7.0.3-main**
    - **Finalidade**: Verificar se endereço está selecionado
    - **Problema**: JavaScript com classe genérica
    - **Risco**: 🔴 **ALTO** → 🟢 **RESOLVIDO**
@@ -605,16 +605,16 @@ page.locator("#radio-condutor-principal-sim")
 - **Estimativas**: ✅ 3 coberturas capturadas com valores precisos
 - **Commit**: `0e8df2a`
 
-##### **✅ IMPLEMENTAÇÃO v3.7.0.3 - Sugestões Endereço (Tela 7) - CONCLUÍDA**
+##### **✅ IMPLEMENTAÇÃO v3.7.0.3-main - Sugestões Endereço (Tela 7) - CONCLUÍDA**
 - **Tela**: 7
 - **Seletor**: `.overflow-hidden` → `[data-testid="sugestao-endereco"]`
 - **Prioridade**: Alta
 - **Data Implementação**: 09/09/2025
-- **Status**: ✅ **IMPLEMENTADO E TESTADO COM SUCESSO**
+- **Status**: ✅ **IMPLEMENTADO E TESTADO COM SUCESSO NO ARQUIVO PRINCIPAL**
 - **Estratégia**: Híbrida com fallbacks múltiplos
 - **Teste**: ✅ Execução completa bem-sucedida (103.48s)
 - **Sugestões**: ✅ Funcionamento perfeito das sugestões de endereço
-- **Commit**: `[PENDENTE]`
+- **Commit**: `ec9703e`
 
 ##### **IMPLEMENTAÇÃO v3.7.0.4 - Otimização de Timeouts (Telas 14-15)**
 - **Problema**: Timeouts excessivos prejudicam experiência do usuário
