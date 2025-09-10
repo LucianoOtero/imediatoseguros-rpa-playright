@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-EXECUTAR RPA IMEDIATO PLAYWRIGHT - VERSÃO v3.7.0.4
+EXECUTAR RPA IMEDIATO PLAYWRIGHT - VERSÃO v3.7.0.5
 Implementação completa do RPA usando Playwright com Sistema de Exception Handler
 
 DESCRIÇÃO:
@@ -23,6 +23,14 @@ DESCRIÇÃO:
 - Sistema de fallback robusto com múltiplas estratégias
 - Estratégia híbrida: específico + semântico + fallback de compatibilidade
 - Funções auxiliares: aguardar_sugestao_endereco_playwright() e localizar_sugestao_endereco_playwright()
+- Melhoria de estabilidade regional (Brasil + Portugal)
+- Documentação completa da implementação
+
+🎯 IMPLEMENTAÇÃO SELETOR ESPECÍFICO TELA 9 (09/09/2025):
+- Substituição xpath genérico por p:has-text("Nessa etapa, precisamos dos seus dados pessoais")
+- Sistema de fallback robusto com múltiplas estratégias
+- Estratégia híbrida: específico + semântico + estrutural + fallback de compatibilidade
+- Funções auxiliares: aguardar_tela_9_playwright() e localizar_tela_9_playwright()
 - Melhoria de estabilidade regional (Brasil + Portugal)
 - Documentação completa da implementação
 
@@ -49,7 +57,7 @@ DESCRIÇÃO:
 
 AUTOR: Luciano Otero
 DATA: 2025-09-09
-VERSÃO: v3.7.0.4 (Implementações Completas v3.7.0.1, v3.7.0.2, v3.7.0.3 e v3.7.0.4)
+VERSÃO: v3.7.0.5 (Implementações Completas v3.7.0.1, v3.7.0.2, v3.7.0.3, v3.7.0.4 e v3.7.0.5)
 STATUS: Implementação completa com Exception Handler + Compatibilidade Regional + Seletores Específicos
 """
 
@@ -1495,6 +1503,103 @@ def localizar_tela_8_playwright(page: Page):
             continue
     return None
 
+def aguardar_tela_9_playwright(page: Page, timeout: int = 5000) -> bool:
+    """
+    Aguarda carregamento da Tela 9 (Dados Pessoais) com estratégia híbrida robusta
+    
+    ESTRATÉGIA HÍBRIDA v3.7.0.5:
+    1. p:has-text("Nessa etapa, precisamos dos seus dados pessoais") - ESPECÍFICO (conteúdo)
+    2. p.font-asap.text-primary.font-bold - SEMÂNTICO (classes específicas)
+    3. p.text-2xl.font-bold - ESTRUTURAL (classes de tamanho)
+    4. xpath=//*[contains(text(), 'dados pessoais')] - FALLBACK (compatibilidade)
+    
+    Args:
+        page: Instância do Playwright Page
+        timeout: Timeout em milissegundos (padrão: 5000)
+    
+    Returns:
+        bool: True se a tela foi detectada, False caso contrário
+    """
+    try:
+        exibir_mensagem("🔍 v3.7.0.5: Aguardando Tela 9 com estratégia híbrida...")
+        
+        # Estratégia híbrida com 4 níveis de fallback
+        seletores = [
+            'p:has-text("Nessa etapa, precisamos dos seus dados pessoais")',  # ESPECÍFICO
+            'p.font-asap.text-primary.font-bold',                           # SEMÂNTICO
+            'p.text-2xl.font-bold',                                         # ESTRUTURAL
+            'xpath=//*[contains(text(), "dados pessoais") or contains(text(), "Dados pessoais")]'  # FALLBACK
+        ]
+        
+        for i, seletor in enumerate(seletores, 1):
+            try:
+                exibir_mensagem(f"🔍 v3.7.0.5: Tentativa {i}/4 - Testando seletor: {seletor[:50]}...")
+                
+                # Aguardar elemento com timeout específico
+                page.wait_for_selector(seletor, timeout=timeout//4)
+                
+                # Verificar se elemento existe e está visível
+                elemento = page.locator(seletor)
+                if elemento.count() > 0 and elemento.first.is_visible():
+                    exibir_mensagem(f"✅ v3.7.0.5: Tela 9 detectada com seletor {i}/4")
+                    return True
+                    
+            except Exception as e:
+                exibir_mensagem(f"⚠️ v3.7.0.5: Seletor {i}/4 falhou: {str(e)[:100]}")
+                continue
+        
+        exibir_mensagem("❌ v3.7.0.5: Todos os seletores falharam")
+        return False
+        
+    except Exception as e:
+        exibir_mensagem(f"❌ v3.7.0.5: Erro na detecção da Tela 9: {str(e)}")
+        return False
+
+def localizar_tela_9_playwright(page: Page):
+    """
+    Localiza elementos da Tela 9 (Dados Pessoais) com estratégia híbrida robusta
+    
+    ESTRATÉGIA HÍBRIDA v3.7.0.5:
+    1. p:has-text("Nessa etapa, precisamos dos seus dados pessoais") - ESPECÍFICO (conteúdo)
+    2. p.font-asap.text-primary.font-bold - SEMÂNTICO (classes específicas)
+    3. p.text-2xl.font-bold - ESTRUTURAL (classes de tamanho)
+    4. xpath=//*[contains(text(), 'dados pessoais')] - FALLBACK (compatibilidade)
+    
+    Args:
+        page: Instância do Playwright Page
+    
+    Returns:
+        Locator: Elemento encontrado ou None
+    """
+    try:
+        exibir_mensagem("🔍 v3.7.0.5: Localizando elementos da Tela 9...")
+        
+        # Estratégia híbrida com 4 níveis de fallback
+        seletores = [
+            'p:has-text("Nessa etapa, precisamos dos seus dados pessoais")',  # ESPECÍFICO
+            'p.font-asap.text-primary.font-bold',                           # SEMÂNTICO
+            'p.text-2xl.font-bold',                                         # ESTRUTURAL
+            'xpath=//*[contains(text(), "dados pessoais") or contains(text(), "Dados pessoais")]'  # FALLBACK
+        ]
+        
+        for i, seletor in enumerate(seletores, 1):
+            try:
+                elemento = page.locator(seletor)
+                if elemento.count() > 0:
+                    exibir_mensagem(f"✅ v3.7.0.5: Elemento localizado com seletor {i}/4")
+                    return elemento
+                    
+            except Exception as e:
+                exibir_mensagem(f"⚠️ v3.7.0.5: Seletor {i}/4 falhou: {str(e)[:100]}")
+                continue
+        
+        exibir_mensagem("❌ v3.7.0.5: Nenhum elemento foi localizado")
+        return None
+        
+    except Exception as e:
+        exibir_mensagem(f"❌ v3.7.0.5: Erro na localização da Tela 9: {str(e)}")
+        return None
+
 def navegar_tela_8_playwright(page: Page, uso_veiculo: str) -> bool:
     """
     TELA 8: Finalidade do veículo (Uso do veículo)
@@ -1564,7 +1669,7 @@ def navegar_tela_9_playwright(page: Page, nome: str, cpf: str, data_nascimento: 
         
         for tentativa in range(20):
             try:
-                elementos_tela = page.locator("xpath=//*[contains(text(), 'dados pessoais') or contains(text(), 'Dados pessoais')]")
+                elementos_tela = localizar_tela_9_playwright(page)
                 if elementos_tela.count() > 0:
                     exibir_mensagem("✅ Tela 9 carregada com sucesso")
                     break
@@ -1576,8 +1681,7 @@ def navegar_tela_9_playwright(page: Page, nome: str, cpf: str, data_nascimento: 
                 return False
             
             try:
-                page.wait_for_selector("xpath=//*[contains(text(), 'dados pessoais') or contains(text(), 'Dados pessoais')]", timeout=1000)
-                break
+                if aguardar_tela_9_playwright(page, 1000): break
             except:
                 pass
         
