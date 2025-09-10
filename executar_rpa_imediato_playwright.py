@@ -1799,6 +1799,49 @@ def localizar_sexo_playwright(page: Page, sexo: str):
         exibir_mensagem(f"❌ v3.7.0.10: Erro na localização do sexo '{sexo}': {str(e)}")
         return None
 
+def localizar_botao_continuar_garagem_playwright(page: Page):
+    """
+    Localiza botão continuar da Tela 12 com estratégia híbrida robusta
+    
+    ESTRATÉGIA HÍBRIDA v3.7.0.11:
+    1. #botao-continuar-garagem - ESPECÍFICO (ID único)
+    2. button[data-testid="continuar-garagem"] - ESPECÍFICO (data-testid)
+    3. p:has-text("Continuar") - SEMÂNTICO (texto específico)
+    4. button:has-text("Continuar") - SEMÂNTICO (botão com texto)
+    5. p.font-semibold.font-workSans.cursor-pointer - FALLBACK (compatibilidade)
+    
+    Args:
+        page: Instância do Playwright Page
+    
+    Returns:
+        Locator: Elemento encontrado ou None
+    """
+    try:
+        seletores = [
+            "#botao-continuar-garagem",  # Nível 1: Específico (ID único)
+            'button[data-testid="continuar-garagem"]',  # Nível 2: Específico (data-testid)
+            'p:has-text("Continuar")',  # Nível 3: Semântico (texto específico)
+            'button:has-text("Continuar")',  # Nível 4: Semântico (botão com texto)
+            "p.font-semibold.font-workSans.cursor-pointer",  # Nível 5: Fallback (compatibilidade)
+        ]
+        
+        for i, seletor in enumerate(seletores, 1):
+            try:
+                elemento = page.locator(seletor)
+                if elemento.is_visible():
+                    exibir_mensagem(f"✅ v3.7.0.11: Botão continuar garagem localizado com seletor nível {i}: {seletor}")
+                    return elemento
+            except Exception as e:
+                exibir_mensagem(f"⚠️ v3.7.0.11: Seletor nível {i} falhou: {seletor} - {str(e)}")
+                continue
+        
+        exibir_mensagem("❌ v3.7.0.11: Nenhum botão continuar garagem foi localizado")
+        return None
+        
+    except Exception as e:
+        exibir_mensagem(f"❌ v3.7.0.11: Erro na localização do botão continuar garagem: {str(e)}")
+        return None
+
 def localizar_checkbox_trabalho_playwright(page: Page):
     """
     Localiza checkbox Local de Trabalho com estratégia híbrida robusta
@@ -2507,7 +2550,10 @@ def navegar_tela_12_playwright(page, garagem_residencia, portao_eletronico):
         
         # Aguarda o carregamento da Tela 12
         exibir_mensagem("1️⃣ ⏳ Aguardando carregamento da Tela 12...")
-        page.wait_for_selector('p.font-semibold.font-workSans.cursor-pointer', timeout=10000)
+        botao_continuar = localizar_botao_continuar_garagem_playwright(page)
+        if not botao_continuar:
+            exibir_mensagem("❌ v3.7.0.11: Botão continuar não encontrado no carregamento")
+            return False
         page.wait_for_selector('input[name="possuiGaragemTelaGaragemResidencia"]', timeout=3000)
         
         exibir_mensagem("2️⃣ ✅ Tela 12 carregada - garagem na residência detectada!")
@@ -2566,12 +2612,16 @@ def navegar_tela_12_playwright(page, garagem_residencia, portao_eletronico):
                 return False
         
         # Aguarda estabilização após seleções
-        page.wait_for_selector('p.font-semibold.font-workSans.cursor-pointer:has-text("Continuar")', timeout=3000)
+        exibir_mensagem("7️⃣ ⏳ Aguardando estabilização do botão continuar...")
+        botao_continuar = localizar_botao_continuar_garagem_playwright(page)
+        if not botao_continuar:
+            exibir_mensagem("❌ v3.7.0.11: Botão continuar não encontrado após estabilização")
+            return False
         
         # Clica no botão Continuar
         exibir_mensagem("8️⃣ 🔄 Clicando em 'Continuar'...")
-        botao_continuar = page.locator('p.font-semibold.font-workSans.cursor-pointer:has-text("Continuar")')
-        if botao_continuar.is_visible():
+        botao_continuar = localizar_botao_continuar_garagem_playwright(page)
+        if botao_continuar and botao_continuar.is_visible():
             botao_continuar.click()
             exibir_mensagem("9️⃣ ✅ Botão 'Continuar' clicado com sucesso")
         else:
@@ -2587,9 +2637,12 @@ def navegar_tela_12_playwright(page, garagem_residencia, portao_eletronico):
         except:
             # Se não encontrar, verifica se ainda está na tela atual
             try:
-                page.wait_for_selector('p.font-semibold.font-workSans.cursor-pointer:has-text("Continuar")', timeout=2000)
-                exibir_mensagem("🔟 ⚠️ Ainda na tela atual - tentando clicar novamente...")
-                botao_continuar.click()
+                botao_continuar = localizar_botao_continuar_garagem_playwright(page)
+                if botao_continuar and botao_continuar.is_visible():
+                    exibir_mensagem("🔟 ⚠️ Ainda na tela atual - tentando clicar novamente...")
+                    botao_continuar.click()
+                else:
+                    exibir_mensagem("🔟 ⚠️ Botão continuar não encontrado para segundo clique")
 #                page.wait_for_selector("input[name='resideMenoresTelaResidenciaMenores']", timeout=5000)
                 exibir_mensagem("🔟 ✅ Navegação para próxima tela realizada!")
             except:
