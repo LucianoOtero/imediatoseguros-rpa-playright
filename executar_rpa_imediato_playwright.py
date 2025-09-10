@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-EXECUTAR RPA IMEDIATO PLAYWRIGHT - VERSÃO v3.7.0.5
+EXECUTAR RPA IMEDIATO PLAYWRIGHT - VERSÃO v3.7.0.6
 Implementação completa do RPA usando Playwright com Sistema de Exception Handler
 
 DESCRIÇÃO:
@@ -1600,6 +1600,105 @@ def localizar_tela_9_playwright(page: Page):
         exibir_mensagem(f"❌ v3.7.0.5: Erro na localização da Tela 9: {str(e)}")
         return None
 
+def aguardar_radio_condutor_playwright(page: Page, opcao: str, timeout: int = 3000) -> bool:
+    """
+    Aguarda carregamento dos radio buttons da Tela 10 com estratégia híbrida robusta
+    
+    ESTRATÉGIA HÍBRIDA v3.7.0.6:
+    1. input[value="{opcao}"][name="condutorPrincipalTelaCondutorPrincipal"] - ESPECÍFICO
+    2. input.PrivateSwitchBase-input[name="condutorPrincipalTelaCondutorPrincipal"] - SEMÂNTICO
+    3. input[type="radio"][name="condutorPrincipalTelaCondutorPrincipal"] - ESTRUTURAL
+    4. input[value="{opcao}"] - FALLBACK
+    
+    Args:
+        page: Instância do Playwright Page
+        opcao: "sim" ou "nao"
+        timeout: Timeout em milissegundos (padrão: 3000)
+    
+    Returns:
+        bool: True se o radio button foi detectado, False caso contrário
+    """
+    try:
+        exibir_mensagem(f"🔍 v3.7.0.6: Aguardando radio button '{opcao}' com estratégia híbrida...")
+        
+        # Estratégia híbrida com 4 níveis de fallback
+        seletores = [
+            f'input[value="{opcao}"][name="condutorPrincipalTelaCondutorPrincipal"]',  # ESPECÍFICO
+            'input.PrivateSwitchBase-input[name="condutorPrincipalTelaCondutorPrincipal"]',  # SEMÂNTICO
+            'input[type="radio"][name="condutorPrincipalTelaCondutorPrincipal"]',  # ESTRUTURAL
+            f'input[value="{opcao}"]'  # FALLBACK
+        ]
+        
+        for i, seletor in enumerate(seletores, 1):
+            try:
+                exibir_mensagem(f"🔍 v3.7.0.6: Tentativa {i}/4 - Testando seletor: {seletor[:50]}...")
+                
+                # Aguardar elemento com timeout específico
+                page.wait_for_selector(seletor, timeout=timeout//4)
+                
+                # Verificar se elemento existe e está visível
+                elemento = page.locator(seletor)
+                if elemento.count() > 0 and elemento.first.is_visible():
+                    exibir_mensagem(f"✅ v3.7.0.6: Radio button '{opcao}' detectado com seletor {i}/4")
+                    return True
+                    
+            except Exception as e:
+                exibir_mensagem(f"⚠️ v3.7.0.6: Seletor {i}/4 falhou: {str(e)[:100]}")
+                continue
+        
+        exibir_mensagem(f"❌ v3.7.0.6: Todos os seletores falharam para '{opcao}'")
+        return False
+        
+    except Exception as e:
+        exibir_mensagem(f"❌ v3.7.0.6: Erro na detecção do radio button '{opcao}': {str(e)}")
+        return False
+
+def localizar_radio_condutor_playwright(page: Page, opcao: str):
+    """
+    Localiza radio button da Tela 10 com estratégia híbrida robusta
+    
+    ESTRATÉGIA HÍBRIDA v3.7.0.6:
+    1. input[value="{opcao}"][name="condutorPrincipalTelaCondutorPrincipal"] - ESPECÍFICO
+    2. input.PrivateSwitchBase-input[name="condutorPrincipalTelaCondutorPrincipal"] - SEMÂNTICO
+    3. input[type="radio"][name="condutorPrincipalTelaCondutorPrincipal"] - ESTRUTURAL
+    4. input[value="{opcao}"] - FALLBACK
+    
+    Args:
+        page: Instância do Playwright Page
+        opcao: "sim" ou "nao"
+    
+    Returns:
+        Locator: Elemento encontrado ou None
+    """
+    try:
+        exibir_mensagem(f"🔍 v3.7.0.6: Localizando radio button '{opcao}'...")
+        
+        # Estratégia híbrida com 4 níveis de fallback
+        seletores = [
+            f'input[value="{opcao}"][name="condutorPrincipalTelaCondutorPrincipal"]',  # ESPECÍFICO
+            'input.PrivateSwitchBase-input[name="condutorPrincipalTelaCondutorPrincipal"]',  # SEMÂNTICO
+            'input[type="radio"][name="condutorPrincipalTelaCondutorPrincipal"]',  # ESTRUTURAL
+            f'input[value="{opcao}"]'  # FALLBACK
+        ]
+        
+        for i, seletor in enumerate(seletores, 1):
+            try:
+                elemento = page.locator(seletor)
+                if elemento.count() > 0:
+                    exibir_mensagem(f"✅ v3.7.0.6: Radio button '{opcao}' localizado com seletor {i}/4")
+                    return elemento
+                    
+            except Exception as e:
+                exibir_mensagem(f"⚠️ v3.7.0.6: Seletor {i}/4 falhou: {str(e)[:100]}")
+                continue
+        
+        exibir_mensagem(f"❌ v3.7.0.6: Nenhum radio button '{opcao}' foi localizado")
+        return None
+        
+    except Exception as e:
+        exibir_mensagem(f"❌ v3.7.0.6: Erro na localização do radio button '{opcao}': {str(e)}")
+        return None
+
 def navegar_tela_8_playwright(page: Page, uso_veiculo: str) -> bool:
     """
     TELA 8: Finalidade do veículo (Uso do veículo)
@@ -1878,7 +1977,7 @@ def navegar_tela_10_playwright(page, condutor_principal, nome_condutor=None, cpf
         # PASSO 1: Selecionar se é condutor principal ou não
         if condutor_principal:
             exibir_mensagem("👤 Selecionando 'Sim' - segurado é condutor principal")
-            radio_sim = page.locator('input[value="sim"][name="condutorPrincipalTelaCondutorPrincipal"]')
+            radio_sim = localizar_radio_condutor_playwright(page, "sim")
             if radio_sim.is_visible():
                 radio_sim.click()
                 exibir_mensagem("✅ Radio 'Sim' selecionado com sucesso")
@@ -1886,7 +1985,7 @@ def navegar_tela_10_playwright(page, condutor_principal, nome_condutor=None, cpf
                 exception_handler.capturar_warning("Radio 'Sim' não encontrado", "TELA_10")
         else:
             exibir_mensagem("👤 Selecionando 'Não' - segurado não é condutor principal")
-            radio_nao = page.locator('input[value="nao"][name="condutorPrincipalTelaCondutorPrincipal"]')
+            radio_nao = localizar_radio_condutor_playwright(page, "nao")
             if radio_nao.is_visible():
                 radio_nao.click()
                 exibir_mensagem("✅ Radio 'Não' selecionado com sucesso")
