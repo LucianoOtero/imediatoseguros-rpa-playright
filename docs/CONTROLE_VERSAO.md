@@ -17,25 +17,26 @@
 
 ## 🏆 **IMPLEMENTAÇÕES COMPLETAS NO ARQUIVO PRINCIPAL - v3.7.0.4**
 
-### ✅ **Nova Versão Principal**: v3.7.0.4
-- **Commit**: `efd8634`
-- **Data**: 09/09/2025
-- **Status**: ✅ **TODAS AS IMPLEMENTAÇÕES v3.7.0.1, v3.7.0.2, v3.7.0.3 E v3.7.0.4 NO ARQUIVO PRINCIPAL**
-- **Tag**: `v3.7.0.4`
+### ✅ **Nova Versão Principal**: v3.7.0.5
+- **Commit**: `f3ea83c`
+- **Data**: 10/01/2025
+- **Status**: ✅ **TODAS AS IMPLEMENTAÇÕES v3.7.0.1, v3.7.0.2, v3.7.0.3, v3.7.0.4 E v3.7.0.5 NO ARQUIVO PRINCIPAL**
+- **Tag**: `v3.7.0.5`
 - **Funcionalidades**:
   - ✅ Implementação completa v3.7.0.1: Seletor específico Botão Carro (Tela 1)
   - ✅ Implementação completa v3.7.0.2: Seletor específico Cards Estimativa (Tela 5)
   - ✅ Implementação completa v3.7.0.3: Seletor específico Sugestões Endereço (Tela 7)
   - ✅ Implementação completa v3.7.0.4: Seletor específico Detecção Tela 8 (Finalidade Veículo)
+  - ✅ Implementação completa v3.7.0.5: Seletor específico Detecção Tela 9 (Dados Pessoais)
   - ✅ Sistema de fallback robusto com múltiplas estratégias
   - ✅ Estratégia híbrida: específico + fallbacks de compatibilidade
-  - ✅ Funções auxiliares: `aguardar_cards_estimativa_playwright()`, `localizar_cards_estimativa_playwright()`, `aguardar_sugestao_endereco_playwright()`, `localizar_sugestao_endereco_playwright()`
+  - ✅ Funções auxiliares: `aguardar_tela_9_playwright()`, `localizar_tela_9_playwright()`
   - ✅ Documentação completa da implementação
   - ✅ Auditoria de seletores atualizada
   - ✅ Compatibilidade Regional (v3.5.0) mantida
-  - ✅ Seletor Botão Carro (v3.7.0.1) mantido
   - ✅ Performance mantida e otimizada
   - ✅ Estabilidade excelente
+  - ✅ Teste completo bem-sucedido (175.77s)
 
 ### **Principais Conquistas da v3.7.0.2:**
 - **Seletores Específicos**: Maior precisão e confiabilidade
@@ -47,13 +48,13 @@
 - **Performance**: Mantida e otimizada
 - **Estabilidade**: Excelente
 
-### **Principais Conquistas da v3.7.0.4:**
-- **Detecção Tela 8**: Seletor específico `#finalidadeVeiculoTelaUsoVeiculo` implementado
+### **Principais Conquistas da v3.7.0.5:**
+- **Detecção Tela 9**: Seletor específico `p:has-text("Nessa etapa, precisamos dos seus dados pessoais")` implementado
 - **Estratégia Híbrida**: 4 níveis de fallback para máxima robustez
-- **Funções Auxiliares**: `aguardar_tela_8_playwright()` e `localizar_tela_8_playwright()`
+- **Funções Auxiliares**: `aguardar_tela_9_playwright()` e `localizar_tela_9_playwright()`
 - **Compatibilidade**: Funciona em todas as versões do site
 - **Documentação**: Implementação completamente documentada
-- **Testes**: Validação completa com execução bem-sucedida (151.91s)
+- **Testes**: Validação completa com execução bem-sucedida (175.77s)
 - **Performance**: Mantida e otimizada
 - **Estabilidade**: Excelente
 
@@ -548,12 +549,22 @@ git push origin --tags
 ## 📈 Próximos Passos
 
 ### **Componentes Pendentes de Implementação:**
-1. **Sistema de Exception Handler Robusto** (Prioridade Média)
-2. **Captura de Dados da Tela 5** (Melhorias necessárias)
-3. **Sistema de Screenshots de Debug** (Prioridade Baixa)
-4. **Modo de Execução via Linha de Comando** (Prioridade Baixa)
-5. **Conversor Unicode → ASCII Robusto** (Prioridade Baixa)
-6. **Configuração Avançada de Browser** (Prioridade Baixa)
+1. **Análise Profunda de Performance** (Prioridade Alta)
+   - **Objetivo**: Otimizar tempo de execução de 151.91s para ~64s
+   - **Foco**: Tela 15 (timer regressivo), Tela 8 (timeouts), Finalização (captura de dados)
+   - **Impacto Esperado**: Redução de 57.9% no tempo total
+   - **Status**: Análise completa realizada, aguardando implementação
+2. **Implementação Opção "Moto" na Tela Inicial** (Prioridade Média)
+   - **Objetivo**: Adicionar funcionalidade para cotação de motos
+   - **Foco**: Tela 1 - Botão "Moto" além do botão "Carro" existente
+   - **Impacto**: Expansão da funcionalidade do RPA
+   - **Status**: Aguardando análise e implementação
+3. **Sistema de Exception Handler Robusto** (Prioridade Média)
+4. **Captura de Dados da Tela 5** (Melhorias necessárias)
+5. **Sistema de Screenshots de Debug** (Prioridade Baixa)
+6. **Modo de Execução via Linha de Comando** (Prioridade Baixa)
+7. **Conversor Unicode → ASCII Robusto** (Prioridade Baixa)
+8. **Configuração Avançada de Browser** (Prioridade Baixa)
 
 ### **Componentes Já Implementados:**
 ✅ **Sistema de Login Automático** (v3.0.0) - 100% implementado e funcionando
@@ -572,8 +583,57 @@ git push origin --tags
 3. **Release Notes**: Automatizar geração de release notes
 4. **Backup**: Implementar backup adicional das tags importantes
 
+## 🎯 **PRIORIDADES ESTRATÉGICAS v3.8.0**
+
+### **📊 PRIORIDADE ALTA - Análise Profunda de Performance**
+
+#### **🎯 Objetivo:**
+Otimizar significativamente o tempo de execução do RPA, reduzindo de 175.77s para aproximadamente 64s (redução de 63.6%).
+
+#### **🔍 Análise Realizada:**
+- **Tempo Total**: 175.77 segundos
+- **Breakdown**: Inicialização (10s) + Telas (100s) + Finalização (22s)
+- **Gargalos Identificados**:
+  - Tela 15: 38s (timer regressivo 2:43min)
+  - Tela 9: 21s (estratégia híbrida v3.7.0.5)
+  - Finalização: 22s (captura de dados)
+
+#### **💡 Soluções Propostas:**
+1. **Reduzir Timer Tela 15**: 2:43min → 1:30min (-73s)
+2. **Otimizar Timeouts Tela 8**: 5000ms → 2000ms por seletor (-10-15s)
+3. **Melhorar Captura de Dados**: Processamento mais eficiente (-5-10s)
+4. **Inicialização Lazy**: Carregar sistemas sob demanda (-2-5s)
+
+#### **📈 Impacto Esperado:**
+- **Cenário Realista**: 175.77s → 64s (2.7x mais rápido)
+- **Cenário Otimista**: 175.77s → 49s (3.6x mais rápido)
+
 ---
 
-**Status**: ✅ **PARÂMETROS DE TEMPO CONFIGURÁVEIS IMPLEMENTADOS - v3.4.0**
-**Última Atualização**: 04/09/2025
-**Próxima Versão**: v3.4.1 (quando implementar próximo componente pendente)
+### **🏍️ PRIORIDADE MÉDIA - Implementação Opção "Moto"**
+
+#### **🎯 Objetivo:**
+Expandir a funcionalidade do RPA para incluir cotação de motos, além da funcionalidade existente de carros.
+
+#### **🔍 Análise Necessária:**
+- **Tela 1**: Adicionar botão "Moto" ao lado do botão "Carro"
+- **Fluxo**: Verificar se o fluxo de cotação de motos é similar ao de carros
+- **Seletores**: Identificar seletores específicos para motos
+- **Validação**: Testar funcionalidade completa
+
+#### **💡 Implementação Proposta:**
+1. **Análise da Tela 1**: Identificar elementos da interface para motos
+2. **Seletores Específicos**: Desenvolver seletores robustos para botão "Moto"
+3. **Fluxo de Cotação**: Adaptar ou criar fluxo específico para motos
+4. **Testes**: Validar funcionalidade completa
+
+#### **📈 Impacto Esperado:**
+- **Funcionalidade**: Expansão significativa do RPA
+- **Usuários**: Atendimento a novos segmentos de mercado
+- **Robustez**: Maior cobertura de casos de uso
+
+---
+
+**Status**: ✅ **IMPLEMENTAÇÃO v3.7.0.5 CONCLUÍDA COM SUCESSO**
+**Última Atualização**: 10/01/2025
+**Próxima Versão**: v3.7.0.6 (Tela 10 - Condutor Principal)
