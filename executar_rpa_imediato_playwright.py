@@ -1754,6 +1754,51 @@ def localizar_estado_civil_playwright(page: Page, estado_civil: str):
         exibir_mensagem(f"❌ v3.7.0.8: Erro na localização do estado civil '{estado_civil}': {str(e)}")
         return None
 
+def localizar_sexo_playwright(page: Page, sexo: str):
+    """
+    Localiza opção de sexo com estratégia híbrida robusta
+    
+    ESTRATÉGIA HÍBRIDA v3.7.0.10:
+    1. li[data-value="{sexo.lower()}"] - ESPECÍFICO (atributo data-value)
+    2. li[data-value="{sexo}"] - ESPECÍFICO (atributo data-value original)
+    3. li[role="option"] - SEMÂNTICO (ARIA role)
+    4. li.MuiMenuItem-root - ESTRUTURAL (classes Material-UI)
+    5. text={sexo} - FALLBACK (compatibilidade)
+    
+    Args:
+        page: Instância do Playwright Page
+        sexo: Sexo desejado (ex: "Masculino", "Feminino")
+    
+    Returns:
+        Locator: Elemento encontrado ou None
+    """
+    try:
+        sexo_lower = sexo.lower()
+        seletores = [
+            f"li[data-value='{sexo_lower}']",  # Nível 1: Específico (lowercase)
+            f"li[data-value='{sexo}']",  # Nível 2: Específico (original)
+            "li[role='option']",  # Nível 3: Semântico
+            "li.MuiMenuItem-root",  # Nível 4: Estrutural
+            f"text={sexo}",  # Nível 5: Fallback
+        ]
+        
+        for i, seletor in enumerate(seletores, 1):
+            try:
+                elemento = page.locator(seletor)
+                if elemento.is_visible():
+                    exibir_mensagem(f"✅ v3.7.0.10: Sexo '{sexo}' localizado com seletor nível {i}: {seletor}")
+                    return elemento
+            except Exception as e:
+                exibir_mensagem(f"⚠️ v3.7.0.10: Seletor nível {i} falhou: {seletor} - {str(e)}")
+                continue
+        
+        exibir_mensagem(f"❌ v3.7.0.10: Nenhum sexo '{sexo}' foi localizado")
+        return None
+        
+    except Exception as e:
+        exibir_mensagem(f"❌ v3.7.0.10: Erro na localização do sexo '{sexo}': {str(e)}")
+        return None
+
 def localizar_checkbox_trabalho_playwright(page: Page):
     """
     Localiza checkbox Local de Trabalho com estratégia híbrida robusta
@@ -2049,7 +2094,7 @@ def navegar_tela_9_playwright(page: Page, nome: str, cpf: str, data_nascimento: 
                 campo_sexo.click()
                 page.wait_for_selector(f"text={sexo}", timeout=2000)
                 
-                opcao_sexo = page.locator(f"text={sexo}").first
+                opcao_sexo = localizar_sexo_playwright(page, sexo)
                 if opcao_sexo.is_visible():
                     opcao_sexo.click()
                     exibir_mensagem(f"✅ Sexo selecionado: {sexo}")
