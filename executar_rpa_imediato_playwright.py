@@ -1754,6 +1754,178 @@ def localizar_estado_civil_playwright(page: Page, estado_civil: str):
         exibir_mensagem(f"❌ v3.7.0.8: Erro na localização do estado civil '{estado_civil}': {str(e)}")
         return None
 
+def localizar_checkbox_trabalho_playwright(page: Page):
+    """
+    Localiza checkbox Local de Trabalho com estratégia híbrida robusta
+    
+    ESTRATÉGIA HÍBRIDA v3.7.0.9:
+    1. input[value="trabalho"] - ESPECÍFICO (atributo value)
+    2. #atividadeVeiculoTelaAtividadeVeiculo input[type="checkbox"].PrivateSwitchBase-input:not(.MuiSwitch-input) - SEMÂNTICO
+    3. input.PrivateSwitchBase-input.mui-1m9pwf3:not(.MuiSwitch-input) - ESTRUTURAL
+    4. input[value="trabalho"] - FALLBACK (compatibilidade)
+    
+    Args:
+        page: Instância do Playwright Page
+    
+    Returns:
+        Locator: Elemento encontrado ou None
+    """
+    try:
+        exibir_mensagem("🔍 v3.7.0.9: Localizando checkbox Local de Trabalho...")
+        
+        seletores = [
+            'input[value="trabalho"]',  # ESPECÍFICO
+            '#atividadeVeiculoTelaAtividadeVeiculo input[type="checkbox"].PrivateSwitchBase-input:not(.MuiSwitch-input)',  # SEMÂNTICO
+            'input.PrivateSwitchBase-input.mui-1m9pwf3:not(.MuiSwitch-input)',  # ESTRUTURAL
+            'input[value="trabalho"]'  # FALLBACK
+        ]
+        
+        for i, seletor in enumerate(seletores, 1):
+            try:
+                elemento = page.locator(seletor)
+                if elemento.count() > 0:
+                    exibir_mensagem(f"✅ v3.7.0.9: Checkbox trabalho localizado com seletor {i}/4")
+                    return elemento
+            except Exception as e:
+                exibir_mensagem(f"⚠️ v3.7.0.9: Seletor {i}/4 falhou: {str(e)[:100]}")
+                continue
+        
+        exibir_mensagem("❌ v3.7.0.9: Nenhum checkbox trabalho foi localizado")
+        return None
+        
+    except Exception as e:
+        exibir_mensagem(f"❌ v3.7.0.9: Erro na localização do checkbox trabalho: {str(e)}")
+        return None
+
+def localizar_switch_trabalho_playwright(page: Page):
+    """
+    Localiza switch Estacionamento Trabalho com estratégia híbrida robusta
+    
+    ESTRATÉGIA HÍBRIDA v3.7.0.9:
+    1. #atividadeVeiculoTelaAtividadeVeiculo input[value="trabalho"] + * input.MuiSwitch-input - ESPECÍFICO
+    2. #atividadeVeiculoTelaAtividadeVeiculo input.MuiSwitch-input - SEMÂNTICO
+    3. input.MuiSwitch-input.mui-1m9pwf3 - ESTRUTURAL
+    4. input[type="checkbox"]:not([value]) - FALLBACK
+    
+    Args:
+        page: Instância do Playwright Page
+    
+    Returns:
+        Locator: Elemento encontrado ou None
+    """
+    try:
+        exibir_mensagem("🔍 v3.7.0.9: Localizando switch Estacionamento Trabalho...")
+        
+        seletores = [
+            '#atividadeVeiculoTelaAtividadeVeiculo input[value="trabalho"] + * input.MuiSwitch-input',  # ESPECÍFICO
+            '#atividadeVeiculoTelaAtividadeVeiculo input.MuiSwitch-input',  # SEMÂNTICO
+            'input.MuiSwitch-input.mui-1m9pwf3',  # ESTRUTURAL
+            'input[type="checkbox"]:not([value])'  # FALLBACK
+        ]
+        
+        for i, seletor in enumerate(seletores, 1):
+            try:
+                elemento = page.locator(seletor)
+                if elemento.count() > 0:
+                    exibir_mensagem(f"✅ v3.7.0.9: Switch trabalho localizado com seletor {i}/4")
+                    return elemento
+            except Exception as e:
+                exibir_mensagem(f"⚠️ v3.7.0.9: Seletor {i}/4 falhou: {str(e)[:100]}")
+                continue
+        
+        exibir_mensagem("❌ v3.7.0.9: Nenhum switch trabalho foi localizado")
+        return None
+        
+    except Exception as e:
+        exibir_mensagem(f"❌ v3.7.0.9: Erro na localização do switch trabalho: {str(e)}")
+        return None
+
+def localizar_checkbox_estudo_playwright(page: Page):
+    """
+    Localiza checkbox Local de Estudo com estratégia híbrida robusta
+    
+    ESTRATÉGIA HÍBRIDA v3.7.0.9:
+    1. input[value="estudo"] - ESPECÍFICO (atributo value)
+    2. #atividadeVeiculoTelaAtividadeVeiculo input[type="checkbox"].PrivateSwitchBase-input:not(.MuiSwitch-input) - SEMÂNTICO
+    3. input.PrivateSwitchBase-input.mui-1m9pwf3:not(.MuiSwitch-input) - ESTRUTURAL
+    4. input[value="estudo"] - FALLBACK (compatibilidade)
+    
+    Args:
+        page: Instância do Playwright Page
+    
+    Returns:
+        Locator: Elemento encontrado ou None
+    """
+    try:
+        exibir_mensagem("🔍 v3.7.0.9: Localizando checkbox Local de Estudo...")
+        
+        seletores = [
+            'input[value="estudo"]',  # ESPECÍFICO
+            '#atividadeVeiculoTelaAtividadeVeiculo input[type="checkbox"].PrivateSwitchBase-input:not(.MuiSwitch-input)',  # SEMÂNTICO
+            'input.PrivateSwitchBase-input.mui-1m9pwf3:not(.MuiSwitch-input)',  # ESTRUTURAL
+            'input[value="estudo"]'  # FALLBACK
+        ]
+        
+        for i, seletor in enumerate(seletores, 1):
+            try:
+                elemento = page.locator(seletor)
+                if elemento.count() > 0:
+                    exibir_mensagem(f"✅ v3.7.0.9: Checkbox estudo localizado com seletor {i}/4")
+                    return elemento
+            except Exception as e:
+                exibir_mensagem(f"⚠️ v3.7.0.9: Seletor {i}/4 falhou: {str(e)[:100]}")
+                continue
+        
+        exibir_mensagem("❌ v3.7.0.9: Nenhum checkbox estudo foi localizado")
+        return None
+        
+    except Exception as e:
+        exibir_mensagem(f"❌ v3.7.0.9: Erro na localização do checkbox estudo: {str(e)}")
+        return None
+
+def localizar_switch_estudo_playwright(page: Page):
+    """
+    Localiza switch Estacionamento Estudo com estratégia híbrida robusta
+    
+    ESTRATÉGIA HÍBRIDA v3.7.0.9:
+    1. #atividadeVeiculoTelaAtividadeVeiculo input[value="estudo"] + * input.MuiSwitch-input - ESPECÍFICO
+    2. #atividadeVeiculoTelaAtividadeVeiculo input.MuiSwitch-input - SEMÂNTICO
+    3. input.MuiSwitch-input.mui-1m9pwf3 - ESTRUTURAL
+    4. input[type="checkbox"]:not([value]) - FALLBACK
+    
+    Args:
+        page: Instância do Playwright Page
+    
+    Returns:
+        Locator: Elemento encontrado ou None
+    """
+    try:
+        exibir_mensagem("🔍 v3.7.0.9: Localizando switch Estacionamento Estudo...")
+        
+        seletores = [
+            '#atividadeVeiculoTelaAtividadeVeiculo input[value="estudo"] + * input.MuiSwitch-input',  # ESPECÍFICO
+            '#atividadeVeiculoTelaAtividadeVeiculo input.MuiSwitch-input',  # SEMÂNTICO
+            'input.MuiSwitch-input.mui-1m9pwf3',  # ESTRUTURAL
+            'input[type="checkbox"]:not([value])'  # FALLBACK
+        ]
+        
+        for i, seletor in enumerate(seletores, 1):
+            try:
+                elemento = page.locator(seletor)
+                if elemento.count() > 0:
+                    exibir_mensagem(f"✅ v3.7.0.9: Switch estudo localizado com seletor {i}/4")
+                    return elemento
+            except Exception as e:
+                exibir_mensagem(f"⚠️ v3.7.0.9: Seletor {i}/4 falhou: {str(e)[:100]}")
+                continue
+        
+        exibir_mensagem("❌ v3.7.0.9: Nenhum switch estudo foi localizado")
+        return None
+        
+    except Exception as e:
+        exibir_mensagem(f"❌ v3.7.0.9: Erro na localização do switch estudo: {str(e)}")
+        return None
+
 def navegar_tela_8_playwright(page: Page, uso_veiculo: str) -> bool:
     """
     TELA 8: Finalidade do veículo (Uso do veículo)
@@ -2184,7 +2356,7 @@ def navegar_tela_11_playwright(page, local_de_trabalho, estacionamento_proprio_l
         # PASSO 1: Seleciona checkbox Local de Trabalho se necessário
         if local_de_trabalho:
             exibir_mensagem("📋 Marcando checkbox 'Local de Trabalho'...")
-            checkbox_trabalho = page.locator('input[type="checkbox"][value="trabalho"]')
+            checkbox_trabalho = localizar_checkbox_trabalho_playwright(page)
             if not checkbox_trabalho.is_checked():
                 checkbox_trabalho.check()
                 exibir_mensagem("✅ Checkbox 'Local de Trabalho' marcado!")
@@ -2197,7 +2369,7 @@ def navegar_tela_11_playwright(page, local_de_trabalho, estacionamento_proprio_l
         # PASSO 2: Seleciona checkbox Local de Estudo se necessário
         if local_de_estudo:
             exibir_mensagem("📋 Marcando checkbox 'Local de Estudo'...")
-            checkbox_estudo = page.locator('input[type="checkbox"][value="estudo"]')
+            checkbox_estudo = localizar_checkbox_estudo_playwright(page)
             if not checkbox_estudo.is_checked():
                 checkbox_estudo.check()
                 exibir_mensagem("✅ Checkbox 'Local de Estudo' marcado!")
@@ -2211,7 +2383,7 @@ def navegar_tela_11_playwright(page, local_de_trabalho, estacionamento_proprio_l
         if local_de_trabalho:
             exibir_mensagem("🅿️ Configurando estacionamento do trabalho...")
             try:
-                checkbox_estacionamento_trabalho = page.locator('input[type="checkbox"][data-gtm-form-interact-field-id="10"]')
+                checkbox_estacionamento_trabalho = localizar_switch_trabalho_playwright(page)
                 if checkbox_estacionamento_trabalho.is_visible():
                     if estacionamento_proprio_local_de_trabalho and not checkbox_estacionamento_trabalho.is_checked():
                         checkbox_estacionamento_trabalho.check()
@@ -2231,7 +2403,7 @@ def navegar_tela_11_playwright(page, local_de_trabalho, estacionamento_proprio_l
         if local_de_estudo:
             exibir_mensagem("🅿️ Configurando estacionamento do estudo...")
             try:
-                checkbox_estacionamento_estudo = page.locator('input[type="checkbox"][data-gtm-form-interact-field-id="11"]')
+                checkbox_estacionamento_estudo = localizar_switch_estudo_playwright(page)
                 if checkbox_estacionamento_estudo.is_visible():
                     if estacionamento_proprio_local_de_estudo and not checkbox_estacionamento_estudo.is_checked():
                         checkbox_estacionamento_estudo.check()

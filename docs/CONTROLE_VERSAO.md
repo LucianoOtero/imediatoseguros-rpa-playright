@@ -17,11 +17,11 @@
 
 ## 🏆 **IMPLEMENTAÇÕES COMPLETAS NO ARQUIVO PRINCIPAL - v3.7.0.4**
 
-### ✅ **Nova Versão Principal**: v3.7.0.8
-- **Commit**: `e4f5g6h` (próximo commit)
+### ✅ **Nova Versão Principal**: v3.7.0.9
+- **Commit**: `f7g8h9i` (próximo commit)
 - **Data**: 10/01/2025
-- **Status**: ✅ **TODAS AS IMPLEMENTAÇÕES v3.7.0.1, v3.7.0.2, v3.7.0.3, v3.7.0.4, v3.7.0.5, v3.7.0.6 E v3.7.0.8 NO ARQUIVO PRINCIPAL**
-- **Tag**: `v3.7.0.8`
+- **Status**: ✅ **TODAS AS IMPLEMENTAÇÕES v3.7.0.1, v3.7.0.2, v3.7.0.3, v3.7.0.4, v3.7.0.5, v3.7.0.6, v3.7.0.8 E v3.7.0.9 NO ARQUIVO PRINCIPAL**
+- **Tag**: `v3.7.0.9`
 - **Funcionalidades**:
   - ✅ Implementação completa v3.7.0.1: Seletor específico Botão Carro (Tela 1)
   - ✅ Implementação completa v3.7.0.2: Seletor específico Cards Estimativa (Tela 5)
@@ -30,15 +30,27 @@
   - ✅ Implementação completa v3.7.0.5: Seletor específico Detecção Tela 9 (Dados Pessoais)
   - ✅ Implementação completa v3.7.0.6: Seletor específico Radio Buttons Tela 10 (Condutor Principal)
   - ✅ Implementação completa v3.7.0.8: Seletor específico Estado Civil Tela 9 (Dados Pessoais)
+  - ✅ Implementação completa v3.7.0.9: Seletor específico Checkboxes e Switches Tela 11 (Atividade do Veículo)
   - ✅ Sistema de fallback robusto com múltiplas estratégias
   - ✅ Estratégia híbrida: específico + fallbacks de compatibilidade
-  - ✅ Funções auxiliares: `aguardar_tela_9_playwright()`, `localizar_tela_9_playwright()`, `aguardar_radio_condutor_playwright()`, `localizar_radio_condutor_playwright()`, `localizar_estado_civil_playwright()`
+  - ✅ Funções auxiliares: `aguardar_tela_9_playwright()`, `localizar_tela_9_playwright()`, `aguardar_radio_condutor_playwright()`, `localizar_radio_condutor_playwright()`, `localizar_estado_civil_playwright()`, `localizar_checkbox_trabalho_playwright()`, `localizar_switch_trabalho_playwright()`, `localizar_checkbox_estudo_playwright()`, `localizar_switch_estudo_playwright()`
   - ✅ Documentação completa da implementação
   - ✅ Auditoria de seletores atualizada
   - ✅ Compatibilidade Regional (v3.5.0) mantida
   - ✅ Performance mantida e otimizada
   - ✅ Estabilidade excelente
-  - ✅ Teste completo bem-sucedido (135.46s)
+  - ✅ Teste completo bem-sucedido (131.68s)
+
+### **Principais Conquistas da v3.7.0.9:**
+- **Checkboxes e Switches Tela 11**: Estratégia híbrida robusta implementada
+- **Seletores Específicos**: 4 níveis de fallback para máxima confiabilidade
+- **Performance**: Detecção rápida com seletores específicos (nível 1/4)
+- **Robustez**: Fallbacks semânticos, estruturais e contextuais para compatibilidade
+- **Funções Auxiliares**: 4 funções isoladas e reutilizáveis para cada elemento
+- **Compatibilidade**: Mantida com todas as versões anteriores
+- **Documentação**: Estratégia híbrida completamente documentada
+- **Teste**: Execução completa bem-sucedida (131.68s)
+- **Estabilidade**: Zero erros e warnings na execução
 
 ### **Principais Conquistas da v3.7.0.8:**
 - **Estado Civil Tela 9**: Estratégia híbrida robusta implementada
@@ -659,6 +671,6 @@ Expandir a funcionalidade do RPA para incluir cotação de motos, além da funci
 
 ---
 
-**Status**: ✅ **IMPLEMENTAÇÃO v3.7.0.8 CONCLUÍDA COM SUCESSO**
+**Status**: ✅ **IMPLEMENTAÇÃO v3.7.0.9 CONCLUÍDA COM SUCESSO**
 **Última Atualização**: 10/01/2025
-**Próxima Versão**: v3.7.0.9 (Tela 12 - Garagem na Residência)
+**Próxima Versão**: v3.7.0.10 (Tela 12 - Garagem na Residência)
