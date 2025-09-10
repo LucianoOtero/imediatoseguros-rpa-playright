@@ -1699,6 +1699,61 @@ def localizar_radio_condutor_playwright(page: Page, opcao: str):
         exibir_mensagem(f"❌ v3.7.0.6: Erro na localização do radio button '{opcao}': {str(e)}")
         return None
 
+def localizar_estado_civil_playwright(page: Page, estado_civil: str):
+    """
+    Localiza opção de estado civil com estratégia híbrida robusta
+    
+    ESTRATÉGIA HÍBRIDA v3.7.0.8:
+    1. li[data-value="{valor}"] - ESPECÍFICO (atributo data-value)
+    2. li[role="option"] - SEMÂNTICO (ARIA role)
+    3. li.MuiMenuItem-root - ESTRUTURAL (classes Material-UI)
+    4. xpath=//li[contains(text(), '{texto}')] - FALLBACK (compatibilidade)
+    
+    Args:
+        page: Instância do Playwright Page
+        estado_civil: Estado civil desejado (ex: "Casado ou Uniao Estavel")
+    
+    Returns:
+        Locator: Elemento encontrado ou None
+    """
+    try:
+        exibir_mensagem(f"🔍 v3.7.0.8: Localizando estado civil '{estado_civil}'...")
+        
+        # Mapeamento de estado civil para data-value
+        mapeamento_data_value = {
+            "Casado ou Uniao Estavel": "casado",
+            "Divorciado": "divorciado", 
+            "Separado": "separado",
+            "Solteiro": "solteiro",
+            "Viuvo": "viuvo"
+        }
+        
+        # Estratégia híbrida com 4 níveis de fallback
+        seletores = [
+            f'li[data-value="{mapeamento_data_value.get(estado_civil, estado_civil.lower())}"]',  # ESPECÍFICO
+            'li[role="option"]',  # SEMÂNTICO
+            'li.MuiMenuItem-root',  # ESTRUTURAL
+            f'xpath=//li[contains(text(), "{estado_civil}")]'  # FALLBACK
+        ]
+        
+        for i, seletor in enumerate(seletores, 1):
+            try:
+                elemento = page.locator(seletor)
+                if elemento.count() > 0:
+                    exibir_mensagem(f"✅ v3.7.0.8: Estado civil '{estado_civil}' localizado com seletor {i}/4")
+                    return elemento
+                    
+            except Exception as e:
+                exibir_mensagem(f"⚠️ v3.7.0.8: Seletor {i}/4 falhou: {str(e)[:100]}")
+                continue
+        
+        exibir_mensagem(f"❌ v3.7.0.8: Nenhum estado civil '{estado_civil}' foi localizado")
+        return None
+        
+    except Exception as e:
+        exibir_mensagem(f"❌ v3.7.0.8: Erro na localização do estado civil '{estado_civil}': {str(e)}")
+        return None
+
 def navegar_tela_8_playwright(page: Page, uso_veiculo: str) -> bool:
     """
     TELA 8: Finalidade do veículo (Uso do veículo)
@@ -1839,7 +1894,7 @@ def navegar_tela_9_playwright(page: Page, nome: str, cpf: str, data_nascimento: 
             campo_estado_civil = page.locator("#estadoCivilTelaSegurado")
             if campo_estado_civil.is_visible():
                 campo_estado_civil.click()
-                page.wait_for_selector("xpath=//li[contains(text(), 'Casado') or contains(text(), 'Solteiro') or contains(text(), 'Divorciado') or contains(text(), 'Viúvo') or contains(text(), 'Separado')]", timeout=2000)
+                page.wait_for_selector('li[role="option"]', timeout=2000)
                 
                 # Mapear estado civil do JSON para possíveis variações na tela
                 mapeamento_estado_civil = {
@@ -1859,7 +1914,7 @@ def navegar_tela_9_playwright(page: Page, nome: str, cpf: str, data_nascimento: 
                     try:
                         # Tentar cada variação possível
                         for variacao in variacoes_estado_civil:
-                            opcoes_estado_civil = page.locator("xpath=//li[contains(text(), '" + variacao + "')]")
+                            opcoes_estado_civil = localizar_estado_civil_playwright(page, variacao)
                             if opcoes_estado_civil.count() > 0:
                                 opcoes_estado_civil.first.click()
                                 exibir_mensagem(f"✅ Estado civil selecionado: {estado_civil} (encontrado como '{variacao}')")
@@ -1875,7 +1930,7 @@ def navegar_tela_9_playwright(page: Page, nome: str, cpf: str, data_nascimento: 
                         exception_handler.capturar_warning(f"Estado civil '{estado_civil}' não encontrado no dropdown (tentou: {', '.join(variacoes_estado_civil)})", "TELA_9")
                     
                     try:
-                        page.wait_for_selector("xpath=//li[contains(text(), 'Casado') or contains(text(), 'Solteiro') or contains(text(), 'Divorciado') or contains(text(), 'Viúvo') or contains(text(), 'Separado')]", timeout=1000)
+                        page.wait_for_selector('li[role="option"]', timeout=1000)
                         break
                     except:
                         pass
