@@ -342,3 +342,5 @@ Write-Host ""
 Write-ColorMessage "🎉 INSTALAÇÃO FINALIZADA!" "Green"
 Read-Host "Pressione Enter para sair"
 
+
+
