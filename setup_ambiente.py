@@ -302,3 +302,5 @@ if __name__ == "__main__":
         exibir_mensagem(f"❌ Erro inesperado: {e}", "ERROR")
         sys.exit(1)
 
+
+

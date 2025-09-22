@@ -73,3 +73,5 @@ def navegar_tela_4_playwright(page: Page, veiculo_segurado: Dict[str, Any]) -> b
 
 
 
+
+
