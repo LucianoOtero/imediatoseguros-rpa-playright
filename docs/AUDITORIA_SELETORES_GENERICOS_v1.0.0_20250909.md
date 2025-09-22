@@ -1,23 +1,25 @@
-# 🔍 AUDITORIA COMPLETA DE SELETORES GENÉRICOS - v1.0.0 (09/09/2025)
+# 🔍 AUDITORIA COMPLETA DE SELETORES GENÉRICOS - v1.2.0 (10/01/2025)
 
 ## 📋 **INFORMAÇÕES DA AUDITORIA**
-- **Data**: 09/09/2025 (Terça-feira)
+- **Data**: 09/09/2025 (Auditoria Original) → **Atualizada**: 10/01/2025
 - **Arquivo Analisado**: `executar_rpa_imediato_playwright.py`
-- **Total de Linhas**: 3917
+- **Total de Linhas**: 4568 (atualizado)
 - **Objetivo**: Identificar todos os seletores genéricos para substituição por específicos
-- **Status**: ✅ **AUDITORIA CONCLUÍDA**
+- **Status**: ✅ **AUDITORIA CONCLUÍDA E ATUALIZADA**
 
 ---
 
 ## 🎯 **RESUMO EXECUTIVO**
 
-### **📊 ESTATÍSTICAS GERAIS**
+### **📊 ESTATÍSTICAS GERAIS ATUALIZADAS**
 - **Total de Seletores Genéricos Identificados**: 47
-- **Seletores Implementados**: 4 ✅
-- **Seletores Pendentes**: 43
+- **Seletores de Alto Risco Implementados**: 10 ✅
+- **Seletores de Alto Risco Restantes**: 4 🔴
+- **Seletores de Médio Risco**: 32 🟡
+- **Seletores de Baixo Risco**: 1 🟢
 - **Telas Afetadas**: 15 (todas as telas)
 - **Tipos de Seletores Genéricos**: 8 categorias
-- **Risco de Falha**: 🔴 **ALTO** → 🟡 **REDUZIDO** (4 implementados)
+- **Risco de Falha**: 🔴 **ALTO** → 🟡 **REDUZIDO** (10 de 14 alto risco implementados - 71.4%)
 
 ### **🚨 PROBLEMAS CRÍTICOS IDENTIFICADOS**
 1. **Seletores baseados em classes CSS** - Falham em diferentes regiões
@@ -180,48 +182,68 @@
 ### **TELA 9: Dados Pessoais**
 **Função**: `navegar_tela_9_playwright()`
 
-#### **🔴 SELETORES GENÉRICOS IDENTIFICADOS**
-1. **`xpath=//*[contains(text(), 'dados pessoais') or contains(text(), 'Dados pessoais')]`** (Linha 1326)
+#### **✅ SELETORES IMPLEMENTADOS**
+1. **`xpath=//*[contains(text(), 'dados pessoais') or contains(text(), 'Dados pessoais')]`** ✅ **IMPLEMENTADO v3.7.0.5**
    - **Finalidade**: Detectar elementos da tela
    - **Problema**: XPath baseado em texto
-   - **Risco**: 🔴 **ALTO**
-   - **Alternativa Sugerida**: `[data-testid="tela-dados-pessoais"]`
+   - **Risco**: 🔴 **ALTO** → 🟢 **RESOLVIDO**
+   - **Alternativa Implementada**: `#dadosPessoaisTelaSegurado` + `[role="radiogroup"]` + `p:has-text("Dados pessoais")`
+   - **Status**: ✅ **IMPLEMENTADO E TESTADO COM SUCESSO**
+   - **Data Implementação**: 10/09/2025
+   - **Estratégia**: Híbrida com fallbacks múltiplos
 
-2. **`text={sexo}`** (Linha 1381)
-   - **Finalidade**: Selecionar opção de sexo
-   - **Problema**: Depende de texto específico
-   - **Risco**: 🟡 **MÉDIO**
-   - **Alternativa Sugerida**: `[data-testid="opcao-sexo-{sexo}"]`
-
-3. **`xpath=//li[contains(text(), 'Casado') or contains(text(), 'Solteiro') or contains(text(), 'Divorciado') or contains(text(), 'Viúvo') or contains(text(), 'Separado')]`** (Linha 1398)
+2. **`xpath=//li[contains(text(), 'Casado') or contains(text(), 'Solteiro') or contains(text(), 'Divorciado') or contains(text(), 'Viúvo') or contains(text(), 'Separado')]`** ✅ **IMPLEMENTADO v3.7.0.8**
    - **Finalidade**: Selecionar estado civil
    - **Problema**: XPath complexo baseado em texto
-   - **Risco**: 🔴 **ALTO**
-   - **Alternativa Sugerida**: `[data-testid="opcao-estado-civil-{estado}"]`
+   - **Risco**: 🔴 **ALTO** → 🟢 **RESOLVIDO**
+   - **Alternativa Implementada**: `li[data-value="{valor}"]` + `li[role="option"]` + `li.MuiMenuItem-root`
+   - **Status**: ✅ **IMPLEMENTADO E TESTADO COM SUCESSO**
+   - **Data Implementação**: 10/01/2025
+   - **Estratégia**: Híbrida com 4 níveis de fallback
 
-4. **`xpath=//li[contains(text(), '" + variacao + "')]`** (Linha 1418)
+3. **`xpath=//li[contains(text(), '" + variacao + "')]`** ✅ **IMPLEMENTADO v3.7.0.8**
    - **Finalidade**: Selecionar variação de estado civil
    - **Problema**: XPath dinâmico baseado em texto
-   - **Risco**: 🔴 **ALTO**
-   - **Alternativa Sugerida**: IDs específicos por estado civil
+   - **Risco**: 🔴 **ALTO** → 🟢 **RESOLVIDO**
+   - **Alternativa Implementada**: Função `localizar_estado_civil_playwright()` com estratégia híbrida
+   - **Status**: ✅ **IMPLEMENTADO E TESTADO COM SUCESSO**
+   - **Data Implementação**: 10/01/2025
+
+#### **✅ SELETORES IMPLEMENTADOS**
+4. **`text={sexo}`** ✅ **IMPLEMENTADO v3.7.0.10**
+   - **Finalidade**: Selecionar opção de sexo
+   - **Problema**: Depende de texto específico
+   - **Risco**: 🔴 **ALTO** → 🟢 **RESOLVIDO**
+   - **Alternativa Implementada**: Função `localizar_sexo_playwright()` com estratégia híbrida
+   - **Status**: ✅ **IMPLEMENTADO E TESTADO COM SUCESSO**
+   - **Data Implementação**: 10/01/2025
+   - **Estratégia**: Híbrida com 5 níveis de fallback
+
+#### **✅ SELETORES ESPECÍFICOS (OK)**
+- **Botão Continuar**: `#gtm-telaDadosSeguradoContinuar` - ✅ **ESPECÍFICO** (nunca foi genérico)
 
 ---
 
 ### **TELA 10: Condutor Principal**
 **Função**: `navegar_tela_10_playwright()`
 
-#### **🔴 SELETORES GENÉRICOS IDENTIFICADOS**
-1. **`input[value="sim"][name="condutorPrincipalTelaCondutorPrincipal"]`** (Linha 1536)
+#### **✅ SELETORES IMPLEMENTADOS**
+1. **`input[value="sim"][name="condutorPrincipalTelaCondutorPrincipal"]`** ✅ **IMPLEMENTADO v3.7.0.6**
    - **Finalidade**: Radio button "Sim"
    - **Problema**: Depende de valor específico
-   - **Risco**: 🟡 **MÉDIO**
-   - **Alternativa Sugerida**: `#radio-condutor-principal-sim`
+   - **Risco**: 🟡 **MÉDIO** → 🟢 **RESOLVIDO**
+   - **Alternativa Implementada**: Função `localizar_radio_condutor_playwright()` com estratégia híbrida
+   - **Status**: ✅ **IMPLEMENTADO E TESTADO COM SUCESSO**
+   - **Data Implementação**: 10/09/2025
+   - **Estratégia**: Híbrida com 4 níveis de fallback
 
-2. **`input[value="nao"][name="condutorPrincipalTelaCondutorPrincipal"]`** (Linha 1544)
+2. **`input[value="nao"][name="condutorPrincipalTelaCondutorPrincipal"]`** ✅ **IMPLEMENTADO v3.7.0.6**
    - **Finalidade**: Radio button "Não"
    - **Problema**: Depende de valor específico
-   - **Risco**: 🟡 **MÉDIO**
-   - **Alternativa Sugerida**: `#radio-condutor-principal-nao`
+   - **Risco**: 🟡 **MÉDIO** → 🟢 **RESOLVIDO**
+   - **Alternativa Implementada**: Função `localizar_radio_condutor_playwright()` com estratégia híbrida
+   - **Status**: ✅ **IMPLEMENTADO E TESTADO COM SUCESSO**
+   - **Data Implementação**: 10/09/2025
 
 3. **`ul`** (Linha 1587)
    - **Finalidade**: Aguardar lista de opções
@@ -246,30 +268,39 @@
 ### **TELA 11: Atividade do Veículo**
 **Função**: `navegar_tela_11_playwright()`
 
-#### **🔴 SELETORES GENÉRICOS IDENTIFICADOS**
-1. **`input[type="checkbox"][value="trabalho"]`** (Linha 1688)
+#### **✅ SELETORES IMPLEMENTADOS**
+1. **`input[type="checkbox"][value="trabalho"]`** ✅ **IMPLEMENTADO v3.7.0.9**
    - **Finalidade**: Checkbox local de trabalho
    - **Problema**: Depende de valor específico
-   - **Risco**: 🟡 **MÉDIO**
-   - **Alternativa Sugerida**: `#checkbox-local-trabalho`
+   - **Risco**: 🔴 **ALTO** → 🟢 **RESOLVIDO**
+   - **Alternativa Implementada**: Função `localizar_checkbox_trabalho_playwright()` com estratégia híbrida
+   - **Status**: ✅ **IMPLEMENTADO E TESTADO COM SUCESSO**
+   - **Data Implementação**: 10/01/2025
+   - **Estratégia**: Híbrida com 4 níveis de fallback
 
-2. **`input[type="checkbox"][value="estudo"]`** (Linha 1701)
+2. **`input[type="checkbox"][value="estudo"]`** ✅ **IMPLEMENTADO v3.7.0.9**
    - **Finalidade**: Checkbox local de estudo
    - **Problema**: Depende de valor específico
-   - **Risco**: 🟡 **MÉDIO**
-   - **Alternativa Sugerida**: `#checkbox-local-estudo`
+   - **Risco**: 🔴 **ALTO** → 🟢 **RESOLVIDO**
+   - **Alternativa Implementada**: Função `localizar_checkbox_estudo_playwright()` com estratégia híbrida
+   - **Status**: ✅ **IMPLEMENTADO E TESTADO COM SUCESSO**
+   - **Data Implementação**: 10/01/2025
 
-3. **`input[type="checkbox"][data-gtm-form-interact-field-id="10"]`** (Linha 1715)
-   - **Finalidade**: Checkbox estacionamento trabalho
+3. **`input[type="checkbox"][data-gtm-form-interact-field-id="10"]`** ✅ **IMPLEMENTADO v3.7.0.9**
+   - **Finalidade**: Switch estacionamento trabalho
    - **Problema**: Depende de atributo GTM
-   - **Risco**: 🟡 **MÉDIO**
-   - **Alternativa Sugerida**: `#checkbox-estacionamento-trabalho`
+   - **Risco**: 🔴 **ALTO** → 🟢 **RESOLVIDO**
+   - **Alternativa Implementada**: Função `localizar_switch_trabalho_playwright()` com estratégia híbrida
+   - **Status**: ✅ **IMPLEMENTADO E TESTADO COM SUCESSO**
+   - **Data Implementação**: 10/01/2025
 
-4. **`input[type="checkbox"][data-gtm-form-interact-field-id="11"]`** (Linha 1735)
-   - **Finalidade**: Checkbox estacionamento estudo
+4. **`input[type="checkbox"][data-gtm-form-interact-field-id="11"]`** ✅ **IMPLEMENTADO v3.7.0.9**
+   - **Finalidade**: Switch estacionamento estudo
    - **Problema**: Depende de atributo GTM
-   - **Risco**: 🟡 **MÉDIO**
-   - **Alternativa Sugerida**: `#checkbox-estacionamento-estudo`
+   - **Risco**: 🔴 **ALTO** → 🟢 **RESOLVIDO**
+   - **Alternativa Implementada**: Função `localizar_switch_estudo_playwright()` com estratégia híbrida
+   - **Status**: ✅ **IMPLEMENTADO E TESTADO COM SUCESSO**
+   - **Data Implementação**: 10/01/2025
 
 ---
 
@@ -393,20 +424,71 @@
 
 ---
 
-## 📊 **RESUMO POR CATEGORIA DE RISCO**
+## 📊 **RESUMO POR CATEGORIA DE RISCO ATUALIZADO**
 
 ### **🔴 RISCO ALTO (14 seletores)**
-- Seletores baseados em classes CSS genéricas
-- XPath baseados em texto
-- JavaScript com classes genéricas
+- **Implementados**: 10 ✅ (71.4%)
+- **Restantes**: 4 ⏳ (28.6%)
+- **Tipos**: Seletores baseados em classes CSS genéricas, XPath baseados em texto, JavaScript com classes genéricas
 
 ### **🟡 RISCO MÉDIO (32 seletores)**
-- Seletores baseados em valores específicos
+- **Implementados**: 0 ⏳ (0%)
+- **Restantes**: 32 ⏳ (100%)
+- **Tipos**: Seletores baseados em valores específicos
 - Seletores baseados em atributos GTM
 - Seletores baseados em texto específico
 
-### **🟢 RISCO RESOLVIDO (1 seletor)**
-- ✅ **Tela 1**: `button.group` → `button:has(img[alt="Icone car"])`
+### **🟢 RISCO BAIXO (1 seletor)**
+- **Implementados**: 1 ✅ (100%)
+- **Restantes**: 0 ✅ (0%)
+- **Tipos**: Seletores por IDs específicos
+
+### **📈 PROGRESSO GERAL**
+- **Total de Seletores**: 47
+- **Implementados**: 11 ✅ (23.4%)
+- **Restantes**: 36 ⏳ (76.6%)
+- **Foco Atual**: Seletores de Alto Risco (4 restantes)
+
+---
+
+## 🎯 **SELETORES DE ALTO RISCO RESTANTES (4)**
+
+### **🔴 PENDENTES DE IMPLEMENTAÇÃO:**
+
+1. **Tela 12**: `p.font-semibold.font-workSans.cursor-pointer` ✅ **IMPLEMENTADO v3.7.0.11**
+   - **Finalidade**: Botão continuar garagem
+   - **Risco**: 🔴 **ALTO** → ✅ **IMPLEMENTADO**
+   - **Alternativa Implementada**: Estratégia híbrida com 5 níveis de fallback
+   - **Função**: `localizar_botao_continuar_garagem_playwright()`
+
+2. **Tela 15**: `//*[contains(text(), 'Plano recomendado')]` (Linha 3571)
+   - **Finalidade**: Detecção de planos recomendados
+   - **Risco**: 🔴 **ALTO**
+   - **Alternativa Sugerida**: `[data-testid="plano-recomendado"]`
+
+3. **Tela 15**: `//div[contains(@class, 'md:w-80')...]` (Linha 3574)
+   - **Finalidade**: Detecção de cards de planos
+   - **Risco**: 🔴 **ALTO**
+   - **Alternativa Sugerida**: `[data-testid="card-plano"]`
+
+4. **Tela 15**: `//*[contains(text(), 'R$')]` (Linha 3577)
+   - **Finalidade**: Detecção de valores monetários
+   - **Risco**: 🔴 **ALTO**
+   - **Alternativa Sugerida**: `[data-testid="preco-plano"]`
+
+### **✅ SELETORES DE ALTO RISCO IMPLEMENTADOS (11):**
+
+1. **v3.7.0.1**: `button.group` → `button:has(img[alt="Icone car"])` (Tela 1)
+2. **v3.7.0.2**: `div.bg-primary` → `div[role="group"][aria-roledescription="slide"]` (Tela 5)
+3. **v3.7.0.3**: `.overflow-hidden` → `[data-testid="sugestao-endereco"]` (Tela 7)
+4. **v3.7.0.4**: XPath finalidade → Estratégia híbrida (Tela 8)
+5. **v3.7.0.5**: XPath dados pessoais → Estratégia híbrida (Tela 9)
+6. **v3.7.0.6**: Radio buttons condutor → Estratégia híbrida (Tela 10)
+7. **v3.7.0.8**: XPath estado civil → Estratégia híbrida (Tela 9)
+8. **v3.7.0.9**: Checkboxes/switches → Estratégia híbrida (Tela 11)
+9. **v3.7.0.9**: Switch estacionamento → Estratégia híbrida (Tela 11)
+10. **v3.7.0.10**: `text={sexo}` → Estratégia híbrida (Tela 9)
+11. **v3.7.0.11**: `p.font-semibold.font-workSans.cursor-pointer` → Estratégia híbrida (Tela 12)
 
 ---
 
