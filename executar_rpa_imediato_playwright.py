@@ -1045,9 +1045,9 @@ def navegar_tela_5_playwright(page: Page, parametros_tempo) -> bool:
         
         exibir_mensagem("✅ Estimativa carregada com sucesso")
         
-        # Aguardar um pouco mais para garantir que os dados estão carregados
+        # OTIMIZAÇÃO: Reduzir delay de estabilização
         exibir_mensagem("⏳ Aguardando estabilização dos dados...")
-        time.sleep(5)
+        time.sleep(2)  # Reduzido de 5 para 2 segundos
         
         # CAPTURAR DADOS DO CARROSSEL DE ESTIMATIVAS
         dados_carrossel = capturar_dados_carrossel_estimativas_playwright(page)
@@ -2081,28 +2081,40 @@ def navegar_tela_9_playwright(page: Page, nome: str, cpf: str, data_nascimento: 
         exception_handler.definir_tela_atual("TELA_9")
         exibir_mensagem("📱 TELA 9: Aguardando carregamento...")
         
-        for tentativa in range(20):
-            try:
-                elementos_tela = localizar_tela_9_playwright(page)
-                if elementos_tela.count() > 0:
-                    exibir_mensagem("✅ Tela 9 carregada com sucesso")
-                    break
-            except:
-                pass
-            
-            if tentativa == 19:
-                exception_handler.capturar_warning("Tela 9 não foi detectada após 20 segundos", "TELA_9")
-                return False
-            
-            try:
-                if aguardar_tela_9_playwright(page, 1000): break
-            except:
-                pass
+        # OTIMIZAÇÃO: Detecção mais rápida da Tela 9
+        exibir_mensagem("📱 TELA 9: Aguardando carregamento...")
         
-        # Preencher Nome Completo
+        # Estratégia otimizada: aguardar elemento específico diretamente
+        try:
+            # Aguardar o campo nome aparecer (mais específico que localizar_tela_9)
+            page.wait_for_selector("#nomeTelaSegurado", timeout=5000)
+            exibir_mensagem("✅ Tela 9 carregada com sucesso (otimizada)")
+        except:
+            # Fallback para método anterior (reduzido)
+            for tentativa in range(5):  # Reduzido de 20 para 5
+                try:
+                    elementos_tela = localizar_tela_9_playwright(page)
+                    if elementos_tela.count() > 0:
+                        exibir_mensagem("✅ Tela 9 carregada com sucesso (fallback)")
+                        break
+                except:
+                    pass
+                
+                if tentativa == 4:
+                    exception_handler.capturar_warning("Tela 9 não foi detectada após 5 segundos", "TELA_9")
+                    return False
+                
+                try:
+                    if aguardar_tela_9_playwright(page, 1000): break
+                except:
+                    pass
+        
+        # OTIMIZAÇÃO: Preenchimento imediato do nome (sem delays desnecessários)
         exibir_mensagem("📱 TELA 9: Preenchendo nome...")
         try:
             nome_campo = page.locator("#nomeTelaSegurado")
+            # Aguardar campo estar pronto para interação
+            nome_campo.wait_for(state="visible", timeout=2000)
             nome_campo.click()
             nome_campo.fill(nome)
             exibir_mensagem(f"✅ Nome preenchido: {nome}")
@@ -3214,13 +3226,25 @@ def navegar_tela_15_playwright(page, email_login, senha_login, parametros_tempo)
                 
                 # Aguardar possível redirecionamento ou modal CPF divergente
                 exibir_mensagem("⏳ Aguardando resposta do login...")
-                time.sleep(parametros_tempo['tempo_carregamento'])  # ESTRATÉGIA SIMPLES: time.sleep ao invés de waits complexos
+                
+                # DETECTAR FECHAMENTO DO MODAL DE LOGIN
+                exibir_mensagem("🔍 Detectando fechamento do modal de login...")
+                try:
+                    # Aguardar o modal de login desaparecer (indicando que o login foi processado)
+                    modal_login = page.locator("text=Acesse sua conta para visualizar o resultado final")
+                    modal_login.wait_for(state="hidden", timeout=10000)
+                    exibir_mensagem("✅ Modal de login fechado - login processado!")
+                except Exception as e:
+                    exibir_mensagem(f"⚠️ Modal de login não fechou no tempo esperado: {str(e)}")
+                    exibir_mensagem("ℹ️ Continuando com time.sleep como fallback...")
+                    time.sleep(parametros_tempo['tempo_carregamento'])  # Fallback
                 
                 # Verificar se apareceu modal CPF divergente
                 try:
                     modal_cpf = page.locator("text=CPF informado não corresponde à conta")
                     if modal_cpf.count() > 0:
                         exibir_mensagem("✅ Modal CPF divergente detectado!")
+                        exibir_mensagem("🎯 MODAL CPF DIVERGENTE DETECTADO: 'CPF informado não corresponde à conta'")
                         
                         # Clicar no botão "Manter Login atual"
                         try:
@@ -3231,22 +3255,71 @@ def navegar_tela_15_playwright(page, email_login, senha_login, parametros_tempo)
                             if botao_manter_login.is_visible():
                                 botao_manter_login.click()
                                 exibir_mensagem("✅ Botão 'Manter Login atual' clicado pelo ID!")
-                                time.sleep(parametros_tempo['tempo_estabilizacao'])
+                                
+                                # DETECTAR FECHAMENTO DO MODAL CPF DIVERGENTE
+                                exibir_mensagem("🔍 Detectando fechamento do modal CPF divergente...")
+                                try:
+                                    modal_cpf.wait_for(state="hidden", timeout=5000)
+                                    exibir_mensagem("✅ Modal CPF divergente fechado!")
+                                except Exception as e:
+                                    exibir_mensagem(f"⚠️ Modal CPF divergente não fechou no tempo esperado: {str(e)}")
+                                    time.sleep(parametros_tempo['tempo_estabilizacao'])
                             else:
                                 # Tentar pelo texto
                                 botao_manter_login = page.locator("text=Manter Login atual")
                                 if botao_manter_login.is_visible():
                                     botao_manter_login.click()
                                     exibir_mensagem("✅ Botão 'Manter Login atual' clicado pelo texto!")
-                                    time.sleep(parametros_tempo['tempo_estabilizacao'])
+                                    
+                                    # DETECTAR FECHAMENTO DO MODAL CPF DIVERGENTE
+                                    exibir_mensagem("🔍 Detectando fechamento do modal CPF divergente...")
+                                    try:
+                                        modal_cpf.wait_for(state="hidden", timeout=5000)
+                                        exibir_mensagem("✅ Modal CPF divergente fechado!")
+                                    except Exception as e:
+                                        exibir_mensagem(f"⚠️ Modal CPF divergente não fechou no tempo esperado: {str(e)}")
+                                        time.sleep(parametros_tempo['tempo_estabilizacao'])
                                 else:
                                     exibir_mensagem("⚠️ Botão 'Manter Login atual' não encontrado")
                         except Exception as e:
                             exibir_mensagem(f"⚠️ Erro ao clicar no botão 'Manter Login atual': {str(e)}")
                     else:
                         exibir_mensagem("ℹ️ Modal CPF divergente não apareceu - login pode ter sido bem-sucedido")
+                        exibir_mensagem("❌ MODAL CPF DIVERGENTE NÃO DETECTADO: 'CPF informado não corresponde à conta'")
                 except Exception as e:
                     exibir_mensagem(f"⚠️ Erro ao verificar modal CPF: {str(e)}")
+                
+                # VERIFICAR OUTROS MODAIS QUE PODEM APARECER
+                exibir_mensagem("🔍 Verificando outros modais que podem aparecer...")
+                try:
+                    # Verificar modal de erro de login
+                    modal_erro_login = page.locator("text=Erro ao fazer login")
+                    if modal_erro_login.count() > 0:
+                        exibir_mensagem("⚠️ MODAL DE ERRO DE LOGIN DETECTADO!")
+                    
+                    # Verificar modal de sessão expirada
+                    modal_sessao_expirada = page.locator("text=sessão expirada")
+                    if modal_sessao_expirada.count() > 0:
+                        exibir_mensagem("⚠️ MODAL DE SESSÃO EXPIRADA DETECTADO!")
+                    
+                    # Verificar modal de manutenção
+                    modal_manutencao = page.locator("text=manutenção")
+                    if modal_manutencao.count() > 0:
+                        exibir_mensagem("⚠️ MODAL DE MANUTENÇÃO DETECTADO!")
+                    
+                    # Verificar modal de captcha
+                    modal_captcha = page.locator("text=captcha")
+                    if modal_captcha.count() > 0:
+                        exibir_mensagem("⚠️ MODAL DE CAPTCHA DETECTADO!")
+                    
+                    # Verificar modal de confirmação de dados
+                    modal_confirmacao = page.locator("text=confirmação")
+                    if modal_confirmacao.count() > 0:
+                        exibir_mensagem("⚠️ MODAL DE CONFIRMAÇÃO DETECTADO!")
+                    
+                    exibir_mensagem("✅ Verificação de modais concluída")
+                except Exception as e:
+                    exibir_mensagem(f"⚠️ Erro ao verificar outros modais: {str(e)}")
                 
             else:
                 exibir_mensagem("❌ Botão 'Acessar' não está visível!")
@@ -3268,8 +3341,10 @@ def navegar_tela_15_playwright(page, email_login, senha_login, parametros_tempo)
             # Aguardar pelo texto de sucesso final que indica que a página foi carregada
             page.wait_for_selector("text=Parabéns, chegamos ao resultado final da cotação!", timeout=180000)
             exibir_mensagem("✅ Página principal dos planos carregada!")
+            exibir_mensagem("🎯 MODAL DE SUCESSO DETECTADO: 'Parabéns, chegamos ao resultado final da cotação!'")
         except Exception as e:
             exibir_mensagem(f"⚠️ Texto de sucesso final não encontrado: {str(e)}")
+            exibir_mensagem("❌ MODAL DE SUCESSO NÃO DETECTADO: 'Parabéns, chegamos ao resultado final da cotação!'")
             exibir_mensagem("ℹ️ Usando fallback com time.sleep...")
             time.sleep(parametros_tempo['tempo_carregamento'])  # Fallback para time.sleep
         
@@ -3292,6 +3367,11 @@ def navegar_tela_15_playwright(page, email_login, senha_login, parametros_tempo)
             exibir_mensagem("⚠️ FALHA NA CAPTURA DE DADOS DOS PLANOS")
         
         exibir_mensagem("🎯 TELA 15 FINALIZADA COM SUCESSO!")
+        
+        # Delay para inspeção da tela
+        exibir_mensagem("⏳ Aguardando 60 segundos para inspeção da tela...")
+        time.sleep(60)
+        exibir_mensagem("✅ Tempo de inspeção concluído!")
         
         return True
         
@@ -3732,69 +3812,196 @@ def capturar_dados_planos_seguro(page: Page, parametros_tempo) -> Dict[str, Any]
         }
         
         # ========================================
-        # ETAPA 1: ENCONTRAR CONTAINERS DOS PLANOS
+        # ETAPA 1: ENCONTRAR CONTAINERS DOS PLANOS (ESTRUTURA HTML CORRETA)
         # ========================================
-        exibir_mensagem("🔍 ETAPA 1: Encontrando containers dos planos...")
+        exibir_mensagem("🔍 ETAPA 1: Encontrando containers dos planos usando estrutura HTML correta...")
         
-        # Estratégia 1: Procurar por divs que contêm "Plano recomendado"
-        planos_recomendados = page.locator("//*[contains(text(), 'Plano recomendado')]").all()
-        
-        # Estratégia 2: Procurar por divs com classes específicas que contêm planos
-        planos_divs = page.locator("//div[contains(@class, 'md:w-80') or contains(@class, 'border-4') or contains(@class, 'border-primary')]").all()
-        
-        # Estratégia 3: Procurar por elementos que contêm valores monetários específicos
-        elementos_valores = page.locator("//*[contains(text(), 'R$')]").all()
-        
-        # Estratégia 4: Procurar por elementos que contêm coberturas específicas
-        elementos_coberturas = page.locator("//*[contains(text(), 'Franquia') or contains(text(), 'Valor de Mercado') or contains(text(), 'Assistência') or contains(text(), 'Vidros') or contains(text(), 'Carro Reserva') or contains(text(), 'Danos Materiais') or contains(text(), 'Danos Corporais') or contains(text(), 'Danos Morais') or contains(text(), 'Morte/Invalidez')]").all()
-        
-        # Combinar todos os elementos encontrados
-        todos_elementos = list(set(planos_recomendados + planos_divs + elementos_valores + elementos_coberturas))
-        
-        exibir_mensagem(f"📊 ELEMENTOS ENCONTRADOS: {len(todos_elementos)}")
-        
-        # Filtrar elementos que são containers de planos (não apenas texto)
-        tabelas_planos = []
-        for elem in todos_elementos:
-            try:
-                # Verificar se o elemento contém múltiplos valores monetários ou é um container
-                texto = elem.text_content()
-                if (texto.count('R$') >= 2 or 
-                    'Franquia' in texto or 
-                    'Valor de Mercado' in texto or
-                    'Plano recomendado' in texto or
-                    len(texto) > 100):  # Elementos com muito texto provavelmente são containers
-                    tabelas_planos.append(elem)
-            except:
-                continue
+        # Usar a estrutura HTML correta identificada
+        try:
+            # Encontrar o container principal com grid
+            container_principal = page.locator("div.grid-cols-\\[250px__1fr__1fr\\]")
+            if container_principal.count() == 0:
+                exibir_mensagem("⚠️ Container principal não encontrado, usando fallback...")
+                # Fallback para método anterior
+                container_principal = page.locator("div")
+            
+            exibir_mensagem(f"📊 CONTAINER PRINCIPAL ENCONTRADO: {container_principal.count()}")
+            
+            # Extrair planos diretamente da estrutura correta
+            tabelas_planos = []
+            
+            # Plano Recomendado: div com border-primary
+            plano_recomendado = container_principal.locator("div.md\\:w-80.border-4.border-primary")
+            if plano_recomendado.count() > 0:
+                tabelas_planos.append(plano_recomendado.first)
+                exibir_mensagem("✅ PLANO RECOMENDADO ENCONTRADO na estrutura correta")
+            
+            # Plano Alternativo: div com border-4 mas sem border-primary
+            plano_alternativo = container_principal.locator("div.md\\:w-80.border-4:not(.border-primary)")
+            if plano_alternativo.count() > 0:
+                tabelas_planos.append(plano_alternativo.first)
+                exibir_mensagem("✅ PLANO ALTERNATIVO ENCONTRADO na estrutura correta")
+            
+            # Se não encontrou na estrutura correta, usar fallback
+            if len(tabelas_planos) == 0:
+                exibir_mensagem("⚠️ Usando fallback para detecção de planos...")
+                # Fallback: procurar por divs com classes específicas
+                planos_divs = page.locator("//div[contains(@class, 'md:w-80') or contains(@class, 'border-4')]").all()
+                for elem in planos_divs:
+                    try:
+                        texto = elem.text_content()
+                        if texto and len(texto) > 100:
+                            tabelas_planos.append(elem)
+                            exibir_mensagem(f"📋 CONTAINER FALLBACK: {len(texto)} caracteres - {texto[:100]}...")
+                    except:
+                        continue
+            
+        except Exception as e:
+            exibir_mensagem(f"⚠️ Erro na detecção por estrutura: {str(e)}")
+            # Fallback completo
+            tabelas_planos = []
+            elementos_valores = page.locator("//*[contains(text(), 'R$')]").all()
+            for elem in elementos_valores:
+                try:
+                    texto = elem.text_content()
+                    if texto and len(texto) > 100:
+                        tabelas_planos.append(elem)
+                        exibir_mensagem(f"📋 CONTAINER FALLBACK COMPLETO: {len(texto)} caracteres - {texto[:100]}...")
+                except:
+                    continue
         
         exibir_mensagem(f"📊 CONTAINERS DE PLANOS ENCONTRADOS: {len(tabelas_planos)}")
         
         # ========================================
         # ETAPA 2: ANALISAR CADA CONTAINER
         # ========================================
-        for i, elemento in enumerate(tabelas_planos[:10]):  # Limitar a 10 containers
+        exibir_mensagem(f"🔍 PROCESSANDO {len(tabelas_planos)} CONTAINERS...")
+        for i, elemento in enumerate(tabelas_planos):  # Processar todos os containers
             try:
                 tabela_text = elemento.text_content().strip()
                 if not tabela_text or len(tabela_text) < 30:
                     continue
                 
-                exibir_mensagem(f"📋 ANALISANDO CONTAINER {i+1}: {len(tabela_text)} caracteres")
+                exibir_mensagem(f"📋 ANALISANDO CONTAINER {i+1}/{len(tabelas_planos)}: {len(tabela_text)} caracteres")
+                exibir_mensagem(f"🔍 DEBUG: Texto completo da tabela: '{tabela_text}'")
                 
-                # Determinar se é plano recomendado ou alternativo
+                # DEBUG: Capturar HTML completo do container
+                try:
+                    html_completo = elemento.inner_html()
+                    exibir_mensagem(f"🔍 DEBUG: HTML completo do container (primeiros 500 chars): {html_completo[:500]}...")
+                except Exception as e:
+                    exibir_mensagem(f"⚠️ Erro ao capturar HTML: {str(e)}")
+                
+                # Determinar tipo de plano baseado na estrutura HTML
                 if "plano recomendado" in tabela_text.lower():
                     plano_tipo = "plano_recomendado"
                     exibir_mensagem("✅ PLANO RECOMENDADO DETECTADO")
-                else:
+                elif "plano alternativo" in tabela_text.lower():
                     plano_tipo = "plano_alternativo"
                     exibir_mensagem("✅ PLANO ALTERNATIVO DETECTADO")
+                elif tabela_text.startswith("R$") and "anual" in tabela_text.lower():
+                    # Container que começa com R$ e tem "anual" é provavelmente Plano Alternativo
+                    plano_tipo = "plano_alternativo"
+                    exibir_mensagem("✅ PLANO ALTERNATIVO DETECTADO (por padrão)")
+                else:
+                    # Detectar por posição na lista (primeiro = recomendado, segundo = alternativo)
+                    if i == 0:
+                        plano_tipo = "plano_recomendado"
+                        exibir_mensagem("✅ PLANO RECOMENDADO DETECTADO (por posição)")
+                    elif i == 1:
+                        plano_tipo = "plano_alternativo"
+                        exibir_mensagem("✅ PLANO ALTERNATIVO DETECTADO (por posição)")
+                    else:
+                        exibir_mensagem(f"⚠️ TIPO DE PLANO NÃO IDENTIFICADO - Container {i+1}: {tabela_text[:200]}...")
+                        continue
                 
                 # ETAPA 3: PARSE ESTRUTURADO BASEADO NA POSIÇÃO
                 # Dividir o texto por quebras de linha para análise estruturada
                 linhas = tabela_text.split('\n')
                 linhas = [linha.strip() for linha in linhas if linha.strip()]
                 
+                # DEBUG: Verificar elementos no container (mantido para debug)
+                try:
+                    todos_elementos = elemento.locator("*").all()
+                    exibir_mensagem(f"🔍 Total de elementos no container: {len(todos_elementos)}")
+                except Exception as e:
+                    exibir_mensagem(f"⚠️ Erro ao contar elementos: {str(e)}")
+                
+                # Se o split por \n resultou em apenas 1 linha, tentar dividir por padrões específicos
+                if len(linhas) == 1:
+                    exibir_mensagem("⚠️ Apenas 1 linha detectada - aplicando divisão por padrões")
+                    texto_original = linhas[0]
+                    
+                    # Padrões para dividir o texto em campos individuais (em ordem de prioridade)
+                    padroes_divisao = [
+                        r'(Plano\s*recomendado)',  # Título do plano primeiro
+                        r'(R\$\s*[0-9.,]+)',  # Valores monetários
+                        r'(anual)',  # Periodicidade
+                        r'(Crédito\s*em\s*até\s*[^!]+!)',  # Forma de pagamento crédito
+                        r'(Boleto/Débito\s*em\s*até\s*[^!]+!)',  # Forma de pagamento boleto
+                        r'(Franquia)',  # Label Franquia
+                        r'(Valor\s*de\s*Mercado)',  # Label Valor de Mercado
+                        r'(100%\s*da\s*tabela\s*FIPE)',  # Valor de mercado
+                        r'(Assistência)',  # Assistência
+                        r'(Vidros)',  # Vidros
+                        r'(Carro\s*Reserva)',  # Carro Reserva
+                        r'(Danos\s*Materiais)',  # Danos Materiais
+                        r'(Danos\s*Corporais)',  # Danos Corporais
+                        r'(Danos\s*Morais)',  # Danos Morais
+                        r'(Morte/Invalidez)',  # Morte/Invalidez
+                        r'(Normal|Reduzida)',  # Tipo de franquia
+                    ]
+                    
+                    # Aplicar divisão por padrões usando uma abordagem sequencial
+                    linhas_divididas = []
+                    texto_restante = texto_original
+                    
+                    # Processar cada padrão em ordem
+                    for padrao in padroes_divisao:
+                        match = re.search(padrao, texto_restante, re.IGNORECASE)
+                        if match:
+                            start, end = match.span()
+                            
+                            # Extrair texto antes do padrão
+                            if start > 0:
+                                texto_antes = texto_restante[:start].strip()
+                                if texto_antes:
+                                    linhas_divididas.append(texto_antes)
+                            
+                            # Adicionar o padrão encontrado
+                            linhas_divididas.append(match.group().strip())
+                            
+                            # Atualizar texto restante
+                            texto_restante = texto_restante[end:].strip()
+                    
+                    # Adicionar texto restante se houver
+                    if texto_restante:
+                        linhas_divididas.append(texto_restante)
+                    
+                    # Filtrar linhas vazias e reorganizar
+                    linhas = [linha.strip() for linha in linhas_divididas if linha.strip()]
+                    
+                    # CORREÇÃO ESPECÍFICA: Separar valor da franquia do tipo de franquia
+                    linhas_corrigidas = []
+                    for i, linha in enumerate(linhas):
+                        # Verificar se a linha contém valor da franquia seguido de tipo de franquia
+                        # Padrão: "R$ 9.501,00Normal" -> "R$ 9.501,00" + "Normal"
+                        match_franquia = re.match(r'(R\$\s*[0-9.,]+)(Normal|Reduzida)', linha)
+                        if match_franquia:
+                            valor_franquia = match_franquia.group(1).strip()
+                            tipo_franquia = match_franquia.group(2).strip()
+                            linhas_corrigidas.append(valor_franquia)
+                            linhas_corrigidas.append(tipo_franquia)
+                            exibir_mensagem(f"✅ FRANQUIA SEPARADA: '{valor_franquia}' + '{tipo_franquia}'")
+                        else:
+                            linhas_corrigidas.append(linha)
+                    
+                    linhas = linhas_corrigidas
+                    
+                    exibir_mensagem(f"✅ DIVISÃO POR PADRÕES APLICADA: {len(linhas)} campos encontrados")
+                
                 exibir_mensagem(f"🔍 ANALISANDO ESTRUTURA: {len(linhas)} linhas encontradas")
+                exibir_mensagem(f"🔍 DEBUG: Linhas da tabela: {linhas}")
                 
                 # Determinar se tem título e ajustar índice de início
                 tem_titulo = False
@@ -3810,77 +4017,98 @@ def capturar_dados_planos_seguro(page: Page, parametros_tempo) -> Dict[str, Any]
                 # Parse estruturado baseado na especificação
                 if len(linhas) >= indice_inicio + 8:  # Mínimo de 8 campos após título
                     try:
-                        # 1. Moeda (R$) - posição 0 ou 1 dependendo se tem título
-                        moeda = linhas[indice_inicio]
-                        if moeda == "R$":
-                            exibir_mensagem("✅ MOEDA DETECTADA: R$")
+                        exibir_mensagem("🔍 Iniciando mapeamento dinâmico de dados...")
                         
-                        # 2. Preço anual - posição 1 ou 2 dependendo se tem título
-                        if indice_inicio + 1 < len(linhas):
-                            preco_anual = linhas[indice_inicio + 1]
-                            # Validar se é um preço (contém números e vírgula/ponto)
-                            if re.match(r'^[0-9.,]+$', preco_anual):
-                                dados_planos[plano_tipo]["valor"] = f"R$ {preco_anual}"
-                                exibir_mensagem(f"✅ PREÇO ANUAL: R$ {preco_anual}")
-                        
-                        # 3. Periodicidade (anual) - posição 2 ou 3
-                        if indice_inicio + 2 < len(linhas):
-                            periodicidade = linhas[indice_inicio + 2]
-                            if "anual" in periodicidade.lower():
-                                dados_planos[plano_tipo]["forma_pagamento"] = periodicidade
-                                exibir_mensagem("✅ PERIODICIDADE: Anual")
-                        
-                        # 4. Forma de pagamento - posição 3 ou 4
-                        if indice_inicio + 3 < len(linhas):
-                            forma_pagamento = linhas[indice_inicio + 3]
-                            dados_planos[plano_tipo]["parcelamento"] = forma_pagamento
+                        # 7-9. Processar ícones de cobertura usando estrutura HTML correta
+                        exibir_mensagem("🔍 Detectando ícones de cobertura usando estrutura HTML correta...")
+                        try:
+                            # Detectar ícones diretamente no container
+                            icones_ok = elemento.locator("img[src='/icone-ok.svg']").all()
+                            icones_nok = elemento.locator("img[src='/icone-nok.svg']").all()
                             
-                            # Extrair valor de parcelamento se houver
-                            # Padrão: "Crédito em até 1x sem juros ou 10x de R$ 346,82"
-                            parcelamento_match = re.search(r'(\d+x)\s*de\s*R\$\s*([0-9.,]+)', forma_pagamento)
-                            if parcelamento_match:
-                                valor_parcela = parcelamento_match.group(2)
-                                exibir_mensagem(f"✅ VALOR PARCELA: R$ {valor_parcela}")
+                            exibir_mensagem(f"🔍 Ícones de OK encontrados: {len(icones_ok)}")
+                            exibir_mensagem(f"🔍 Ícones de NOK encontrados: {len(icones_nok)}")
                             
-                            exibir_mensagem(f"✅ FORMA PAGAMENTO: {forma_pagamento}")
-                        
-                        # 5. Franquia - posição 4 ou 5
-                        if indice_inicio + 4 < len(linhas):
-                            franquia_valor = linhas[indice_inicio + 4]
-                            if re.match(r'^R\$\s*[0-9.,]+$', franquia_valor):
-                                dados_planos[plano_tipo]["valor_franquia"] = franquia_valor
-                                exibir_mensagem(f"✅ FRANQUIA VALOR: {franquia_valor}")
-                        
-                        # 6. Característica da franquia - posição 5 ou 6
-                        if indice_inicio + 5 < len(linhas):
-                            franquia_tipo = linhas[indice_inicio + 5]
-                            if franquia_tipo.lower() in ["reduzida", "normal"]:
-                                exibir_mensagem(f"✅ FRANQUIA TIPO: {franquia_tipo}")
-                        
-                        # 7. Cobertura do valor do veículo - posição 6 ou 7
-                        if indice_inicio + 6 < len(linhas):
-                            cobertura_veiculo = linhas[indice_inicio + 6]
-                            if "100% da tabela FIPE" in cobertura_veiculo:
-                                dados_planos[plano_tipo]["valor_mercado"] = cobertura_veiculo
-                                exibir_mensagem(f"✅ COBERTURA VEÍCULO: {cobertura_veiculo}")
-                        
-                        # 8-11. Itens adicionais (posições 7-10 ou 8-11)
-                        itens_adicionais = []
-                        for j in range(indice_inicio + 7, min(indice_inicio + 11, len(linhas))):
-                            if j < len(linhas):
-                                item = linhas[j]
-                                if re.match(r'^R\$\s*[0-9.,]+$', item):
-                                    itens_adicionais.append(item)
-                        
-                        # Mapear itens adicionais para coberturas específicas
-                        if len(itens_adicionais) >= 4:
-                            # Baseado na especificação: Danos Materiais, Danos Corporais, Danos Morais, Morte/Invalidez
-                            dados_planos[plano_tipo]["danos_materiais"] = itens_adicionais[0]
-                            dados_planos[plano_tipo]["danos_corporais"] = itens_adicionais[1]
-                            dados_planos[plano_tipo]["danos_morais"] = itens_adicionais[2]
-                            dados_planos[plano_tipo]["morte_invalidez"] = itens_adicionais[3]
+                            # Mapear ícones por ordem de aparição na estrutura HTML
+                            coberturas_campos = ['assistencia', 'vidros', 'carro_reserva']
                             
-                            exibir_mensagem(f"✅ ITENS ADICIONAIS: {len(itens_adicionais)} itens mapeados")
+                            for i, campo in enumerate(coberturas_campos):
+                                try:
+                                    # Verificar se há ícone de OK na posição i
+                                    if len(icones_ok) > i and icones_ok[i].is_visible():
+                                        dados_planos[plano_tipo][campo] = True
+                                        exibir_mensagem(f"✅ {campo.title()}: True (ícone OK detectado na posição {i})")
+                                    elif len(icones_nok) > i and icones_nok[i].is_visible():
+                                        dados_planos[plano_tipo][campo] = False
+                                        exibir_mensagem(f"❌ {campo.title()}: False (ícone NOK detectado na posição {i})")
+                                    else:
+                                        # Fallback: verificar se existe o texto da cobertura
+                                        if campo.title() in tabela_text:
+                                            dados_planos[plano_tipo][campo] = True
+                                            exibir_mensagem(f"✅ {campo.title()}: True (texto detectado como fallback)")
+                                        else:
+                                            dados_planos[plano_tipo][campo] = False
+                                            exibir_mensagem(f"❌ {campo.title()}: False (nenhum ícone ou texto encontrado)")
+                                        
+                                except Exception as e:
+                                    exibir_mensagem(f"⚠️ Erro ao processar ícone para {campo}: {str(e)}")
+                                    dados_planos[plano_tipo][campo] = False
+                            
+                        except Exception as e:
+                            exibir_mensagem(f"⚠️ Erro na detecção de ícones: {str(e)}")
+                            # Fallback: definir todos como False
+                            for cobertura in ['assistencia', 'vidros', 'carro_reserva']:
+                                dados_planos[plano_tipo][cobertura] = False
+                        
+                        # 8-11. Mapear dados por padrões (NOVA LÓGICA DINÂMICA)
+                        exibir_mensagem("🔍 Mapeando dados por padrões dinâmicos...")
+                        try:
+                            # Detectar valores monetários
+                            valores_monetarios = []
+                            for linha in linhas:
+                                if re.match(r'^R\$\s*[0-9.,]+$', linha):
+                                    valores_monetarios.append(linha)
+                            
+                            exibir_mensagem(f"🔍 Valores monetários encontrados: {valores_monetarios}")
+                            
+                            # Detectar textos específicos
+                            textos_especificos = {}
+                            for linha in linhas:
+                                if "anual" in linha.lower():
+                                    textos_especificos["parcelamento"] = linha
+                                elif "crédito" in linha.lower() or "boleto" in linha.lower():
+                                    textos_especificos["forma_pagamento"] = linha
+                                elif "100% da tabela fipe" in linha.lower():
+                                    textos_especificos["valor_mercado"] = linha
+                                elif linha.lower() in ['normal', 'reduzida']:
+                                    textos_especificos["tipo_franquia"] = linha
+                            
+                            exibir_mensagem(f"🔍 Textos específicos encontrados: {textos_especificos}")
+                            
+                            # Mapear valores monetários por ordem de aparição
+                            if len(valores_monetarios) >= 6:
+                                dados_planos[plano_tipo]["valor"] = valores_monetarios[0]  # Primeiro valor
+                                dados_planos[plano_tipo]["valor_franquia"] = valores_monetarios[1]  # Segundo valor
+                                dados_planos[plano_tipo]["danos_materiais"] = valores_monetarios[2]  # Terceiro valor
+                                dados_planos[plano_tipo]["danos_corporais"] = valores_monetarios[3]  # Quarto valor
+                                dados_planos[plano_tipo]["danos_morais"] = valores_monetarios[4]  # Quinto valor
+                                dados_planos[plano_tipo]["morte_invalidez"] = valores_monetarios[5]  # Sexto valor
+                                
+                                exibir_mensagem(f"✅ VALORES MONETÁRIOS MAPEADOS: {len(valores_monetarios)} valores")
+                            
+                            # Mapear textos específicos
+                            for campo, valor in textos_especificos.items():
+                                dados_planos[plano_tipo][campo] = valor
+                                exibir_mensagem(f"✅ {campo.upper()}: {valor}")
+                            
+                            # Definir tipo_franquia padrão se não encontrado
+                            if "tipo_franquia" not in dados_planos[plano_tipo]:
+                                dados_planos[plano_tipo]["tipo_franquia"] = "Normal"
+                                exibir_mensagem("✅ TIPO_FRANQUIA: Normal (padrão)")
+                            
+                        except Exception as e:
+                            exibir_mensagem(f"⚠️ Erro no mapeamento dinâmico: {str(e)}")
+                            # Fallback para lógica anterior se necessário
                         
                     except Exception as e:
                         exception_handler.capturar_warning(f"ERRO NO PARSE ESTRUTURADO: {str(e)}", "CAPTURA_DADOS_PLANOS")
@@ -4091,55 +4319,22 @@ def capturar_dados_planos_seguro(page: Page, parametros_tempo) -> Dict[str, Any]
                     dados_planos[plano_tipo]["morte_invalidez"] = f"R$ {morte_invalidez_match.group(1)}"
                     exibir_mensagem(f"✅ Morte/Invalidez: R$ {morte_invalidez_match.group(1)}")
                 
-                # Se encontrou dados válidos, sair do loop
+                # Se encontrou dados válidos, continuar processando outros containers
                 if dados_planos[plano_tipo]["valor"] != "N/A":
                     exibir_mensagem(f"✅ DADOS CAPTURADOS COM SUCESSO PARA {plano_tipo.upper()}")
-                    break
+                    # Removido o break para processar todos os containers
                     
             except Exception as e:
                 exception_handler.capturar_warning(f"Erro ao analisar container {i+1}: {str(e)}", "CAPTURA_DADOS_PLANOS")
                 continue
         
         # ========================================
-        # ETAPA 5: FALLBACK FINAL COM SELETORES ESPECÍFICOS
+        # ETAPA 5: FALLBACK REMOVIDO
         # ========================================
-        exibir_mensagem("🔍 ETAPA 5: Fallback final com seletores específicos...")
+        exibir_mensagem("🔍 ETAPA 5: Fallback removido - usando apenas dados dinâmicos")
         
-        # Para cada plano, verificar se ainda há campos "N/A" e tentar preencher
-        for plano_tipo in ["plano_recomendado", "plano_alternativo"]:
-            if dados_planos[plano_tipo]["valor"] == "N/A":
-                # Tentar capturar valor com seletores específicos
-                try:
-                    valores_seguro = page.locator("label.text-primary.font-workSans.font-semibold.text-\\[32px\\]").all()
-                    if len(valores_seguro) > 0:
-                        if plano_tipo == "plano_recomendado":
-                            valor_elem = valores_seguro[0]
-                        else:
-                            valor_elem = valores_seguro[1] if len(valores_seguro) > 1 else valores_seguro[0]
-                        
-                        texto_valor = valor_elem.text_content().strip()
-                        valor_formatado = texto_valor.replace('\n', '').replace(' ', '')
-                        if valor_formatado.startswith('R$'):
-                            dados_planos[plano_tipo]["valor"] = valor_formatado
-                        else:
-                            dados_planos[plano_tipo]["valor"] = f"R$ {valor_formatado}"
-                        exibir_mensagem(f"✅ VALOR CAPTURADO (fallback): {dados_planos[plano_tipo]['valor']}")
-                except Exception as e:
-                    exibir_mensagem(f"⚠️ Erro no fallback de valor: {str(e)}")
-            
-            if dados_planos[plano_tipo]["forma_pagamento"] == "N/A":
-                try:
-                    formas_pagamento = page.locator("label.text-primary.text-xs.font-normal.mb-2").all()
-                    if len(formas_pagamento) > 0:
-                        if plano_tipo == "plano_recomendado":
-                            forma_elem = formas_pagamento[0]
-                        else:
-                            forma_elem = formas_pagamento[1] if len(formas_pagamento) > 1 else formas_pagamento[0]
-                        
-                        dados_planos[plano_tipo]["forma_pagamento"] = forma_elem.text_content().strip()
-                        exibir_mensagem(f"✅ FORMA PAGAMENTO CAPTURADA (fallback): {dados_planos[plano_tipo]['forma_pagamento']}")
-                except Exception as e:
-                    exibir_mensagem(f"⚠️ Erro no fallback de forma de pagamento: {str(e)}")
+        # Fallback removido para evitar sobrescrever dados corretos
+        # Os dados são capturados pela lógica dinâmica anterior
         
         # ========================================
         # ETAPA 6: SALVAR E RETORNAR DADOS
@@ -4747,6 +4942,11 @@ if __name__ == "__main__":
             print("✅ RPA executado com sucesso!")
         else:
             print("❌ RPA falhou!")
+        
+        # Delay para inspeção da tela final
+        print("⏳ Aguardando 60 segundos para inspeção da tela final...")
+        time.sleep(60)
+        print("✅ Tempo de inspeção concluído!")
         
         # Exibir retorno estruturado completo
         print("\n" + "="*50)
