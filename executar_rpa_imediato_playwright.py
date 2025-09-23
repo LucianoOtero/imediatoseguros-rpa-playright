@@ -2654,6 +2654,76 @@ def navegar_tela_12_playwright(page, garagem_residencia, portao_eletronico):
         exibir_mensagem(f"❌ ERRO na Tela 12: {str(e)}")
         return False
 
+def localizar_botao_continuar_menores_playwright(page: Page):
+    """
+    ESTRATÉGIA HÍBRIDA v3.7.0.12 - Tela 13 (Residência com Menores):
+    1. #gtm-telaUsoResidentesContinuar - ESPECÍFICO (ID único)
+    2. button[data-testid="continuar-menores"] - ESPECÍFICO (data-testid)
+    3. p:has-text("Continuar") - SEMÂNTICO (texto específico)
+    4. button:has-text("Continuar") - SEMÂNTICO (botão com texto)
+    5. p.font-semibold.font-workSans.cursor-pointer - FALLBACK (compatibilidade)
+    
+    Args:
+        page: Instância do Playwright Page
+        
+    Returns:
+        Locator: Elemento do botão continuar localizado
+    """
+    try:
+        # Nível 1: ID específico (mais confiável)
+        try:
+            elemento = page.locator("#gtm-telaUsoResidentesContinuar")
+            if elemento.is_visible(timeout=1000):
+                exibir_mensagem("🔍 v3.7.0.12: Botão continuar localizado por ID específico (nível 1)")
+                return elemento
+        except:
+            pass
+        
+        # Nível 2: Data-testid específico
+        try:
+            elemento = page.locator('button[data-testid="continuar-menores"]')
+            if elemento.is_visible(timeout=1000):
+                exibir_mensagem("🔍 v3.7.0.12: Botão continuar localizado por data-testid (nível 2)")
+                return elemento
+        except:
+            pass
+        
+        # Nível 3: Texto semântico no parágrafo
+        try:
+            elemento = page.locator('p:has-text("Continuar")')
+            if elemento.is_visible(timeout=1000):
+                exibir_mensagem("🔍 v3.7.0.12: Botão continuar localizado por texto semântico (nível 3)")
+                return elemento
+        except:
+            pass
+        
+        # Nível 4: Texto semântico no botão
+        try:
+            elemento = page.locator('button:has-text("Continuar")')
+            if elemento.is_visible(timeout=1000):
+                exibir_mensagem("🔍 v3.7.0.12: Botão continuar localizado por botão com texto (nível 4)")
+                return elemento
+        except:
+            pass
+        
+        # Nível 5: Fallback com classes CSS (compatibilidade)
+        try:
+            elemento = page.locator('p.font-semibold.font-workSans.cursor-pointer')
+            if elemento.is_visible(timeout=1000):
+                exibir_mensagem("🔍 v3.7.0.12: Botão continuar localizado por classes CSS (nível 5 - fallback)")
+                return elemento
+        except:
+            pass
+        
+        # Se nenhum nível funcionou, retornar o fallback padrão
+        exibir_mensagem("⚠️ v3.7.0.12: Usando fallback padrão para botão continuar")
+        return page.locator('p.font-semibold.font-workSans.cursor-pointer')
+        
+    except Exception as e:
+        exibir_mensagem(f"❌ v3.7.0.12: Erro ao localizar botão continuar: {str(e)}")
+        # Fallback final
+        return page.locator('p.font-semibold.font-workSans.cursor-pointer')
+
 def navegar_tela_13_playwright(page, reside_18_26, sexo_do_menor, faixa_etaria_menor_mais_novo):
     """
     a versão ntir : Residência com Menores de 18-26 anos
@@ -4688,73 +4758,3 @@ if __name__ == "__main__":
     except Exception as e:
         exception_handler.capturar_excecao(e, "EXECUCAO_DIRETA", "Erro na execução direta")
         sys.exit(1)
-
-def localizar_botao_continuar_menores_playwright(page: Page):
-    """
-    ESTRATÉGIA HÍBRIDA v3.7.0.12 - Tela 13 (Residência com Menores):
-    1. #gtm-telaUsoResidentesContinuar - ESPECÍFICO (ID único)
-    2. button[data-testid="continuar-menores"] - ESPECÍFICO (data-testid)
-    3. p:has-text("Continuar") - SEMÂNTICO (texto específico)
-    4. button:has-text("Continuar") - SEMÂNTICO (botão com texto)
-    5. p.font-semibold.font-workSans.cursor-pointer - FALLBACK (compatibilidade)
-    
-    Args:
-        page: Instância do Playwright Page
-        
-    Returns:
-        Locator: Elemento do botão continuar localizado
-    """
-    try:
-        # Nível 1: ID específico (mais confiável)
-        try:
-            elemento = page.locator("#gtm-telaUsoResidentesContinuar")
-            if elemento.is_visible(timeout=1000):
-                exibir_mensagem("🔍 v3.7.0.12: Botão continuar localizado por ID específico (nível 1)")
-                return elemento
-        except:
-            pass
-        
-        # Nível 2: Data-testid específico
-        try:
-            elemento = page.locator('button[data-testid="continuar-menores"]')
-            if elemento.is_visible(timeout=1000):
-                exibir_mensagem("🔍 v3.7.0.12: Botão continuar localizado por data-testid (nível 2)")
-                return elemento
-        except:
-            pass
-        
-        # Nível 3: Texto semântico no parágrafo
-        try:
-            elemento = page.locator('p:has-text("Continuar")')
-            if elemento.is_visible(timeout=1000):
-                exibir_mensagem("🔍 v3.7.0.12: Botão continuar localizado por texto semântico (nível 3)")
-                return elemento
-        except:
-            pass
-        
-        # Nível 4: Texto semântico no botão
-        try:
-            elemento = page.locator('button:has-text("Continuar")')
-            if elemento.is_visible(timeout=1000):
-                exibir_mensagem("🔍 v3.7.0.12: Botão continuar localizado por botão com texto (nível 4)")
-                return elemento
-        except:
-            pass
-        
-        # Nível 5: Fallback com classes CSS (compatibilidade)
-        try:
-            elemento = page.locator('p.font-semibold.font-workSans.cursor-pointer')
-            if elemento.is_visible(timeout=1000):
-                exibir_mensagem("🔍 v3.7.0.12: Botão continuar localizado por classes CSS (nível 5 - fallback)")
-                return elemento
-        except:
-            pass
-        
-        # Se nenhum nível funcionou, retornar o fallback padrão
-        exibir_mensagem("⚠️ v3.7.0.12: Usando fallback padrão para botão continuar")
-        return page.locator('p.font-semibold.font-workSans.cursor-pointer')
-        
-    except Exception as e:
-        exibir_mensagem(f"❌ v3.7.0.12: Erro ao localizar botão continuar: {str(e)}")
-        # Fallback final
-        return page.locator('p.font-semibold.font-workSans.cursor-pointer')
