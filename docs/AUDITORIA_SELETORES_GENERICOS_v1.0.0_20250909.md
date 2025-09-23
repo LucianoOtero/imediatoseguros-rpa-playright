@@ -13,13 +13,13 @@
 
 ### **📊 ESTATÍSTICAS GERAIS ATUALIZADAS**
 - **Total de Seletores Genéricos Identificados**: 47
-- **Seletores de Alto Risco Implementados**: 10 ✅
-- **Seletores de Alto Risco Restantes**: 4 🔴
+- **Seletores de Alto Risco Implementados**: 12 ✅
+- **Seletores de Alto Risco Restantes**: 2 🔴
 - **Seletores de Médio Risco**: 32 🟡
-- **Seletores de Baixo Risco**: 1 🟢
+- **Seletores de Baixo Risco**: 2 🟢
 - **Telas Afetadas**: 15 (todas as telas)
 - **Tipos de Seletores Genéricos**: 8 categorias
-- **Risco de Falha**: 🔴 **ALTO** → 🟡 **REDUZIDO** (10 de 14 alto risco implementados - 71.4%)
+- **Risco de Falha**: 🔴 **ALTO** → 🟡 **REDUZIDO** (12 de 14 alto risco implementados - 85.7%)
 
 ### **🚨 PROBLEMAS CRÍTICOS IDENTIFICADOS**
 1. **Seletores baseados em classes CSS** - Falham em diferentes regiões
@@ -364,35 +364,43 @@
 
 ---
 
-### **TELA 14: Dados do Condutor Adicional**
+### **TELA 14: Corretor Anterior (CONDICIONAL)**
 **Função**: `navegar_tela_14_playwright()`
 
+#### **🟢 SELETORES DE BAIXO RISCO IDENTIFICADOS**
+1. **`p.font-semibold.font-workSans.cursor-pointer.text-sm.leading-6:has-text("Continuar")`** (Linha 2991)
+   - **Finalidade**: Botão continuar corretor anterior
+   - **Problema**: Classes CSS genéricas
+   - **Risco**: 🟢 **BAIXO** (ID específico já existe: `#gtm-telaCorretorAnteriorContinuar`)
+   - **Características**: Tela condicional, ID específico disponível
+   - **Alternativa Sugerida**: Usar ID específico como nível 1 + fallbacks
+
 #### **🔴 SELETORES GENÉRICOS IDENTIFICADOS**
-1. **`input[type='radio'][value='nao']`** (Linha 2003)
+2. **`input[type='radio'][value='nao']`** (Linha 2003)
    - **Finalidade**: Radio button "Não"
    - **Problema**: Depende de valor específico
    - **Risco**: 🟡 **MÉDIO**
    - **Alternativa Sugerida**: `#radio-condutor-adicional-nao`
 
-2. **`input[type='radio'][value='sim']`** (Linha 2010)
+3. **`input[type='radio'][value='sim']`** (Linha 2010)
    - **Finalidade**: Radio button "Sim"
    - **Problema**: Depende de valor específico
    - **Risco**: 🟡 **MÉDIO**
    - **Alternativa Sugerida**: `#radio-condutor-adicional-sim`
 
-3. **`ul`** (Linha 2025)
+4. **`ul`** (Linha 2025)
    - **Finalidade**: Aguardar lista de opções
    - **Problema**: Tag genérica
    - **Risco**: 🟡 **MÉDIO**
    - **Alternativa Sugerida**: `[data-testid="lista-opcoes-condutor"]`
 
-4. **`text={sexo_condutor_adicional}`** (Linha 2030)
+5. **`text={sexo_condutor_adicional}`** (Linha 2030)
    - **Finalidade**: Selecionar sexo do condutor adicional
    - **Problema**: Depende de texto específico
    - **Risco**: 🟡 **MÉDIO**
    - **Alternativa Sugerida**: `[data-testid="opcao-sexo-condutor-adicional-{sexo}"]`
 
-5. **`text={estado_civil_condutor_adicional}`** (Linha 2058)
+6. **`text={estado_civil_condutor_adicional}`** (Linha 2058)
    - **Finalidade**: Selecionar estado civil do condutor adicional
    - **Problema**: Depende de texto específico
    - **Risco**: 🟡 **MÉDIO**
@@ -427,8 +435,8 @@
 ## 📊 **RESUMO POR CATEGORIA DE RISCO ATUALIZADO**
 
 ### **🔴 RISCO ALTO (14 seletores)**
-- **Implementados**: 10 ✅ (71.4%)
-- **Restantes**: 4 ⏳ (28.6%)
+- **Implementados**: 12 ✅ (85.7%)
+- **Restantes**: 2 ⏳ (14.3%)
 - **Tipos**: Seletores baseados em classes CSS genéricas, XPath baseados em texto, JavaScript com classes genéricas
 
 ### **🟡 RISCO MÉDIO (32 seletores)**
@@ -438,45 +446,47 @@
 - Seletores baseados em atributos GTM
 - Seletores baseados em texto específico
 
-### **🟢 RISCO BAIXO (1 seletor)**
-- **Implementados**: 1 ✅ (100%)
-- **Restantes**: 0 ✅ (0%)
-- **Tipos**: Seletores por IDs específicos
+### **🟢 RISCO BAIXO (2 seletores)**
+- **Implementados**: 1 ✅ (50%)
+- **Restantes**: 1 ⏳ (50%)
+- **Tipos**: Seletores por IDs específicos, seletores com ID específico disponível
 
 ### **📈 PROGRESSO GERAL**
 - **Total de Seletores**: 47
-- **Implementados**: 11 ✅ (23.4%)
-- **Restantes**: 36 ⏳ (76.6%)
-- **Foco Atual**: Seletores de Alto Risco (4 restantes)
+- **Implementados**: 12 ✅ (25.5%)
+- **Restantes**: 35 ⏳ (74.5%)
+- **Foco Atual**: Seletores de Alto Risco (3 restantes)
 
 ---
 
-## 🎯 **SELETORES DE ALTO RISCO RESTANTES (4)**
+## 🎯 **SELETORES DE ALTO RISCO RESTANTES (3)**
 
 ### **🔴 PENDENTES DE IMPLEMENTAÇÃO:**
 
-1. **Tela 12**: `p.font-semibold.font-workSans.cursor-pointer` ✅ **IMPLEMENTADO v3.7.0.11**
-   - **Finalidade**: Botão continuar garagem
-   - **Risco**: 🔴 **ALTO** → ✅ **IMPLEMENTADO**
-   - **Alternativa Implementada**: Estratégia híbrida com 5 níveis de fallback
-   - **Função**: `localizar_botao_continuar_garagem_playwright()`
-
-2. **Tela 15**: `//*[contains(text(), 'Plano recomendado')]` (Linha 3571)
+1. **Tela 15**: `//*[contains(text(), 'Plano recomendado')]` (Linha 3571)
    - **Finalidade**: Detecção de planos recomendados
    - **Risco**: 🔴 **ALTO**
    - **Alternativa Sugerida**: `[data-testid="plano-recomendado"]`
 
-3. **Tela 15**: `//div[contains(@class, 'md:w-80')...]` (Linha 3574)
+2. **Tela 15**: `//div[contains(@class, 'md:w-80')...]` (Linha 3574)
    - **Finalidade**: Detecção de cards de planos
    - **Risco**: 🔴 **ALTO**
    - **Alternativa Sugerida**: `[data-testid="card-plano"]`
 
-4. **Tela 15**: `//*[contains(text(), 'R$')]` (Linha 3577)
+3. **Tela 15**: `//*[contains(text(), 'R$')]` (Linha 3577)
    - **Finalidade**: Detecção de valores monetários
    - **Risco**: 🔴 **ALTO**
    - **Alternativa Sugerida**: `[data-testid="preco-plano"]`
 
-### **✅ SELETORES DE ALTO RISCO IMPLEMENTADOS (11):**
+### **🟢 SELETORES DE BAIXO RISCO (1):**
+
+1. **Tela 14**: `p.font-semibold.font-workSans.cursor-pointer.text-sm.leading-6:has-text("Continuar")` (Linha 2991)
+   - **Finalidade**: Botão continuar corretor anterior
+   - **Risco**: 🟢 **BAIXO** (ID específico já existe: `#gtm-telaCorretorAnteriorContinuar`)
+   - **Características**: Tela condicional, ID específico disponível
+   - **Alternativa Sugerida**: Usar ID específico como nível 1 + fallbacks
+
+### **✅ SELETORES DE ALTO RISCO IMPLEMENTADOS (12):**
 
 1. **v3.7.0.1**: `button.group` → `button:has(img[alt="Icone car"])` (Tela 1)
 2. **v3.7.0.2**: `div.bg-primary` → `div[role="group"][aria-roledescription="slide"]` (Tela 5)
@@ -489,6 +499,7 @@
 9. **v3.7.0.9**: Switch estacionamento → Estratégia híbrida (Tela 11)
 10. **v3.7.0.10**: `text={sexo}` → Estratégia híbrida (Tela 9)
 11. **v3.7.0.11**: `p.font-semibold.font-workSans.cursor-pointer` → Estratégia híbrida (Tela 12)
+12. **v3.7.0.12**: `p.font-semibold.font-workSans.cursor-pointer:has-text("Continuar")` → Estratégia híbrida (Tela 13)
 
 ---
 
