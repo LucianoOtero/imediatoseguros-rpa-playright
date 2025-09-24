@@ -26,11 +26,8 @@ from typing import Optional, Dict, Any
 import traceback
 import inspect
 
-# Importar controle de display do arquivo principal
-try:
-    from executar_rpa_imediato_playwright import DISPLAY_ENABLED
-except ImportError:
-    DISPLAY_ENABLED = True  # Fallback para compatibilidade
+# Controle de display global (sem import circular)
+DISPLAY_ENABLED = True  # Será sobrescrito pelo arquivo principal quando necessário
 
 class RPALogger:
     """

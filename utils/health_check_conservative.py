@@ -16,11 +16,8 @@ import platform
 from datetime import datetime
 from typing import Dict, Any, Optional
 
-# Importar controle de display do arquivo principal
-try:
-    from executar_rpa_imediato_playwright import DISPLAY_ENABLED
-except ImportError:
-    DISPLAY_ENABLED = True  # Fallback para compatibilidade
+# Controle de display global (sem import circular)
+DISPLAY_ENABLED = True  # Será sobrescrito pelo arquivo principal quando necessário
 
 def exibir_health_check(mensagem: str):
     """Exibe mensagem do health check respeitando flag global"""

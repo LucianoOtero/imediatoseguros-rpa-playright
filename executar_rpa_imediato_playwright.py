@@ -1020,6 +1020,7 @@ def configurar_display(parametros: Dict[str, Any]):
         - Lê configuracao.display e configuracao.visualizar_mensagens
         - Define DISPLAY_ENABLED = display AND visualizar_mensagens
         - Modo silencioso: ZERO output adicional
+        - Configura também os módulos externos
     """
     global DISPLAY_ENABLED
     
@@ -1028,6 +1029,19 @@ def configurar_display(parametros: Dict[str, Any]):
     visualizar_mensagens = configuracao.get('visualizar_mensagens', True)
     
     DISPLAY_ENABLED = display and visualizar_mensagens
+    
+    # Configurar módulos externos
+    try:
+        import utils.health_check_conservative
+        utils.health_check_conservative.DISPLAY_ENABLED = DISPLAY_ENABLED
+    except:
+        pass
+    
+    try:
+        import utils.logger_rpa
+        utils.logger_rpa.DISPLAY_ENABLED = DISPLAY_ENABLED
+    except:
+        pass
     
     if not DISPLAY_ENABLED:
         # Modo silencioso ativo - zero outputs
