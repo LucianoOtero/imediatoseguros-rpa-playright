@@ -11,7 +11,7 @@
     "tempo_estabilizacao_tela15": 3,
     "tempo_carregamento_tela15": 5,
     "inserir_log": true,
-    "visualizar_mensagens": true,
+    "visualizar_mensagens": false,
     "eliminar_tentativas_inuteis": true
   },
   "autenticacao": {
@@ -20,7 +20,7 @@
     "manter_login_atual": true
   },
   "url": "https://www.app.tosegurado.com.br/imediatosolucoes",
-  "tipo_veiculo": "caminhao",
+  "tipo_veiculo": "carro",
   "placa": "EYQ4J41",
   "marca": "TOYOTA",
   "modelo": "COROLLA XEI 1.8/1.8 FLEX 16V MEC",

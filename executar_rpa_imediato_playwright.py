@@ -1070,6 +1070,9 @@ def carregar_parametros(arquivo_config: str = "parametros.json") -> Dict[str, An
         with open(arquivo_config, 'r', encoding='utf-8') as f:
             parametros = json.load(f)
         
+        # NOVA LINHA: Configurar display baseado nos parâmetros
+        configurar_display(parametros)
+        
         exibir_mensagem("✅ Parâmetros carregados com sucesso!")
         return parametros
         
@@ -5071,9 +5074,6 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
     inicio_execucao = time.time()
     
     try:
-        # NOVA LINHA: Configurar display baseado nos parâmetros
-        configurar_display(parametros)
-        
         # Inicializar ProgressTracker
         progress_tracker = ProgressTracker(total_etapas=15)
         progress_tracker.update_progress(0, "Iniciando RPA")
