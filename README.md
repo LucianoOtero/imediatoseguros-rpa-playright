@@ -151,19 +151,23 @@ python teste_tela_1_a_15_sequencial.py
 
 ```
 imediatoseguros-rpa-playwright/
-├── 📄 executar_rpa_imediato_playwright.py    # Script principal
-├── 📄 teste_tela_1_a_15_sequencial.py       # Script de testes
-├── 📁 config/
-│   └── 📄 parametros.json                   # Configurações
+├── 📄 executar_rpa_imediato_playwright.py    # Script principal v3.2.0
+├── 📄 parametros.json                        # Configurações completas
+├── 📄 backup_pre_zero_km_20250923.py        # Backup segurança
+├── 📄 backup_pre_version_3.2.0_*/           # Backups de versão
+├── 📄 backup_pre_help_update_*/             # Backups de documentação
 ├── 📁 docs/
 │   ├── 📄 DOCUMENTACAO_COMPLETA_MIGRACAO.md # Documentação principal
 │   ├── 📄 CONTROLE_VERSAO.md                # Controle de versão
 │   ├── 📄 COMPONENTES_AUSENTES.md           # Componentes pendentes
-│   └── 📄 exemplo_json_retorno_completo.json # JSON de referência
+│   ├── 📄 exemplo_json_retorno_completo.json # JSON de referência atualizado
+│   ├── 📄 DOCUMENTACAO_TELA_ZERO_KM.md      # NOVO - Tela Zero KM
+│   └── 📄 TROUBLESHOOTING_TELA_ZERO_KM.md   # NOVO - Troubleshooting
 ├── 📁 logs/                                 # Logs de execução
 ├── 📁 screenshots/                          # Screenshots de debug
 ├── 📄 requirements.txt                      # Dependências Python
-└── 📄 README.md                             # Este arquivo
+├── 📄 README.md                             # Este arquivo
+└── 📄 README_PLAYWRIGHT.md                  # Documentação Playwright
 ```
 
 ---

@@ -356,45 +356,460 @@ if (json_last_error() !== JSON_ERROR_NONE) {
     
     elif tipo == "params":
         print("""
-📋 DESCRIÇÃO DOS PARÂMETROS JSON
-================================
+📋 DOCUMENTAÇÃO COMPLETA DOS PARÂMETROS JSON
+==========================================
 
-O arquivo parametros.json contém todas as configurações necessárias:
+🎯 VISÃO GERAL
+==============
+O arquivo parametros.json contém todas as configurações necessárias para
+executar o RPA Tô Segurado. Esta documentação cobre todos os 40+ campos
+disponíveis com seus domínios de valores e funcionalidades.
+
+📁 ESTRUTURA HIERÁRQUICA
+========================
+{
+  "configuracao": { ... },      # Configurações do sistema
+  "autenticacao": { ... },      # Dados de login
+  "url": "...",                 # URL do site
+  "placa": "...",               # Dados do veículo
+  "marca": "...",
+  "modelo": "...",
+  "ano": "...",
+  "zero_km": false,             # NOVO - Tela Zero KM
+  "combustivel": "...",
+  "veiculo_segurado": "...",
+  "cep": "...",                 # Dados de endereço
+  "endereco_completo": "...",
+  "uso_veiculo": "...",
+  "nome": "...",                # Dados pessoais
+  "cpf": "...",
+  "data_nascimento": "...",
+  "sexo": "...",
+  "estado_civil": "...",
+  "email": "...",
+  "celular": "...",
+  "endereco": "...",
+  "condutor_principal": true,    # Dados do condutor
+  "nome_condutor": "...",
+  "cpf_condutor": "...",
+  "data_nascimento_condutor": "...",
+  "sexo_condutor": "...",
+  "estado_civil_condutor": "...",
+  "local_de_trabalho": false,    # Localização
+  "estacionamento_proprio_local_de_trabalho": false,
+  "local_de_estudo": false,
+  "estacionamento_proprio_local_de_estudo": false,
+  "garagem_residencia": true,
+  "portao_eletronico": "...",
+  "reside_18_26": "...",        # Residentes
+  "sexo_do_menor": "...",
+  "faixa_etaria_menor_mais_novo": "...",
+  "kit_gas": false,             # Veículo avançado
+  "blindado": false,
+  "financiado": false,
+  "continuar_com_corretor_anterior": true
+}
 
 🔧 SEÇÃO: CONFIGURAÇÃO
----------------------
-• log (boolean): Ativa/desativa logs
-• display (boolean): Exibe mensagens
-• tempo_estabilizacao (integer): Tempo de espera
-• tempo_carregamento (integer): Tempo de carregamento
+=====================
+Controle de comportamento do sistema e timeouts.
+
+• log (boolean): Ativa/desativa logs do sistema
+  - Valores: true, false
+  - Padrão: true
+  - Função: Controla geração de logs em logs/
+
+• display (boolean): Exibe mensagens no console
+  - Valores: true, false
+  - Padrão: true
+  - Função: Controla exibição de mensagens em tempo real
+
+• log_rotacao_dias (integer): Dias para rotação de logs
+  - Valores: 1-365
+  - Padrão: 90
+  - Função: Define quando logs antigos são removidos
+
+• log_nivel (string): Nível de log
+  - Valores: "DEBUG", "INFO", "WARNING", "ERROR"
+  - Padrão: "INFO"
+  - Função: Controla verbosidade dos logs
+
+• tempo_estabilizacao (float): Tempo de espera geral
+  - Valores: 0.1-10.0
+  - Padrão: 0.5
+  - Função: Tempo de estabilização entre ações
+
+• tempo_carregamento (float): Tempo de carregamento geral
+  - Valores: 0.1-30.0
+  - Padrão: 0.5
+  - Função: Tempo de espera para carregamento de páginas
+
+• tempo_estabilizacao_tela5 (float): Tempo específico Tela 5
+  - Valores: 0.1-10.0
+  - Padrão: 2.0
+  - Função: Tempo extra para estabilização da Tela 5
+
+• tempo_carregamento_tela5 (float): Carregamento específico Tela 5
+  - Valores: 0.1-30.0
+  - Padrão: 5.0
+  - Função: Tempo extra para carregamento da Tela 5
+
+• tempo_estabilizacao_tela15 (float): Tempo específico Tela 15
+  - Valores: 0.1-10.0
+  - Padrão: 3.0
+  - Função: Tempo extra para estabilização da Tela 15
+
+• tempo_carregamento_tela15 (float): Carregamento específico Tela 15
+  - Valores: 0.1-30.0
+  - Padrão: 5.0
+  - Função: Tempo extra para carregamento da Tela 15
+
+• inserir_log (boolean): Insere logs no sistema
+  - Valores: true, false
+  - Padrão: true
+  - Função: Controla inserção de logs no sistema
+
+• visualizar_mensagens (boolean): Visualiza mensagens
+  - Valores: true, false
+  - Padrão: true
+  - Função: Controla visualização de mensagens
+
+• eliminar_tentativas_inuteis (boolean): Elimina tentativas inúteis
+  - Valores: true, false
+  - Padrão: true
+  - Função: Otimiza execução eliminando tentativas desnecessárias
 
 🔐 SEÇÃO: AUTENTICAÇÃO
----------------------
+=====================
+Dados de login no sistema Tô Segurado.
+
 • email_login (string): Email de acesso
+  - Formato: email válido
+  - Exemplo: "usuario@email.com"
+  - Função: Email para login no sistema
+
 • senha_login (string): Senha de acesso
+  - Formato: string
+  - Exemplo: "MinhaSenh@123"
+  - Função: Senha para login no sistema
+
+• manter_login_atual (boolean): Manter sessão ativa
+  - Valores: true, false
+  - Padrão: true
+  - Função: Controla se mantém login entre execuções
 
 🚗 SEÇÃO: DADOS DO VEÍCULO
--------------------------
+==========================
+Informações básicas do veículo a ser segurado.
+
 • placa (string): Placa do veículo
+  - Formato: ABC1234 ou ABC-1234
+  - Exemplo: "ABC1234", "ABC-1234"
+  - Função: Identifica o veículo no sistema
+
 • marca (string): Marca do veículo
+  - Valores: "TOYOTA", "HONDA", "VOLKSWAGEN", "FORD", etc.
+  - Exemplo: "TOYOTA"
+  - Função: Marca do veículo para cotação
+
 • modelo (string): Modelo do veículo
+  - Formato: string descritivo
+  - Exemplo: "COROLLA XEI 1.8/1.8 FLEX 16V MEC"
+  - Função: Modelo específico do veículo
+
 • ano (string): Ano de fabricação
+  - Formato: YYYY
+  - Exemplo: "2009", "2020"
+  - Função: Ano de fabricação do veículo
+
+• zero_km (boolean): Veículo zero quilômetro
+  - Valores: true, false
+  - Padrão: false
+  - Função: NOVO - Ativa Tela Zero KM condicional
+  - Impacto: Se true, pode aparecer tela adicional
+
+• combustivel (string): Tipo de combustível
+  - Valores: "Flex", "Gasolina", "Álcool", "Diesel", "Elétrico"
+  - Exemplo: "Flex"
+  - Função: Tipo de combustível do veículo
+
+• veiculo_segurado (string): Veículo já segurado
+  - Valores: "Sim", "Não"
+  - Exemplo: "Não"
+  - Função: Indica se veículo já possui seguro
+
+🏠 SEÇÃO: ENDEREÇO
+==================
+Informações de localização e uso do veículo.
+
+• cep (string): CEP do endereço
+  - Formato: 00000-000
+  - Exemplo: "03317-000"
+  - Função: CEP para localização do veículo
+
+• endereco_completo (string): Endereço completo
+  - Formato: string descritivo
+  - Exemplo: "Rua Serra de Botucatu, 410 APTO 11 - São Paulo, SP"
+  - Função: Endereço completo para cotação
+
+• uso_veiculo (string): Finalidade do veículo
+  - Valores: "Pessoal", "Comercial", "Profissional"
+  - Exemplo: "Pessoal"
+  - Função: Define finalidade de uso do veículo
 
 👤 SEÇÃO: DADOS PESSOAIS
------------------------
+========================
+Informações pessoais do segurado.
+
 • nome (string): Nome completo
+  - Formato: string
+  - Exemplo: "ALEX KAMINSKI"
+  - Função: Nome do segurado principal
+
 • cpf (string): CPF do segurado
+  - Formato: 00000000000 (11 dígitos)
+  - Exemplo: "97137189768"
+  - Função: CPF do segurado principal
+
+• data_nascimento (string): Data de nascimento
+  - Formato: DD/MM/AAAA
+  - Exemplo: "25/04/1970"
+  - Função: Data de nascimento do segurado
+
+• sexo (string): Sexo do segurado
+  - Valores: "Masculino", "Feminino"
+  - Exemplo: "Masculino"
+  - Função: Sexo do segurado principal
+
+• estado_civil (string): Estado civil
+  - Valores: "Solteiro", "Casado", "Divorciado", "Viúvo", "Casado ou Uniao Estavel"
+  - Exemplo: "Casado ou Uniao Estavel"
+  - Função: Estado civil do segurado
+
 • email (string): Email de contato
+  - Formato: email válido
+  - Exemplo: "alex.kaminski@imediatoseguros.com.br"
+  - Função: Email para contato e comunicação
+
 • celular (string): Número de celular
+  - Formato: 11999999999 (11 dígitos)
+  - Exemplo: "11953288466"
+  - Função: Celular para contato
 
-🏠 SEÇÃO: RESIDÊNCIA
--------------------
-• cep (string): CEP do endereço
+• endereco (string): Endereço do segurado
+  - Formato: string descritivo
+  - Exemplo: "Rua Serra de Botucatu, Tatuapé - São Paulo/SP"
+  - Função: Endereço do segurado
+
+👥 SEÇÃO: CONDUTOR PRINCIPAL
+============================
+Informações do condutor principal do veículo.
+
+• condutor_principal (boolean): Condutor é o principal
+  - Valores: true, false
+  - Padrão: true
+  - Função: Indica se há condutor principal diferente
+
+• nome_condutor (string): Nome do condutor
+  - Formato: string
+  - Exemplo: "SANDRA LOUREIRO"
+  - Função: Nome do condutor principal
+
+• cpf_condutor (string): CPF do condutor
+  - Formato: 00000000000 (11 dígitos)
+  - Exemplo: "25151787829"
+  - Função: CPF do condutor principal
+
+• data_nascimento_condutor (string): Data nascimento condutor
+  - Formato: DD/MM/AAAA
+  - Exemplo: "28/08/1975"
+  - Função: Data de nascimento do condutor
+
+• sexo_condutor (string): Sexo do condutor
+  - Valores: "Masculino", "Feminino"
+  - Exemplo: "Feminino"
+  - Função: Sexo do condutor principal
+
+• estado_civil_condutor (string): Estado civil condutor
+  - Valores: "Solteiro", "Casado", "Divorciado", "Viúvo", "Casado ou Uniao Estavel"
+  - Exemplo: "Casado ou Uniao Estavel"
+  - Função: Estado civil do condutor
+
+🏢 SEÇÃO: LOCALIZAÇÃO
+=====================
+Informações sobre locais de trabalho e estudo.
+
+• local_de_trabalho (boolean): Trabalha em local específico
+  - Valores: true, false
+  - Padrão: false
+  - Função: Indica se trabalha em local específico
+
+• estacionamento_proprio_local_de_trabalho (boolean): Estacionamento no trabalho
+  - Valores: true, false
+  - Padrão: false
+  - Função: Tem estacionamento próprio no trabalho
+
+• local_de_estudo (boolean): Estuda em local específico
+  - Valores: true, false
+  - Padrão: false
+  - Função: Indica se estuda em local específico
+
+• estacionamento_proprio_local_de_estudo (boolean): Estacionamento no estudo
+  - Valores: true, false
+  - Padrão: false
+  - Função: Tem estacionamento próprio no local de estudo
+
 • garagem_residencia (boolean): Garagem na residência
-• portao_eletronico (string): Tipo de portão
+  - Valores: true, false
+  - Padrão: true
+  - Função: Tem garagem na residência
 
-📝 EXEMPLO DE USO:
-  python executar_rpa_imediato_playwright.py --config meu_parametros.json
+• portao_eletronico (string): Tipo de portão
+  - Valores: "Eletronico", "Manual", "Nenhum"
+  - Exemplo: "Eletronico"
+  - Função: Tipo de portão da residência
+
+👶 SEÇÃO: RESIDENTES
+====================
+Informações sobre residentes menores de idade.
+
+• reside_18_26 (string): Reside com pessoa 18-26 anos
+  - Valores: "Sim", "Não", "N/A"
+  - Exemplo: "Não"
+  - Função: Indica se reside com pessoa entre 18-26 anos
+
+• sexo_do_menor (string): Sexo do menor
+  - Valores: "Masculino", "Feminino", "N/A"
+  - Exemplo: "N/A"
+  - Função: Sexo do menor residente
+
+• faixa_etaria_menor_mais_novo (string): Faixa etária do menor
+  - Valores: "0-5", "6-10", "11-17", "N/A"
+  - Exemplo: "N/A"
+  - Função: Faixa etária do menor residente
+
+🚗 SEÇÃO: VEÍCULO AVANÇADO
+==========================
+Características especiais do veículo.
+
+• kit_gas (boolean): Possui kit gás
+  - Valores: true, false
+  - Padrão: false
+  - Função: Veículo possui kit gás
+
+• blindado (boolean): Veículo blindado
+  - Valores: true, false
+  - Padrão: false
+  - Função: Veículo é blindado
+
+• financiado (boolean): Veículo financiado
+  - Valores: true, false
+  - Padrão: false
+  - Função: Veículo está financiado
+
+• continuar_com_corretor_anterior (boolean): Continuar com corretor
+  - Valores: true, false
+  - Padrão: true
+  - Função: Continuar com corretor anterior
+
+📋 VALIDAÇÕES AUTOMÁTICAS
+========================
+O sistema valida automaticamente:
+
+• CPF: Formato e dígitos verificadores
+• CEP: Formato 00000-000
+• Email: Formato válido
+• Celular: 11 dígitos
+• Placa: Formato ABC1234 ou ABC-1234
+• Data: Formato DD/MM/AAAA
+• Valores permitidos: sexo, estado_civil, combustivel, etc.
+
+⚠️ CAMPOS OBRIGATÓRIOS
+======================
+Estes campos são obrigatórios e a execução falhará se ausentes:
+
+• url, placa, marca, modelo, ano, combustivel
+• cep, uso_veiculo, veiculo_segurado
+• nome, cpf, email, celular
+• autenticacao (email_login, senha_login)
+
+🔄 CAMPOS CONDICIONAIS
+======================
+Estes campos podem afetar o fluxo:
+
+• zero_km: Ativa Tela Zero KM (condicional)
+• condutor_principal: Se true, requer dados do condutor
+• local_de_trabalho: Se true, requer dados de trabalho
+• local_de_estudo: Se true, requer dados de estudo
+
+📝 EXEMPLO COMPLETO
+==================
+{
+  "configuracao": {
+    "log": true,
+    "display": true,
+    "log_rotacao_dias": 90,
+    "log_nivel": "INFO",
+    "tempo_estabilizacao": 0.5,
+    "tempo_carregamento": 0.5,
+    "tempo_estabilizacao_tela5": 2,
+    "tempo_carregamento_tela5": 5,
+    "tempo_estabilizacao_tela15": 3,
+    "tempo_carregamento_tela15": 5,
+    "inserir_log": true,
+    "visualizar_mensagens": true,
+    "eliminar_tentativas_inuteis": true
+  },
+  "autenticacao": {
+    "email_login": "usuario@email.com",
+    "senha_login": "MinhaSenh@123",
+    "manter_login_atual": true
+  },
+  "url": "https://www.app.tosegurado.com.br/imediatosolucoes",
+  "placa": "ABC1234",
+  "marca": "TOYOTA",
+  "modelo": "COROLLA XEI 1.8/1.8 FLEX 16V MEC",
+  "ano": "2009",
+  "zero_km": false,
+  "combustivel": "Flex",
+  "veiculo_segurado": "Não",
+  "cep": "03317-000",
+  "endereco_completo": "Rua Serra de Botucatu, 410 APTO 11 - São Paulo, SP",
+  "uso_veiculo": "Pessoal",
+  "nome": "ALEX KAMINSKI",
+  "cpf": "97137189768",
+  "data_nascimento": "25/04/1970",
+  "sexo": "Masculino",
+  "estado_civil": "Casado ou Uniao Estavel",
+  "email": "alex.kaminski@imediatoseguros.com.br",
+  "celular": "11953288466",
+  "endereco": "Rua Serra de Botucatu, Tatuapé - São Paulo/SP",
+  "condutor_principal": true,
+  "nome_condutor": "SANDRA LOUREIRO",
+  "cpf_condutor": "25151787829",
+  "data_nascimento_condutor": "28/08/1975",
+  "sexo_condutor": "Feminino",
+  "estado_civil_condutor": "Casado ou Uniao Estavel",
+  "local_de_trabalho": false,
+  "estacionamento_proprio_local_de_trabalho": false,
+  "local_de_estudo": false,
+  "estacionamento_proprio_local_de_estudo": false,
+  "garagem_residencia": true,
+  "portao_eletronico": "Eletronico",
+  "reside_18_26": "Não",
+  "sexo_do_menor": "N/A",
+  "faixa_etaria_menor_mais_novo": "N/A",
+  "kit_gas": false,
+  "blindado": false,
+  "financiado": false,
+  "continuar_com_corretor_anterior": true
+}
+
+🚀 COMANDOS DE USO
+==================
+python executar_rpa_imediato_playwright.py --docs params
+python executar_rpa_imediato_playwright.py --config meu_parametros.json
+python executar_rpa_imediato_playwright.py --docs completa
         """)
 
 
