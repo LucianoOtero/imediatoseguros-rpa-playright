@@ -1,0 +1,27 @@
+{
+  "configuracao": {
+    "display": true,
+    "visualizar_mensagens": true
+  },
+  "placa": "ABC1234",
+  "nome": "Teste Normal",
+  "url": "https://www.imediatoseguros.com.br",
+  "tipo_veiculo": "carro",
+  "zero_km": "Não",
+  "cep": "01310-100",
+  "endereco": "Av. Paulista, 1000",
+  "cidade": "São Paulo",
+  "estado": "SP",
+  "telefone": "11999999999",
+  "email": "teste@teste.com",
+  "data_nascimento": "01/01/1990",
+  "cpf": "12345678901",
+  "sexo": "M",
+  "estado_civil": "Solteiro",
+  "profissao": "Desenvolvedor",
+  "renda_mensal": "5000",
+  "uso_veiculo": "Particular",
+  "garagem": "Garagem fechada",
+  "condutor_principal": "Sim",
+  "corretor": "Não"
+}

@@ -1000,23 +1000,53 @@ exception_handler = ExceptionHandler()
 tela_15_detectada = False
 
 # ========================================
+# CONTROLE DE DISPLAY GLOBAL
+# ========================================
+
+DISPLAY_ENABLED = True  # Flag global para controle de saída
+
+# ========================================
 # FUNÇÕES AUXILIARES
 # ========================================
 
+def configurar_display(parametros: Dict[str, Any]):
+    """
+    Configura flag de display baseado nos parâmetros
+    
+    PARÂMETROS:
+        parametros (Dict): Parâmetros do arquivo JSON
+        
+    COMPORTAMENTO:
+        - Lê configuracao.display e configuracao.visualizar_mensagens
+        - Define DISPLAY_ENABLED = display AND visualizar_mensagens
+        - Modo silencioso: ZERO output adicional
+    """
+    global DISPLAY_ENABLED
+    
+    configuracao = parametros.get('configuracao', {})
+    display = configuracao.get('display', True)
+    visualizar_mensagens = configuracao.get('visualizar_mensagens', True)
+    
+    DISPLAY_ENABLED = display and visualizar_mensagens
+    
+    if not DISPLAY_ENABLED:
+        # Modo silencioso ativo - zero outputs
+        pass
+
 def exibir_mensagem(mensagem: str):
     """
-    Exibe mensagem formatada com timestamp
+    Exibe mensagem formatada com timestamp (controlado por flag)
     
     PARÂMETROS:
         mensagem (str): Mensagem a ser exibida
     
     COMPORTAMENTO:
-        1. Formata mensagem com timestamp
-        2. Exibe no terminal
-        3. Formato: [HH:MM:SS] mensagem
+        - Se DISPLAY_ENABLED = True: exibe mensagem formatada
+        - Se DISPLAY_ENABLED = False: não exibe nada (modo silencioso)
     """
-    timestamp = time.strftime('%H:%M:%S')
-    print(f"[{timestamp}] {mensagem}")
+    if DISPLAY_ENABLED:
+        timestamp = time.strftime('%H:%M:%S')
+        print(f"[{timestamp}] {mensagem}")
 
 def carregar_parametros(arquivo_config: str = "parametros.json") -> Dict[str, Any]:
     """
@@ -5041,6 +5071,9 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
     inicio_execucao = time.time()
     
     try:
+        # NOVA LINHA: Configurar display baseado nos parâmetros
+        configurar_display(parametros)
+        
         # Inicializar ProgressTracker
         progress_tracker = ProgressTracker(total_etapas=15)
         progress_tracker.update_progress(0, "Iniciando RPA")
