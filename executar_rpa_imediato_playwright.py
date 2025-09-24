@@ -90,7 +90,7 @@ try:
     TIMEOUT_SYSTEM_AVAILABLE = True
 except ImportError:
     TIMEOUT_SYSTEM_AVAILABLE = False
-    print("⚠️ Sistema de timeout não disponível - usando timeouts padrão")
+    exibir_mensagem("⚠️ Sistema de timeout não disponível - usando timeouts padrão")
 
 # Importar Sistema de Logger Avançado (opcional)
 try:
@@ -98,7 +98,7 @@ try:
     LOGGER_SYSTEM_AVAILABLE = True
 except ImportError:
     LOGGER_SYSTEM_AVAILABLE = False
-    print("⚠️ Sistema de logger não disponível - usando logs padrão")
+    exibir_mensagem("⚠️ Sistema de logger não disponível - usando logs padrão")
 
 # Importar Sistema de Comunicação Bidirecional (opcional)
 try:
@@ -106,7 +106,7 @@ try:
     BIDIRECTIONAL_SYSTEM_AVAILABLE = True
 except ImportError:
     BIDIRECTIONAL_SYSTEM_AVAILABLE = False
-    print("⚠️ Sistema de comunicação bidirecional não disponível - executando sem controle remoto")
+    exibir_mensagem("⚠️ Sistema de comunicação bidirecional não disponível - executando sem controle remoto")
 
 # Importar Sistema de Validação de Parâmetros Avançado (opcional)
 try:
@@ -114,7 +114,7 @@ try:
     VALIDATION_SYSTEM_AVAILABLE = True
 except ImportError:
     VALIDATION_SYSTEM_AVAILABLE = False
-    print("⚠️ Sistema de validação avançado não disponível - usando validação básica")
+    exibir_mensagem("⚠️ Sistema de validação avançado não disponível - usando validação básica")
 
 # Importar Sistema de Health Check Ultra-Conservador (opcional)
 try:
@@ -122,7 +122,7 @@ try:
     HEALTH_CHECK_AVAILABLE = True
 except ImportError:
     HEALTH_CHECK_AVAILABLE = False
-    print("⚠️ Sistema de health check não disponível - continuando sem verificação")
+    exibir_mensagem("⚠️ Sistema de health check não disponível - continuando sem verificação")
 
 
 # ========================================
@@ -934,15 +934,15 @@ class ExceptionHandler:
         mensagem = erro_estruturado["mensagem"]
         severidade = erro_estruturado["severidade"]
         
-        print(f"\n{'='*80}")
-        print(f"🚨 ERRO CAPTURADO - {severidade}")
-        print(f"{'='*80}")
-        print(f"⏰ Timestamp: {timestamp}")
-        print(f"📱 Tela: {tela}")
-        print(f"🔍 Tipo: {tipo}")
-        print(f"💬 Mensagem: {mensagem}")
-        print(f"💡 Recomendação: {erro_estruturado['recomendacao']}")
-        print(f"{'='*80}")
+        exibir_mensagem(f"\n{'='*80}")
+        exibir_mensagem(f"🚨 ERRO CAPTURADO - {severidade}")
+        exibir_mensagem(f"{'='*80}")
+        exibir_mensagem(f"⏰ Timestamp: {timestamp}")
+        exibir_mensagem(f"📱 Tela: {tela}")
+        exibir_mensagem(f"🔍 Tipo: {tipo}")
+        exibir_mensagem(f"💬 Mensagem: {mensagem}")
+        exibir_mensagem(f"💡 Recomendação: {erro_estruturado['recomendacao']}")
+        exibir_mensagem(f"{'='*80}")
     
     def capturar_warning(self, mensagem: str, tela: str = None, contexto: str = None):
         """
@@ -960,7 +960,7 @@ class ExceptionHandler:
         
         self.warnings_capturados.append(warning)
         
-        print(f"⚠️ WARNING - {tela}: {mensagem}")
+        exibir_mensagem(f"⚠️ WARNING - {tela}: {mensagem}")
     
     def definir_tela_atual(self, tela: str):
         """
@@ -1585,21 +1585,21 @@ def navegar_tela_5_playwright(page: Page, parametros_tempo) -> bool:
                 json.dump(json_compreensivo, f, indent=2, ensure_ascii=False)
             
             # Exibir resumo do JSON compreensivo
-            print("\n" + "="*80)
-            print("🎯 JSON COMPREENSIVO - TELA 5 CRIADO COM SUCESSO!")
-            print("="*80)
-            print(f"📁 Arquivo: {json_compreensivo_path}")
-            print(f"📊 Total de Coberturas Únicas: {len(coberturas_unicas)}")
-            print(f"🎁 Total de Benefícios: {len(dados_carrossel.get('beneficios_gerais', []))}")
+            exibir_mensagem("\n" + "="*80)
+            exibir_mensagem("🎯 JSON COMPREENSIVO - TELA 5 CRIADO COM SUCESSO!")
+            exibir_mensagem("="*80)
+            exibir_mensagem(f"📁 Arquivo: {json_compreensivo_path}")
+            exibir_mensagem(f"📊 Total de Coberturas Únicas: {len(coberturas_unicas)}")
+            exibir_mensagem(f"🎁 Total de Benefícios: {len(dados_carrossel.get('beneficios_gerais', []))}")
             
             # Exibir coberturas encontradas
             for nome, cobertura in coberturas_unicas.items():
                 valores = cobertura.get('valores', {})
                 de = valores.get('de', 'N/A')
                 ate = valores.get('ate', 'N/A')
-                print(f"💰 {nome}: {de} até {ate}")
+                exibir_mensagem(f"💰 {nome}: {de} até {ate}")
             
-            print("="*80)
+            exibir_mensagem("="*80)
             
             exibir_mensagem(f"💾 **JSON COMPREENSIVO SALVO**: {json_compreensivo_path}")
         
@@ -1646,11 +1646,11 @@ def navegar_tela_5_playwright(page: Page, parametros_tempo) -> bool:
             exibir_mensagem(f"💾 **RETORNO SALVO**: {retorno_path}")
             
             # Exibir retorno intermediário estruturado no terminal
-            print("\n" + "="*60)
-            print("📋 RETORNO INTERMEDIÁRIO - TELA 5")
-            print("="*60)
-            print(json.dumps(dados_limpos, indent=2, ensure_ascii=False))
-            print("="*60)
+            exibir_mensagem("\n" + "="*60)
+            exibir_mensagem("📋 RETORNO INTERMEDIÁRIO - TELA 5")
+            exibir_mensagem("="*60)
+            exibir_mensagem(json.dumps(dados_limpos, indent=2, ensure_ascii=False))
+            exibir_mensagem("="*60)
             
         else:
             exibir_mensagem("⚠️ **AVISO**: Não foi possível capturar dados do carrossel")
@@ -3924,11 +3924,11 @@ def navegar_tela_15_playwright(page, email_login, senha_login, parametros_tempo,
             exibir_mensagem(f"   📊 Plano Alternativo: {dados_planos['plano_alternativo'].get('valor', 'N/A')}")
             
             # RETORNO FINAL SIMPLES
-            print("\n" + "="*60)
-            print("📋 RETORNO FINAL - TELA 15")
-            print("="*60)
-            print(json.dumps(dados_planos, indent=2, ensure_ascii=False))
-            print("="*60)
+            exibir_mensagem("\n" + "="*60)
+            exibir_mensagem("📋 RETORNO FINAL - TELA 15")
+            exibir_mensagem("="*60)
+            exibir_mensagem(json.dumps(dados_planos, indent=2, ensure_ascii=False))
+            exibir_mensagem("="*60)
         else:
             exibir_mensagem("⚠️ FALHA NA CAPTURA DE DADOS DOS PLANOS")
         
@@ -5081,7 +5081,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
         # Inicializar Sistema de Timeout Inteligente (opcional)
         if TIMEOUT_SYSTEM_AVAILABLE:
             smart_timeout = SmartTimeout()
-            print("✅ Sistema de timeout inteligente ativado")
+            exibir_mensagem("✅ Sistema de timeout inteligente ativado")
         else:
             smart_timeout = None
         
@@ -5090,16 +5090,16 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             from utils.logger_rpa import RPALogger
             logger = RPALogger()
             log_info(logger, "Sistema de logger inicializado", {"versao": "3.4.0"})
-            print("✅ Sistema de logger avançado ativado")
+            exibir_mensagem("✅ Sistema de logger avançado ativado")
         else:
             logger = None
         
         # Inicializar Sistema de Comunicação Bidirecional (opcional)
         if BIDIRECTIONAL_SYSTEM_AVAILABLE:
-            print("✅ Sistema de comunicação bidirecional ativado")
+            exibir_mensagem("✅ Sistema de comunicação bidirecional ativado")
             # O sistema será usado via wrapper na execução
         else:
-            print("⚠️ Executando sem comunicação bidirecional")
+            exibir_mensagem("⚠️ Executando sem comunicação bidirecional")
         
         # Inicializar Exception Handler
         exception_handler.limpar_erros()
@@ -5124,12 +5124,12 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                 # Usar sistema de validação avançado
                 validador = ValidadorParametros()
                 parametros_validados = validador.validar_parametros(parametros)
-                print("✅ Validação avançada de parâmetros concluída")
+                exibir_mensagem("✅ Validação avançada de parâmetros concluída")
             except ValidacaoParametrosError as e:
                 # ❌ INTERROMPER EXECUÇÃO - Parâmetros inválidos detectados
                 erro_msg = f"❌ VALIDAÇÃO DE PARÂMETROS FALHOU: {str(e)}"
-                print(erro_msg)
-                print("🚫 Execução interrompida devido a parâmetros inválidos")
+                exibir_mensagem(erro_msg)
+                exibir_mensagem("🚫 Execução interrompida devido a parâmetros inválidos")
                 return criar_retorno_erro(
                     f"Validação de parâmetros falhou: {str(e)}",
                     "VALIDACAO",
@@ -5140,8 +5140,8 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             except Exception as e:
                 # ❌ INTERROMPER EXECUÇÃO - Erro inesperado na validação
                 erro_msg = f"❌ ERRO INESPERADO NA VALIDAÇÃO: {str(e)}"
-                print(erro_msg)
-                print("🚫 Execução interrompida devido a erro na validação")
+                exibir_mensagem(erro_msg)
+                exibir_mensagem("🚫 Execução interrompida devido a erro na validação")
                 return criar_retorno_erro(
                     f"Erro inesperado na validação: {str(e)}",
                     "VALIDACAO",
@@ -5655,15 +5655,15 @@ if __name__ == "__main__":
             try:
                 health_checker = ConservativeHealthChecker()
                 environment = health_checker.get_environment()
-                print(f"🔍 Ambiente detectado: {environment}")
+                exibir_mensagem(f"🔍 Ambiente detectado: {environment}")
                 
                 if health_checker.is_system_ready():
-                    print(f"✅ Health Check {environment}: Sistema pronto")
+                    exibir_mensagem(f"✅ Health Check {environment}: Sistema pronto")
                 else:
-                    print(f"⚠️ Health Check {environment}: Problemas detectados - continuando mesmo assim")
+                    exibir_mensagem(f"⚠️ Health Check {environment}: Problemas detectados - continuando mesmo assim")
                     
             except Exception as e:
-                print(f"⚠️ Erro no health check: {e} - continuando sem verificação")
+                exibir_mensagem(f"⚠️ Erro no health check: {e} - continuando sem verificação")
         
         # EXECUÇÃO COM CONTROLE BIDIRECIONAL SEGURO
         if BIDIRECTIONAL_SYSTEM_AVAILABLE:
@@ -5677,28 +5677,28 @@ if __name__ == "__main__":
             if resultado_wrapper["status"] == "success":
                 resultado = resultado_wrapper["result"]
                 bidirectional_used = resultado_wrapper.get("bidirectional_used", False)
-                print(f"✅ Comunicação bidirecional: {'Ativa' if bidirectional_used else 'Não utilizada'}")
+                exibir_mensagem(f"✅ Comunicação bidirecional: {'Ativa' if bidirectional_used else 'Não utilizada'}")
             else:
                 # Fallback para execução direta
                 resultado = executar_rpa_playwright(parametros)
-                print("⚠️ Fallback para execução direta devido a erro no sistema bidirecional")
+                exibir_mensagem("⚠️ Fallback para execução direta devido a erro no sistema bidirecional")
         else:
             # Executar RPA (ESTRUTURA ORIGINAL PRESERVADA)
             resultado = executar_rpa_playwright(parametros)
         
         # Exibir resultado
-        print("\n" + "="*50)
-        print("📊 RESULTADO DA EXECUÇÃO")
-        print("="*50)
-        print(f"Status: {resultado['status']}")
-        print(f"Tempo: {resultado['tempo_execucao']}")
-        print(f"Erros: {resultado['erros']['total_erros']}")
-        print(f"Warnings: {resultado['erros']['total_warnings']}")
+        exibir_mensagem("\n" + "="*50)
+        exibir_mensagem("📊 RESULTADO DA EXECUÇÃO")
+        exibir_mensagem("="*50)
+        exibir_mensagem(f"Status: {resultado['status']}")
+        exibir_mensagem(f"Tempo: {resultado['tempo_execucao']}")
+        exibir_mensagem(f"Erros: {resultado['erros']['total_erros']}")
+        exibir_mensagem(f"Warnings: {resultado['erros']['total_warnings']}")
         
         if resultado['status'] == 'success':
-            print("✅ RPA executado com sucesso!")
+            exibir_mensagem("✅ RPA executado com sucesso!")
         else:
-            print("❌ RPA falhou!")
+            exibir_mensagem("❌ RPA falhou!")
         
         # Delay para inspeção da tela final
         # print("⏳ Aguardando 60 segundos para inspeção da tela final...")
@@ -5706,11 +5706,11 @@ if __name__ == "__main__":
         # print("✅ Tempo de inspeção concluído!")
         
         # Exibir retorno estruturado completo
-        print("\n" + "="*50)
-        print("📋 RETORNO ESTRUTURADO COMPLETO")
-        print("="*50)
+        exibir_mensagem("\n" + "="*50)
+        exibir_mensagem("📋 RETORNO ESTRUTURADO COMPLETO")
+        exibir_mensagem("="*50)
         import json
-        print(json.dumps(resultado, indent=2, ensure_ascii=False))
+        exibir_mensagem(json.dumps(resultado, indent=2, ensure_ascii=False))
             
     except Exception as e:
         exception_handler.capturar_excecao(e, "EXECUCAO_DIRETA", "Erro na execução direta")
