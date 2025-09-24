@@ -28,11 +28,14 @@ class ProgressTracker:
         15: "Aguardando cálculo completo"
     }
     
-    def __init__(self, total_etapas: int = 15):
+    def __init__(self, total_etapas: int = 15, usar_arquivo: bool = True):
         self.total_etapas = total_etapas
         self.current_etapa = 0
         self.start_time = datetime.now()
-        self.progress_file = "temp/progress_status.json"
+        self.usar_arquivo = usar_arquivo
+        self.progress_file = "temp/progress_status.json" if usar_arquivo else None
+        self.progress_data = {}  # Armazenar dados em memória quando usar_arquivo=False
+        self.etapas_historico = []  # Histórico completo das etapas
         
     def update_progress(self, etapa_atual: int, status: str = None,
                        details: Dict[str, Any] = None):
@@ -64,13 +67,26 @@ class ProgressTracker:
                 "details": details or {}
             }
             
+            # Adicionar ao histórico
+            etapa_info = {
+                "etapa": etapa_atual,
+                "status": status,
+                "timestamp": datetime.now().isoformat(),
+                "tempo_etapa": progress_data["tempo_decorrido"]
+            }
+            self.etapas_historico.append(etapa_info)
+            
             # Adicionar informações específicas para Etapa 5
             if etapa_atual == 5 and details:
                 progress_data["json_retorno"] = "Estimativas disponíveis"
             
-            # Salvar em arquivo temporário (seguro)
-            with open(self.progress_file, 'w', encoding='utf-8') as f:
-                json.dump(progress_data, f, indent=2, ensure_ascii=False)
+            if self.usar_arquivo:
+                # Modo atual: salvar arquivo (compatibilidade)
+                with open(self.progress_file, 'w', encoding='utf-8') as f:
+                    json.dump(progress_data, f, indent=2, ensure_ascii=False)
+            else:
+                # Modo novo: armazenar em memória
+                self.progress_data = progress_data
                 
             return True
         except Exception as e:
@@ -100,8 +116,31 @@ class ProgressTracker:
             print(f"⚠️ Erro ao ler progresso: {e}")
             return {}
     
+    def get_progress(self) -> Dict[str, Any]:
+        """
+        Retorna dados de progresso para inclusão no resultado final
+        """
+        if self.usar_arquivo:
+            # Modo compatibilidade: ler do arquivo
+            try:
+                with open(self.progress_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    # Adicionar histórico se disponível
+                    data["etapas_historico"] = self.etapas_historico
+                    return data
+            except:
+                return {"erro": "Arquivo de progresso não encontrado"}
+        else:
+            # Modo novo: retornar dados da memória
+            if self.progress_data:
+                self.progress_data["etapas_historico"] = self.etapas_historico
+                return self.progress_data
+            else:
+                return {"erro": "Dados de progresso não disponíveis"}
+    
     def reset_progress(self):
         """Reseta o progresso"""
         self.current_etapa = 0
         self.start_time = datetime.now()
+        self.etapas_historico = []
         self.update_progress(0, "Progresso resetado")

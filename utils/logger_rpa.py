@@ -26,6 +26,12 @@ from typing import Optional, Dict, Any
 import traceback
 import inspect
 
+# Importar controle de display do arquivo principal
+try:
+    from executar_rpa_imediato_playwright import DISPLAY_ENABLED
+except ImportError:
+    DISPLAY_ENABLED = True  # Fallback para compatibilidade
+
 class RPALogger:
     """
     Sistema de logging robusto para RPA com rotação automática
@@ -426,8 +432,21 @@ def log_debug(message: str, error_code: Optional[int] = None,
 
 def log_info(message: str, error_code: Optional[int] = None, 
              extra_data: Optional[Dict[str, Any]] = None):
-    """Log de informação"""
-    rpa_logger.info(message, error_code, extra_data)
+    """Log de informação com controle de saída"""
+    try:
+        # Sempre salvar no arquivo de log
+        rpa_logger.info(message, error_code, extra_data)
+        
+        # Controlar saída do console baseado em DISPLAY_ENABLED
+        if not DISPLAY_ENABLED:
+            # Silenciar saída do console temporariamente
+            # (mantém arquivo de log funcionando)
+            for handler in rpa_logger.logger.handlers:
+                if isinstance(handler, logging.StreamHandler) and handler.stream.name == '<stderr>':
+                    handler.setLevel(logging.CRITICAL)
+    except Exception as e:
+        # Fallback silencioso
+        pass
 
 def log_error(message: str, error_code: Optional[int] = None, 
               extra_data: Optional[Dict[str, Any]] = None):

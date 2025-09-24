@@ -5075,7 +5075,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
     
     try:
         # Inicializar ProgressTracker
-        progress_tracker = ProgressTracker(total_etapas=15)
+        progress_tracker = ProgressTracker(total_etapas=15, usar_arquivo=False)
         progress_tracker.update_progress(0, "Iniciando RPA")
         
         # Inicializar Sistema de Timeout Inteligente (opcional)
@@ -5597,6 +5597,15 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                 pass  # Não falhar se o logger der erro
             
             # Retorno estruturado
+            # Incluir progresso no resultado final
+            try:
+                progresso_final = progress_tracker.get_progress()
+                resultado_telas["progresso"] = progresso_final
+                exibir_mensagem("✅ Progresso incluído no resultado final")
+            except Exception as e:
+                exibir_mensagem(f"⚠️ Erro ao incluir progresso: {e}")
+                resultado_telas["progresso"] = {"erro": "Progresso não disponível"}
+            
             return criar_retorno_sucesso(
                 resultado_telas,
                 dados_planos,

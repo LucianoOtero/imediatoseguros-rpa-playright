@@ -16,6 +16,17 @@ import platform
 from datetime import datetime
 from typing import Dict, Any, Optional
 
+# Importar controle de display do arquivo principal
+try:
+    from executar_rpa_imediato_playwright import DISPLAY_ENABLED
+except ImportError:
+    DISPLAY_ENABLED = True  # Fallback para compatibilidade
+
+def exibir_health_check(mensagem: str):
+    """Exibe mensagem do health check respeitando flag global"""
+    if DISPLAY_ENABLED:
+        print(mensagem)
+
 
 class ConservativeHealthChecker:
     """
@@ -321,11 +332,11 @@ class ConservativeHealthChecker:
             passed_checks = health_report["summary"]["passed_checks"]
             
             if status == "OK":
-                print(f"✅ Health Check: Sistema pronto ({passed_checks}/{total_checks} verificações OK)")
+                exibir_health_check(f"✅ Health Check: Sistema pronto ({passed_checks}/{total_checks} verificações OK)")
             elif status == "WARNING":
-                print(f"⚠️ Health Check: Sistema com avisos ({passed_checks}/{total_checks} verificações OK)")
+                exibir_health_check(f"⚠️ Health Check: Sistema com avisos ({passed_checks}/{total_checks} verificações OK)")
             else:
-                print(f"❌ Health Check: Sistema com problemas ({passed_checks}/{total_checks} verificações OK)")
+                exibir_health_check(f"❌ Health Check: Sistema com problemas ({passed_checks}/{total_checks} verificações OK)")
             
             # SEMPRE retorna True para não bloquear execução
             return True
