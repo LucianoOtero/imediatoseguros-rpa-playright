@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-EXECUTAR RPA IMEDIATO PLAYWRIGHT - VERSÃO v3.4.0
+EXECUTAR RPA IMEDIATO PLAYWRIGHT - VERSÃO v3.7.0.6
 Implementação completa do RPA usando Playwright com Sistema de Exception Handler
 
 DESCRIÇÃO:
@@ -134,7 +134,7 @@ def processar_argumentos():
     Processa argumentos de linha de comando de forma segura
     """
     parser = argparse.ArgumentParser(
-        description="EXECUTAR RPA IMEDIATO PLAYWRIGHT - VERSÃO v3.4.0",
+        description="EXECUTAR RPA IMEDIATO PLAYWRIGHT - VERSÃO PRODUÇÃO",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 EXEMPLOS DE USO:
@@ -179,14 +179,11 @@ ARQUIVOS GERADOS:
   - temp/json_compreensivo_tela_5_*.json: Dados intermediários
   - temp/retorno_intermediario_carrossel_*.json: Dados brutos Tela 5
   - temp/dados_tela_5_*.json: Metadados da captura
-  - temp/cotacao_manual_YYYYMMDD_HHMMSS.json: Dados para cotação manual
   - logs/bidirectional.log: Logs do sistema bidirecional
 
 STATUS CODES:
   - 9001: Sucesso completo
-  - 9002: Erro específico por tela
-  - 9003: Cotação manual necessária
-  - 9004-9999: Códigos de erro específicos por tela
+  - 9002-9999: Códigos de erro específicos por tela
         """
     )
     
@@ -251,7 +248,6 @@ dados em tempo real e gerando JSONs estruturados para integração com PHP.
 3. temp/json_compreensivo_tela_5_*.json - Dados intermediários
 4. temp/retorno_intermediario_carrossel_*.json - Dados brutos
 5. temp/dados_tela_5_*.json - Metadados
-6. temp/cotacao_manual_*.json - Dados para cotação manual
 
 🛡️ SISTEMA DE HEALTH CHECK
 ==========================
@@ -285,7 +281,7 @@ O sistema inclui verificação automática de saúde antes da execução:
 🎯 VISÃO GERAL DOS JSONS
 =======================
 
-O sistema gera 6 tipos de arquivos JSON para integração com PHP:
+O sistema gera 5 tipos de arquivos JSON para integração com PHP:
 
 1. temp/progress_status.json - PROGRESSO EM TEMPO REAL
    Estrutura: timestamp, etapa_atual, percentual, status, tempo_decorrido
@@ -302,14 +298,10 @@ O sistema gera 6 tipos de arquivos JSON para integração com PHP:
 5. temp/dados_tela_5_*.json - METADADOS
    Estrutura: timestamp, tela, metadados
 
-6. temp/cotacao_manual_*.json - COTAÇÃO MANUAL
-   Estrutura: dados_coletados, mensagem, tipo_veiculo, status
-
 🔧 EXEMPLO PHP BÁSICO:
 ```php
 $progress = json_decode(file_get_contents('temp/progress_status.json'), true);
 $planos = json_decode(file_get_contents('dados_planos_seguro_*.json'), true);
-$cotacao_manual = json_decode(file_get_contents('temp/cotacao_manual_*.json'), true);
 ```
         """)
     

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-EXECUTAR RPA IMEDIATO PLAYWRIGHT - VERSÃO v3.4.0
+EXECUTAR RPA IMEDIATO PLAYWRIGHT - VERSÃO v3.7.0.6
 Implementação completa do RPA usando Playwright com Sistema de Exception Handler
 
 DESCRIÇÃO:
@@ -134,7 +134,7 @@ def processar_argumentos():
     Processa argumentos de linha de comando de forma segura
     """
     parser = argparse.ArgumentParser(
-        description="EXECUTAR RPA IMEDIATO PLAYWRIGHT - VERSÃO v3.4.0",
+        description="EXECUTAR RPA IMEDIATO PLAYWRIGHT - VERSÃO PRODUÇÃO",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 EXEMPLOS DE USO:
@@ -179,14 +179,11 @@ ARQUIVOS GERADOS:
   - temp/json_compreensivo_tela_5_*.json: Dados intermediários
   - temp/retorno_intermediario_carrossel_*.json: Dados brutos Tela 5
   - temp/dados_tela_5_*.json: Metadados da captura
-  - temp/cotacao_manual_YYYYMMDD_HHMMSS.json: Dados para cotação manual
   - logs/bidirectional.log: Logs do sistema bidirecional
 
 STATUS CODES:
   - 9001: Sucesso completo
-  - 9002: Erro específico por tela
-  - 9003: Cotação manual necessária
-  - 9004-9999: Códigos de erro específicos por tela
+  - 9002-9999: Códigos de erro específicos por tela
         """
     )
     
@@ -251,7 +248,6 @@ dados em tempo real e gerando JSONs estruturados para integração com PHP.
 3. temp/json_compreensivo_tela_5_*.json - Dados intermediários
 4. temp/retorno_intermediario_carrossel_*.json - Dados brutos
 5. temp/dados_tela_5_*.json - Metadados
-6. temp/cotacao_manual_*.json - Dados para cotação manual
 
 🛡️ SISTEMA DE HEALTH CHECK
 ==========================
@@ -285,7 +281,7 @@ O sistema inclui verificação automática de saúde antes da execução:
 🎯 VISÃO GERAL DOS JSONS
 =======================
 
-O sistema gera 6 tipos de arquivos JSON para integração com PHP:
+O sistema gera 5 tipos de arquivos JSON para integração com PHP:
 
 1. temp/progress_status.json - PROGRESSO EM TEMPO REAL
    Estrutura: timestamp, etapa_atual, percentual, status, tempo_decorrido
@@ -302,14 +298,10 @@ O sistema gera 6 tipos de arquivos JSON para integração com PHP:
 5. temp/dados_tela_5_*.json - METADADOS
    Estrutura: timestamp, tela, metadados
 
-6. temp/cotacao_manual_*.json - COTAÇÃO MANUAL
-   Estrutura: dados_coletados, mensagem, tipo_veiculo, status
-
 🔧 EXEMPLO PHP BÁSICO:
 ```php
 $progress = json_decode(file_get_contents('temp/progress_status.json'), true);
 $planos = json_decode(file_get_contents('dados_planos_seguro_*.json'), true);
-$cotacao_manual = json_decode(file_get_contents('temp/cotacao_manual_*.json'), true);
 ```
         """)
     
@@ -364,469 +356,45 @@ if (json_last_error() !== JSON_ERROR_NONE) {
     
     elif tipo == "params":
         print("""
-📋 DOCUMENTAÇÃO COMPLETA DOS PARÂMETROS JSON
-==========================================
+📋 DESCRIÇÃO DOS PARÂMETROS JSON
+================================
 
-🎯 VISÃO GERAL
-==============
-O arquivo parametros.json contém todas as configurações necessárias para
-executar o RPA Tô Segurado. Esta documentação cobre todos os 40+ campos
-disponíveis com seus domínios de valores e funcionalidades.
-
-📁 ESTRUTURA HIERÁRQUICA
-========================
-{
-  "configuracao": { ... },      # Configurações do sistema
-  "autenticacao": { ... },      # Dados de login
-  "url": "...",                 # URL do site
-  "tipo_veiculo": "carro",      # NOVO - Tipo de veículo
-  "placa": "...",               # Dados do veículo
-  "marca": "...",
-  "modelo": "...",
-  "ano": "...",
-  "zero_km": false,             # NOVO - Tela Zero KM
-  "combustivel": "...",
-  "veiculo_segurado": "...",
-  "cep": "...",                 # Dados de endereço
-  "endereco_completo": "...",
-  "uso_veiculo": "...",
-  "nome": "...",                # Dados pessoais
-  "cpf": "...",
-  "data_nascimento": "...",
-  "sexo": "...",
-  "estado_civil": "...",
-  "email": "...",
-  "celular": "...",
-  "endereco": "...",
-  "condutor_principal": true,    # Dados do condutor
-  "nome_condutor": "...",
-  "cpf_condutor": "...",
-  "data_nascimento_condutor": "...",
-  "sexo_condutor": "...",
-  "estado_civil_condutor": "...",
-  "local_de_trabalho": false,    # Localização
-  "estacionamento_proprio_local_de_trabalho": false,
-  "local_de_estudo": false,
-  "estacionamento_proprio_local_de_estudo": false,
-  "garagem_residencia": true,
-  "portao_eletronico": "...",
-  "reside_18_26": "...",        # Residentes
-  "sexo_do_menor": "...",
-  "faixa_etaria_menor_mais_novo": "...",
-  "kit_gas": false,             # Veículo avançado
-  "blindado": false,
-  "financiado": false,
-  "continuar_com_corretor_anterior": true
-}
+O arquivo parametros.json contém todas as configurações necessárias:
 
 🔧 SEÇÃO: CONFIGURAÇÃO
-=====================
-Controle de comportamento do sistema e timeouts.
-
-• log (boolean): Ativa/desativa logs do sistema
-  - Valores: true, false
-  - Padrão: true
-  - Função: Controla geração de logs em logs/
-
-• display (boolean): Exibe mensagens no console
-  - Valores: true, false
-  - Padrão: true
-  - Função: Controla exibição de mensagens em tempo real
-
-• log_rotacao_dias (integer): Dias para rotação de logs
-  - Valores: 1-365
-  - Padrão: 90
-  - Função: Define quando logs antigos são removidos
-
-• log_nivel (string): Nível de log
-  - Valores: "DEBUG", "INFO", "WARNING", "ERROR"
-  - Padrão: "INFO"
-  - Função: Controla verbosidade dos logs
-
-• tempo_estabilizacao (float): Tempo de espera geral
-  - Valores: 0.1-10.0
-  - Padrão: 0.5
-  - Função: Tempo de estabilização entre ações
-
-• tempo_carregamento (float): Tempo de carregamento geral
-  - Valores: 0.1-30.0
-  - Padrão: 0.5
-  - Função: Tempo de espera para carregamento de páginas
-
-• tempo_estabilizacao_tela5 (float): Tempo específico Tela 5
-  - Valores: 0.1-10.0
-  - Padrão: 2.0
-  - Função: Tempo extra para estabilização da Tela 5
-
-• tempo_carregamento_tela5 (float): Carregamento específico Tela 5
-  - Valores: 0.1-30.0
-  - Padrão: 5.0
-  - Função: Tempo extra para carregamento da Tela 5
-
-• tempo_estabilizacao_tela15 (float): Tempo específico Tela 15
-  - Valores: 0.1-10.0
-  - Padrão: 3.0
-  - Função: Tempo extra para estabilização da Tela 15
-
-• tempo_carregamento_tela15 (float): Carregamento específico Tela 15
-  - Valores: 0.1-30.0
-  - Padrão: 5.0
-  - Função: Tempo extra para carregamento da Tela 15
-
-• inserir_log (boolean): Insere logs no sistema
-  - Valores: true, false
-  - Padrão: true
-  - Função: Controla inserção de logs no sistema
-
-• visualizar_mensagens (boolean): Visualiza mensagens
-  - Valores: true, false
-  - Padrão: true
-  - Função: Controla visualização de mensagens
-
-• eliminar_tentativas_inuteis (boolean): Elimina tentativas inúteis
-  - Valores: true, false
-  - Padrão: true
-  - Função: Otimiza execução eliminando tentativas desnecessárias
+---------------------
+• log (boolean): Ativa/desativa logs
+• display (boolean): Exibe mensagens
+• tempo_estabilizacao (integer): Tempo de espera
+• tempo_carregamento (integer): Tempo de carregamento
 
 🔐 SEÇÃO: AUTENTICAÇÃO
-=====================
-Dados de login no sistema Tô Segurado.
-
+---------------------
 • email_login (string): Email de acesso
-  - Formato: email válido
-  - Exemplo: "usuario@email.com"
-  - Função: Email para login no sistema
-
 • senha_login (string): Senha de acesso
-  - Formato: string
-  - Exemplo: "MinhaSenh@123"
-  - Função: Senha para login no sistema
-
-• manter_login_atual (boolean): Manter sessão ativa
-  - Valores: true, false
-  - Padrão: true
-  - Função: Controla se mantém login entre execuções
 
 🚗 SEÇÃO: DADOS DO VEÍCULO
-==========================
-Informações básicas do veículo a ser segurado.
-
-• tipo_veiculo (string): Tipo de veículo para cotação
-  - Valores: "carro", "moto"
-  - Padrão: "carro"
-  - Função: Define qual botão será clicado na Tela 1
-  - Impacto: Determina fluxo de navegação e campos disponíveis
-  - Exemplo: "carro", "moto"
-
+-------------------------
 • placa (string): Placa do veículo
-  - Formato: ABC1234 ou ABC-1234
-  - Exemplo: "ABC1234", "ABC-1234"
-  - Função: Identifica o veículo no sistema
-
 • marca (string): Marca do veículo
-  - Valores: "TOYOTA", "HONDA", "VOLKSWAGEN", "FORD", etc.
-  - Exemplo: "TOYOTA"
-  - Função: Marca do veículo para cotação
-
 • modelo (string): Modelo do veículo
-  - Formato: string descritivo
-  - Exemplo: "COROLLA XEI 1.8/1.8 FLEX 16V MEC"
-  - Função: Modelo específico do veículo
-
 • ano (string): Ano de fabricação
-  - Formato: YYYY
-  - Exemplo: "2009", "2020"
-  - Função: Ano de fabricação do veículo
-
-• zero_km (boolean): Veículo zero quilômetro
-  - Valores: true, false
-  - Padrão: false
-  - Função: NOVO - Ativa Tela Zero KM condicional
-  - Impacto: Se true, pode aparecer tela adicional
-
-• combustivel (string): Tipo de combustível
-  - Valores: "Flex", "Gasolina", "Álcool", "Diesel", "Elétrico"
-  - Exemplo: "Flex"
-  - Função: Tipo de combustível do veículo
-
-• veiculo_segurado (string): Veículo já segurado
-  - Valores: "Sim", "Não"
-  - Exemplo: "Não"
-  - Função: Indica se veículo já possui seguro
-
-🏠 SEÇÃO: ENDEREÇO
-==================
-Informações de localização e uso do veículo.
-
-• cep (string): CEP do endereço
-  - Formato: 00000-000
-  - Exemplo: "03317-000"
-  - Função: CEP para localização do veículo
-
-• endereco_completo (string): Endereço completo
-  - Formato: string descritivo
-  - Exemplo: "Rua Serra de Botucatu, 410 APTO 11 - São Paulo, SP"
-  - Função: Endereço completo para cotação
-
-• uso_veiculo (string): Finalidade do veículo
-  - Valores: "Pessoal", "Comercial", "Profissional"
-  - Exemplo: "Pessoal"
-  - Função: Define finalidade de uso do veículo
 
 👤 SEÇÃO: DADOS PESSOAIS
-========================
-Informações pessoais do segurado.
-
+-----------------------
 • nome (string): Nome completo
-  - Formato: string
-  - Exemplo: "ALEX KAMINSKI"
-  - Função: Nome do segurado principal
-
 • cpf (string): CPF do segurado
-  - Formato: 00000000000 (11 dígitos)
-  - Exemplo: "97137189768"
-  - Função: CPF do segurado principal
-
-• data_nascimento (string): Data de nascimento
-  - Formato: DD/MM/AAAA
-  - Exemplo: "25/04/1970"
-  - Função: Data de nascimento do segurado
-
-• sexo (string): Sexo do segurado
-  - Valores: "Masculino", "Feminino"
-  - Exemplo: "Masculino"
-  - Função: Sexo do segurado principal
-
-• estado_civil (string): Estado civil
-  - Valores: "Solteiro", "Casado", "Divorciado", "Viúvo", "Casado ou Uniao Estavel"
-  - Exemplo: "Casado ou Uniao Estavel"
-  - Função: Estado civil do segurado
-
 • email (string): Email de contato
-  - Formato: email válido
-  - Exemplo: "alex.kaminski@imediatoseguros.com.br"
-  - Função: Email para contato e comunicação
-
 • celular (string): Número de celular
-  - Formato: 11999999999 (11 dígitos)
-  - Exemplo: "11953288466"
-  - Função: Celular para contato
 
-• endereco (string): Endereço do segurado
-  - Formato: string descritivo
-  - Exemplo: "Rua Serra de Botucatu, Tatuapé - São Paulo/SP"
-  - Função: Endereço do segurado
-
-👥 SEÇÃO: CONDUTOR PRINCIPAL
-============================
-Informações do condutor principal do veículo.
-
-• condutor_principal (boolean): Condutor é o principal
-  - Valores: true, false
-  - Padrão: true
-  - Função: Indica se há condutor principal diferente
-
-• nome_condutor (string): Nome do condutor
-  - Formato: string
-  - Exemplo: "SANDRA LOUREIRO"
-  - Função: Nome do condutor principal
-
-• cpf_condutor (string): CPF do condutor
-  - Formato: 00000000000 (11 dígitos)
-  - Exemplo: "25151787829"
-  - Função: CPF do condutor principal
-
-• data_nascimento_condutor (string): Data nascimento condutor
-  - Formato: DD/MM/AAAA
-  - Exemplo: "28/08/1975"
-  - Função: Data de nascimento do condutor
-
-• sexo_condutor (string): Sexo do condutor
-  - Valores: "Masculino", "Feminino"
-  - Exemplo: "Feminino"
-  - Função: Sexo do condutor principal
-
-• estado_civil_condutor (string): Estado civil condutor
-  - Valores: "Solteiro", "Casado", "Divorciado", "Viúvo", "Casado ou Uniao Estavel"
-  - Exemplo: "Casado ou Uniao Estavel"
-  - Função: Estado civil do condutor
-
-🏢 SEÇÃO: LOCALIZAÇÃO
-=====================
-Informações sobre locais de trabalho e estudo.
-
-• local_de_trabalho (boolean): Trabalha em local específico
-  - Valores: true, false
-  - Padrão: false
-  - Função: Indica se trabalha em local específico
-
-• estacionamento_proprio_local_de_trabalho (boolean): Estacionamento no trabalho
-  - Valores: true, false
-  - Padrão: false
-  - Função: Tem estacionamento próprio no trabalho
-
-• local_de_estudo (boolean): Estuda em local específico
-  - Valores: true, false
-  - Padrão: false
-  - Função: Indica se estuda em local específico
-
-• estacionamento_proprio_local_de_estudo (boolean): Estacionamento no estudo
-  - Valores: true, false
-  - Padrão: false
-  - Função: Tem estacionamento próprio no local de estudo
-
+🏠 SEÇÃO: RESIDÊNCIA
+-------------------
+• cep (string): CEP do endereço
 • garagem_residencia (boolean): Garagem na residência
-  - Valores: true, false
-  - Padrão: true
-  - Função: Tem garagem na residência
-
 • portao_eletronico (string): Tipo de portão
-  - Valores: "Eletronico", "Manual", "Nenhum"
-  - Exemplo: "Eletronico"
-  - Função: Tipo de portão da residência
 
-👶 SEÇÃO: RESIDENTES
-====================
-Informações sobre residentes menores de idade.
-
-• reside_18_26 (string): Reside com pessoa 18-26 anos
-  - Valores: "Sim", "Não", "N/A"
-  - Exemplo: "Não"
-  - Função: Indica se reside com pessoa entre 18-26 anos
-
-• sexo_do_menor (string): Sexo do menor
-  - Valores: "Masculino", "Feminino", "N/A"
-  - Exemplo: "N/A"
-  - Função: Sexo do menor residente
-
-• faixa_etaria_menor_mais_novo (string): Faixa etária do menor
-  - Valores: "0-5", "6-10", "11-17", "N/A"
-  - Exemplo: "N/A"
-  - Função: Faixa etária do menor residente
-
-🚗 SEÇÃO: VEÍCULO AVANÇADO
-==========================
-Características especiais do veículo.
-
-• kit_gas (boolean): Possui kit gás
-  - Valores: true, false
-  - Padrão: false
-  - Função: Veículo possui kit gás
-  - Observação: Ignorado para motos (não aplicável)
-
-• blindado (boolean): Veículo blindado
-  - Valores: true, false
-  - Padrão: false
-  - Função: Veículo é blindado
-
-• financiado (boolean): Veículo financiado
-  - Valores: true, false
-  - Padrão: false
-  - Função: Veículo está financiado
-
-• continuar_com_corretor_anterior (boolean): Continuar com corretor
-  - Valores: true, false
-  - Padrão: true
-  - Função: Continuar com corretor anterior
-
-📋 VALIDAÇÕES AUTOMÁTICAS
-========================
-O sistema valida automaticamente:
-
-• CPF: Formato e dígitos verificadores
-• CEP: Formato 00000-000
-• Email: Formato válido
-• Celular: 11 dígitos
-• Placa: Formato ABC1234 ou ABC-1234
-• Data: Formato DD/MM/AAAA
-• Valores permitidos: sexo, estado_civil, combustivel, etc.
-
-⚠️ CAMPOS OBRIGATÓRIOS
-======================
-Estes campos são obrigatórios e a execução falhará se ausentes:
-
-• url, placa, marca, modelo, ano, combustivel
-• cep, uso_veiculo, veiculo_segurado
-• nome, cpf, email, celular
-• autenticacao (email_login, senha_login)
-
-🔄 CAMPOS CONDICIONAIS
-======================
-Estes campos podem afetar o fluxo:
-
-• zero_km: Ativa Tela Zero KM (condicional)
-• condutor_principal: Se true, requer dados do condutor
-• local_de_trabalho: Se true, requer dados de trabalho
-• local_de_estudo: Se true, requer dados de estudo
-
-📝 EXEMPLO COMPLETO
-==================
-{
-  "configuracao": {
-    "log": true,
-    "display": true,
-    "log_rotacao_dias": 90,
-    "log_nivel": "INFO",
-    "tempo_estabilizacao": 0.5,
-    "tempo_carregamento": 0.5,
-    "tempo_estabilizacao_tela5": 2,
-    "tempo_carregamento_tela5": 5,
-    "tempo_estabilizacao_tela15": 3,
-    "tempo_carregamento_tela15": 5,
-    "inserir_log": true,
-    "visualizar_mensagens": true,
-    "eliminar_tentativas_inuteis": true
-  },
-  "autenticacao": {
-    "email_login": "usuario@email.com",
-    "senha_login": "MinhaSenh@123",
-    "manter_login_atual": true
-  },
-  "url": "https://www.app.tosegurado.com.br/imediatosolucoes",
-  "placa": "ABC1234",
-  "marca": "TOYOTA",
-  "modelo": "COROLLA XEI 1.8/1.8 FLEX 16V MEC",
-  "ano": "2009",
-  "zero_km": false,
-  "combustivel": "Flex",
-  "veiculo_segurado": "Não",
-  "cep": "03317-000",
-  "endereco_completo": "Rua Serra de Botucatu, 410 APTO 11 - São Paulo, SP",
-  "uso_veiculo": "Pessoal",
-  "nome": "ALEX KAMINSKI",
-  "cpf": "97137189768",
-  "data_nascimento": "25/04/1970",
-  "sexo": "Masculino",
-  "estado_civil": "Casado ou Uniao Estavel",
-  "email": "alex.kaminski@imediatoseguros.com.br",
-  "celular": "11953288466",
-  "endereco": "Rua Serra de Botucatu, Tatuapé - São Paulo/SP",
-  "condutor_principal": true,
-  "nome_condutor": "SANDRA LOUREIRO",
-  "cpf_condutor": "25151787829",
-  "data_nascimento_condutor": "28/08/1975",
-  "sexo_condutor": "Feminino",
-  "estado_civil_condutor": "Casado ou Uniao Estavel",
-  "local_de_trabalho": false,
-  "estacionamento_proprio_local_de_trabalho": false,
-  "local_de_estudo": false,
-  "estacionamento_proprio_local_de_estudo": false,
-  "garagem_residencia": true,
-  "portao_eletronico": "Eletronico",
-  "reside_18_26": "Não",
-  "sexo_do_menor": "N/A",
-  "faixa_etaria_menor_mais_novo": "N/A",
-  "kit_gas": false,
-  "blindado": false,
-  "financiado": false,
-  "continuar_com_corretor_anterior": true
-}
-
-🚀 COMANDOS DE USO
-==================
-python executar_rpa_imediato_playwright.py --docs params
-python executar_rpa_imediato_playwright.py --config meu_parametros.json
-python executar_rpa_imediato_playwright.py --docs completa
+📝 EXEMPLO DE USO:
+  python executar_rpa_imediato_playwright.py --config meu_parametros.json
         """)
 
 
@@ -1202,72 +770,54 @@ def executar_com_timeout(smart_timeout, tela_num, funcao_tela, *args, **kwargs):
 # FUNÇÕES DE NAVEGAÇÃO DAS TELAS
 # ========================================
 
-def navegar_tela_1_playwright(page: Page, tipo_veiculo: str = "carro") -> bool:
+def navegar_tela_1_playwright(page: Page) -> bool:
     """
-    TELA 1: Seleção do tipo de seguro (Carro ou Moto)
+    TELA 1: Seleção do tipo de seguro (Carro)
     
-    VERSÃO: v3.3.0
-    IMPLEMENTAÇÃO: Suporte a carro e moto
-    DATA: 24/09/2025
+    VERSÃO: v3.7.0.1
+    IMPLEMENTAÇÃO: Substituição de seletor genérico por específico
+    DATA: 09/09/2025
     STATUS: ✅ IMPLEMENTADO
     """
     try:
         exception_handler.definir_tela_atual("TELA_1")
-        # Validação do parâmetro
-        if tipo_veiculo not in ["carro", "moto"]:
-            exception_handler.capturar_excecao(
-                ValueError(f"tipo_veiculo inválido: {tipo_veiculo}"), 
-                "TELA_1", 
-                "Tipo de veículo deve ser 'carro' ou 'moto'"
-            )
-            return False
-        
-        exibir_mensagem(f"📱 TELA 1: Selecionando {tipo_veiculo.title()}...")
+        exibir_mensagem("📱 TELA 1: Selecionando tipo de seguro...")
         
         # Aguardar carregamento inicial da página
         page.wait_for_selector("button", timeout=5000)
         
         # ESTRATÉGIA HÍBRIDA: Específico + Fallback
-        if tipo_veiculo == "carro":
-            seletores = [
-                # PRIMÁRIO: Seletor específico por alt da imagem
-                'button:has(img[alt="Icone car"])',
-                # SECUNDÁRIO: Seletor específico por src da imagem
-                'button:has(img[src="/insurance-icons/car.svg"])',
-                # TERCIÁRIO: Seletor específico por texto
-                'button:has-text("Carro")',
-                # FALLBACK: Seletor genérico original
-                'button.group:nth-child(1)'
-            ]
-        elif tipo_veiculo == "moto":
-            seletores = [
-                # PRIMÁRIO: Seletor específico por alt da imagem
-                'button:has(img[alt="Icone motorcycle"])',
-                # SECUNDÁRIO: Seletor específico por src da imagem
-                'button:has(img[src="/insurance-icons/motorcycle.svg"])',
-                # TERCIÁRIO: Seletor específico por texto
-                'button:has-text("Moto")',
-                # FALLBACK: Seletor genérico (segundo botão)
-                'button.group:nth-child(2)'
-            ]
+        seletores_carro = [
+            # PRIMÁRIO: Seletor específico por alt da imagem (NOVO)
+            'button:has(img[alt="Icone car"])',
+            
+            # SECUNDÁRIO: Seletor específico por src da imagem
+            'button:has(img[src="/insurance-icons/car.svg"])',
+            
+            # TERCIÁRIO: Seletor específico por texto
+            'button:has-text("Carro")',
+            
+            # FALLBACK: Seletor genérico original (COMPATIBILIDADE)
+            'button.group'
+        ]
         
-        botao_veiculo = None
+        botao_carro = None
         seletor_usado = None
         
         # Tentar cada seletor em ordem de prioridade
-        for seletor in seletores:
+        for seletor in seletores_carro:
             try:
-                botao_veiculo = page.locator(seletor).first
-                if botao_veiculo.is_visible():
+                botao_carro = page.locator(seletor).first
+                if botao_carro.is_visible():
                     seletor_usado = seletor
-                    exibir_mensagem(f"✅ Botão '{tipo_veiculo.title()}' encontrado com seletor: {seletor}")
+                    exibir_mensagem(f"✅ Botão 'Carro' encontrado com seletor: {seletor}")
                     break
             except Exception as e:
                 continue
         
-        if botao_veiculo and botao_veiculo.is_visible():
-            botao_veiculo.click()
-            exibir_mensagem(f"✅ Botão '{tipo_veiculo.title()}' clicado com sucesso")
+        if botao_carro and botao_carro.is_visible():
+            botao_carro.click()
+            exibir_mensagem("✅ Botão 'Carro' clicado com sucesso")
             
             # Log do seletor usado para monitoramento
             if seletor_usado.startswith('button:has'):
@@ -1279,11 +829,11 @@ def navegar_tela_1_playwright(page: Page, tipo_veiculo: str = "carro") -> bool:
             page.wait_for_selector("#placaTelaDadosPlaca", timeout=5000)
             return True
         else:
-            exception_handler.capturar_warning(f"Botão '{tipo_veiculo.title()}' não encontrado com nenhum seletor", "TELA_1")
+            exception_handler.capturar_warning("Botão 'Carro' não encontrado com nenhum seletor", "TELA_1")
             return False
             
     except Exception as e:
-        exception_handler.capturar_excecao(e, "TELA_1", f"Erro ao selecionar {tipo_veiculo.title()}")
+        exception_handler.capturar_excecao(e, "TELA_1", "Erro ao selecionar Carro")
         return False
 
 def navegar_tela_2_playwright(page: Page, placa: str) -> bool:
@@ -1524,7 +1074,7 @@ def navegar_tela_5_playwright(page: Page, parametros_tempo) -> bool:
                     "nome_tela": "Estimativa Inicial",
                     "url": page.url,
                     "titulo_pagina": page.title(),
-                    "versao_rpa": "3.4.0",
+                    "versao_rpa": "3.2.0",
                     "autor": "Luciano Otero"
                 },
                 "resumo_executivo": {
@@ -1715,12 +1265,9 @@ def navegar_tela_zero_km_playwright(page: Page, parametros: Dict[str, Any]) -> b
         exception_handler.capturar_excecao(e, "TELA_ZERO_KM", "Erro ao processar Tela Zero KM")
         return False
 
-def navegar_tela_6_playwright(page: Page, combustivel: str, kit_gas: bool, blindado: bool, financiado: bool, tipo_veiculo: str = "carro") -> bool:
+def navegar_tela_6_playwright(page: Page, combustivel: str, kit_gas: bool, blindado: bool, financiado: bool) -> bool:
     """
-    TELA 6: Itens do veículo - SELEÇÃO DE COMBUSTÍVEL E CHECKBOXES
-    
-    VERSÃO: v3.3.0
-    IMPLEMENTAÇÃO: Suporte a carro e moto (kit_gas ignorado para moto)
+    TELA 6: Itens do carro - SELEÇÃO DE COMBUSTÍVEL E CHECKBOXES
     """
     try:
         exception_handler.definir_tela_atual("TELA_6")
@@ -1778,26 +1325,23 @@ def navegar_tela_6_playwright(page: Page, combustivel: str, kit_gas: bool, blind
         # Configurar checkboxes
         exibir_mensagem("📱 TELA 6: Configurando checkboxes...")
         
-        # Kit Gas (apenas para carros)
-        if tipo_veiculo == "carro":
-            try:
-                checkbox_kit_gas = page.locator('input[value="Kit Gás"]').first
-                if checkbox_kit_gas.is_visible():
-                    if kit_gas and not checkbox_kit_gas.is_checked():
-                        checkbox_kit_gas.check()
-                        exibir_mensagem("✅ Checkbox Kit Gas: MARCADO")
-                    elif not kit_gas and checkbox_kit_gas.is_checked():
-                        checkbox_kit_gas.uncheck()
-                        exibir_mensagem("✅ Checkbox Kit Gas: DESMARCADO")
-                    else:
-                        estado = "MARCADO" if kit_gas else "DESMARCADO"
-                        exibir_mensagem(f"✅ Checkbox Kit Gas: {estado} (já estava correto)")
+        # Kit Gas
+        try:
+            checkbox_kit_gas = page.locator('input[value="Kit Gás"]').first
+            if checkbox_kit_gas.is_visible():
+                if kit_gas and not checkbox_kit_gas.is_checked():
+                    checkbox_kit_gas.check()
+                    exibir_mensagem("✅ Checkbox Kit Gas: MARCADO")
+                elif not kit_gas and checkbox_kit_gas.is_checked():
+                    checkbox_kit_gas.uncheck()
+                    exibir_mensagem("✅ Checkbox Kit Gas: DESMARCADO")
                 else:
-                    exception_handler.capturar_warning("Checkbox Kit Gas não encontrado", "TELA_6")
-            except Exception as e:
-                exception_handler.capturar_warning(f"Erro ao configurar Kit Gas: {str(e)}", "TELA_6")
-        else:
-            exibir_mensagem("ℹ️ Kit Gas ignorado para motos")
+                    estado = "MARCADO" if kit_gas else "DESMARCADO"
+                    exibir_mensagem(f"✅ Checkbox Kit Gas: {estado} (já estava correto)")
+            else:
+                exception_handler.capturar_warning("Checkbox Kit Gas não encontrado", "TELA_6")
+        except Exception as e:
+            exception_handler.capturar_warning(f"Erro ao configurar Kit Gas: {str(e)}", "TELA_6")
         
         # Blindado
         try:
@@ -3541,7 +3085,7 @@ def navegar_tela_14_playwright(page, continuar_com_corretor_anterior):
         exibir_mensagem(f"❌ ERRO na Tela 14: {str(e)}")
         return False
 
-def navegar_tela_15_playwright(page, email_login, senha_login, parametros_tempo, parametros):
+def navegar_tela_15_playwright(page, email_login, senha_login, parametros_tempo):
     """
     TELA 15: Resultado Final (DUAS FASES)
     
@@ -3630,7 +3174,7 @@ def navegar_tela_15_playwright(page, email_login, senha_login, parametros_tempo,
         exibir_mensagem("⏳ Aguardando tela de cálculo...")
         page.wait_for_selector("text=Acesse sua conta para visualizar o resultado final", timeout=8000)
         
-        # PASSO 4: Aguardar modal de login aparecer OU tela de cotação manual
+        # PASSO 4: Aguardar modal de login aparecer
         exibir_mensagem("⏳ Aguardando modal de login...")
         
         try:
@@ -3638,29 +3182,9 @@ def navegar_tela_15_playwright(page, email_login, senha_login, parametros_tempo,
             modal_login = page.locator("text=Acesse sua conta para visualizar o resultado final")
             modal_login.wait_for(timeout=5000)
             exibir_mensagem("✅ Modal de login detectado!")
-            
         except Exception as e:
             exibir_mensagem(f"⚠️ Modal de login não detectado: {str(e)}")
-            exibir_mensagem("🔍 Verificando se apareceu tela de cotação manual...")
-            
-            # Verificar se apareceu tela de cotação manual
-            try:
-                tela_cotacao_manual = page.locator('p.text-center.text-base')
-                tela_cotacao_manual.wait_for(timeout=3000)
-                exibir_mensagem("✅ TELA DE COTAÇÃO MANUAL DETECTADA!")
-                
-                # Processar cotação manual
-                if processar_cotacao_manual(page, parametros):
-                    exibir_mensagem("✅ COTAÇÃO MANUAL PROCESSADA COM SUCESSO!")
-                    return True
-                else:
-                    exibir_mensagem("❌ ERRO AO PROCESSAR COTAÇÃO MANUAL!")
-                    return False
-                    
-            except Exception as e2:
-                exibir_mensagem(f"❌ Tela de cotação manual também não detectada: {str(e2)}")
-                exibir_mensagem("❌ Nenhuma tela esperada encontrada!")
-                return False
+            return False
         
         # PASSO 5: Preencher email
         exibir_mensagem("📧 Preenchendo email...")
@@ -4283,139 +3807,6 @@ def capturar_dados_carrossel_estimativas_playwright(page: Page) -> Dict[str, Any
     except Exception as e:
         exibir_mensagem(f"❌ ERRO na captura de dados: {str(e)}")
         return None
-
-def processar_cotacao_manual(page: Page, parametros: Dict[str, Any]) -> bool:
-    """
-    PROCESSAR COTAÇÃO MANUAL: Quando não há cotação automática disponível
-    
-    VERSÃO: v3.4.0
-    IMPLEMENTAÇÃO: Captura dados e retorna erro específico para cotação manual
-    """
-    try:
-        exception_handler.definir_tela_atual("COTACAO_MANUAL")
-        exibir_mensagem("📋 PROCESSANDO COTAÇÃO MANUAL...")
-        
-        # 1. CAPTURAR MENSAGEM COMPLETA
-        mensagem_elemento = page.locator('p.text-center.text-base').first
-        mensagem_completa = mensagem_elemento.text_content() if mensagem_elemento.is_visible() else "Mensagem não capturada"
-        
-        exibir_mensagem(f"📝 Mensagem capturada: {mensagem_completa}")
-        
-        # 2. CRIAR ESTRUTURA DE DADOS
-        dados_cotacao_manual = {
-            "timestamp": datetime.now().isoformat(),
-            "tela": "cotacao_manual",
-            "nome_tela": "Cotação Manual",
-            "url": page.url,
-            "titulo_pagina": page.title(),
-            "mensagem": mensagem_completa,
-            "tipo_veiculo": parametros.get('tipo_veiculo', 'carro'),
-            "placa": parametros.get('placa', ''),
-            "marca": parametros.get('marca', ''),
-            "modelo": parametros.get('modelo', ''),
-            "ano": parametros.get('ano', ''),
-            "dados_pessoais": {
-                "nome": parametros.get('nome', ''),
-                "cpf": parametros.get('cpf', ''),
-                "email": parametros.get('email', ''),
-                "celular": parametros.get('celular', '')
-            },
-            "dados_endereco": {
-                "cep": parametros.get('cep', ''),
-                "endereco_completo": parametros.get('endereco_completo', '')
-            },
-            "status": "cotacao_manual_necessaria"
-        }
-        
-        # 3. SALVAR DADOS
-        timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
-        json_path = f"temp/cotacao_manual_{timestamp_str}.json"
-        
-        # Criar diretório se não existir
-        os.makedirs("temp", exist_ok=True)
-        
-        with open(json_path, 'w', encoding='utf-8') as f:
-            json.dump(dados_cotacao_manual, f, ensure_ascii=False, indent=2)
-        
-        exibir_mensagem(f"💾 DADOS SALVOS: {json_path}")
-        
-        # 4. LOGS DETALHADOS
-        exibir_mensagem("ℹ️ Cotação será feita manualmente pelo corretor")
-        exibir_mensagem(f"📊 Dados coletados para análise:")
-        exibir_mensagem(f"   🚗 Veículo: {parametros.get('marca')} {parametros.get('modelo')} {parametros.get('ano')}")
-        exibir_mensagem(f"   📍 Placa: {parametros.get('placa')}")
-        exibir_mensagem(f"   👤 Segurado: {parametros.get('nome')}")
-        exibir_mensagem(f"   📧 Email: {parametros.get('email')}")
-        
-        return True
-        
-    except Exception as e:
-        exception_handler.capturar_excecao(e, "COTACAO_MANUAL", "Erro ao processar cotação manual")
-        return False
-
-def criar_retorno_erro_cotacao_manual(mensagem: str, tipo_erro: str, tempo_execucao: float, parametros: Dict[str, Any], exception_handler) -> Dict[str, Any]:
-    """
-    CRIAR RETORNO DE ERRO ESPECÍFICO PARA COTAÇÃO MANUAL
-    
-    VERSÃO: v3.4.0
-    IMPLEMENTAÇÃO: Retorno específico quando cotação manual é necessária
-    """
-    try:
-        # Estrutura específica para cotação manual
-        retorno = {
-            "status": "cotacao_manual",
-            "timestamp": datetime.now().isoformat(),
-            "versao": "3.4.0",
-            "sistema": "RPA Tô Segurado - Playwright",
-            "codigo": 9003,
-            "mensagem": mensagem,
-            "tipo_erro": tipo_erro,
-            "tempo_execucao": f"{tempo_execucao:.1f}s",
-            "dados": {
-                "tipo_veiculo": parametros.get('tipo_veiculo', 'carro'),
-                "placa_processada": parametros.get('placa', ''),
-                "marca": parametros.get('marca', ''),
-                "modelo": parametros.get('modelo', ''),
-                "ano": parametros.get('ano', ''),
-                "cotacao_manual_necessaria": True,
-                "dados_coletados": {
-                    "dados_pessoais": {
-                        "nome": parametros.get('nome', ''),
-                        "cpf": parametros.get('cpf', ''),
-                        "email": parametros.get('email', ''),
-                        "celular": parametros.get('celular', '')
-                    },
-                    "dados_endereco": {
-                        "cep": parametros.get('cep', ''),
-                        "endereco_completo": parametros.get('endereco_completo', '')
-                    },
-                    "dados_veiculo": {
-                        "tipo_veiculo": parametros.get('tipo_veiculo', 'carro'),
-                        "placa": parametros.get('placa', ''),
-                        "marca": parametros.get('marca', ''),
-                        "modelo": parametros.get('modelo', ''),
-                        "ano": parametros.get('ano', ''),
-                        "combustivel": parametros.get('combustivel', ''),
-                        "zero_km": parametros.get('zero_km', False),
-                        "blindado": parametros.get('blindado', False),
-                        "financiado": parametros.get('financiado', False)
-                    }
-                }
-            },
-            "logs": exception_handler.obter_logs() if hasattr(exception_handler, 'obter_logs') else []
-        }
-        
-        return retorno
-        
-    except Exception as e:
-        # Fallback para retorno de erro padrão
-        return criar_retorno_erro(
-            f"Erro ao criar retorno de cotação manual: {str(e)}",
-            "COTACAO_MANUAL_ERROR",
-            tempo_execucao,
-            parametros,
-            exception_handler
-        )
 
 def capturar_dados_planos_seguro(page: Page, parametros_tempo) -> Dict[str, Any]:
     """
@@ -5056,7 +4447,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
         if LOGGER_SYSTEM_AVAILABLE:
             from utils.logger_rpa import RPALogger
             logger = RPALogger()
-            log_info(logger, "Sistema de logger inicializado", {"versao": "3.4.0"})
+            log_info(logger, "Sistema de logger inicializado", {"versao": "3.2.0"})
             print("✅ Sistema de logger avançado ativado")
         else:
             logger = None
@@ -5078,7 +4469,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
         # Log de início da execução
         try:
             if LOGGER_SYSTEM_AVAILABLE and 'logger' in locals() and logger:
-                log_info(logger, "RPA iniciado", {"versao": "3.4.0", "parametros": parametros})
+                log_info(logger, "RPA iniciado", {"versao": "3.2.0", "parametros": parametros})
         except:
             pass  # Não falhar se o logger der erro
         
@@ -5146,7 +4537,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             except:
                 pass  # Não falhar se o logger der erro
             
-            if executar_com_timeout(smart_timeout, 1, navegar_tela_1_playwright, page, parametros.get('tipo_veiculo', 'carro')):
+            if executar_com_timeout(smart_timeout, 1, navegar_tela_1_playwright, page):
                 telas_executadas += 1
                 resultado_telas["tela_1"] = True
                 progress_tracker.update_progress(1, "Tela 1 concluída")
@@ -5287,7 +4678,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             # TELA 6
             progress_tracker.update_progress(6, "Seleção de detalhes do veículo")
             exibir_mensagem("\n" + "="*50)
-            if executar_com_timeout(smart_timeout, 6, navegar_tela_6_playwright, page, parametros['combustivel'], parametros.get('kit_gas', False), parametros.get('blindado', False), parametros.get('financiado', False), parametros.get('tipo_veiculo', 'carro')):
+            if executar_com_timeout(smart_timeout, 6, navegar_tela_6_playwright, page, parametros['combustivel'], parametros.get('kit_gas', False), parametros.get('blindado', False), parametros.get('financiado', False)):
                 telas_executadas += 1
                 resultado_telas["tela_6"] = True
                 progress_tracker.update_progress(6, "Tela 6 concluída")
@@ -5483,7 +4874,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             # TELA 15
             progress_tracker.update_progress(15, "Aguardando cálculo completo")
             exibir_mensagem("\n" + "="*50)
-            if executar_com_timeout(smart_timeout, 15, navegar_tela_15_playwright, page, parametros['autenticacao']['email_login'], parametros['autenticacao']['senha_login'], parametros_tempo, parametros):
+            if executar_com_timeout(smart_timeout, 15, navegar_tela_15_playwright, page, parametros['autenticacao']['email_login'], parametros['autenticacao']['senha_login'], parametros_tempo):
                 telas_executadas += 1
                 resultado_telas["tela_15"] = True
                 progress_tracker.update_progress(15, "Tela 15 concluída")
@@ -5492,45 +4883,13 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                 resultado_telas["tela_15"] = False
                 progress_tracker.update_progress(15, "Tela 15 falhou")
                 exibir_mensagem("❌ TELA 15 FALHOU!")
-                
-                # Verificar se foi por cotação manual
-                try:
-                    # Verificar se apareceu tela de cotação manual
-                    page.wait_for_selector('p.text-center.text-base', timeout=2000)
-                    exibir_mensagem("📋 COTAÇÃO MANUAL DETECTADA NO FLUXO PRINCIPAL!")
-                    
-                    # Processar cotação manual
-                    if processar_cotacao_manual(page, parametros):
-                        resultado_telas["tela_cotacao_manual"] = True
-                        exibir_mensagem("✅ COTAÇÃO MANUAL PROCESSADA!")
-                        
-                        # Retornar erro específico para cotação manual
-                        return criar_retorno_erro_cotacao_manual(
-                            "Não foi possível efetuar o cálculo nesse momento. O corretor de seguros já foi notificado e logo entrará em contato para te auxiliar a encontrar as melhores opções.",
-                            "COTACAO_MANUAL_NECESSARIA",
-                            time.time() - inicio_execucao,
-                            parametros,
-                            exception_handler
-                        )
-                    else:
-                        exibir_mensagem("❌ ERRO AO PROCESSAR COTAÇÃO MANUAL!")
-                        return criar_retorno_erro(
-                            "Erro ao processar cotação manual",
-                            "COTACAO_MANUAL_ERROR",
-                            time.time() - inicio_execucao,
-                            parametros,
-                            exception_handler
-                        )
-                        
-                except:
-                    # Não é cotação manual, retornar erro padrão
-                    return criar_retorno_erro(
-                        "Tela 15 falhou",
-                        "TELA_15",
-                        time.time() - inicio_execucao,
-                        parametros,
-                        exception_handler
-                    )
+                return criar_retorno_erro(
+                    "Tela 15 falhou",
+                    "TELA_15",
+                    time.time() - inicio_execucao,
+                    parametros,
+                    exception_handler
+                )
             
             # Resultado final
             progress_tracker.update_progress(15, "RPA concluído com sucesso")

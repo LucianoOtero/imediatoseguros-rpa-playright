@@ -4,7 +4,7 @@
 
 ### **Projeto**: RPA Tô Segurado - Migração Selenium → Playwright
 ### **Status**: ✅ **MIGRAÇÃO COMPLETA REALIZADA**
-### **Versão**: v3.2.0 - Tela Zero KM Implementada
+### **Versão**: v3.4.0 - Detecção de Cotação Manual Implementada
 ### **Resultado**: Sistema RPA completo funcionando com Playwright
 
 ---
@@ -37,6 +37,20 @@
 - **Tela 10**: Corrigida (navegação e dados)
 - **Telas 11-15**: Implementadas com sucesso
 - **Sintaxe**: Corrigida e validada
+
+### ✅ **SUPORTE A TIPO DE VEÍCULO (v3.3.0)**
+- **Carros e Motos**: Suporte completo implementado
+- **Seletores específicos**: Para cada tipo de veículo
+- **Validação de domínio**: `carro` ou `moto` apenas
+- **Tratamento condicional**: Campo `kit_gas` ignorado para motos
+- **Compatibilidade**: Total com versões anteriores
+
+### ✅ **DETECÇÃO DE COTAÇÃO MANUAL (v3.4.0)**
+- **Detecção automática**: Quando não há cotação automática
+- **Wait condicional**: Após modal de login
+- **Captura de dados**: Para análise manual pelo corretor
+- **Retorno específico**: `status: cotacao_manual`
+- **Arquivo JSON**: Dados salvos para análise
 
 ---
 
@@ -119,14 +133,22 @@ python teste_tela_1_a_15_sequencial.py
 - ✅ **Tratamento de ambiguidade** de seletores
 - ✅ **Suporte para carros e motos**
 
+### **✅ DETECÇÃO DE COTAÇÃO MANUAL (v3.4.0) - NOVO**
+- ✅ **Detecção automática** quando não há cotação automática
+- ✅ **Wait condicional** após modal de login
+- ✅ **Captura de dados** para análise manual pelo corretor
+- ✅ **Retorno específico** (`status: cotacao_manual`)
+- ✅ **Arquivo JSON** com dados coletados
+- ✅ **Logs detalhados** para monitoramento
+
 ### **Telas Implementadas (16/16)**
-- ✅ **Tela 1**: Seleção do Tipo de Seguro
+- ✅ **Tela 1**: Seleção do Tipo de Seguro (Carro/Moto)
 - ✅ **Tela 2**: Inserção da Placa
 - ✅ **Tela 3**: Dados do Veículo
 - ✅ **Tela 4**: Dados do Proprietário
 - ✅ **Tela 5**: Carrossel de Estimativas
-- ✅ **Tela Zero KM**: Detecção Condicional (NOVO)
-- ✅ **Tela 6**: Seleção de Coberturas
+- ✅ **Tela Zero KM**: Detecção Condicional
+- ✅ **Tela 6**: Seleção de Coberturas (Kit Gas condicional)
 - ✅ **Tela 7**: Dados do Condutor
 - ✅ **Tela 8**: Dados do Condutor (Continuação)
 - ✅ **Tela 9**: Dados Pessoais
@@ -142,7 +164,9 @@ python teste_tela_1_a_15_sequencial.py
 - ✅ **Parcelamento** (12x sem juros, 1x sem juros)
 - ✅ **Coberturas** (Assistência, Vidros, Carro Reserva)
 - ✅ **Valores de danos** (Materiais, Corporais, Morais)
-- ✅ **Tipo de franquia** (Normal, Reduzida) - NOVO
+- ✅ **Tipo de franquia** (Normal, Reduzida)
+- ✅ **Tipo de veículo** (Carro, Moto) - NOVO
+- ✅ **Cotação manual** (Dados para análise) - NOVO
 - ✅ **Estrutura JSON** padronizada
 
 ---
@@ -151,20 +175,24 @@ python teste_tela_1_a_15_sequencial.py
 
 ```
 imediatoseguros-rpa-playwright/
-├── 📄 executar_rpa_imediato_playwright.py    # Script principal v3.2.0
+├── 📄 executar_rpa_imediato_playwright.py    # Script principal v3.4.0
 ├── 📄 parametros.json                        # Configurações completas
 ├── 📄 backup_pre_zero_km_20250923.py        # Backup segurança
 ├── 📄 backup_pre_version_3.2.0_*/           # Backups de versão
 ├── 📄 backup_pre_help_update_*/             # Backups de documentação
+├── 📄 backup_pre_cotacao_manual_*/          # Backups de cotação manual
+├── 📄 backup_pre_release_v3.4.0_*/          # Backups de release
 ├── 📁 docs/
 │   ├── 📄 DOCUMENTACAO_COMPLETA_MIGRACAO.md # Documentação principal
 │   ├── 📄 CONTROLE_VERSAO.md                # Controle de versão
 │   ├── 📄 COMPONENTES_AUSENTES.md           # Componentes pendentes
 │   ├── 📄 exemplo_json_retorno_completo.json # JSON de referência atualizado
-│   ├── 📄 DOCUMENTACAO_TELA_ZERO_KM.md      # NOVO - Tela Zero KM
-│   └── 📄 TROUBLESHOOTING_TELA_ZERO_KM.md   # NOVO - Troubleshooting
+│   ├── 📄 DOCUMENTACAO_TELA_ZERO_KM.md      # Tela Zero KM
+│   └── 📄 TROUBLESHOOTING_TELA_ZERO_KM.md   # Troubleshooting
 ├── 📁 logs/                                 # Logs de execução
 ├── 📁 screenshots/                          # Screenshots de debug
+├── 📁 temp/                                 # Arquivos temporários
+│   └── 📄 cotacao_manual_*.json            # Dados de cotação manual
 ├── 📄 requirements.txt                      # Dependências Python
 ├── 📄 README.md                             # Este arquivo
 └── 📄 README_PLAYWRIGHT.md                  # Documentação Playwright
@@ -285,6 +313,22 @@ context = browser.new_context(
 
 ## 📈 **ROADMAP**
 
+## 📈 **ROADMAP**
+
+### **v3.4.0 (IMPLEMENTADO)**
+- ✅ Detecção de Cotação Manual
+- ✅ Wait Condicional após Modal de Login
+- ✅ Captura de Dados para Análise Manual
+- ✅ Retorno Específico (`status: cotacao_manual`)
+- ✅ Arquivo JSON com Dados Coletados
+
+### **v3.3.0 (IMPLEMENTADO)**
+- ✅ Suporte a Tipo de Veículo (Carro/Moto)
+- ✅ Seletores Específicos para Cada Tipo
+- ✅ Validação de Domínio (`carro` ou `moto`)
+- ✅ Tratamento Condicional do Campo `kit_gas`
+- ✅ Compatibilidade Total com Versões Anteriores
+
 ### **v3.2.0 (IMPLEMENTADO)**
 - ✅ Tela Zero KM Condicional
 - ✅ Campo tipo_franquia na captura de dados
@@ -296,12 +340,10 @@ context = browser.new_context(
 - ✅ Teste Ponta-a-Ponta Completo
 - ✅ Validação e Estrutura JSON Padronizada
 
-### **v3.3.0**
+### **v3.5.0 (PRÓXIMA VERSÃO)**
 - 🔄 Conversor Unicode → ASCII
 - 📊 Sistema de Screenshots de Debug
 - 🔄 Modo de Execução via Linha de Comando
-
-### **v3.4.0**
 - 🔧 Configuração Avançada do Browser
 - 🔐 Sistema de Login Automático
 - 📊 Melhorias de Performance
@@ -354,6 +396,6 @@ Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalh
 
 ---
 
-**Status**: ✅ **TELA ZERO KM IMPLEMENTADA - v3.2.0**  
+**Status**: ✅ **DETECÇÃO DE COTAÇÃO MANUAL IMPLEMENTADA - v3.4.0**  
 **Última Atualização**: 24/09/2025  
-**Próxima Versão**: v3.3.0
+**Próxima Versão**: v3.5.0
