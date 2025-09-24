@@ -22,9 +22,8 @@ class TesteExecucaoConcorrente {
     public function criarArquivosConfiguracao() {
         echo "📁 Criando arquivos de configuração...\n";
         
-        $placas = [
-EYQ4J41, TKH6F60, ABC1234];
-        $tipos = [carro, moto, carro];
+        $placas = ['EYQ4J41', 'TKH6F60', 'ABC1234'];
+        $tipos = ['carro', 'moto', 'carro'];
         
         for ($i = 0; $i < 3; $i++) {
             $config = [
@@ -102,7 +101,7 @@ EYQ4J41, TKH6F60, ABC1234];
      */
     public function executarConcorrente() {
         echo "🚀 Iniciando execução concorrente...\n";
-        echo "⏰ Início: " . date(H:i:s) . "\n\n";
+        echo "⏰ Início: " . date('H:i:s') . "\n\n";
         
         $processos = [];
         
@@ -112,10 +111,10 @@ EYQ4J41, TKH6F60, ABC1234];
             echo "🔄 Iniciando Sessão $i...\n";
             
             // Executar em background (Windows)
-            if (strtoupper(substr(PHP_OS, 0, 3)) === WIN) {
-                $processos[$i] = popen("start /B $comando", r);
+            if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                $processos[$i] = popen("start /B $comando", 'r');
             } else {
-                $processos[$i] = popen("$comando &", r);
+                $processos[$i] = popen("$comando &", 'r');
             }
         }
         
@@ -153,7 +152,7 @@ EYQ4J41, TKH6F60, ABC1234];
             }
         }
         
-        echo "⏰ Fim: " . date(H:i:s) . "\n\n";
+        echo "⏰ Fim: " . date('H:i:s') . "\n\n";
     }
     
     /**
@@ -177,20 +176,20 @@ EYQ4J41, TKH6F60, ABC1234];
                     $resultado = json_decode($conteudo, true);
                     
                     if ($resultado) {
-                        echo "Status: " . ($resultado[status] ?? N/A) . "\n";
-                        echo "Tempo: " . ($resultado[tempo_execucao] ?? N/A) . "s\n";
+                        echo "Status: " . ($resultado['status'] ?? 'N/A') . "\n";
+                        echo "Tempo: " . ($resultado['tempo_execucao'] ?? 'N/A') . "s\n";
                         
                         // Verificar progresso (Fase 3)
-                        if (isset($resultado[progresso])) {
-                            $progresso = $resultado[progresso];
-                            echo "Progresso: Etapa " . ($progresso[etapa_atual] ?? N/A) . "/" . ($progresso[total_etapas] ?? N/A) . "\n";
-                            echo "Percentual: " . round($progresso[percentual] ?? 0, 1) . "%\n";
-                            echo "Histórico: " . count($progresso[etapas_historico] ?? []) . " etapas\n";
+                        if (isset($resultado['progresso'])) {
+                            $progresso = $resultado['progresso'];
+                            echo "Progresso: Etapa " . ($progresso['etapa_atual'] ?? 'N/A') . "/" . ($progresso['total_etapas'] ?? 'N/A') . "\n";
+                            echo "Percentual: " . round($progresso['percentual'] ?? 0, 1) . "%\n";
+                            echo "Histórico: " . count($progresso['etapas_historico'] ?? []) . " etapas\n";
                         } else {
                             echo "⚠️ Progresso não encontrado (problema na Fase 3)\n";
                         }
                         
-                        if (($resultado[status] ?? ') === success) {
+                        if (($resultado['status'] ?? '') === 'success') {
                             $sucessos++;
                             echo "✅ SUCESSO\n";
                         } else {
@@ -271,7 +270,7 @@ EYQ4J41, TKH6F60, ABC1234];
 }
 
 // Executar teste se chamado diretamente
-if (basename(__FILE__) == basename($_SERVER[SCRIPT_NAME])) {
+if (basename(__FILE__) == basename($_SERVER['SCRIPT_NAME'])) {
     $teste = new TesteExecucaoConcorrente();
     $teste->executarTesteCompleto();
 }
