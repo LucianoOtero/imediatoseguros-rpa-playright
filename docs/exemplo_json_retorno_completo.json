@@ -1,7 +1,7 @@
 {
   "status": "sucesso",
   "timestamp": "2025-09-02T03:45:30.523994",
-  "versao": "2.11.0",
+  "versao": "3.2.0",
   "sistema": "RPA Tô Segurado - Playwright",
   "codigo": 9002,
   "mensagem": "RPA executado com sucesso - Telas 1-5",

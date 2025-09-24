@@ -4,7 +4,7 @@
 
 ### **Projeto**: RPA Tô Segurado - Migração Selenium → Playwright
 ### **Status**: ✅ **MIGRAÇÃO COMPLETA REALIZADA**
-### **Versão**: v3.1.0 - Sistema de Retorno Estruturado Implementado
+### **Versão**: v3.2.0 - Tela Zero KM Implementada
 ### **Resultado**: Sistema RPA completo funcionando com Playwright
 
 ---
@@ -112,12 +112,20 @@ python teste_tela_1_a_15_sequencial.py
 - ✅ **Conversão de formatos antigos** para novo padrão
 - ✅ **Logs estruturados** com timestamps precisos
 
-### **Telas Implementadas (15/15)**
+### **✅ TELA ZERO KM (CONDICIONAL) - NOVO**
+- ✅ **Detecção automática** após Tela 5
+- ✅ **Seleção inteligente** baseada no parâmetro `zero_km`
+- ✅ **Transição suave** para Tela 6
+- ✅ **Tratamento de ambiguidade** de seletores
+- ✅ **Suporte para carros e motos**
+
+### **Telas Implementadas (16/16)**
 - ✅ **Tela 1**: Seleção do Tipo de Seguro
 - ✅ **Tela 2**: Inserção da Placa
 - ✅ **Tela 3**: Dados do Veículo
 - ✅ **Tela 4**: Dados do Proprietário
 - ✅ **Tela 5**: Carrossel de Estimativas
+- ✅ **Tela Zero KM**: Detecção Condicional (NOVO)
 - ✅ **Tela 6**: Seleção de Coberturas
 - ✅ **Tela 7**: Dados do Condutor
 - ✅ **Tela 8**: Dados do Condutor (Continuação)
@@ -134,6 +142,7 @@ python teste_tela_1_a_15_sequencial.py
 - ✅ **Parcelamento** (12x sem juros, 1x sem juros)
 - ✅ **Coberturas** (Assistência, Vidros, Carro Reserva)
 - ✅ **Valores de danos** (Materiais, Corporais, Morais)
+- ✅ **Tipo de franquia** (Normal, Reduzida) - NOVO
 - ✅ **Estrutura JSON** padronizada
 
 ---
@@ -272,17 +281,23 @@ context = browser.new_context(
 
 ## 📈 **ROADMAP**
 
+### **v3.2.0 (IMPLEMENTADO)**
+- ✅ Tela Zero KM Condicional
+- ✅ Campo tipo_franquia na captura de dados
+- ✅ Detecção automática de telas condicionais
+- ✅ Tratamento de ambiguidade de seletores
+
 ### **v3.1.0 (IMPLEMENTADO)**
 - ✅ Sistema de Retorno Estruturado
 - ✅ Teste Ponta-a-Ponta Completo
 - ✅ Validação e Estrutura JSON Padronizada
 
-### **v3.2.0**
+### **v3.3.0**
 - 🔄 Conversor Unicode → ASCII
 - 📊 Sistema de Screenshots de Debug
 - 🔄 Modo de Execução via Linha de Comando
 
-### **v3.3.0**
+### **v3.4.0**
 - 🔧 Configuração Avançada do Browser
 - 🔐 Sistema de Login Automático
 - 📊 Melhorias de Performance
@@ -335,6 +350,6 @@ Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalh
 
 ---
 
-**Status**: ✅ **SISTEMA DE RETORNO ESTRUTURADO IMPLEMENTADO - v3.1.0**  
-**Última Atualização**: 02/09/2025  
-**Próxima Versão**: v3.2.0
+**Status**: ✅ **TELA ZERO KM IMPLEMENTADA - v3.2.0**  
+**Última Atualização**: 24/09/2025  
+**Próxima Versão**: v3.3.0

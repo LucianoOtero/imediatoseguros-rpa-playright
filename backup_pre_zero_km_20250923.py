@@ -1074,7 +1074,7 @@ def navegar_tela_5_playwright(page: Page, parametros_tempo) -> bool:
                     "nome_tela": "Estimativa Inicial",
                     "url": page.url,
                     "titulo_pagina": page.title(),
-                    "versao_rpa": "3.2.0",
+                    "versao_rpa": "2.0.0",
                     "autor": "Luciano Otero"
                 },
                 "resumo_executivo": {
@@ -1200,69 +1200,12 @@ def navegar_tela_5_playwright(page: Page, parametros_tempo) -> bool:
                 exibir_mensagem(f"❌ Falha ao clicar no botão Continuar: {str(e2)}")
                 return False
         
-        # DETECÇÃO INTELIGENTE DA PRÓXIMA TELA
-        try:
-            # Tentar detectar Tela Zero KM primeiro (2 segundos)
-            page.wait_for_selector("#gtm-telaZeroKmContinuar", timeout=2000)
-            exibir_mensagem("✅ Tela Zero KM detectada após Tela 5")
-            return True  # Tela Zero KM será processada separadamente
-        except:
-            try:
-                # Se não for Zero KM, detectar Tela 6 (3 segundos)
-                page.wait_for_selector("#gtm-telaItensAutoContinuar", timeout=3000)
-                exibir_mensagem("✅ Tela 6 detectada após Tela 5")
-                return True
-            except:
-                exibir_mensagem("❌ Nenhuma tela detectada após Tela 5")
-                return False
-        
-    except Exception as e:
-        exception_handler.capturar_excecao(e, "TELA_5", "Erro ao processar Tela 5")
-        return False
-
-def navegar_tela_zero_km_playwright(page: Page, parametros: Dict[str, Any]) -> bool:
-    """
-    TELA ZERO KM: Condicional - aparece ocasionalmente após Tela 5
-    """
-    try:
-        exception_handler.definir_tela_atual("TELA_ZERO_KM")
-        exibir_mensagem("🛵 TELA ZERO KM: Processando...")
-        
-        # Verificar se a tela Zero KM está presente (usar radiogroup específico)
-        elemento_zero_km = page.locator("#zerokmTelaZeroKm[role='radiogroup']")
-        if not elemento_zero_km.is_visible():
-            exibir_mensagem("⚠️ Tela Zero KM não está visível")
-            return False
-            
-        exibir_mensagem("✅ Tela Zero KM carregada com sucesso")
-        
-        # Selecionar opção baseada no parâmetro
-        zero_km = parametros.get('zero_km', False)
-        
-        if zero_km:
-            # Selecionar "Sim" - usar seletor mais específico
-            page.locator('input[name="zerokmTelaZeroKm"][value="Sim"]').click()
-            exibir_mensagem("✅ Opção 'Sim' (Zero KM) selecionada!")
-        else:
-            # Selecionar "Não" - usar seletor mais específico
-            page.locator('input[name="zerokmTelaZeroKm"][value="Não"]').click()
-            exibir_mensagem("✅ Opção 'Não' (Não Zero KM) selecionada!")
-        
-        # Aguardar estabilização
-        time.sleep(1)
-        
-        # Clicar em Continuar
-        exibir_mensagem("⏳ Clicando em Continuar...")
-        page.locator("#gtm-telaZeroKmContinuar").click()
-        
-        # Aguardar próxima tela (Tela 6)
-        exibir_mensagem("⏳ Aguardando transição para Tela 6...")
+        # Aguardar transição para a próxima tela
         page.wait_for_selector("#gtm-telaItensAutoContinuar", timeout=5000)
-        exibir_mensagem("✅ Tela Zero KM processada com sucesso!")
         return True
         
     except Exception as e:
-        exception_handler.capturar_excecao(e, "TELA_ZERO_KM", "Erro ao processar Tela Zero KM")
+        exception_handler.capturar_excecao(e, "TELA_5", "Erro ao processar Tela 5")
         return False
 
 def navegar_tela_6_playwright(page: Page, combustivel: str, kit_gas: bool, blindado: bool, financiado: bool) -> bool:
@@ -3426,9 +3369,9 @@ def navegar_tela_15_playwright(page, email_login, senha_login, parametros_tempo)
         exibir_mensagem("🎯 TELA 15 FINALIZADA COM SUCESSO!")
         
         # Delay para inspeção da tela
-        # exibir_mensagem("⏳ Aguardando 60 segundos para inspeção da tela...")
-        # time.sleep(60)
-        # exibir_mensagem("✅ Tempo de inspeção concluído!")
+        exibir_mensagem("⏳ Aguardando 60 segundos para inspeção da tela...")
+        time.sleep(60)
+        exibir_mensagem("✅ Tempo de inspeção concluído!")
         
         return True
         
@@ -4447,7 +4390,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
         if LOGGER_SYSTEM_AVAILABLE:
             from utils.logger_rpa import RPALogger
             logger = RPALogger()
-            log_info(logger, "Sistema de logger inicializado", {"versao": "3.2.0"})
+            log_info(logger, "Sistema de logger inicializado", {"versao": "3.1.3"})
             print("✅ Sistema de logger avançado ativado")
         else:
             logger = None
@@ -4469,7 +4412,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
         # Log de início da execução
         try:
             if LOGGER_SYSTEM_AVAILABLE and 'logger' in locals() and logger:
-                log_info(logger, "RPA iniciado", {"versao": "3.2.0", "parametros": parametros})
+                log_info(logger, "RPA iniciado", {"versao": "3.1.3", "parametros": parametros})
         except:
             pass  # Não falhar se o logger der erro
         
@@ -4637,32 +4580,6 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                 resultado_telas["tela_5"] = True
                 progress_tracker.update_progress(5, "Tela 5 concluída")
                 exibir_mensagem("✅ TELA 5 CONCLUÍDA!")
-                
-                # VERIFICAR SE APARECEU TELA ZERO KM
-                try:
-                    page.wait_for_selector("#gtm-telaZeroKmContinuar", timeout=2000)
-                    exibir_mensagem("🛵 TELA ZERO KM DETECTADA!")
-                    
-                    # TELA ZERO KM
-                    progress_tracker.update_progress(5.5, "Processando Zero KM")
-                    if executar_com_timeout(smart_timeout, 5.5, navegar_tela_zero_km_playwright, page, parametros):
-                        telas_executadas += 1
-                        resultado_telas["tela_zero_km"] = True
-                        progress_tracker.update_progress(5.5, "Tela Zero KM concluída")
-                        exibir_mensagem("✅ TELA ZERO KM CONCLUÍDA!")
-                    else:
-                        resultado_telas["tela_zero_km"] = False
-                        progress_tracker.update_progress(5.5, "Tela Zero KM falhou")
-                        exibir_mensagem("❌ TELA ZERO KM FALHOU!")
-                        return criar_retorno_erro(
-                            "Tela Zero KM falhou",
-                            "TELA_ZERO_KM",
-                            time.time() - inicio_execucao,
-                            parametros,
-                            exception_handler
-                        )
-                except:
-                    exibir_mensagem("ℹ️ Tela Zero KM não apareceu - continuando fluxo normal")
             else:
                 resultado_telas["tela_5"] = False
                 progress_tracker.update_progress(5, "Tela 5 falhou")
@@ -5027,9 +4944,9 @@ if __name__ == "__main__":
             print("❌ RPA falhou!")
         
         # Delay para inspeção da tela final
-        # print("⏳ Aguardando 60 segundos para inspeção da tela final...")
-        # time.sleep(60)
-        # print("✅ Tempo de inspeção concluído!")
+        print("⏳ Aguardando 60 segundos para inspeção da tela final...")
+        time.sleep(60)
+        print("✅ Tempo de inspeção concluído!")
         
         # Exibir retorno estruturado completo
         print("\n" + "="*50)
