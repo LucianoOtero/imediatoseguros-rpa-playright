@@ -29,6 +29,11 @@ import inspect
 # Controle de display global (sem import circular)
 DISPLAY_ENABLED = True  # Será sobrescrito pelo arquivo principal quando necessário
 
+def set_display_enabled(enabled: bool):
+    """Define o estado do display globalmente"""
+    global DISPLAY_ENABLED
+    DISPLAY_ENABLED = enabled
+
 class RPALogger:
     """
     Sistema de logging robusto para RPA com rotação automática
@@ -430,17 +435,13 @@ def log_debug(message: str, error_code: Optional[int] = None,
 def log_info(message: str, error_code: Optional[int] = None, 
              extra_data: Optional[Dict[str, Any]] = None):
     """Log de informação com controle de saída"""
+    # Se DISPLAY_ENABLED = False, não fazer nada (modo silencioso)
+    if not DISPLAY_ENABLED:
+        return  # Modo silencioso - não exibir nada
+    
     try:
-        # Sempre salvar no arquivo de log
+        # Modo normal: salvar no arquivo E exibir no console
         rpa_logger.info(message, error_code, extra_data)
-        
-        # Controlar saída do console baseado em DISPLAY_ENABLED
-        if not DISPLAY_ENABLED:
-            # Silenciar saída do console temporariamente
-            # (mantém arquivo de log funcionando)
-            for handler in rpa_logger.logger.handlers:
-                if isinstance(handler, logging.StreamHandler) and handler.stream.name == '<stderr>':
-                    handler.setLevel(logging.CRITICAL)
     except Exception as e:
         # Fallback silencioso
         pass

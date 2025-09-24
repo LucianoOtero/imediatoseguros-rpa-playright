@@ -1039,7 +1039,7 @@ def configurar_display(parametros: Dict[str, Any]):
     
     try:
         import utils.logger_rpa
-        utils.logger_rpa.DISPLAY_ENABLED = DISPLAY_ENABLED
+        utils.logger_rpa.set_display_enabled(DISPLAY_ENABLED)
     except:
         pass
     
