@@ -371,6 +371,7 @@ disponíveis com seus domínios de valores e funcionalidades.
   "configuracao": { ... },      # Configurações do sistema
   "autenticacao": { ... },      # Dados de login
   "url": "...",                 # URL do site
+  "tipo_veiculo": "carro",      # NOVO - Tipo de veículo
   "placa": "...",               # Dados do veículo
   "marca": "...",
   "modelo": "...",
@@ -501,6 +502,13 @@ Dados de login no sistema Tô Segurado.
 🚗 SEÇÃO: DADOS DO VEÍCULO
 ==========================
 Informações básicas do veículo a ser segurado.
+
+• tipo_veiculo (string): Tipo de veículo para cotação
+  - Valores: "carro", "moto"
+  - Padrão: "carro"
+  - Função: Define qual botão será clicado na Tela 1
+  - Impacto: Determina fluxo de navegação e campos disponíveis
+  - Exemplo: "carro", "moto"
 
 • placa (string): Placa do veículo
   - Formato: ABC1234 ou ABC-1234
@@ -696,6 +704,7 @@ Características especiais do veículo.
   - Valores: true, false
   - Padrão: false
   - Função: Veículo possui kit gás
+  - Observação: Ignorado para motos (não aplicável)
 
 • blindado (boolean): Veículo blindado
   - Valores: true, false
@@ -1185,54 +1194,72 @@ def executar_com_timeout(smart_timeout, tela_num, funcao_tela, *args, **kwargs):
 # FUNÇÕES DE NAVEGAÇÃO DAS TELAS
 # ========================================
 
-def navegar_tela_1_playwright(page: Page) -> bool:
+def navegar_tela_1_playwright(page: Page, tipo_veiculo: str = "carro") -> bool:
     """
-    TELA 1: Seleção do tipo de seguro (Carro)
+    TELA 1: Seleção do tipo de seguro (Carro ou Moto)
     
-    VERSÃO: v3.7.0.1
-    IMPLEMENTAÇÃO: Substituição de seletor genérico por específico
-    DATA: 09/09/2025
+    VERSÃO: v3.3.0
+    IMPLEMENTAÇÃO: Suporte a carro e moto
+    DATA: 24/09/2025
     STATUS: ✅ IMPLEMENTADO
     """
     try:
         exception_handler.definir_tela_atual("TELA_1")
-        exibir_mensagem("📱 TELA 1: Selecionando tipo de seguro...")
+        # Validação do parâmetro
+        if tipo_veiculo not in ["carro", "moto"]:
+            exception_handler.capturar_excecao(
+                ValueError(f"tipo_veiculo inválido: {tipo_veiculo}"), 
+                "TELA_1", 
+                "Tipo de veículo deve ser 'carro' ou 'moto'"
+            )
+            return False
+        
+        exibir_mensagem(f"📱 TELA 1: Selecionando {tipo_veiculo.title()}...")
         
         # Aguardar carregamento inicial da página
         page.wait_for_selector("button", timeout=5000)
         
         # ESTRATÉGIA HÍBRIDA: Específico + Fallback
-        seletores_carro = [
-            # PRIMÁRIO: Seletor específico por alt da imagem (NOVO)
-            'button:has(img[alt="Icone car"])',
-            
-            # SECUNDÁRIO: Seletor específico por src da imagem
-            'button:has(img[src="/insurance-icons/car.svg"])',
-            
-            # TERCIÁRIO: Seletor específico por texto
-            'button:has-text("Carro")',
-            
-            # FALLBACK: Seletor genérico original (COMPATIBILIDADE)
-            'button.group'
-        ]
+        if tipo_veiculo == "carro":
+            seletores = [
+                # PRIMÁRIO: Seletor específico por alt da imagem
+                'button:has(img[alt="Icone car"])',
+                # SECUNDÁRIO: Seletor específico por src da imagem
+                'button:has(img[src="/insurance-icons/car.svg"])',
+                # TERCIÁRIO: Seletor específico por texto
+                'button:has-text("Carro")',
+                # FALLBACK: Seletor genérico original
+                'button.group:nth-child(1)'
+            ]
+        elif tipo_veiculo == "moto":
+            seletores = [
+                # PRIMÁRIO: Seletor específico por alt da imagem
+                'button:has(img[alt="Icone motorcycle"])',
+                # SECUNDÁRIO: Seletor específico por src da imagem
+                'button:has(img[src="/insurance-icons/motorcycle.svg"])',
+                # TERCIÁRIO: Seletor específico por texto
+                'button:has-text("Moto")',
+                # FALLBACK: Seletor genérico (segundo botão)
+                'button.group:nth-child(2)'
+            ]
         
-        botao_carro = None
+        botao_veiculo = None
         seletor_usado = None
         
         # Tentar cada seletor em ordem de prioridade
-        for seletor in seletores_carro:
+        for seletor in seletores:
             try:
-                botao_carro = page.locator(seletor).first
-                if botao_carro.is_visible():
+                botao_veiculo = page.locator(seletor).first
+                if botao_veiculo.is_visible():
                     seletor_usado = seletor
-                    exibir_mensagem(f"✅ Botão 'Carro' encontrado com seletor: {seletor}")
+                    exibir_mensagem(f"✅ Botão '{tipo_veiculo.title()}' encontrado com seletor: {seletor}")
                     break
             except Exception as e:
                 continue
         
-        if botao_carro and botao_carro.is_visible():
-            botao_carro.click()
-            exibir_mensagem("✅ Botão 'Carro' clicado com sucesso")
+        if botao_veiculo and botao_veiculo.is_visible():
+            botao_veiculo.click()
+            exibir_mensagem(f"✅ Botão '{tipo_veiculo.title()}' clicado com sucesso")
             
             # Log do seletor usado para monitoramento
             if seletor_usado.startswith('button:has'):
@@ -1244,11 +1271,11 @@ def navegar_tela_1_playwright(page: Page) -> bool:
             page.wait_for_selector("#placaTelaDadosPlaca", timeout=5000)
             return True
         else:
-            exception_handler.capturar_warning("Botão 'Carro' não encontrado com nenhum seletor", "TELA_1")
+            exception_handler.capturar_warning(f"Botão '{tipo_veiculo.title()}' não encontrado com nenhum seletor", "TELA_1")
             return False
             
     except Exception as e:
-        exception_handler.capturar_excecao(e, "TELA_1", "Erro ao selecionar Carro")
+        exception_handler.capturar_excecao(e, "TELA_1", f"Erro ao selecionar {tipo_veiculo.title()}")
         return False
 
 def navegar_tela_2_playwright(page: Page, placa: str) -> bool:
@@ -1489,7 +1516,7 @@ def navegar_tela_5_playwright(page: Page, parametros_tempo) -> bool:
                     "nome_tela": "Estimativa Inicial",
                     "url": page.url,
                     "titulo_pagina": page.title(),
-                    "versao_rpa": "3.2.0",
+                    "versao_rpa": "3.3.0",
                     "autor": "Luciano Otero"
                 },
                 "resumo_executivo": {
@@ -1680,9 +1707,12 @@ def navegar_tela_zero_km_playwright(page: Page, parametros: Dict[str, Any]) -> b
         exception_handler.capturar_excecao(e, "TELA_ZERO_KM", "Erro ao processar Tela Zero KM")
         return False
 
-def navegar_tela_6_playwright(page: Page, combustivel: str, kit_gas: bool, blindado: bool, financiado: bool) -> bool:
+def navegar_tela_6_playwright(page: Page, combustivel: str, kit_gas: bool, blindado: bool, financiado: bool, tipo_veiculo: str = "carro") -> bool:
     """
-    TELA 6: Itens do carro - SELEÇÃO DE COMBUSTÍVEL E CHECKBOXES
+    TELA 6: Itens do veículo - SELEÇÃO DE COMBUSTÍVEL E CHECKBOXES
+    
+    VERSÃO: v3.3.0
+    IMPLEMENTAÇÃO: Suporte a carro e moto (kit_gas ignorado para moto)
     """
     try:
         exception_handler.definir_tela_atual("TELA_6")
@@ -1740,23 +1770,26 @@ def navegar_tela_6_playwright(page: Page, combustivel: str, kit_gas: bool, blind
         # Configurar checkboxes
         exibir_mensagem("📱 TELA 6: Configurando checkboxes...")
         
-        # Kit Gas
-        try:
-            checkbox_kit_gas = page.locator('input[value="Kit Gás"]').first
-            if checkbox_kit_gas.is_visible():
-                if kit_gas and not checkbox_kit_gas.is_checked():
-                    checkbox_kit_gas.check()
-                    exibir_mensagem("✅ Checkbox Kit Gas: MARCADO")
-                elif not kit_gas and checkbox_kit_gas.is_checked():
-                    checkbox_kit_gas.uncheck()
-                    exibir_mensagem("✅ Checkbox Kit Gas: DESMARCADO")
+        # Kit Gas (apenas para carros)
+        if tipo_veiculo == "carro":
+            try:
+                checkbox_kit_gas = page.locator('input[value="Kit Gás"]').first
+                if checkbox_kit_gas.is_visible():
+                    if kit_gas and not checkbox_kit_gas.is_checked():
+                        checkbox_kit_gas.check()
+                        exibir_mensagem("✅ Checkbox Kit Gas: MARCADO")
+                    elif not kit_gas and checkbox_kit_gas.is_checked():
+                        checkbox_kit_gas.uncheck()
+                        exibir_mensagem("✅ Checkbox Kit Gas: DESMARCADO")
+                    else:
+                        estado = "MARCADO" if kit_gas else "DESMARCADO"
+                        exibir_mensagem(f"✅ Checkbox Kit Gas: {estado} (já estava correto)")
                 else:
-                    estado = "MARCADO" if kit_gas else "DESMARCADO"
-                    exibir_mensagem(f"✅ Checkbox Kit Gas: {estado} (já estava correto)")
-            else:
-                exception_handler.capturar_warning("Checkbox Kit Gas não encontrado", "TELA_6")
-        except Exception as e:
-            exception_handler.capturar_warning(f"Erro ao configurar Kit Gas: {str(e)}", "TELA_6")
+                    exception_handler.capturar_warning("Checkbox Kit Gas não encontrado", "TELA_6")
+            except Exception as e:
+                exception_handler.capturar_warning(f"Erro ao configurar Kit Gas: {str(e)}", "TELA_6")
+        else:
+            exibir_mensagem("ℹ️ Kit Gas ignorado para motos")
         
         # Blindado
         try:
@@ -4862,7 +4895,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
         if LOGGER_SYSTEM_AVAILABLE:
             from utils.logger_rpa import RPALogger
             logger = RPALogger()
-            log_info(logger, "Sistema de logger inicializado", {"versao": "3.2.0"})
+            log_info(logger, "Sistema de logger inicializado", {"versao": "3.3.0"})
             print("✅ Sistema de logger avançado ativado")
         else:
             logger = None
@@ -4884,7 +4917,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
         # Log de início da execução
         try:
             if LOGGER_SYSTEM_AVAILABLE and 'logger' in locals() and logger:
-                log_info(logger, "RPA iniciado", {"versao": "3.2.0", "parametros": parametros})
+                log_info(logger, "RPA iniciado", {"versao": "3.3.0", "parametros": parametros})
         except:
             pass  # Não falhar se o logger der erro
         
@@ -4952,7 +4985,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             except:
                 pass  # Não falhar se o logger der erro
             
-            if executar_com_timeout(smart_timeout, 1, navegar_tela_1_playwright, page):
+            if executar_com_timeout(smart_timeout, 1, navegar_tela_1_playwright, page, parametros.get('tipo_veiculo', 'carro')):
                 telas_executadas += 1
                 resultado_telas["tela_1"] = True
                 progress_tracker.update_progress(1, "Tela 1 concluída")
@@ -5093,7 +5126,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             # TELA 6
             progress_tracker.update_progress(6, "Seleção de detalhes do veículo")
             exibir_mensagem("\n" + "="*50)
-            if executar_com_timeout(smart_timeout, 6, navegar_tela_6_playwright, page, parametros['combustivel'], parametros.get('kit_gas', False), parametros.get('blindado', False), parametros.get('financiado', False)):
+            if executar_com_timeout(smart_timeout, 6, navegar_tela_6_playwright, page, parametros['combustivel'], parametros.get('kit_gas', False), parametros.get('blindado', False), parametros.get('financiado', False), parametros.get('tipo_veiculo', 'carro')):
                 telas_executadas += 1
                 resultado_telas["tela_6"] = True
                 progress_tracker.update_progress(6, "Tela 6 concluída")
