@@ -19,10 +19,28 @@ from typing import Dict, Any, Optional
 # Controle de display global (sem import circular)
 DISPLAY_ENABLED = True  # Será sobrescrito pelo arquivo principal quando necessário
 
+def limpar_emojis_windows(mensagem: str) -> str:
+    """Remove emojis para compatibilidade com Windows"""
+    emojis = {
+        '✅': '[OK]', '🎯': '[ETAPA]', '⚠️': '[AVISO]', '❌': '[ERRO]',
+        '🚨': '[ALERTA]', '💾': '[SALVO]', '⏳': '[AGUARDANDO]', '🔍': '[BUSCANDO]',
+        '📊': '[DADOS]', '🎉': '[SUCESSO]', '💡': '[DICA]', '🔧': '[CONFIG]',
+        '📁': '[ARQUIVO]', '⏰': '[TEMPO]', '🎁': '[BENEFICIO]', '🚗': '[VEICULO]',
+        '👤': '[USUARIO]', '📧': '[EMAIL]', '📍': '[LOCAL]', '⚙️': '[CONFIG]',
+        '🛡️': '[SEGURANCA]', '🔐': '[LOGIN]', '🌐': '[WEB]', '📱': '[MOBILE]',
+        '💻': '[SISTEMA]', '🔄': '[PROCESSANDO]', '📈': '[PROGRESSO]', '🎪': '[CARROSSEL]'
+    }
+    
+    for emoji, substituto in emojis.items():
+        mensagem = mensagem.replace(emoji, substituto)
+    
+    return mensagem
+
 def exibir_health_check(mensagem: str):
     """Exibe mensagem do health check respeitando flag global"""
     if DISPLAY_ENABLED:
-        print(mensagem)
+        mensagem_limpa = limpar_emojis_windows(mensagem)
+        print(mensagem_limpa)
 
 
 class ConservativeHealthChecker:

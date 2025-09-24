@@ -1,0 +1,50 @@
+[15:00:59] 
+================================================================================
+[15:00:59] 
+================================================================================
+Traceback (most recent call last):
+  File "C:\Users\Luciano\OneDrive - Imediato Soluções em Seguros\Imediato\imediatoseguros-rpa-playwright\executar_rpa_imediato_playwright.py", line 1082, in carregar_parametros
+    raise RPAException(f"Arquivo de configuração não encontrado: {arquivo_config}")
+RPAException: Arquivo de configuração não encontrado: monitor_progress.json
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Luciano\OneDrive - Imediato Soluções em Seguros\Imediato\imediatoseguros-rpa-playwright\executar_rpa_imediato_playwright.py", line 5674, in <module>
+    parametros = carregar_parametros(args.config)
+  File "C:\Users\Luciano\OneDrive - Imediato Soluções em Seguros\Imediato\imediatoseguros-rpa-playwright\executar_rpa_imediato_playwright.py", line 1098, in carregar_parametros
+    erro = exception_handler.capturar_excecao(e, "CARREGAMENTO_PARAMETROS", "Erro genérico")
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Luciano\OneDrive - Imediato Soluções em Seguros\Imediato\imediatoseguros-rpa-playwright\executar_rpa_imediato_playwright.py", line 895, in capturar_excecao
+    self._log_erro(erro_estruturado)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Luciano\OneDrive - Imediato Soluções em Seguros\Imediato\imediatoseguros-rpa-playwright\executar_rpa_imediato_playwright.py", line 938, in _log_erro
+    exibir_mensagem(f"\U0001f6a8 ERRO CAPTURADO - {severidade}")
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Luciano\OneDrive - Imediato Soluções em Seguros\Imediato\imediatoseguros-rpa-playwright\executar_rpa_imediato_playwright.py", line 1063, in exibir_mensagem
+    print(f"[{timestamp}] {mensagem}")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2032.0_x64__qbz5n2kfra8p0\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f6a8' in position 11: character maps to <undefined>
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Luciano\OneDrive - Imediato Soluções em Seguros\Imediato\imediatoseguros-rpa-playwright\executar_rpa_imediato_playwright.py", line 5739, in <module>
+    exception_handler.capturar_excecao(e, "EXECUCAO_DIRETA", "Erro na execução direta")
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Luciano\OneDrive - Imediato Soluções em Seguros\Imediato\imediatoseguros-rpa-playwright\executar_rpa_imediato_playwright.py", line 895, in capturar_excecao
+    self._log_erro(erro_estruturado)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Luciano\OneDrive - Imediato Soluções em Seguros\Imediato\imediatoseguros-rpa-playwright\executar_rpa_imediato_playwright.py", line 938, in _log_erro
+    exibir_mensagem(f"\U0001f6a8 ERRO CAPTURADO - {severidade}")
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Luciano\OneDrive - Imediato Soluções em Seguros\Imediato\imediatoseguros-rpa-playwright\executar_rpa_imediato_playwright.py", line 1063, in exibir_mensagem
+    print(f"[{timestamp}] {mensagem}")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2032.0_x64__qbz5n2kfra8p0\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f6a8' in position 11: character maps to <undefined>

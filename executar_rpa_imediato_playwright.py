@@ -210,6 +210,12 @@ STATUS CODES:
         help='Exibe documentação específica (completa/json/php/params)'
     )
     
+    parser.add_argument(
+        '--session',
+        type=str,
+        help='ID da sessão para monitoramento em tempo real'
+    )
+    
     return parser.parse_args()
 
 
@@ -1047,6 +1053,36 @@ def configurar_display(parametros: Dict[str, Any]):
         # Modo silencioso ativo - zero outputs
         pass
 
+def limpar_emojis_windows(mensagem: str) -> str:
+    """
+    Remove emojis para compatibilidade com Windows
+    
+    PARÂMETROS:
+        mensagem (str): Mensagem que pode conter emojis
+    
+    RETORNA:
+        str: Mensagem com emojis substituídos por texto
+    
+    COMPORTAMENTO:
+        - Substitui emojis Unicode por texto legível
+        - Garante compatibilidade com console Windows (CP1252)
+        - Mantém significado semântico da mensagem
+    """
+    emojis = {
+        '✅': '[OK]', '🎯': '[ETAPA]', '⚠️': '[AVISO]', '❌': '[ERRO]',
+        '🚨': '[ALERTA]', '💾': '[SALVO]', '⏳': '[AGUARDANDO]', '🔍': '[BUSCANDO]',
+        '📊': '[DADOS]', '🎉': '[SUCESSO]', '💡': '[DICA]', '🔧': '[CONFIG]',
+        '📁': '[ARQUIVO]', '⏰': '[TEMPO]', '🎁': '[BENEFICIO]', '🚗': '[VEICULO]',
+        '👤': '[USUARIO]', '📧': '[EMAIL]', '📍': '[LOCAL]', '⚙️': '[CONFIG]',
+        '🛡️': '[SEGURANCA]', '🔐': '[LOGIN]', '🌐': '[WEB]', '📱': '[MOBILE]',
+        '💻': '[SISTEMA]', '🔄': '[PROCESSANDO]', '📈': '[PROGRESSO]', '🎪': '[CARROSSEL]'
+    }
+    
+    for emoji, substituto in emojis.items():
+        mensagem = mensagem.replace(emoji, substituto)
+    
+    return mensagem
+
 def exibir_mensagem(mensagem: str):
     """
     Exibe mensagem formatada com timestamp (controlado por flag)
@@ -1057,10 +1093,12 @@ def exibir_mensagem(mensagem: str):
     COMPORTAMENTO:
         - Se DISPLAY_ENABLED = True: exibe mensagem formatada
         - Se DISPLAY_ENABLED = False: não exibe nada (modo silencioso)
+        - Remove emojis para compatibilidade com Windows
     """
     if DISPLAY_ENABLED:
         timestamp = time.strftime('%H:%M:%S')
-        print(f"[{timestamp}] {mensagem}")
+        mensagem_limpa = limpar_emojis_windows(mensagem)
+        print(f"[{timestamp}] {mensagem_limpa}")
 
 def carregar_parametros(arquivo_config: str = "parametros.json") -> Dict[str, Any]:
     """
@@ -5088,8 +5126,11 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
     inicio_execucao = time.time()
     
     try:
-        # Inicializar ProgressTracker
-        progress_tracker = ProgressTracker(total_etapas=15, usar_arquivo=False)
+        # Inicializar ProgressTracker com session_id
+        import uuid
+        # Usar session_id do argumento se fornecido, senão gerar um novo
+        session_id = args.session if args.session else str(uuid.uuid4())[:8]
+        progress_tracker = ProgressTracker(total_etapas=15, usar_arquivo=True, session_id=session_id)
         progress_tracker.update_progress(0, "Iniciando RPA")
         
         # Inicializar Sistema de Timeout Inteligente (opcional)

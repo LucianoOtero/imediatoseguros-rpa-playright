@@ -29,6 +29,23 @@ import inspect
 # Controle de display global (sem import circular)
 DISPLAY_ENABLED = True  # Será sobrescrito pelo arquivo principal quando necessário
 
+def limpar_emojis_windows(mensagem: str) -> str:
+    """Remove emojis para compatibilidade com Windows"""
+    emojis = {
+        '✅': '[OK]', '🎯': '[ETAPA]', '⚠️': '[AVISO]', '❌': '[ERRO]',
+        '🚨': '[ALERTA]', '💾': '[SALVO]', '⏳': '[AGUARDANDO]', '🔍': '[BUSCANDO]',
+        '📊': '[DADOS]', '🎉': '[SUCESSO]', '💡': '[DICA]', '🔧': '[CONFIG]',
+        '📁': '[ARQUIVO]', '⏰': '[TEMPO]', '🎁': '[BENEFICIO]', '🚗': '[VEICULO]',
+        '👤': '[USUARIO]', '📧': '[EMAIL]', '📍': '[LOCAL]', '⚙️': '[CONFIG]',
+        '🛡️': '[SEGURANCA]', '🔐': '[LOGIN]', '🌐': '[WEB]', '📱': '[MOBILE]',
+        '💻': '[SISTEMA]', '🔄': '[PROCESSANDO]', '📈': '[PROGRESSO]', '🎪': '[CARROSSEL]'
+    }
+    
+    for emoji, substituto in emojis.items():
+        mensagem = mensagem.replace(emoji, substituto)
+    
+    return mensagem
+
 def set_display_enabled(enabled: bool):
     """Define o estado do display globalmente"""
     global DISPLAY_ENABLED
@@ -441,7 +458,8 @@ def log_info(message: str, error_code: Optional[int] = None,
     
     try:
         # Modo normal: salvar no arquivo E exibir no console
-        rpa_logger.info(message, error_code, extra_data)
+        mensagem_limpa = limpar_emojis_windows(message)
+        rpa_logger.info(mensagem_limpa, error_code, extra_data)
     except Exception as e:
         # Fallback silencioso
         pass

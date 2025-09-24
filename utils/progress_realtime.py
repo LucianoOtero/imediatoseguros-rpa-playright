@@ -28,12 +28,19 @@ class ProgressTracker:
         15: "Aguardando cálculo completo"
     }
     
-    def __init__(self, total_etapas: int = 15, usar_arquivo: bool = True):
+    def __init__(self, total_etapas: int = 15, usar_arquivo: bool = True, session_id: str = None):
         self.total_etapas = total_etapas
         self.current_etapa = 0
         self.start_time = datetime.now()
         self.usar_arquivo = usar_arquivo
-        self.progress_file = "temp/progress_status.json" if usar_arquivo else None
+        self.session_id = session_id or "default"
+        
+        # Definir arquivo de progresso baseado na sessão
+        if usar_arquivo:
+            self.progress_file = f"temp/progress_{self.session_id}.json"
+        else:
+            self.progress_file = None
+            
         self.progress_data = {}  # Armazenar dados em memória quando usar_arquivo=False
         self.etapas_historico = []  # Histórico completo das etapas
         
