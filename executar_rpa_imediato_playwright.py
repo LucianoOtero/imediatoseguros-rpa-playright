@@ -5418,22 +5418,23 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             # TELA 5
             if progress_tracker: progress_tracker.update_progress(5, "Elaborando estimativas")
             exibir_mensagem("\n" + "="*50)
-            if executar_com_timeout(smart_timeout, 5, navegar_tela_5_playwright, page, parametros_tempo):
+            dados_carrossel = executar_com_timeout(smart_timeout, 5, navegar_tela_5_playwright, page, parametros_tempo)
+            if dados_carrossel:
                 telas_executadas += 1
                 resultado_telas["tela_5"] = True
                 
                 # Capturar estimativas da tela 5 para ProgressTracker
                 estimativas_tela_5 = None
                 try:
-                    # Tentar obter dados do carrossel se disponíveis
-                    if 'dados_carrossel' in locals() and dados_carrossel:
+                    # Usar dados do carrossel retornados pela função
+                    if dados_carrossel:
                         estimativas_tela_5 = {
                             "timestamp": datetime.now().isoformat(),
                             "coberturas_detalhadas": dados_carrossel.get('coberturas_detalhadas', []),
                             "resumo": {
                                 "total_coberturas": len(dados_carrossel.get('coberturas_detalhadas', [])),
-                                "valor_minimo": dados_carrossel.get('valor_minimo', 'N/A'),
-                                "valor_maximo": dados_carrossel.get('valor_maximo', 'N/A')
+                                "total_beneficios": len(dados_carrossel.get('beneficios_gerais', [])),
+                                "valores_encontrados": dados_carrossel.get('valores_encontrados', 0)
                             }
                         }
                 except:
