@@ -1,0 +1,12 @@
+{
+  "etapa_atual": 5,
+  "total_etapas": 15,
+  "percentual": 33.33333333333333,
+  "status": "executando",
+  "mensagem": "Tela 5 falhou",
+  "timestamp_inicio": "2025-09-26T19:37:57.270523",
+  "timestamp_atualizacao": "2025-09-26T19:38:04.870395",
+  "dados_extra": {},
+  "erros": [],
+  "session_id": "67a53536"
+}

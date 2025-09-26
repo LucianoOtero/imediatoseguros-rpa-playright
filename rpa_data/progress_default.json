@@ -1,0 +1,16 @@
+{
+  "etapa_atual": 5,
+  "total_etapas": 15,
+  "percentual": 33.33333333333333,
+  "status": "executando",
+  "mensagem": "Teste",
+  "timestamp_inicio": "2025-09-26T18:38:23.340016",
+  "timestamp_atualizacao": "2025-09-26T18:38:23.341908",
+  "dados_extra": {
+    "estimativas_tela_5": {
+      "teste": "dados"
+    }
+  },
+  "erros": [],
+  "session_id": "default"
+}

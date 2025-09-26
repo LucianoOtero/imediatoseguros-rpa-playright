@@ -4,7 +4,7 @@
 
 ### **Projeto**: RPA Tô Segurado - Migração Selenium → Playwright
 ### **Status**: ✅ **MIGRAÇÃO COMPLETA REALIZADA**
-### **Versão**: v3.4.0 - Detecção de Cotação Manual Implementada
+### **Versão**: v3.5.1 - ProgressTracker com Estimativas da Tela 5
 ### **Resultado**: Sistema RPA completo funcionando com Playwright
 
 ---
@@ -44,6 +44,16 @@
 - **Validação de domínio**: `carro` ou `moto` apenas
 - **Tratamento condicional**: Campo `kit_gas` ignorado para motos
 - **Compatibilidade**: Total com versões anteriores
+
+### ✅ **PROGRESSTRACKER COM ESTIMATIVAS DA TELA 5 (v3.5.1)**
+- **ProgressTracker integrado**: Diretamente em `navegar_tela_5_playwright()`
+- **Estimativas em tempo real**: Dados da Tela 5 transmitidos instantaneamente
+- **Deduplicação inteligente**: 3 coberturas únicas (CompreensivaDe, Roubo, RCFDe)
+- **Arquivo JSON populado**: Estimativas salvas em `rpa_data/progress_*.json`
+- **Arquitetura simplificada**: 69 linhas removidas (wrapper desnecessário)
+- **Backend Redis e JSON**: Ambos suportam estimativas da Tela 5
+- **Interface unificada**: Detecção automática de backend
+- **Session management**: Suporte a execuções concorrentes
 
 ### ✅ **DETECÇÃO DE COTAÇÃO MANUAL (v3.4.0)**
 - **Detecção automática**: Quando não há cotação automática
@@ -340,7 +350,15 @@ context = browser.new_context(
 - ✅ Teste Ponta-a-Ponta Completo
 - ✅ Validação e Estrutura JSON Padronizada
 
-### **v3.5.0 (PRÓXIMA VERSÃO)**
+### **v3.5.1 (IMPLEMENTADO)**
+- ✅ ProgressTracker com Estimativas da Tela 5
+- ✅ Deduplicação Inteligente de Coberturas
+- ✅ Arquitetura Simplificada
+- ✅ Backend Redis e JSON Suportam Estimativas
+- ✅ Interface Unificada com Detecção Automática
+- ✅ Session Management para Execuções Concorrentes
+
+### **v3.6.0 (PRÓXIMA VERSÃO)**
 - 🔄 Conversor Unicode → ASCII
 - 📊 Sistema de Screenshots de Debug
 - 🔄 Modo de Execução via Linha de Comando
@@ -396,6 +414,6 @@ Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalh
 
 ---
 
-**Status**: ✅ **DETECÇÃO DE COTAÇÃO MANUAL IMPLEMENTADA - v3.4.0**  
-**Última Atualização**: 24/09/2025  
-**Próxima Versão**: v3.5.0
+**Status**: ✅ **PROGRESSTRACKER COM ESTIMATIVAS DA TELA 5 IMPLEMENTADO - v3.5.1**  
+**Última Atualização**: 26/09/2025  
+**Próxima Versão**: v3.6.0

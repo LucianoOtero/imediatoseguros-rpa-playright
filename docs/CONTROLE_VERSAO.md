@@ -15,9 +15,42 @@
 - **Histórico**: ✅ Completo
 - **Repositório**: https://github.com/LucianoOtero/imediatoseguros-rpa-playright.git
 
+## 🏆 **PROGRESSTRACKER COM ESTIMATIVAS DA TELA 5 - v3.5.1**
+
+### ✅ **Nova Versão Principal**: v3.5.1
+- **Commit**: `0867c9e`
+- **Data**: 26/09/2025
+- **Status**: ✅ **PROGRESSTRACKER COM ESTIMATIVAS DA TELA 5 IMPLEMENTADO**
+- **Tag**: `v3.5.1`
+- **Funcionalidades**:
+  - ✅ ProgressTracker integrado diretamente em `navegar_tela_5_playwright()`
+  - ✅ Estimativas da Tela 5 capturadas e transmitidas em tempo real
+  - ✅ Deduplicação inteligente de coberturas (3 únicas: CompreensivaDe, Roubo, RCFDe)
+  - ✅ Arquivo JSON populado com dados completos das estimativas
+  - ✅ Código simplificado: 69 linhas removidas (wrapper desnecessário)
+  - ✅ Arquitetura limpa: uma função, uma responsabilidade
+  - ✅ Compatibilidade: funciona com ou sem ProgressTracker
+  - ✅ Backend Redis e JSON: ambos suportam estimativas da Tela 5
+  - ✅ Interface unificada: detecção automática de backend
+  - ✅ Session management: suporte a execuções concorrentes
+
+### **Principais Conquistas da v3.5.1:**
+- **ProgressTracker Funcionando**: Estimativas da Tela 5 transmitidas corretamente
+- **Dados Completos**: 3 coberturas únicas capturadas sem duplicação
+- **Arquitetura Simplificada**: Implementação direta sem wrappers desnecessários
+- **Compatibilidade**: Mantida com todas as versões anteriores
+- **Performance**: Mantida e otimizada
+- **Estabilidade**: Excelente
+- **Captura de dados**: Robusta e confiável
+
+### **Problema Resolvido:**
+- **ANTES**: ProgressTracker recebia dados vazios devido a captura dupla
+- **DEPOIS**: ProgressTracker recebe dados corretos da primeira captura
+- **Solução**: Integração direta na função `navegar_tela_5_playwright()`
+
 ## 🏆 **IMPLEMENTAÇÕES COMPLETAS NO ARQUIVO PRINCIPAL - v3.7.0.4**
 
-### ✅ **Nova Versão Principal**: v3.7.0.11
+### ✅ **Versão Anterior**: v3.7.0.11
 - **Commit**: `bba2f4f`
 - **Data**: 10/01/2025
 - **Status**: ✅ **TODAS AS IMPLEMENTAÇÕES v3.7.0.1, v3.7.0.2, v3.7.0.3, v3.7.0.4, v3.7.0.5, v3.7.0.6, v3.7.0.8, v3.7.0.9, v3.7.0.10 E v3.7.0.11 NO ARQUIVO PRINCIPAL**
