@@ -1316,27 +1316,77 @@ def executar_com_timeout(smart_timeout, tela_num, funcao_tela, *args, **kwargs):
 # FUNÇÕES AUXILIARES
 # ========================================
 
+def extrair_nome_e_valores(texto: str) -> tuple:
+    """
+    Extrai nome da cobertura e valores monetários do texto
+    
+    Args:
+        texto: Texto completo do elemento
+    
+    Returns:
+        tuple: (nome_cobertura, valores_dict)
+    """
+    try:
+        import re
+        
+        # Regex para encontrar nome da cobertura
+        nome_match = re.search(r'Cobertura\s+(\w+)', texto)
+        nome = nome_match.group(1) if nome_match else "Desconhecida"
+        
+        # Regex para encontrar valores monetários
+        valores_match = re.search(r'R\$\s*([\d.,]+).*?até.*?R\$\s*([\d.,]+)', texto)
+        if valores_match:
+            valores = {
+                "de": f"R$ {valores_match.group(1)}",
+                "ate": f"R$ {valores_match.group(2)}"
+            }
+        else:
+            valores = {"de": "", "ate": ""}
+        
+        return nome, valores
+        
+    except:
+        return "Desconhecida", {"de": "", "ate": ""}
+
 def validar_elemento_unico(elemento_texto: str, elementos_processados: set) -> bool:
     """
-    Valida se elemento é único baseado em hash de conteúdo
+    Valida se elemento é único baseado em nome + valores únicos
+    
+    NOVA IMPLEMENTAÇÃO: Critério mais inteligente
+    FALLBACK: Algoritmo original se nova lógica falhar
     
     Args:
         elemento_texto: Texto do elemento a ser validado
-        elementos_processados: Set com hashes de elementos já processados
+        elementos_processados: Set com elementos já processados
     
     Returns:
         bool: True se elemento é único, False se é duplicado
     """
     try:
-        import hashlib
-        hash_conteudo = hashlib.md5(elemento_texto.encode()).hexdigest()
-        if hash_conteudo in elementos_processados:
+        # NOVA LÓGICA: Extrair nome e valores
+        nome, valores = extrair_nome_e_valores(elemento_texto)
+        chave_unica = f"{nome}_{valores['de']}_{valores['ate']}"
+        
+        if chave_unica in elementos_processados:
+            exibir_mensagem(f"[DUPLICATA] Ignorada: {nome} ({valores['de']} - {valores['ate']})")
             return False
         
-        elementos_processados.add(hash_conteudo)
+        elementos_processados.add(chave_unica)
+        exibir_mensagem(f"[UNICA] Aceita: {nome} ({valores['de']} - {valores['ate']})")
         return True
-    except:
-        return True  # Fallback: permitir elemento se validação falhar
+        
+    except Exception as e:
+        exibir_mensagem(f"[FALLBACK] Usando algoritmo original: {str(e)}")
+        # FALLBACK: Algoritmo original
+        try:
+            import hashlib
+            hash_conteudo = hashlib.md5(elemento_texto.encode()).hexdigest()
+            if hash_conteudo in elementos_processados:
+                return False
+            elementos_processados.add(hash_conteudo)
+            return True
+        except:
+            return True  # Fallback final: permitir elemento
 
 # ========================================
 # FUNÇÕES DE NAVEGAÇÃO DAS TELAS
@@ -1810,9 +1860,51 @@ def navegar_tela_5_playwright(page: Page, parametros_tempo) -> bool:
         exception_handler.capturar_excecao(e, "TELA_5", "Erro ao processar Tela 5")
         return False
 
+def validar_dados_capturados(dados_carrossel) -> bool:
+    """
+    Valida se dados capturados são válidos para ProgressTracker
+    
+    Args:
+        dados_carrossel: Dados retornados pela captura
+    
+    Returns:
+        bool: True se dados são válidos, False caso contrário
+    """
+    try:
+        # Verificar se dados não são None
+        if not dados_carrossel:
+            exibir_mensagem("[VALIDACAO] Dados são None")
+            return False
+        
+        # Verificar se é dicionário
+        if not isinstance(dados_carrossel, dict):
+            exibir_mensagem("[VALIDACAO] Dados não são dicionário")
+            return False
+        
+        # Verificar se tem coberturas detalhadas
+        coberturas = dados_carrossel.get('coberturas_detalhadas', [])
+        if not coberturas:
+            exibir_mensagem("[VALIDACAO] Lista de coberturas está vazia")
+            return False
+        
+        # Verificar se lista não está vazia
+        if len(coberturas) == 0:
+            exibir_mensagem("[VALIDACAO] Lista de coberturas tem tamanho zero")
+            return False
+        
+        exibir_mensagem(f"[VALIDACAO] Dados válidos: {len(coberturas)} coberturas")
+        return True
+        
+    except Exception as e:
+        exibir_mensagem(f"[VALIDACAO] Erro na validação: {str(e)}")
+        return False
+
 def navegar_tela_5_playwright_com_dados(page: Page, parametros_tempo) -> dict:
     """
     Wrapper que executa navegação da Tela 5 e retorna dados capturados
+    
+    NOVA IMPLEMENTAÇÃO: Validação robusta dos dados
+    FALLBACK: Comportamento original se validação falhar
     
     Args:
         page: Instância do Playwright Page
@@ -1822,19 +1914,26 @@ def navegar_tela_5_playwright_com_dados(page: Page, parametros_tempo) -> dict:
         dict: Dados do carrossel capturados ou dict vazio se falhar
     """
     try:
-        # Executar navegação original
+        # LÓGICA ORIGINAL MANTIDA
         sucesso = navegar_tela_5_playwright(page, parametros_tempo)
         
         if sucesso:
-            # Capturar dados se navegação foi bem-sucedida
+            # LÓGICA ORIGINAL MANTIDA
             dados_carrossel = capturar_dados_carrossel_estimativas_playwright(page)
-            return dados_carrossel or {}
+            
+            # NOVA VALIDAÇÃO: Verificar integridade dos dados
+            if validar_dados_capturados(dados_carrossel):
+                exibir_mensagem(f"[SUCCESS] Dados válidos retornados: {len(dados_carrossel.get('coberturas_detalhadas', []))} coberturas")
+                return dados_carrossel
+            else:
+                exibir_mensagem("[WARNING] Dados inválidos, retornando dict vazio")
+                return {}
         else:
-            exibir_mensagem("[AVISO] Navegação da Tela 5 falhou, dados não capturados")
+            exibir_mensagem("[ERROR] Navegação falhou")
             return {}
             
     except Exception as e:
-        exibir_mensagem(f"[ERRO] Erro ao capturar dados da Tela 5: {str(e)}")
+        exibir_mensagem(f"[ERROR] Erro na wrapper: {str(e)}")
         return {}
 
 def navegar_tela_zero_km_playwright(page: Page, parametros: Dict[str, Any]) -> bool:
