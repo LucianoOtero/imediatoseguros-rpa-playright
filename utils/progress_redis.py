@@ -110,6 +110,22 @@ class RedisProgressTracker:
         elif self.usar_arquivo:
             self._salvar_progresso_arquivo()
     
+    def add_estimativas(self, estimativas: Dict[str, Any]):
+        """
+        Adiciona estimativas da tela 5 ao progresso
+        
+        Args:
+            estimativas: Dados das estimativas capturadas na tela 5
+        """
+        if estimativas:
+            self.dados_extra['estimativas_tela_5'] = estimativas
+            self.timestamp_atualizacao = datetime.now().isoformat()
+            # Salvar progresso atualizado
+            if self.redis_client:
+                self._salvar_progresso_redis()
+            elif self.usar_arquivo:
+                self._salvar_progresso_arquivo()
+    
     def add_error(self, erro: str, contexto: str = ""):
         """
         Adiciona um erro ao progresso

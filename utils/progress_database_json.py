@@ -96,6 +96,20 @@ class DatabaseProgressTracker:
         if self.usar_arquivo:
             self._salvar_progresso()
     
+    def add_estimativas(self, estimativas: Dict[str, Any]):
+        """
+        Adiciona estimativas da tela 5 ao progresso
+        
+        Args:
+            estimativas: Dados das estimativas capturadas na tela 5
+        """
+        if estimativas:
+            self.dados_extra['estimativas_tela_5'] = estimativas
+            self.timestamp_atualizacao = datetime.now().isoformat()
+            
+            if self.usar_arquivo:
+                self._salvar_progresso()
+    
     def finalizar(self, status_final: str = "success", dados_finais: Dict[str, Any] = None, erro_final: str = None):
         """
         Finaliza o progresso
