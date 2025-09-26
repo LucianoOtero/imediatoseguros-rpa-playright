@@ -1,0 +1,12 @@
+{
+  "etapa_atual": 0,
+  "total_etapas": 15,
+  "percentual": 0.0,
+  "status": "iniciando",
+  "mensagem": "Inicializando",
+  "timestamp_inicio": "2025-09-26T13:15:02.307755",
+  "timestamp_atualizacao": "2025-09-26T13:15:02.307763",
+  "dados_extra": {},
+  "erros": [],
+  "session_id": "test_auto"
+}

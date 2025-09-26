@@ -1,0 +1,13 @@
+{
+  "session_id": "teste_chrome_123",
+  "etapa_atual": 15,
+  "total_etapas": 15,
+  "percentual": 100.0,
+  "status": "RPA concluído com sucesso",
+  "descricao_etapa": "",
+  "tempo_decorrido": 85.196892,
+  "tempo_estimado_restante": 0.0,
+  "dados_extras": null,
+  "timestamp": 1758748316.666296,
+  "created_at": "2025-09-24T18:11:56.666296"
+}

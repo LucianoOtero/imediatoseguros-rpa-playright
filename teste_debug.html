@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug JavaScript</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        input { padding: 10px; margin: 10px 0; width: 200px; }
+        button { padding: 10px 20px; background: #007cba; color: white; border: none; cursor: pointer; }
+        button:hover { background: #005a87; }
+        #resultado { margin-top: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Debug JavaScript</h1>
+    
+    <div>
+        <label for="placa">Placa do Veículo:</label><br>
+        <input type="text" id="placa" placeholder="Ex: MIH5B55" maxlength="7" value="MIH5B55">
+        <button onclick="testarProxy()">🔍 Testar Proxy</button>
+        <button onclick="testarJS()">🔍 Testar JS</button>
+    </div>
+    
+    <div id="resultado"></div>
+    
+    <script>
+        // Teste direto do proxy
+        function testarProxy() {
+            const placa = document.getElementById("placa").value.trim().toUpperCase();
+            document.getElementById("resultado").innerHTML = "🔄 Testando proxy diretamente...";
+            
+            fetch(`proxy_placa_fipe_final.php?placa=${placa}`)
+                .then(response => {
+                    console.log("Response status:", response.status);
+                    console.log("Response headers:", response.headers);
+                    return response.text();
+                })
+                .then(text => {
+                    console.log("Raw response:", text);
+                    try {
+                        const data = JSON.parse(text);
+                        document.getElementById("resultado").innerHTML = 
+                            "<div class='success'>" +
+                            "<h3>✅ Proxy Funcionando!</h3>" +
+                            "<pre>" + JSON.stringify(data, null, 2) + "</pre>" +
+                            "</div>";
+                    } catch (e) {
+                        document.getElementById("resultado").innerHTML = 
+                            "<div class='error'>" +
+                            "<h3>❌ Erro ao parsear JSON:</h3>" +
+                            "<p>" + e.message + "</p>" +
+                            "<pre>" + text + "</pre>" +
+                            "</div>";
+                    }
+                })
+                .catch(error => {
+                    console.error("Erro:", error);
+                    document.getElementById("resultado").innerHTML = 
+                        "<div class='error'>" +
+                        "<h3>❌ Erro de Conexão:</h3><p>" + error.message + "</p>" +
+                        "</div>";
+                });
+        }
+        
+        // Teste com JavaScript atualizado
+        function testarJS() {
+            const placa = document.getElementById("placa").value.trim().toUpperCase();
+            document.getElementById("resultado").innerHTML = "🔄 Testando JavaScript...";
+            
+            // Verificar se as funções existem
+            console.log("toUpperNospace existe?", typeof toUpperNospace);
+            console.log("onlyDigits existe?", typeof onlyDigits);
+            console.log("validarPlacaApi existe?", typeof validarPlacaApi);
+            
+            if (typeof validarPlacaApi === 'undefined') {
+                document.getElementById("resultado").innerHTML = 
+                    "<div class='error'>" +
+                    "<h3>❌ Função validarPlacaApi não encontrada!</h3>" +
+                    "<p>Verifique se o arquivo valida-placa.js está sendo carregado corretamente.</p>" +
+                    "</div>";
+                return;
+            }
+            
+            validarPlacaApi(placa)
+                .then(result => {
+                    console.log("Resultado:", result);
+                    if (result.ok) {
+                        document.getElementById("resultado").innerHTML = 
+                            "<div class='success'>" +
+                            "<h3>✅ JavaScript Funcionando!</h3>" +
+                            "<p><strong>Placa:</strong> " + placa + "</p>" +
+                            "<p><strong>Marca/Modelo:</strong> " + result.parsed.marcaTxt + "</p>" +
+                            "<p><strong>Ano:</strong> " + result.parsed.anoModelo + "</p>" +
+                            "<p><strong>Tipo:</strong> " + result.parsed.tipoVeiculo + "</p>" +
+                            "<pre>" + JSON.stringify(result, null, 2) + "</pre>" +
+                            "</div>";
+                    } else {
+                        document.getElementById("resultado").innerHTML = 
+                            "<div class='error'>" +
+                            "<h3>❌ Erro na validação:</h3><p>" + result.reason + "</p>" +
+                            "<pre>" + JSON.stringify(result, null, 2) + "</pre>" +
+                            "</div>";
+                    }
+                })
+                .catch(error => {
+                    console.error("Erro:", error);
+                    document.getElementById("resultado").innerHTML = 
+                        "<div class='error'>" +
+                        "<h3>❌ Erro de Conexão:</h3><p>" + error.message + "</p>" +
+                        "</div>";
+                });
+        }
+    </script>
+    
+    <script src="valida-placa.js"></script>
+</body>
+</html>
+
+
+
+
+
+

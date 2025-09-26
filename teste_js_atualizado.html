@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste JavaScript Atualizado</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        input { padding: 10px; margin: 10px 0; width: 200px; }
+        button { padding: 10px 20px; background: #007cba; color: white; border: none; cursor: pointer; }
+        button:hover { background: #005a87; }
+        #resultado { margin-top: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Teste JavaScript Atualizado</h1>
+    <p>Testando a integração com a nova API doc.placa.fipe</p>
+    
+    <div>
+        <label for="placa">Placa do Veículo:</label><br>
+        <input type="text" id="placa" placeholder="Ex: MIH5B55" maxlength="7">
+        <button onclick="testar()">🔍 Testar</button>
+    </div>
+    
+    <div id="resultado"></div>
+    
+    <script src="valida-placa.js"></script>
+    <script>
+        function testar() {
+            const placa = document.getElementById("placa").value.trim().toUpperCase();
+            if (!placa) {
+                alert("Por favor, digite uma placa!");
+                return;
+            }
+            
+            document.getElementById("resultado").innerHTML = "🔄 Consultando API...";
+            
+            validarPlacaApi(placa)
+                .then(result => {
+                    if (result.ok) {
+                        document.getElementById("resultado").innerHTML = 
+                            "<div class='success'>" +
+                            "<h3>✅ Sucesso!</h3>" +
+                            "<p><strong>Placa:</strong> " + placa + "</p>" +
+                            "<p><strong>Marca/Modelo:</strong> " + result.parsed.marcaTxt + "</p>" +
+                            "<p><strong>Ano:</strong> " + result.parsed.anoModelo + "</p>" +
+                            "<p><strong>Tipo:</strong> " + result.parsed.tipoVeiculo + "</p>" +
+                            "</div>";
+                    } else {
+                        document.getElementById("resultado").innerHTML = 
+                            "<div class='error'>" +
+                            "<h3>❌ Erro:</h3><p>" + result.reason + "</p>" +
+                            "</div>";
+                    }
+                })
+                .catch(error => {
+                    document.getElementById("resultado").innerHTML = 
+                        "<div class='error'>" +
+                        "<h3>❌ Erro de Conexão:</h3><p>" + error.message + "</p>" +
+                        "</div>";
+                });
+        }
+        
+        // Teste automático com placas conhecidas
+        function testarPlacas() {
+            const placas = ['MIH5B55', 'FPG8D63', 'TKH6F60'];
+            placas.forEach((placa, index) => {
+                setTimeout(() => {
+                    document.getElementById("placa").value = placa;
+                    testar();
+                }, index * 2000);
+            });
+        }
+    </script>
+    
+    <div style="margin-top: 30px;">
+        <h3>🧪 Teste Automático</h3>
+        <button onclick="testarPlacas()">Testar Placas Conhecidas</button>
+        <p><small>Testará: MIH5B55 (carro), FPG8D63 (carro), TKH6F60 (moto)</small></p>
+    </div>
+</body>
+</html>
+
+
+
+
+
+

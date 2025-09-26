@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Validação de Placa</title>
+</head>
+<body>
+    <h1>Teste Validação de Placa</h1>
+    <input type="text" id="placa" placeholder="Digite uma placa" value="MIH5B55">
+    <button onclick="testar()">Testar Validação</button>
+    <div id="resultado"></div>
+    
+    <script src="valida-placa.js"></script>
+    <script>
+        function testar() {
+            const placa = document.getElementById("placa").value;
+            const isValid = validarPlacaFormato(placa);
+            
+            document.getElementById("resultado").innerHTML = 
+                "<h3>Resultado:</h3>" +
+                "<p><strong>Placa:</strong> " + placa + "</p>" +
+                "<p><strong>Válida:</strong> " + (isValid ? "✅ SIM" : "❌ NÃO") + "</p>";
+        }
+        
+        // Teste automático
+        testar();
+    </script>
+</body>
+</html>
+
+
+
+
+
+
