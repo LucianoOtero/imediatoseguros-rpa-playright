@@ -1,153 +1,236 @@
-import json
+"""
+Interface unificada para ProgressTracker
+Detecção automática de backend (Redis vs JSON)
+"""
+
 import os
-from datetime import datetime
-from typing import Dict, Any
+from typing import Optional
+from .progress_database_json import DatabaseProgressTracker
+from .progress_redis import RedisProgressTracker
+
+
+def detectar_progress_tracker(tipo_solicitado: str = 'auto') -> Optional[type]:
+    """
+    Detecta automaticamente o melhor progress tracker disponível
+    
+    Args:
+        tipo_solicitado: Tipo solicitado ('auto', 'redis', 'json', 'none')
+        
+    Returns:
+        Classe do progress tracker ou None
+    """
+    if tipo_solicitado == 'none':
+        return None
+    
+    if tipo_solicitado == 'redis':
+        try:
+            return RedisProgressTracker
+        except ImportError:
+            print("⚠️  Redis não disponível, usando JSON como fallback")
+            return DatabaseProgressTracker
+    
+    if tipo_solicitado == 'json':
+        return DatabaseProgressTracker
+    
+    # Modo 'auto' - detectar automaticamente
+    try:
+        import redis
+        r = redis.Redis(
+            host=os.getenv('REDIS_HOST', 'localhost'),
+            port=int(os.getenv('REDIS_PORT', 6379)),
+            db=int(os.getenv('REDIS_DB', 0)),
+            password=os.getenv('REDIS_PASSWORD', None),
+            socket_connect_timeout=2,
+            socket_timeout=2
+        )
+        r.ping()
+        print("✅ Redis detectado, usando Redis Progress Tracker")
+        return RedisProgressTracker
+    except Exception:
+        print("⚠️  Redis não disponível, usando JSON Progress Tracker")
+        return DatabaseProgressTracker
 
 
 class ProgressTracker:
     """
-    Sistema de progresso em tempo real para RPA
+    Interface unificada para ProgressTracker
+    Detecta automaticamente o melhor backend disponível
     """
     
-    # Mapeamento de etapas para descrições compreensivas
-    DESCRICOES_ETAPAS = {
-        1: "Selecionando Tipo de Veiculo",
-        2: "Selecionando veículo com a placa informada",
-        3: "Confirmando seleção do veículo",
-        4: "Calculando como novo Seguro",
-        5: "Elaborando estimativas",
-        6: "Seleção de detalhes do veículo",
-        7: "Definição de local de pernoite com o CEP informado",
-        8: "Definição do uso do veículo",
-        9: "Preenchimento dos dados pessoais",
-        10: "Definição do Condutor Principal",
-        11: "Definição do uso do veículo",
-        12: "Definição do tipo de garagem",
-        13: "Definição de residentes",
-        14: "Definição do Corretor",
-        15: "Aguardando cálculo completo"
-    }
-    
-    def __init__(self, total_etapas: int = 15, usar_arquivo: bool = True, session_id: str = None):
-        self.total_etapas = total_etapas
-        self.current_etapa = 0
-        self.start_time = datetime.now()
-        self.usar_arquivo = usar_arquivo
-        self.session_id = session_id or "default"
+    def __init__(self, total_etapas: int = 15, usar_arquivo: bool = True, session_id: str = None, tipo: str = 'auto'):
+        """
+        Inicializa o ProgressTracker com detecção automática
         
-        # Definir arquivo de progresso baseado na sessão
-        if usar_arquivo:
-            self.progress_file = f"temp/progress_{self.session_id}.json"
+        Args:
+            total_etapas: Número total de etapas (padrão: 15)
+            usar_arquivo: Se deve usar arquivo para persistência
+            session_id: ID da sessão para execução concorrente
+            tipo: Tipo de backend ('auto', 'redis', 'json', 'none')
+        """
+        self.tipo = tipo
+        self.session_id = session_id
+        
+        # Detectar tipo de progress tracker
+        ProgressTrackerClass = detectar_progress_tracker(tipo)
+        
+        if ProgressTrackerClass:
+            self.tracker = ProgressTrackerClass(
+                total_etapas=total_etapas,
+                usar_arquivo=usar_arquivo,
+                session_id=session_id
+            )
         else:
-            self.progress_file = None
-            
-        self.progress_data = {}  # Armazenar dados em memória quando usar_arquivo=False
-        self.etapas_historico = []  # Histórico completo das etapas
-        
-    def update_progress(self, etapa_atual: int, status: str = None,
-                       details: Dict[str, Any] = None):
-        """
-        Atualiza o progresso de forma segura
-        """
-        try:
-            self.current_etapa = etapa_atual
-            
-            # Usar descrição padrão se não fornecida
-            if status is None:
-                status = self.DESCRICOES_ETAPAS.get(
-                    etapa_atual, f"Etapa {etapa_atual}"
-                )
-            
-            progress_data = {
-                "timestamp": datetime.now().isoformat(),
-                "etapa_atual": etapa_atual,
-                "total_etapas": self.total_etapas,
-                "percentual": (etapa_atual / self.total_etapas) * 100,
-                "status": status,
-                "descricao_etapa": self.DESCRICOES_ETAPAS.get(
-                    etapa_atual, f"Etapa {etapa_atual}"
-                ),
-                "tempo_decorrido": (
-                    datetime.now() - self.start_time
-                ).total_seconds(),
-                "tempo_estimado_restante": self._calcular_tempo_restante(),
-                "details": details or {}
-            }
-            
-            # Adicionar ao histórico
-            etapa_info = {
-                "etapa": etapa_atual,
-                "status": status,
-                "timestamp": datetime.now().isoformat(),
-                "tempo_etapa": progress_data["tempo_decorrido"]
-            }
-            self.etapas_historico.append(etapa_info)
-            
-            # Adicionar informações específicas para Etapa 5
-            if etapa_atual == 5 and details:
-                progress_data["json_retorno"] = "Estimativas disponíveis"
-            
-            if self.usar_arquivo:
-                # Modo atual: salvar arquivo (compatibilidade)
-                with open(self.progress_file, 'w', encoding='utf-8') as f:
-                    json.dump(progress_data, f, indent=2, ensure_ascii=False)
-            else:
-                # Modo novo: armazenar em memória
-                self.progress_data = progress_data
-                
-            return True
-        except Exception as e:
-            # Log de erro sem interromper execução
-            print(f"⚠️ Erro ao atualizar progresso: {e}")
-            return False
+            self.tracker = None
     
-    def _calcular_tempo_restante(self) -> float:
-        """Calcula tempo estimado restante baseado no progresso atual"""
-        if self.current_etapa == 0:
-            return 0
-        
-        tempo_medio_por_etapa = (
-            datetime.now() - self.start_time
-        ).total_seconds() / self.current_etapa
-        etapas_restantes = self.total_etapas - self.current_etapa
-        return tempo_medio_por_etapa * etapas_restantes
+    def update_progress(self, etapa: int, mensagem: str = "", dados_extra: dict = None):
+        """Atualiza o progresso da execução"""
+        if self.tracker:
+            self.tracker.update_progress(etapa, mensagem, dados_extra)
     
-    def get_current_progress(self) -> Dict[str, Any]:
+    def add_error(self, erro: str, contexto: str = ""):
+        """Adiciona um erro ao progresso"""
+        if self.tracker:
+            self.tracker.add_error(erro, contexto)
+    
+    def finalizar(self, status_final: str = "success", dados_finais: dict = None, erro_final: str = None):
+        """Finaliza o progresso"""
+        if self.tracker:
+            self.tracker.finalizar(status_final, dados_finais, erro_final)
+    
+    def get_progress(self) -> dict:
         """Retorna o progresso atual"""
-        try:
-            if os.path.exists(self.progress_file):
-                with open(self.progress_file, 'r', encoding='utf-8') as f:
-                    return json.load(f)
-            return {}
-        except Exception as e:
-            print(f"⚠️ Erro ao ler progresso: {e}")
-            return {}
-    
-    def get_progress(self) -> Dict[str, Any]:
-        """
-        Retorna dados de progresso para inclusão no resultado final
-        """
-        if self.usar_arquivo:
-            # Modo compatibilidade: ler do arquivo
-            try:
-                with open(self.progress_file, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
-                    # Adicionar histórico se disponível
-                    data["etapas_historico"] = self.etapas_historico
-                    return data
-            except:
-                return {"erro": "Arquivo de progresso não encontrado"}
+        if self.tracker:
+            return self.tracker.get_progress()
         else:
-            # Modo novo: retornar dados da memória
-            if self.progress_data:
-                self.progress_data["etapas_historico"] = self.etapas_historico
-                return self.progress_data
-            else:
-                return {"erro": "Dados de progresso não disponíveis"}
+            return {
+                "etapa_atual": 0,
+                "total_etapas": 15,
+                "percentual": 0.0,
+                "status": "iniciando",
+                "mensagem": "ProgressTracker desabilitado",
+                "timestamp_inicio": "",
+                "timestamp_atualizacao": "",
+                "dados_extra": {},
+                "erros": [],
+                "session_id": self.session_id,
+                "backend": "none"
+            }
     
-    def reset_progress(self):
-        """Reseta o progresso"""
-        self.current_etapa = 0
-        self.start_time = datetime.now()
-        self.etapas_historico = []
-        self.update_progress(0, "Progresso resetado")
+    def limpar_dados(self):
+        """Remove os dados da sessão"""
+        if self.tracker:
+            if hasattr(self.tracker, 'limpar_dados'):
+                self.tracker.limpar_dados()
+            elif hasattr(self.tracker, 'limpar_arquivos'):
+                self.tracker.limpar_arquivos()
+    
+    @classmethod
+    def carregar_sessao(cls, session_id: str, tipo: str = 'auto') -> Optional['ProgressTracker']:
+        """
+        Carrega uma sessão existente
+        
+        Args:
+            session_id: ID da sessão
+            tipo: Tipo de backend ('auto', 'redis', 'json', 'none')
+            
+        Returns:
+            ProgressTracker carregado ou None
+        """
+        # Tentar carregar do Redis primeiro
+        if tipo in ['auto', 'redis']:
+            try:
+                tracker_redis = RedisProgressTracker.carregar_sessao(session_id)
+                if tracker_redis:
+                    progress_tracker = cls(tipo='redis', session_id=session_id)
+                    progress_tracker.tracker = tracker_redis
+                    return progress_tracker
+            except Exception:
+                pass
+        
+        # Fallback para JSON
+        if tipo in ['auto', 'json']:
+            try:
+                tracker_json = DatabaseProgressTracker.carregar_sessao(session_id)
+                if tracker_json:
+                    progress_tracker = cls(tipo='json', session_id=session_id)
+                    progress_tracker.tracker = tracker_json
+                    return progress_tracker
+            except Exception:
+                pass
+        
+        return None
+    
+    def __getattr__(self, name):
+        """Delega atributos não encontrados para o tracker interno"""
+        if self.tracker:
+            return getattr(self.tracker, name)
+        else:
+            raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")
+
+
+# Alias para compatibilidade com a v3.4.0
+def criar_progress_tracker(total_etapas: int = 15, usar_arquivo: bool = True, session_id: str = None, tipo: str = 'auto') -> ProgressTracker:
+    """
+    Função de conveniência para criar um ProgressTracker
+    
+    Args:
+        total_etapas: Número total de etapas
+        usar_arquivo: Se deve usar arquivo para persistência
+        session_id: ID da sessão
+        tipo: Tipo de backend
+        
+    Returns:
+        ProgressTracker configurado
+    """
+    return ProgressTracker(
+        total_etapas=total_etapas,
+        usar_arquivo=usar_arquivo,
+        session_id=session_id,
+        tipo=tipo
+    )
+
+
+# Função para verificar disponibilidade do Redis
+def verificar_redis_disponivel() -> bool:
+    """
+    Verifica se o Redis está disponível
+    
+    Returns:
+        True se Redis está disponível, False caso contrário
+    """
+    try:
+        import redis
+        r = redis.Redis(
+            host=os.getenv('REDIS_HOST', 'localhost'),
+            port=int(os.getenv('REDIS_PORT', 6379)),
+            db=int(os.getenv('REDIS_DB', 0)),
+            password=os.getenv('REDIS_PASSWORD', None),
+            socket_connect_timeout=2,
+            socket_timeout=2
+        )
+        r.ping()
+        return True
+    except Exception:
+        return False
+
+
+# Função para obter informações do backend
+def obter_info_backend() -> dict:
+    """
+    Obtém informações sobre o backend disponível
+    
+    Returns:
+        Dict com informações do backend
+    """
+    redis_disponivel = verificar_redis_disponivel()
+    
+    return {
+        "redis_disponivel": redis_disponivel,
+        "backend_recomendado": "redis" if redis_disponivel else "json",
+        "configuracao_redis": {
+            "host": os.getenv('REDIS_HOST', 'localhost'),
+            "port": int(os.getenv('REDIS_PORT', 6379)),
+            "db": int(os.getenv('REDIS_DB', 0)),
+            "password": "***" if os.getenv('REDIS_PASSWORD') else None
+        }
+    }

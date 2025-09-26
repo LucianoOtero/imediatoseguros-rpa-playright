@@ -5178,19 +5178,17 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
     inicio_execucao = time.time()
     
     try:
-        # Inicializar ProgressTracker com session_id
+        # Inicializar ProgressTracker com session_id e tipo
         import uuid
         # Usar session_id do argumento se fornecido, senão gerar um novo
         session_id = args.session if args.session else str(uuid.uuid4())[:8]
-        
-        # Detectar tipo de progress tracker
-        ProgressTracker = detectar_progress_tracker(args.progress_tracker)
-        if ProgressTracker:
-            progress_tracker = ProgressTracker(total_etapas=15, session_id=session_id)
-            if progress_tracker: progress_tracker.update_progress(0, "Iniciando RPA")
-        else:
-            progress_tracker = None
-            print("ℹ️  Executando sem progress tracker")
+        progress_tracker = ProgressTracker(
+            total_etapas=15, 
+            usar_arquivo=True, 
+            session_id=session_id,
+            tipo=args.progress_tracker
+        )
+        progress_tracker.update_progress(0, "Iniciando RPA")
         
         # Inicializar Sistema de Timeout Inteligente (opcional)
         if TIMEOUT_SYSTEM_AVAILABLE:
@@ -5695,8 +5693,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             arquivo_dados = salvar_dados_planos(dados_planos)
             
             # Finalizar progress tracker
-            if progress_tracker:
-                progress_tracker.finalizar('success', dados_planos)
+            progress_tracker.finalizar('success', dados_planos)
             
             # Fechar browser
             browser.close()
@@ -5736,9 +5733,8 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
     except Exception as e:
         # Atualizar progresso em caso de erro
         try:
-            if progress_tracker:
-                if progress_tracker: progress_tracker.update_progress(0, f"RPA interrompido por erro: {str(e)}")
-                progress_tracker.finalizar('error', None, str(e))
+            progress_tracker.update_progress(0, f"RPA interrompido por erro: {str(e)}")
+            progress_tracker.finalizar('error', None, str(e))
         except:
             pass  # Não falhar se o progress tracker der erro
         
