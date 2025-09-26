@@ -10,7 +10,7 @@ DESCRIÇÃO:
 - Captura de dados dos planos de seguro
 - Estrutura de retorno padronizada
 
-🎯 IMPLEMENTAÇÃO SELETOR ESPECÍFICO CARDS ESTIMATIVA (09/09/2025):
+[OBJETIVO] IMPLEMENTAÇÃO SELETOR ESPECÍFICO CARDS ESTIMATIVA (09/09/2025):
 - Substituição div.bg-primary por div[role="group"][aria-roledescription="slide"]
 - Sistema de fallback robusto com múltiplas estratégias
 - Estratégia híbrida: específico + fallbacks de compatibilidade
@@ -18,7 +18,7 @@ DESCRIÇÃO:
 - Melhoria de estabilidade regional (Brasil + Portugal)
 - Documentação completa da implementação
 
-🎯 IMPLEMENTAÇÃO SELETOR ESPECÍFICO SUGESTÕES ENDEREÇO (09/09/2025):
+[OBJETIVO] IMPLEMENTAÇÃO SELETOR ESPECÍFICO SUGESTÕES ENDEREÇO (09/09/2025):
 - Substituição .overflow-hidden por [data-testid="sugestao-endereco"]
 - Sistema de fallback robusto com múltiplas estratégias
 - Estratégia híbrida: específico + semântico + fallback de compatibilidade
@@ -26,7 +26,7 @@ DESCRIÇÃO:
 - Melhoria de estabilidade regional (Brasil + Portugal)
 - Documentação completa da implementação
 
-🎯 IMPLEMENTAÇÃO SELETOR ESPECÍFICO TELA 9 (09/09/2025):
+[OBJETIVO] IMPLEMENTAÇÃO SELETOR ESPECÍFICO TELA 9 (09/09/2025):
 - Substituição xpath genérico por p:has-text("Nessa etapa, precisamos dos seus dados pessoais")
 - Sistema de fallback robusto com múltiplas estratégias
 - Estratégia híbrida: específico + semântico + estrutural + fallback de compatibilidade
@@ -34,7 +34,7 @@ DESCRIÇÃO:
 - Melhoria de estabilidade regional (Brasil + Portugal)
 - Documentação completa da implementação
 
-🎯 IMPLEMENTAÇÃO SELETOR ESPECÍFICO TELA 8 (09/09/2025):
+[OBJETIVO] IMPLEMENTAÇÃO SELETOR ESPECÍFICO TELA 8 (09/09/2025):
 - Substituição xpath genérico por #finalidadeVeiculoTelaUsoVeiculo
 - Sistema de fallback robusto com múltiplas estratégias
 - Estratégia híbrida: específico + semântico + conteúdo + fallback de compatibilidade
@@ -42,14 +42,14 @@ DESCRIÇÃO:
 - Melhoria de estabilidade regional (Brasil + Portugal)
 - Documentação completa da implementação
 
-🔄 IMPLEMENTAÇÃO SELETOR ESPECÍFICO BOTÃO CARRO (09/09/2025):
+[ATUALIZANDO] IMPLEMENTAÇÃO SELETOR ESPECÍFICO BOTÃO CARRO (09/09/2025):
 - Substituição button.group por button:has(img[alt="Icone car"])
 - Sistema de fallback robusto com múltiplas estratégias
 - Estratégia híbrida: específico + fallbacks de compatibilidade
 - Teste completo bem-sucedido (dados gerados às 14:20)
 - Documentação completa da implementação
 
-🔄 ATUALIZAÇÃO DE COMPATIBILIDADE REGIONAL (08/09/2025):
+[ATUALIZANDO] ATUALIZAÇÃO DE COMPATIBILIDADE REGIONAL (08/09/2025):
 - Substituição de seletores genéricos por específicos na Tela 13
 - Resolução de problema de falha em Portugal
 - Melhoria de estabilidade regional (Brasil + Portugal)
@@ -82,7 +82,7 @@ from utils.retorno_estruturado import (
 )
 
 # Importar Sistema de Progresso em Tempo Real
-from utils.progress_realtime import ProgressTracker
+# ProgressTracker será definido dinamicamente na função main()
 
 # Importar Sistema de Timeout Inteligente (opcional)
 try:
@@ -90,7 +90,7 @@ try:
     TIMEOUT_SYSTEM_AVAILABLE = True
 except ImportError:
     TIMEOUT_SYSTEM_AVAILABLE = False
-    exibir_mensagem("⚠️ Sistema de timeout não disponível - usando timeouts padrão")
+    exibir_mensagem("[AVISO] Sistema de timeout não disponível - usando timeouts padrão")
 
 # Importar Sistema de Logger Avançado (opcional)
 try:
@@ -98,7 +98,7 @@ try:
     LOGGER_SYSTEM_AVAILABLE = True
 except ImportError:
     LOGGER_SYSTEM_AVAILABLE = False
-    exibir_mensagem("⚠️ Sistema de logger não disponível - usando logs padrão")
+    exibir_mensagem("[AVISO] Sistema de logger não disponível - usando logs padrão")
 
 # Importar Sistema de Comunicação Bidirecional (opcional)
 try:
@@ -106,7 +106,7 @@ try:
     BIDIRECTIONAL_SYSTEM_AVAILABLE = True
 except ImportError:
     BIDIRECTIONAL_SYSTEM_AVAILABLE = False
-    exibir_mensagem("⚠️ Sistema de comunicação bidirecional não disponível - executando sem controle remoto")
+    exibir_mensagem("[AVISO] Sistema de comunicação bidirecional não disponível - executando sem controle remoto")
 
 # Importar Sistema de Validação de Parâmetros Avançado (opcional)
 try:
@@ -114,7 +114,7 @@ try:
     VALIDATION_SYSTEM_AVAILABLE = True
 except ImportError:
     VALIDATION_SYSTEM_AVAILABLE = False
-    exibir_mensagem("⚠️ Sistema de validação avançado não disponível - usando validação básica")
+    exibir_mensagem("[AVISO] Sistema de validação avançado não disponível - usando validação básica")
 
 # Importar Sistema de Health Check Ultra-Conservador (opcional)
 try:
@@ -122,7 +122,7 @@ try:
     HEALTH_CHECK_AVAILABLE = True
 except ImportError:
     HEALTH_CHECK_AVAILABLE = False
-    exibir_mensagem("⚠️ Sistema de health check não disponível - continuando sem verificação")
+    exibir_mensagem("[AVISO] Sistema de health check não disponível - continuando sem verificação")
 
 
 # ========================================
@@ -166,7 +166,7 @@ SISTEMA DE HEALTH CHECK:
   Documentação completa: docs/HEALTH_CHECK_IMPLEMENTATION_REPORT.md
 
 VALIDAÇÃO RIGOROSA DE PARÂMETROS:
-  ⚠️ EXECUÇÃO INTERROMPIDA se parâmetros inválidos detectados
+  [AVISO] EXECUÇÃO INTERROMPIDA se parâmetros inválidos detectados
   Validação de campos obrigatórios, tipos de dados e formatos
   Validação de CPF, CEP, email, celular (11 dígitos), placa
   Validação de valores permitidos (combustível, sexo, etc.)
@@ -237,27 +237,27 @@ def exibir_documentacao(tipo: str = "completa"):
     """
     if tipo == "completa":
         print("""
-🚀 DOCUMENTAÇÃO COMPLETA - SISTEMA RPA IMEDIATO SEGUROS
+[INICIANDO] DOCUMENTAÇÃO COMPLETA - SISTEMA RPA IMEDIATO SEGUROS
 =======================================================
 
-📋 VISÃO GERAL DO SISTEMA
+[INFO] VISÃO GERAL DO SISTEMA
 =========================
 
 O Sistema RPA Imediato Seguros é uma automação completa para cotação de seguros
 automotivos no sistema Tô Segurado. Executa 15 telas sequencialmente, capturando
 dados em tempo real e gerando JSONs estruturados para integração com PHP.
 
-✅ FUNCIONALIDADES PRINCIPAIS
+[OK] FUNCIONALIDADES PRINCIPAIS
 =============================
 
-• AUTOMAÇÃO COMPLETA: Navegação em 15 telas, preenchimento automático
-• PROGRESSO EM TEMPO REAL: Monitoramento via temp/progress_status.json
-• DADOS ESTRUTURADOS: JSONs padronizados para integração
-• SISTEMA DE RETORNO: Códigos 9001-9999, estrutura consistente
-• INTEGRAÇÃO COM PHP: Arquivos prontos para consumo
-• HEALTH CHECK: Verificação automática de saúde do sistema
+* AUTOMAÇÃO COMPLETA: Navegação em 15 telas, preenchimento automático
+* PROGRESSO EM TEMPO REAL: Monitoramento via temp/progress_status.json
+* DADOS ESTRUTURADOS: JSONs padronizados para integração
+* SISTEMA DE RETORNO: Códigos 9001-9999, estrutura consistente
+* INTEGRAÇÃO COM PHP: Arquivos prontos para consumo
+* HEALTH CHECK: Verificação automática de saúde do sistema
 
-📊 ARQUIVOS GERADOS
+[DADOS] ARQUIVOS GERADOS
 ==================
 
 1. temp/progress_status.json - Monitoramento em tempo real
@@ -267,24 +267,24 @@ dados em tempo real e gerando JSONs estruturados para integração com PHP.
 5. temp/dados_tela_5_*.json - Metadados
 6. temp/cotacao_manual_*.json - Dados para cotação manual
 
-🛡️ SISTEMA DE HEALTH CHECK
+[SEGURO]️ SISTEMA DE HEALTH CHECK
 ==========================
 
 O sistema inclui verificação automática de saúde antes da execução:
 
-• VERIFICAÇÃO DE ARQUIVOS: Validação de arquivos essenciais
-• VERIFICAÇÃO PYTHON: Versão mínima 3.8 e módulos necessários
-• VERIFICAÇÃO RECURSOS: Espaço em disco e permissões de escrita
-• VERIFICAÇÃO CONFIGURAÇÃO: Validação do parametros.json
-• DETECÇÃO AMBIENTE: Identificação automática Windows/Linux
-• EXECUÇÃO NÃO-BLOQUEANTE: Fallback garantido se problemas detectados
+* VERIFICAÇÃO DE ARQUIVOS: Validação de arquivos essenciais
+* VERIFICAÇÃO PYTHON: Versão mínima 3.8 e módulos necessários
+* VERIFICAÇÃO RECURSOS: Espaço em disco e permissões de escrita
+* VERIFICAÇÃO CONFIGURAÇÃO: Validação do parametros.json
+* DETECÇÃO AMBIENTE: Identificação automática Windows/Linux
+* EXECUÇÃO NÃO-BLOQUEANTE: Fallback garantido se problemas detectados
 
-📖 DOCUMENTAÇÃO COMPLETA:
+[DOCUMENTO] DOCUMENTAÇÃO COMPLETA:
   docs/HEALTH_CHECK_IMPLEMENTATION_REPORT.md
 
-🎯 STATUS CODES: 9001 (sucesso) - 9002-9999 (erros específicos)
+[OBJETIVO] STATUS CODES: 9001 (sucesso) - 9002-9999 (erros específicos)
 
-📝 EXEMPLOS DE USO:
+[NOTA] EXEMPLOS DE USO:
   python executar_rpa_imediato_playwright.py
   python executar_rpa_imediato_playwright.py --docs json
   python executar_rpa_imediato_playwright.py --docs php
@@ -293,10 +293,10 @@ O sistema inclui verificação automática de saúde antes da execução:
     
     elif tipo == "json":
         print("""
-📊 DOCUMENTAÇÃO DOS JSONS DE SAÍDA
+[DADOS] DOCUMENTAÇÃO DOS JSONS DE SAÍDA
 ==================================
 
-🎯 VISÃO GERAL DOS JSONS
+[OBJETIVO] VISÃO GERAL DOS JSONS
 =======================
 
 O sistema gera 6 tipos de arquivos JSON para integração com PHP:
@@ -319,7 +319,7 @@ O sistema gera 6 tipos de arquivos JSON para integração com PHP:
 6. temp/cotacao_manual_*.json - COTAÇÃO MANUAL
    Estrutura: dados_coletados, mensagem, tipo_veiculo, status
 
-🔧 EXEMPLO PHP BÁSICO:
+[CONFIG] EXEMPLO PHP BÁSICO:
 ```php
 $progress = json_decode(file_get_contents('temp/progress_status.json'), true);
 $planos = json_decode(file_get_contents('dados_planos_seguro_*.json'), true);
@@ -332,20 +332,20 @@ $cotacao_manual = json_decode(file_get_contents('temp/cotacao_manual_*.json'), t
 �� GUIA DE INTEGRAÇÃO PHP
 =========================
 
-🎯 VISÃO GERAL PARA DESENVOLVEDORES PHP
+[OBJETIVO] VISÃO GERAL PARA DESENVOLVEDORES PHP
 =======================================
 
 O sistema gera JSONs estruturados que podem ser consumidos diretamente
 por funções PHP nativas (json_decode).
 
-📋 ARQUIVOS PRINCIPAIS PARA PHP
+[INFO] ARQUIVOS PRINCIPAIS PARA PHP
 ===============================
 
 1. temp/progress_status.json - Monitoramento em tempo real
 2. dados_planos_seguro_*.json - Dados finais da cotação
 3. temp/json_compreensivo_tela_5_*.json - Dados intermediários
 
-🔄 EXEMPLOS PRÁTICOS PHP
+[ATUALIZANDO] EXEMPLOS PRÁTICOS PHP
 =======================
 
 MONITORAMENTO:
@@ -367,7 +367,7 @@ if ($progress['etapa_atual'] == 15 && $progress['percentual'] == 100.0) {
 }
 ```
 
-🔧 TRATAMENTO DE ERROS:
+[CONFIG] TRATAMENTO DE ERROS:
 ```php
 $dados = json_decode($conteudo, true);
 if (json_last_error() !== JSON_ERROR_NONE) {
@@ -378,16 +378,16 @@ if (json_last_error() !== JSON_ERROR_NONE) {
     
     elif tipo == "params":
         print("""
-📋 DOCUMENTAÇÃO COMPLETA DOS PARÂMETROS JSON
+[INFO] DOCUMENTAÇÃO COMPLETA DOS PARÂMETROS JSON
 ==========================================
 
-🎯 VISÃO GERAL
+[OBJETIVO] VISÃO GERAL
 ==============
 O arquivo parametros.json contém todas as configurações necessárias para
 executar o RPA Tô Segurado. Esta documentação cobre todos os 40+ campos
 disponíveis com seus domínios de valores e funcionalidades.
 
-📁 ESTRUTURA HIERÁRQUICA
+[PASTA] ESTRUTURA HIERÁRQUICA
 ========================
 {
   "configuracao": { ... },      # Configurações do sistema
@@ -433,347 +433,347 @@ disponíveis com seus domínios de valores e funcionalidades.
   "continuar_com_corretor_anterior": true
 }
 
-🔧 SEÇÃO: CONFIGURAÇÃO
+[CONFIG] SEÇÃO: CONFIGURAÇÃO
 =====================
 Controle de comportamento do sistema e timeouts.
 
-• log (boolean): Ativa/desativa logs do sistema
+* log (boolean): Ativa/desativa logs do sistema
   - Valores: true, false
   - Padrão: true
   - Função: Controla geração de logs em logs/
 
-• display (boolean): Exibe mensagens no console
+* display (boolean): Exibe mensagens no console
   - Valores: true, false
   - Padrão: true
   - Função: Controla exibição de mensagens em tempo real
 
-• log_rotacao_dias (integer): Dias para rotação de logs
+* log_rotacao_dias (integer): Dias para rotação de logs
   - Valores: 1-365
   - Padrão: 90
   - Função: Define quando logs antigos são removidos
 
-• log_nivel (string): Nível de log
+* log_nivel (string): Nível de log
   - Valores: "DEBUG", "INFO", "WARNING", "ERROR"
   - Padrão: "INFO"
   - Função: Controla verbosidade dos logs
 
-• tempo_estabilizacao (float): Tempo de espera geral
+* tempo_estabilizacao (float): Tempo de espera geral
   - Valores: 0.1-10.0
   - Padrão: 0.5
   - Função: Tempo de estabilização entre ações
 
-• tempo_carregamento (float): Tempo de carregamento geral
+* tempo_carregamento (float): Tempo de carregamento geral
   - Valores: 0.1-30.0
   - Padrão: 0.5
   - Função: Tempo de espera para carregamento de páginas
 
-• tempo_estabilizacao_tela5 (float): Tempo específico Tela 5
+* tempo_estabilizacao_tela5 (float): Tempo específico Tela 5
   - Valores: 0.1-10.0
   - Padrão: 2.0
   - Função: Tempo extra para estabilização da Tela 5
 
-• tempo_carregamento_tela5 (float): Carregamento específico Tela 5
+* tempo_carregamento_tela5 (float): Carregamento específico Tela 5
   - Valores: 0.1-30.0
   - Padrão: 5.0
   - Função: Tempo extra para carregamento da Tela 5
 
-• tempo_estabilizacao_tela15 (float): Tempo específico Tela 15
+* tempo_estabilizacao_tela15 (float): Tempo específico Tela 15
   - Valores: 0.1-10.0
   - Padrão: 3.0
   - Função: Tempo extra para estabilização da Tela 15
 
-• tempo_carregamento_tela15 (float): Carregamento específico Tela 15
+* tempo_carregamento_tela15 (float): Carregamento específico Tela 15
   - Valores: 0.1-30.0
   - Padrão: 5.0
   - Função: Tempo extra para carregamento da Tela 15
 
-• inserir_log (boolean): Insere logs no sistema
+* inserir_log (boolean): Insere logs no sistema
   - Valores: true, false
   - Padrão: true
   - Função: Controla inserção de logs no sistema
 
-• visualizar_mensagens (boolean): Visualiza mensagens
+* visualizar_mensagens (boolean): Visualiza mensagens
   - Valores: true, false
   - Padrão: true
   - Função: Controla visualização de mensagens
 
-• eliminar_tentativas_inuteis (boolean): Elimina tentativas inúteis
+* eliminar_tentativas_inuteis (boolean): Elimina tentativas inúteis
   - Valores: true, false
   - Padrão: true
   - Função: Otimiza execução eliminando tentativas desnecessárias
 
-🔐 SEÇÃO: AUTENTICAÇÃO
+ SEÇÃO: AUTENTICAÇÃO
 =====================
 Dados de login no sistema Tô Segurado.
 
-• email_login (string): Email de acesso
+* email_login (string): Email de acesso
   - Formato: email válido
   - Exemplo: "usuario@email.com"
   - Função: Email para login no sistema
 
-• senha_login (string): Senha de acesso
+* senha_login (string): Senha de acesso
   - Formato: string
   - Exemplo: "MinhaSenh@123"
   - Função: Senha para login no sistema
 
-• manter_login_atual (boolean): Manter sessão ativa
+* manter_login_atual (boolean): Manter sessão ativa
   - Valores: true, false
   - Padrão: true
   - Função: Controla se mantém login entre execuções
 
-🚗 SEÇÃO: DADOS DO VEÍCULO
+[VEICULO] SEÇÃO: DADOS DO VEÍCULO
 ==========================
 Informações básicas do veículo a ser segurado.
 
-• tipo_veiculo (string): Tipo de veículo para cotação
+* tipo_veiculo (string): Tipo de veículo para cotação
   - Valores: "carro", "moto"
   - Padrão: "carro"
   - Função: Define qual botão será clicado na Tela 1
   - Impacto: Determina fluxo de navegação e campos disponíveis
   - Exemplo: "carro", "moto"
 
-• placa (string): Placa do veículo
+* placa (string): Placa do veículo
   - Formato: ABC1234 ou ABC-1234
   - Exemplo: "ABC1234", "ABC-1234"
   - Função: Identifica o veículo no sistema
 
-• marca (string): Marca do veículo
+* marca (string): Marca do veículo
   - Valores: "TOYOTA", "HONDA", "VOLKSWAGEN", "FORD", etc.
   - Exemplo: "TOYOTA"
   - Função: Marca do veículo para cotação
 
-• modelo (string): Modelo do veículo
+* modelo (string): Modelo do veículo
   - Formato: string descritivo
   - Exemplo: "COROLLA XEI 1.8/1.8 FLEX 16V MEC"
   - Função: Modelo específico do veículo
 
-• ano (string): Ano de fabricação
+* ano (string): Ano de fabricação
   - Formato: YYYY
   - Exemplo: "2009", "2020"
   - Função: Ano de fabricação do veículo
 
-• zero_km (boolean): Veículo zero quilômetro
+* zero_km (boolean): Veículo zero quilômetro
   - Valores: true, false
   - Padrão: false
   - Função: NOVO - Ativa Tela Zero KM condicional
   - Impacto: Se true, pode aparecer tela adicional
 
-• combustivel (string): Tipo de combustível
+* combustivel (string): Tipo de combustível
   - Valores: "Flex", "Gasolina", "Álcool", "Diesel", "Elétrico"
   - Exemplo: "Flex"
   - Função: Tipo de combustível do veículo
 
-• veiculo_segurado (string): Veículo já segurado
+* veiculo_segurado (string): Veículo já segurado
   - Valores: "Sim", "Não"
   - Exemplo: "Não"
   - Função: Indica se veículo já possui seguro
 
-🏠 SEÇÃO: ENDEREÇO
+[CASA] SEÇÃO: ENDEREÇO
 ==================
 Informações de localização e uso do veículo.
 
-• cep (string): CEP do endereço
+* cep (string): CEP do endereço
   - Formato: 00000-000
   - Exemplo: "03317-000"
   - Função: CEP para localização do veículo
 
-• endereco_completo (string): Endereço completo
+* endereco_completo (string): Endereço completo
   - Formato: string descritivo
   - Exemplo: "Rua Serra de Botucatu, 410 APTO 11 - São Paulo, SP"
   - Função: Endereço completo para cotação
 
-• uso_veiculo (string): Finalidade do veículo
+* uso_veiculo (string): Finalidade do veículo
   - Valores: "Pessoal", "Comercial", "Profissional"
   - Exemplo: "Pessoal"
   - Função: Define finalidade de uso do veículo
 
-👤 SEÇÃO: DADOS PESSOAIS
+[USUARIO] SEÇÃO: DADOS PESSOAIS
 ========================
 Informações pessoais do segurado.
 
-• nome (string): Nome completo
+* nome (string): Nome completo
   - Formato: string
   - Exemplo: "ALEX KAMINSKI"
   - Função: Nome do segurado principal
 
-• cpf (string): CPF do segurado
+* cpf (string): CPF do segurado
   - Formato: 00000000000 (11 dígitos)
   - Exemplo: "97137189768"
   - Função: CPF do segurado principal
 
-• data_nascimento (string): Data de nascimento
+* data_nascimento (string): Data de nascimento
   - Formato: DD/MM/AAAA
   - Exemplo: "25/04/1970"
   - Função: Data de nascimento do segurado
 
-• sexo (string): Sexo do segurado
+* sexo (string): Sexo do segurado
   - Valores: "Masculino", "Feminino"
   - Exemplo: "Masculino"
   - Função: Sexo do segurado principal
 
-• estado_civil (string): Estado civil
+* estado_civil (string): Estado civil
   - Valores: "Solteiro", "Casado", "Divorciado", "Viúvo", "Casado ou Uniao Estavel"
   - Exemplo: "Casado ou Uniao Estavel"
   - Função: Estado civil do segurado
 
-• email (string): Email de contato
+* email (string): Email de contato
   - Formato: email válido
   - Exemplo: "alex.kaminski@imediatoseguros.com.br"
   - Função: Email para contato e comunicação
 
-• celular (string): Número de celular
+* celular (string): Número de celular
   - Formato: 11999999999 (11 dígitos)
   - Exemplo: "11953288466"
   - Função: Celular para contato
 
-• endereco (string): Endereço do segurado
+* endereco (string): Endereço do segurado
   - Formato: string descritivo
   - Exemplo: "Rua Serra de Botucatu, Tatuapé - São Paulo/SP"
   - Função: Endereço do segurado
 
-👥 SEÇÃO: CONDUTOR PRINCIPAL
+[USUARIOS] SEÇÃO: CONDUTOR PRINCIPAL
 ============================
 Informações do condutor principal do veículo.
 
-• condutor_principal (boolean): Condutor é o principal
+* condutor_principal (boolean): Condutor é o principal
   - Valores: true, false
   - Padrão: true
   - Função: Indica se há condutor principal diferente
 
-• nome_condutor (string): Nome do condutor
+* nome_condutor (string): Nome do condutor
   - Formato: string
   - Exemplo: "SANDRA LOUREIRO"
   - Função: Nome do condutor principal
 
-• cpf_condutor (string): CPF do condutor
+* cpf_condutor (string): CPF do condutor
   - Formato: 00000000000 (11 dígitos)
   - Exemplo: "25151787829"
   - Função: CPF do condutor principal
 
-• data_nascimento_condutor (string): Data nascimento condutor
+* data_nascimento_condutor (string): Data nascimento condutor
   - Formato: DD/MM/AAAA
   - Exemplo: "28/08/1975"
   - Função: Data de nascimento do condutor
 
-• sexo_condutor (string): Sexo do condutor
+* sexo_condutor (string): Sexo do condutor
   - Valores: "Masculino", "Feminino"
   - Exemplo: "Feminino"
   - Função: Sexo do condutor principal
 
-• estado_civil_condutor (string): Estado civil condutor
+* estado_civil_condutor (string): Estado civil condutor
   - Valores: "Solteiro", "Casado", "Divorciado", "Viúvo", "Casado ou Uniao Estavel"
   - Exemplo: "Casado ou Uniao Estavel"
   - Função: Estado civil do condutor
 
-🏢 SEÇÃO: LOCALIZAÇÃO
+[EMPRESA] SEÇÃO: LOCALIZAÇÃO
 =====================
 Informações sobre locais de trabalho e estudo.
 
-• local_de_trabalho (boolean): Trabalha em local específico
+* local_de_trabalho (boolean): Trabalha em local específico
   - Valores: true, false
   - Padrão: false
   - Função: Indica se trabalha em local específico
 
-• estacionamento_proprio_local_de_trabalho (boolean): Estacionamento no trabalho
+* estacionamento_proprio_local_de_trabalho (boolean): Estacionamento no trabalho
   - Valores: true, false
   - Padrão: false
   - Função: Tem estacionamento próprio no trabalho
 
-• local_de_estudo (boolean): Estuda em local específico
+* local_de_estudo (boolean): Estuda em local específico
   - Valores: true, false
   - Padrão: false
   - Função: Indica se estuda em local específico
 
-• estacionamento_proprio_local_de_estudo (boolean): Estacionamento no estudo
+* estacionamento_proprio_local_de_estudo (boolean): Estacionamento no estudo
   - Valores: true, false
   - Padrão: false
   - Função: Tem estacionamento próprio no local de estudo
 
-• garagem_residencia (boolean): Garagem na residência
+* garagem_residencia (boolean): Garagem na residência
   - Valores: true, false
   - Padrão: true
   - Função: Tem garagem na residência
 
-• portao_eletronico (string): Tipo de portão
+* portao_eletronico (string): Tipo de portão
   - Valores: "Eletronico", "Manual", "Nenhum"
   - Exemplo: "Eletronico"
   - Função: Tipo de portão da residência
 
-👶 SEÇÃO: RESIDENTES
+[CRIANCA] SEÇÃO: RESIDENTES
 ====================
 Informações sobre residentes menores de idade.
 
-• reside_18_26 (string): Reside com pessoa 18-26 anos
+* reside_18_26 (string): Reside com pessoa 18-26 anos
   - Valores: "Sim", "Não", "N/A"
   - Exemplo: "Não"
   - Função: Indica se reside com pessoa entre 18-26 anos
 
-• sexo_do_menor (string): Sexo do menor
+* sexo_do_menor (string): Sexo do menor
   - Valores: "Masculino", "Feminino", "N/A"
   - Exemplo: "N/A"
   - Função: Sexo do menor residente
 
-• faixa_etaria_menor_mais_novo (string): Faixa etária do menor
+* faixa_etaria_menor_mais_novo (string): Faixa etária do menor
   - Valores: "0-5", "6-10", "11-17", "N/A"
   - Exemplo: "N/A"
   - Função: Faixa etária do menor residente
 
-🚗 SEÇÃO: VEÍCULO AVANÇADO
+[VEICULO] SEÇÃO: VEÍCULO AVANÇADO
 ==========================
 Características especiais do veículo.
 
-• kit_gas (boolean): Possui kit gás
+* kit_gas (boolean): Possui kit gás
   - Valores: true, false
   - Padrão: false
   - Função: Veículo possui kit gás
   - Observação: Ignorado para motos (não aplicável)
 
-• blindado (boolean): Veículo blindado
+* blindado (boolean): Veículo blindado
   - Valores: true, false
   - Padrão: false
   - Função: Veículo é blindado
 
-• financiado (boolean): Veículo financiado
+* financiado (boolean): Veículo financiado
   - Valores: true, false
   - Padrão: false
   - Função: Veículo está financiado
 
-• continuar_com_corretor_anterior (boolean): Continuar com corretor
+* continuar_com_corretor_anterior (boolean): Continuar com corretor
   - Valores: true, false
   - Padrão: true
   - Função: Continuar com corretor anterior
 
-📋 VALIDAÇÕES AUTOMÁTICAS
+[INFO] VALIDAÇÕES AUTOMÁTICAS
 ========================
 O sistema valida automaticamente:
 
-• CPF: Formato e dígitos verificadores
-• CEP: Formato 00000-000
-• Email: Formato válido
-• Celular: 11 dígitos
-• Placa: Formato ABC1234 ou ABC-1234
-• Data: Formato DD/MM/AAAA
-• Valores permitidos: sexo, estado_civil, combustivel, etc.
+* CPF: Formato e dígitos verificadores
+* CEP: Formato 00000-000
+* Email: Formato válido
+* Celular: 11 dígitos
+* Placa: Formato ABC1234 ou ABC-1234
+* Data: Formato DD/MM/AAAA
+* Valores permitidos: sexo, estado_civil, combustivel, etc.
 
-⚠️ CAMPOS OBRIGATÓRIOS
+[AVISO] CAMPOS OBRIGATÓRIOS
 ======================
 Estes campos são obrigatórios e a execução falhará se ausentes:
 
-• url, placa, marca, modelo, ano, combustivel
-• cep, uso_veiculo, veiculo_segurado
-• nome, cpf, email, celular
-• autenticacao (email_login, senha_login)
+* url, placa, marca, modelo, ano, combustivel
+* cep, uso_veiculo, veiculo_segurado
+* nome, cpf, email, celular
+* autenticacao (email_login, senha_login)
 
-🔄 CAMPOS CONDICIONAIS
+[ATUALIZANDO] CAMPOS CONDICIONAIS
 ======================
 Estes campos podem afetar o fluxo:
 
-• zero_km: Ativa Tela Zero KM (condicional)
-• condutor_principal: Se true, requer dados do condutor
-• local_de_trabalho: Se true, requer dados de trabalho
-• local_de_estudo: Se true, requer dados de estudo
+* zero_km: Ativa Tela Zero KM (condicional)
+* condutor_principal: Se true, requer dados do condutor
+* local_de_trabalho: Se true, requer dados de trabalho
+* local_de_estudo: Se true, requer dados de estudo
 
-📝 EXEMPLO COMPLETO
+[NOTA] EXEMPLO COMPLETO
 ==================
 {
   "configuracao": {
@@ -836,7 +836,7 @@ Estes campos podem afetar o fluxo:
   "continuar_com_corretor_anterior": true
 }
 
-🚀 COMANDOS DE USO
+[INICIANDO] COMANDOS DE USO
 ==================
 python executar_rpa_imediato_playwright.py --docs params
 python executar_rpa_imediato_playwright.py --config meu_parametros.json
@@ -949,13 +949,13 @@ class ExceptionHandler:
         severidade = erro_estruturado["severidade"]
         
         exibir_mensagem(f"\n{'='*80}")
-        exibir_mensagem(f"🚨 ERRO CAPTURADO - {severidade}")
+        exibir_mensagem(f"[ALERTA] ERRO CAPTURADO - {severidade}")
         exibir_mensagem(f"{'='*80}")
-        exibir_mensagem(f"⏰ Timestamp: {timestamp}")
-        exibir_mensagem(f"📱 Tela: {tela}")
-        exibir_mensagem(f"🔍 Tipo: {tipo}")
-        exibir_mensagem(f"💬 Mensagem: {mensagem}")
-        exibir_mensagem(f"💡 Recomendação: {erro_estruturado['recomendacao']}")
+        exibir_mensagem(f"[TEMPO] Timestamp: {timestamp}")
+        exibir_mensagem(f"[CELULAR] Tela: {tela}")
+        exibir_mensagem(f"[BUSCAR] Tipo: {tipo}")
+        exibir_mensagem(f"[MENSAGEM] Mensagem: {mensagem}")
+        exibir_mensagem(f"[IDEIA] Recomendação: {erro_estruturado['recomendacao']}")
         exibir_mensagem(f"{'='*80}")
     
     def capturar_warning(self, mensagem: str, tela: str = None, contexto: str = None):
@@ -974,7 +974,7 @@ class ExceptionHandler:
         
         self.warnings_capturados.append(warning)
         
-        exibir_mensagem(f"⚠️ WARNING - {tela}: {mensagem}")
+        exibir_mensagem(f"[AVISO] WARNING - {tela}: {mensagem}")
     
     def definir_tela_atual(self, tela: str):
         """
@@ -1077,13 +1077,13 @@ def limpar_emojis_windows(mensagem: str) -> str:
         - Mantém significado semântico da mensagem
     """
     emojis = {
-        '✅': '[OK]', '🎯': '[ETAPA]', '⚠️': '[AVISO]', '❌': '[ERRO]',
-        '🚨': '[ALERTA]', '💾': '[SALVO]', '⏳': '[AGUARDANDO]', '🔍': '[BUSCANDO]',
-        '📊': '[DADOS]', '🎉': '[SUCESSO]', '💡': '[DICA]', '🔧': '[CONFIG]',
-        '📁': '[ARQUIVO]', '⏰': '[TEMPO]', '🎁': '[BENEFICIO]', '🚗': '[VEICULO]',
-        '👤': '[USUARIO]', '📧': '[EMAIL]', '📍': '[LOCAL]', '⚙️': '[CONFIG]',
-        '🛡️': '[SEGURANCA]', '🔐': '[LOGIN]', '🌐': '[WEB]', '📱': '[MOBILE]',
-        '💻': '[SISTEMA]', '🔄': '[PROCESSANDO]', '📈': '[PROGRESSO]', '🎪': '[CARROSSEL]'
+        '[OK]': '[OK]', '[OBJETIVO]': '[ETAPA]', '[AVISO]': '[AVISO]', '[ERRO]': '[ERRO]',
+        '[ALERTA]': '[ALERTA]', '[SALVAR]': '[SALVO]', '[AGUARDANDO]': '[AGUARDANDO]', '[BUSCAR]': '[BUSCANDO]',
+        '[DADOS]': '[DADOS]', '[SUCESSO]': '[SUCESSO]', '[IDEIA]': '[DICA]', '[CONFIG]': '[CONFIG]',
+        '[PASTA]': '[ARQUIVO]', '[TEMPO]': '[TEMPO]', '[PRESENTE]': '[BENEFICIO]', '[VEICULO]': '[VEICULO]',
+        '[USUARIO]': '[USUARIO]', '[EMAIL]': '[EMAIL]', '[LOCALIZACAO]': '[LOCAL]', '[CONFIG]️': '[CONFIG]',
+        '[SEGURO]️': '[SEGURANCA]', '': '[LOGIN]', '': '[WEB]', '[CELULAR]': '[MOBILE]',
+        '[COMPUTADOR]': '[SISTEMA]', '[ATUALIZANDO]': '[PROCESSANDO]', '[GRAFICO]': '[PROGRESSO]', '[EVENTO]': '[CARROSSEL]'
     }
     
     for emoji, substituto in emojis.items():
@@ -1133,7 +1133,7 @@ def carregar_parametros(arquivo_config: str = "parametros.json") -> Dict[str, An
         # NOVA LINHA: Configurar display baseado nos parâmetros
         configurar_display(parametros)
         
-        exibir_mensagem("✅ Parâmetros carregados com sucesso!")
+        exibir_mensagem("[OK] Parâmetros carregados com sucesso!")
         return parametros
         
     except json.JSONDecodeError as e:
@@ -1161,7 +1161,7 @@ def obter_parametros_tempo(parametros: Dict[str, Any]) -> Dict[str, int]:
     tempo_estabilizacao_tela5 = configuracao.get('tempo_estabilizacao_tela5', 2)
     tempo_carregamento_tela5 = configuracao.get('tempo_carregamento_tela5', 5)
     
-    exibir_mensagem(f"⚙️ Parâmetros de tempo carregados:")
+    exibir_mensagem(f"[CONFIG]️ Parâmetros de tempo carregados:")
     exibir_mensagem(f"   - Estabilização: {tempo_estabilizacao}s")
     exibir_mensagem(f"   - Carregamento: {tempo_carregamento}s")
     exibir_mensagem(f"   - Estabilização Tela 5: {tempo_estabilizacao_tela5}s")
@@ -1216,7 +1216,7 @@ def validar_parametros_obrigatorios(parametros: Dict[str, Any]) -> bool:
                 exception_handler.capturar_warning("Campos de autenticação incompletos", "VALIDACAO_PARAMETROS")
                 return False
         
-        exibir_mensagem("✅ Todos os parâmetros obrigatórios estão presentes!")
+        exibir_mensagem("[OK] Todos os parâmetros obrigatórios estão presentes!")
         return True
         
     except Exception as e:
@@ -1243,7 +1243,7 @@ def salvar_dados_planos(dados_planos: Dict[str, Any], prefixo: str = "dados_plan
         with open(nome_arquivo, 'w', encoding='utf-8') as f:
             json.dump(dados_planos, f, indent=2, ensure_ascii=False)
         
-        exibir_mensagem(f"💾 Dados salvos em: {nome_arquivo}")
+        exibir_mensagem(f"[SALVAR] Dados salvos em: {nome_arquivo}")
         return nome_arquivo
         
     except Exception as e:
@@ -1275,14 +1275,14 @@ def executar_com_timeout(smart_timeout, tela_num, funcao_tela, *args, **kwargs):
             # Verificar se foi timeout
             if smart_timeout.check_timeout(tela_num):
                 timeout_info = smart_timeout.handle_timeout(tela_num, str(e))
-                exibir_mensagem(f"⚠️ Timeout detectado na Tela {tela_num}: {timeout_info['elapsed_seconds']:.1f}s")
+                exibir_mensagem(f"[AVISO] Timeout detectado na Tela {tela_num}: {timeout_info['elapsed_seconds']:.1f}s")
                 
                 # Tentar retry se disponível
                 if smart_timeout.retry_with_backoff(tela_num):
-                    exibir_mensagem(f"🔄 Retry automático na Tela {tela_num} (tentativa {timeout_info['retries_remaining']})")
+                    exibir_mensagem(f"[ATUALIZANDO] Retry automático na Tela {tela_num} (tentativa {timeout_info['retries_remaining']})")
                     return executar_com_timeout(smart_timeout, tela_num, funcao_tela, *args, **kwargs)
                 else:
-                    exibir_mensagem(f"❌ Máximo de retries atingido na Tela {tela_num}")
+                    exibir_mensagem(f"[ERRO] Máximo de retries atingido na Tela {tela_num}")
             
             # Re-raise a exceção original
             raise e
@@ -1302,7 +1302,7 @@ def navegar_tela_1_playwright(page: Page, tipo_veiculo: str = "carro") -> bool:
     VERSÃO: v3.3.0
     IMPLEMENTAÇÃO: Suporte a carro e moto
     DATA: 24/09/2025
-    STATUS: ✅ IMPLEMENTADO
+    STATUS: [OK] IMPLEMENTADO
     """
     try:
         exception_handler.definir_tela_atual("TELA_1")
@@ -1315,7 +1315,7 @@ def navegar_tela_1_playwright(page: Page, tipo_veiculo: str = "carro") -> bool:
             )
             return False
         
-        exibir_mensagem(f"📱 TELA 1: Selecionando {tipo_veiculo.title()}...")
+        exibir_mensagem(f"[CELULAR] TELA 1: Selecionando {tipo_veiculo.title()}...")
         
         # Aguardar carregamento inicial da página
         page.wait_for_selector("button", timeout=5000)
@@ -1353,20 +1353,20 @@ def navegar_tela_1_playwright(page: Page, tipo_veiculo: str = "carro") -> bool:
                 botao_veiculo = page.locator(seletor).first
                 if botao_veiculo.is_visible():
                     seletor_usado = seletor
-                    exibir_mensagem(f"✅ Botão '{tipo_veiculo.title()}' encontrado com seletor: {seletor}")
+                    exibir_mensagem(f"[OK] Botão '{tipo_veiculo.title()}' encontrado com seletor: {seletor}")
                     break
             except Exception as e:
                 continue
         
         if botao_veiculo and botao_veiculo.is_visible():
             botao_veiculo.click()
-            exibir_mensagem(f"✅ Botão '{tipo_veiculo.title()}' clicado com sucesso")
+            exibir_mensagem(f"[OK] Botão '{tipo_veiculo.title()}' clicado com sucesso")
             
             # Log do seletor usado para monitoramento
             if seletor_usado.startswith('button:has'):
-                exibir_mensagem(f"🎯 Seletor específico usado: {seletor_usado}")
+                exibir_mensagem(f"[OBJETIVO] Seletor específico usado: {seletor_usado}")
             else:
-                exibir_mensagem(f"⚠️ Fallback usado: {seletor_usado}")
+                exibir_mensagem(f"[AVISO] Fallback usado: {seletor_usado}")
             
             # Aguardar transição para a próxima tela
             page.wait_for_selector("#placaTelaDadosPlaca", timeout=5000)
@@ -1385,18 +1385,18 @@ def navegar_tela_2_playwright(page: Page, placa: str) -> bool:
     """
     try:
         exception_handler.definir_tela_atual("TELA_2")
-        exibir_mensagem(f"📱 TELA 2: Inserindo placa {placa}...")
+        exibir_mensagem(f"[CELULAR] TELA 2: Inserindo placa {placa}...")
         
         campo_placa = page.locator("#placaTelaDadosPlaca").first
         campo_placa.click()
         campo_placa.fill(placa)
         
-        exibir_mensagem(f"✅ Placa {placa} inserida com sucesso")
+        exibir_mensagem(f"[OK] Placa {placa} inserida com sucesso")
         
         botao_continuar = page.locator("#gtm-telaDadosAutoCotarComPlacaContinuar").first
         botao_continuar.click()
         
-        exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
+        exibir_mensagem("[OK] Botão 'Continuar' clicado com sucesso")
         # Aguardar transição para a próxima tela
         page.wait_for_selector("#gtm-telaInfosAutoContinuar", timeout=5000)
         return True
@@ -1411,13 +1411,13 @@ def navegar_tela_3_playwright(page: Page) -> bool:
     """
     try:
         exception_handler.definir_tela_atual("TELA_3")
-        exibir_mensagem("📱 TELA 3: Confirmando informações do veículo...")
+        exibir_mensagem("[CELULAR] TELA 3: Confirmando informações do veículo...")
         
         botao_continuar = page.locator("#gtm-telaInfosAutoContinuar").first
         
         if botao_continuar.is_visible():
             botao_continuar.click()
-            exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
+            exibir_mensagem("[OK] Botão 'Continuar' clicado com sucesso")
             page.wait_for_selector("#gtm-telaRenovacaoVeiculoContinuar", timeout=5000)
             return True
         else:
@@ -1434,12 +1434,12 @@ def navegar_tela_4_playwright(page: Page, veiculo_segurado: str) -> bool:
     """
     try:
         exception_handler.definir_tela_atual("TELA_4")
-        exibir_mensagem("📱 TELA 4: Respondendo se veículo está segurado...")
+        exibir_mensagem("[CELULAR] TELA 4: Respondendo se veículo está segurado...")
         
         if veiculo_segurado == "Não":
             botao_nao = page.locator("#gtm-telaRenovacaoVeiculoContinuar").first
             botao_nao.click()
-            exibir_mensagem("✅ Resposta 'Não' selecionada com sucesso")
+            exibir_mensagem("[OK] Resposta 'Não' selecionada com sucesso")
         else:
             exception_handler.capturar_warning(f"Opção '{veiculo_segurado}' não implementada", "TELA_4")
             return False
@@ -1463,25 +1463,25 @@ def aguardar_cards_estimativa_playwright(page: Page, timeout: int = 10000) -> bo
     4. div.bg-primary - FALLBACK ATUAL (compatibilidade)
     """
     seletores_prioridade = [
-        'div[role="group"][aria-roledescription="slide"]',  # ← ESPECÍFICO
-        'div:has(p:has-text("Cobertura")):has(span:has-text("R$"))',  # ← CONTEÚDO
-        'div.border-primary.rounded-xl:has(.bg-primary)',  # ← LAYOUT
-        'div.bg-primary'  # ← FALLBACK ATUAL
+        'div[role="group"][aria-roledescription="slide"]',  # <- ESPECÍFICO
+        'div:has(p:has-text("Cobertura")):has(span:has-text("R$"))',  # <- CONTEÚDO
+        'div.border-primary.rounded-xl:has(.bg-primary)',  # <- LAYOUT
+        'div.bg-primary'  # <- FALLBACK ATUAL
     ]
     
     timeout_por_seletor = timeout // len(seletores_prioridade)
     
     for i, seletor in enumerate(seletores_prioridade):
         try:
-            exibir_mensagem(f"🔍 Tentativa {i+1}/{len(seletores_prioridade)} - Seletor: {seletor}")
+            exibir_mensagem(f"[BUSCAR] Tentativa {i+1}/{len(seletores_prioridade)} - Seletor: {seletor}")
             page.wait_for_selector(seletor, timeout=timeout_por_seletor)
-            exibir_mensagem(f"✅ Cards encontrados com seletor: {seletor}")
+            exibir_mensagem(f"[OK] Cards encontrados com seletor: {seletor}")
             return True
         except Exception as e:
-            exibir_mensagem(f"⚠️ Seletor {i+1} falhou: {str(e)}")
+            exibir_mensagem(f"[AVISO] Seletor {i+1} falhou: {str(e)}")
             continue
     
-    exibir_mensagem("❌ Nenhum seletor funcionou para encontrar os cards")
+    exibir_mensagem("[ERRO] Nenhum seletor funcionou para encontrar os cards")
     return False
 
 def localizar_cards_estimativa_playwright(page: Page):
@@ -1495,23 +1495,23 @@ def localizar_cards_estimativa_playwright(page: Page):
     4. div.bg-primary - FALLBACK ATUAL (compatibilidade)
     """
     seletores_prioridade = [
-        'div[role="group"][aria-roledescription="slide"]',  # ← ESPECÍFICO
-        'div:has(p:has-text("Cobertura")):has(span:has-text("R$"))',  # ← CONTEÚDO
-        'div.border-primary.rounded-xl:has(.bg-primary)',  # ← LAYOUT
-        'div.bg-primary'  # ← FALLBACK ATUAL
+        'div[role="group"][aria-roledescription="slide"]',  # <- ESPECÍFICO
+        'div:has(p:has-text("Cobertura")):has(span:has-text("R$"))',  # <- CONTEÚDO
+        'div.border-primary.rounded-xl:has(.bg-primary)',  # <- LAYOUT
+        'div.bg-primary'  # <- FALLBACK ATUAL
     ]
     
     for i, seletor in enumerate(seletores_prioridade):
         try:
             elemento = page.locator(seletor)
             if elemento.count() > 0:
-                exibir_mensagem(f"✅ Cards localizados com seletor: {seletor} ({elemento.count()} encontrados)")
+                exibir_mensagem(f"[OK] Cards localizados com seletor: {seletor} ({elemento.count()} encontrados)")
                 return elemento
         except Exception as e:
-            exibir_mensagem(f"⚠️ Seletor {i+1} falhou: {str(e)}")
+            exibir_mensagem(f"[AVISO] Seletor {i+1} falhou: {str(e)}")
             continue
     
-    exibir_mensagem("❌ Nenhum seletor funcionou para localizar os cards")
+    exibir_mensagem("[ERRO] Nenhum seletor funcionou para localizar os cards")
     return None
 
 def navegar_tela_5_playwright(page: Page, parametros_tempo) -> bool:
@@ -1520,46 +1520,46 @@ def navegar_tela_5_playwright(page: Page, parametros_tempo) -> bool:
     """
     try:
         exception_handler.definir_tela_atual("TELA_5")
-        exibir_mensagem("📱 TELA 5: Aguardando carregamento da estimativa...")
+        exibir_mensagem("[CELULAR] TELA 5: Aguardando carregamento da estimativa...")
         
         # Aguardar carregamento inicial da página
         # Este delay é maior que as outras telas porque a Tela 5
         # precisa calcular estimativas em tempo real
         # v3.7.0.2: Estratégia híbrida robusta para aguardar cards
         if not aguardar_cards_estimativa_playwright(page, 10000):
-            exibir_mensagem("❌ Falha ao aguardar carregamento dos cards de estimativa")
+            exibir_mensagem("[ERRO] Falha ao aguardar carregamento dos cards de estimativa")
             return False
         
         max_tentativas = 60  # Aumentado de 30 para 60
         tentativa = 0
         
         while tentativa < max_tentativas:
-            exibir_mensagem(f"🔄 Tentativa {tentativa + 1}/{max_tentativas} - Aguardando cards de cobertura...")
+            exibir_mensagem(f"[ATUALIZANDO] Tentativa {tentativa + 1}/{max_tentativas} - Aguardando cards de cobertura...")
             
             # Verificar se os cards de cobertura apareceram
             # v3.7.0.2: Estratégia híbrida robusta para localizar cards
             elemento_estimativa = localizar_cards_estimativa_playwright(page)
             if elemento_estimativa is not None and elemento_estimativa.count() > 0:
-                exibir_mensagem(f"✅ Elemento de estimativa encontrado: {elemento_estimativa.count()} cards")
+                exibir_mensagem(f"[OK] Elemento de estimativa encontrado: {elemento_estimativa.count()} cards")
                 
                 # Verificar se os cards ainda estão carregando (skeleton)
                 card_text = elemento_estimativa.first.text_content().strip() if elemento_estimativa.first.text_content() else ""
                 if "skeleton" not in card_text.lower() and len(card_text) > 10:
-                    exibir_mensagem("✅ Cards carregados completamente!")
+                    exibir_mensagem("[OK] Cards carregados completamente!")
                     break
                 else:
-                    exibir_mensagem("⏳ Cards ainda carregando (skeleton detectado)...")
+                    exibir_mensagem("[AGUARDANDO] Cards ainda carregando (skeleton detectado)...")
             
             # Verificar se há elementos com preços (fallback)
             elementos_preco = page.locator("text=R$")
             if elementos_preco.count() > 0:
-                exibir_mensagem(f"✅ Elementos com preços encontrados: {elementos_preco.count()}")
+                exibir_mensagem(f"[OK] Elementos com preços encontrados: {elementos_preco.count()}")
                 break
             
             # Verificar se o botão "Continuar" apareceu (fallback)
             botao_continuar = page.locator("#gtm-telaEstimativaContinuarParaCotacaoFinal")
             if botao_continuar.count() > 0:
-                exibir_mensagem("✅ Botão 'Continuar' encontrado")
+                exibir_mensagem("[OK] Botão 'Continuar' encontrado")
                 break
             
             # Aguardar elementos dinâmicos com espera específica
@@ -1586,10 +1586,10 @@ def navegar_tela_5_playwright(page: Page, parametros_tempo) -> bool:
             exception_handler.capturar_warning("Elementos da estimativa não carregaram completamente", "TELA_5")
             # Não retornar False aqui, continuar mesmo sem dados completos
         
-        exibir_mensagem("✅ Estimativa carregada com sucesso")
+        exibir_mensagem("[OK] Estimativa carregada com sucesso")
         
         # OTIMIZAÇÃO: Reduzir delay de estabilização
-        exibir_mensagem("⏳ Aguardando estabilização dos dados...")
+        exibir_mensagem("[AGUARDANDO] Aguardando estabilização dos dados...")
         time.sleep(2)  # Reduzido de 5 para 2 segundos
         
         # CAPTURAR DADOS DO CARROSSEL DE ESTIMATIVAS
@@ -1646,38 +1646,38 @@ def navegar_tela_5_playwright(page: Page, parametros_tempo) -> bool:
             
             # Exibir resumo do JSON compreensivo
             exibir_mensagem("\n" + "="*80)
-            exibir_mensagem("🎯 JSON COMPREENSIVO - TELA 5 CRIADO COM SUCESSO!")
+            exibir_mensagem("[OBJETIVO] JSON COMPREENSIVO - TELA 5 CRIADO COM SUCESSO!")
             exibir_mensagem("="*80)
-            exibir_mensagem(f"📁 Arquivo: {json_compreensivo_path}")
-            exibir_mensagem(f"📊 Total de Coberturas Únicas: {len(coberturas_unicas)}")
-            exibir_mensagem(f"🎁 Total de Benefícios: {len(dados_carrossel.get('beneficios_gerais', []))}")
+            exibir_mensagem(f"[PASTA] Arquivo: {json_compreensivo_path}")
+            exibir_mensagem(f"[DADOS] Total de Coberturas Únicas: {len(coberturas_unicas)}")
+            exibir_mensagem(f"[PRESENTE] Total de Benefícios: {len(dados_carrossel.get('beneficios_gerais', []))}")
             
             # Exibir coberturas encontradas
             for nome, cobertura in coberturas_unicas.items():
                 valores = cobertura.get('valores', {})
                 de = valores.get('de', 'N/A')
                 ate = valores.get('ate', 'N/A')
-                exibir_mensagem(f"💰 {nome}: {de} até {ate}")
+                exibir_mensagem(f"[DINHEIRO] {nome}: {de} até {ate}")
             
             exibir_mensagem("="*80)
             
-            exibir_mensagem(f"💾 **JSON COMPREENSIVO SALVO**: {json_compreensivo_path}")
+            exibir_mensagem(f"[SALVAR] **JSON COMPREENSIVO SALVO**: {json_compreensivo_path}")
         
         # RETORNO INTERMEDIÁRIO DOS DADOS DO CARROSSEL
         if dados_carrossel:
-            exibir_mensagem("🎯 **RETORNO INTERMEDIÁRIO**: Dados do carrossel capturados com sucesso!")
-            exibir_mensagem(f"📊 **COBERTURAS DETALHADAS**: {len(dados_carrossel['coberturas_detalhadas'])}")
-            exibir_mensagem(f"🎁 **BENEFÍCIOS GERAIS**: {len(dados_carrossel['beneficios_gerais'])}")
-            exibir_mensagem(f"💰 **VALORES MONETÁRIOS**: {dados_carrossel['valores_encontrados']}")
+            exibir_mensagem("[OBJETIVO] **RETORNO INTERMEDIÁRIO**: Dados do carrossel capturados com sucesso!")
+            exibir_mensagem(f"[DADOS] **COBERTURAS DETALHADAS**: {len(dados_carrossel['coberturas_detalhadas'])}")
+            exibir_mensagem(f"[PRESENTE] **BENEFÍCIOS GERAIS**: {len(dados_carrossel['beneficios_gerais'])}")
+            exibir_mensagem(f"[DINHEIRO] **VALORES MONETÁRIOS**: {dados_carrossel['valores_encontrados']}")
             
             # Exibir detalhes das coberturas encontradas
             for i, cobertura in enumerate(dados_carrossel['coberturas_detalhadas']):
-                exibir_mensagem(f"📋 **COBERTURA {i+1}**: {cobertura['nome_cobertura']}")
+                exibir_mensagem(f"[INFO] **COBERTURA {i+1}**: {cobertura['nome_cobertura']}")
                 if cobertura['valores']['de'] and cobertura['valores']['ate']:
-                    exibir_mensagem(f"   💰 **VALORES**: {cobertura['valores']['de']} até {cobertura['valores']['ate']}")
+                    exibir_mensagem(f"   [DINHEIRO] **VALORES**: {cobertura['valores']['de']} até {cobertura['valores']['ate']}")
                 if cobertura['beneficios']:
                     beneficios_nomes = [b['nome'] for b in cobertura['beneficios']]
-                    exibir_mensagem(f"   🎁 **BENEFÍCIOS**: {', '.join(beneficios_nomes)}")
+                    exibir_mensagem(f"   [PRESENTE] **BENEFÍCIOS**: {', '.join(beneficios_nomes)}")
             
             # Salvar retorno intermediário em arquivo específico
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -1703,20 +1703,20 @@ def navegar_tela_5_playwright(page: Page, parametros_tempo) -> bool:
             with open(retorno_path, 'w', encoding='utf-8') as f:
                 json.dump(dados_limpos, f, indent=2, ensure_ascii=False)
             
-            exibir_mensagem(f"💾 **RETORNO SALVO**: {retorno_path}")
+            exibir_mensagem(f"[SALVAR] **RETORNO SALVO**: {retorno_path}")
             
             # Exibir retorno intermediário estruturado no terminal
             exibir_mensagem("\n" + "="*60)
-            exibir_mensagem("📋 RETORNO INTERMEDIÁRIO - TELA 5")
+            exibir_mensagem("[INFO] RETORNO INTERMEDIÁRIO - TELA 5")
             exibir_mensagem("="*60)
             exibir_mensagem(json.dumps(dados_limpos, indent=2, ensure_ascii=False))
             exibir_mensagem("="*60)
             
         else:
-            exibir_mensagem("⚠️ **AVISO**: Não foi possível capturar dados do carrossel")
+            exibir_mensagem("[AVISO] **AVISO**: Não foi possível capturar dados do carrossel")
         
         # Clicar em Continuar
-        exibir_mensagem("⏳ Aguardando botão Continuar aparecer...")
+        exibir_mensagem("[AGUARDANDO] Aguardando botão Continuar aparecer...")
         
         try:
             # Aguardar o botão estar disponível
@@ -1726,37 +1726,37 @@ def navegar_tela_5_playwright(page: Page, parametros_tempo) -> bool:
             # Verificar se o botão está visível e clicável
             if botao_continuar.is_visible():
                 botao_continuar.click()
-                exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
+                exibir_mensagem("[OK] Botão 'Continuar' clicado com sucesso")
             else:
-                exibir_mensagem("⚠️ Botão 'Continuar' não está visível, tentando clicar mesmo assim...")
+                exibir_mensagem("[AVISO] Botão 'Continuar' não está visível, tentando clicar mesmo assim...")
                 botao_continuar.click()
-                exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
+                exibir_mensagem("[OK] Botão 'Continuar' clicado com sucesso")
         except Exception as e:
-            exibir_mensagem(f"⚠️ Erro ao aguardar botão Continuar: {str(e)}")
-            exibir_mensagem("🔄 Tentando seletor alternativo...")
+            exibir_mensagem(f"[AVISO] Erro ao aguardar botão Continuar: {str(e)}")
+            exibir_mensagem("[ATUALIZANDO] Tentando seletor alternativo...")
             try:
                 # Fallback para seletor por texto
                 botao_continuar = page.locator("text=Continuar").first
                 botao_continuar.click()
-                exibir_mensagem("✅ Botão 'Continuar' clicado com seletor alternativo")
+                exibir_mensagem("[OK] Botão 'Continuar' clicado com seletor alternativo")
             except Exception as e2:
-                exibir_mensagem(f"❌ Falha ao clicar no botão Continuar: {str(e2)}")
+                exibir_mensagem(f"[ERRO] Falha ao clicar no botão Continuar: {str(e2)}")
                 return False
         
         # DETECÇÃO INTELIGENTE DA PRÓXIMA TELA
         try:
             # Tentar detectar Tela Zero KM primeiro (2 segundos)
             page.wait_for_selector("#gtm-telaZeroKmContinuar", timeout=2000)
-            exibir_mensagem("✅ Tela Zero KM detectada após Tela 5")
+            exibir_mensagem("[OK] Tela Zero KM detectada após Tela 5")
             return True  # Tela Zero KM será processada separadamente
         except:
             try:
                 # Se não for Zero KM, detectar Tela 6 (3 segundos)
                 page.wait_for_selector("#gtm-telaItensAutoContinuar", timeout=3000)
-                exibir_mensagem("✅ Tela 6 detectada após Tela 5")
+                exibir_mensagem("[OK] Tela 6 detectada após Tela 5")
                 return True
             except:
-                exibir_mensagem("❌ Nenhuma tela detectada após Tela 5")
+                exibir_mensagem("[ERRO] Nenhuma tela detectada após Tela 5")
                 return False
         
     except Exception as e:
@@ -1769,15 +1769,15 @@ def navegar_tela_zero_km_playwright(page: Page, parametros: Dict[str, Any]) -> b
     """
     try:
         exception_handler.definir_tela_atual("TELA_ZERO_KM")
-        exibir_mensagem("🛵 TELA ZERO KM: Processando...")
+        exibir_mensagem("[MOTO] TELA ZERO KM: Processando...")
         
         # Verificar se a tela Zero KM está presente (usar radiogroup específico)
         elemento_zero_km = page.locator("#zerokmTelaZeroKm[role='radiogroup']")
         if not elemento_zero_km.is_visible():
-            exibir_mensagem("⚠️ Tela Zero KM não está visível")
+            exibir_mensagem("[AVISO] Tela Zero KM não está visível")
             return False
             
-        exibir_mensagem("✅ Tela Zero KM carregada com sucesso")
+        exibir_mensagem("[OK] Tela Zero KM carregada com sucesso")
         
         # Selecionar opção baseada no parâmetro
         zero_km = parametros.get('zero_km', False)
@@ -1785,23 +1785,23 @@ def navegar_tela_zero_km_playwright(page: Page, parametros: Dict[str, Any]) -> b
         if zero_km:
             # Selecionar "Sim" - usar seletor mais específico
             page.locator('input[name="zerokmTelaZeroKm"][value="Sim"]').click()
-            exibir_mensagem("✅ Opção 'Sim' (Zero KM) selecionada!")
+            exibir_mensagem("[OK] Opção 'Sim' (Zero KM) selecionada!")
         else:
             # Selecionar "Não" - usar seletor mais específico
             page.locator('input[name="zerokmTelaZeroKm"][value="Não"]').click()
-            exibir_mensagem("✅ Opção 'Não' (Não Zero KM) selecionada!")
+            exibir_mensagem("[OK] Opção 'Não' (Não Zero KM) selecionada!")
         
         # Aguardar estabilização
         time.sleep(1)
         
         # Clicar em Continuar
-        exibir_mensagem("⏳ Clicando em Continuar...")
+        exibir_mensagem("[AGUARDANDO] Clicando em Continuar...")
         page.locator("#gtm-telaZeroKmContinuar").click()
         
         # Aguardar próxima tela (Tela 6)
-        exibir_mensagem("⏳ Aguardando transição para Tela 6...")
+        exibir_mensagem("[AGUARDANDO] Aguardando transição para Tela 6...")
         page.wait_for_selector("#gtm-telaItensAutoContinuar", timeout=5000)
-        exibir_mensagem("✅ Tela Zero KM processada com sucesso!")
+        exibir_mensagem("[OK] Tela Zero KM processada com sucesso!")
         return True
         
     except Exception as e:
@@ -1817,7 +1817,7 @@ def navegar_tela_6_playwright(page: Page, combustivel: str, kit_gas: bool, blind
     """
     try:
         exception_handler.definir_tela_atual("TELA_6")
-        exibir_mensagem("📱 TELA 6: Aguardando carregamento...")
+        exibir_mensagem("[CELULAR] TELA 6: Aguardando carregamento...")
         
         max_tentativas = 20
         tentativa = 0
@@ -1838,10 +1838,10 @@ def navegar_tela_6_playwright(page: Page, combustivel: str, kit_gas: bool, blind
             exception_handler.capturar_warning("Tela 6 não carregou", "TELA_6")
             return False
         
-        exibir_mensagem("✅ Tela 6 carregada com sucesso")
+        exibir_mensagem("[OK] Tela 6 carregada com sucesso")
         
         # Selecionar combustível
-        exibir_mensagem(f"📱 TELA 6: Selecionando combustível {combustivel}...")
+        exibir_mensagem(f"[CELULAR] TELA 6: Selecionando combustível {combustivel}...")
         
         mapeamento_combustivel = {
             "Flex": "1", "Gasolina": "2", "Alcool": "3", "Etanol": "3",
@@ -1857,7 +1857,7 @@ def navegar_tela_6_playwright(page: Page, combustivel: str, kit_gas: bool, blind
                 if radio_combustivel.is_visible():
                     radio_combustivel.click()
                     combustivel_selecionado = True
-                    exibir_mensagem(f"✅ Combustível {combustivel} selecionado com sucesso")
+                    exibir_mensagem(f"[OK] Combustível {combustivel} selecionado com sucesso")
                 else:
                     exception_handler.capturar_warning(f"Radio button para {combustivel} não está visível", "TELA_6")
             except Exception as e:
@@ -1869,7 +1869,7 @@ def navegar_tela_6_playwright(page: Page, combustivel: str, kit_gas: bool, blind
             exception_handler.capturar_warning(f"Combustível {combustivel} não encontrado, continuando", "TELA_6")
         
         # Configurar checkboxes
-        exibir_mensagem("📱 TELA 6: Configurando checkboxes...")
+        exibir_mensagem("[CELULAR] TELA 6: Configurando checkboxes...")
         
         # Kit Gas (apenas para carros)
         if tipo_veiculo == "carro":
@@ -1878,19 +1878,19 @@ def navegar_tela_6_playwright(page: Page, combustivel: str, kit_gas: bool, blind
                 if checkbox_kit_gas.is_visible():
                     if kit_gas and not checkbox_kit_gas.is_checked():
                         checkbox_kit_gas.check()
-                        exibir_mensagem("✅ Checkbox Kit Gas: MARCADO")
+                        exibir_mensagem("[OK] Checkbox Kit Gas: MARCADO")
                     elif not kit_gas and checkbox_kit_gas.is_checked():
                         checkbox_kit_gas.uncheck()
-                        exibir_mensagem("✅ Checkbox Kit Gas: DESMARCADO")
+                        exibir_mensagem("[OK] Checkbox Kit Gas: DESMARCADO")
                     else:
                         estado = "MARCADO" if kit_gas else "DESMARCADO"
-                        exibir_mensagem(f"✅ Checkbox Kit Gas: {estado} (já estava correto)")
+                        exibir_mensagem(f"[OK] Checkbox Kit Gas: {estado} (já estava correto)")
                 else:
                     exception_handler.capturar_warning("Checkbox Kit Gas não encontrado", "TELA_6")
             except Exception as e:
                 exception_handler.capturar_warning(f"Erro ao configurar Kit Gas: {str(e)}", "TELA_6")
         else:
-            exibir_mensagem("ℹ️ Kit Gas ignorado para motos")
+            exibir_mensagem("[INFO]️ Kit Gas ignorado para motos")
         
         # Blindado
         try:
@@ -1898,13 +1898,13 @@ def navegar_tela_6_playwright(page: Page, combustivel: str, kit_gas: bool, blind
             if checkbox_blindado.is_visible():
                 if blindado and not checkbox_blindado.is_checked():
                     checkbox_blindado.check()
-                    exibir_mensagem("✅ Checkbox Blindado: MARCADO")
+                    exibir_mensagem("[OK] Checkbox Blindado: MARCADO")
                 elif not blindado and checkbox_blindado.is_checked():
                     checkbox_blindado.uncheck()
-                    exibir_mensagem("✅ Checkbox Blindado: DESMARCADO")
+                    exibir_mensagem("[OK] Checkbox Blindado: DESMARCADO")
                 else:
                     estado = "MARCADO" if blindado else "DESMARCADO"
-                    exibir_mensagem(f"✅ Checkbox Blindado: {estado} (já estava correto)")
+                    exibir_mensagem(f"[OK] Checkbox Blindado: {estado} (já estava correto)")
             else:
                 exception_handler.capturar_warning("Checkbox Blindado não encontrado", "TELA_6")
         except Exception as e:
@@ -1916,13 +1916,13 @@ def navegar_tela_6_playwright(page: Page, combustivel: str, kit_gas: bool, blind
             if checkbox_financiado.is_visible():
                 if financiado and not checkbox_financiado.is_checked():
                     checkbox_financiado.check()
-                    exibir_mensagem("✅ Checkbox Financiado: MARCADO")
+                    exibir_mensagem("[OK] Checkbox Financiado: MARCADO")
                 elif not financiado and checkbox_financiado.is_checked():
                     checkbox_financiado.uncheck()
-                    exibir_mensagem("✅ Checkbox Financiado: DESMARCADO")
+                    exibir_mensagem("[OK] Checkbox Financiado: DESMARCADO")
                 else:
                     estado = "MARCADO" if financiado else "DESMARCADO"
-                    exibir_mensagem(f"✅ Checkbox Financiado: {estado} (já estava correto)")
+                    exibir_mensagem(f"[OK] Checkbox Financiado: {estado} (já estava correto)")
             else:
                 exception_handler.capturar_warning("Checkbox Financiado não encontrado", "TELA_6")
         except Exception as e:
@@ -1930,7 +1930,7 @@ def navegar_tela_6_playwright(page: Page, combustivel: str, kit_gas: bool, blind
         
         # Clicar em Continuar
         botao_continuar.first.click()
-        exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
+        exibir_mensagem("[OK] Botão 'Continuar' clicado com sucesso")
         # Aguardar transição para a próxima tela
         page.wait_for_selector("#enderecoTelaEndereco", timeout=5000)
         return True
@@ -1949,24 +1949,24 @@ def aguardar_sugestao_endereco_playwright(page: Page, timeout: int = 8000) -> bo
     3. .overflow-hidden - FALLBACK ATUAL (compatibilidade)
     """
     seletores_prioridade = [
-        '[data-testid="sugestao-endereco"]',  # ← PRINCIPAL
-        '.MuiAutocomplete-option',            # ← SECUNDÁRIO
-        '.overflow-hidden'                    # ← FALLBACK
+        '[data-testid="sugestao-endereco"]',  # <- PRINCIPAL
+        '.MuiAutocomplete-option',            # <- SECUNDÁRIO
+        '.overflow-hidden'                    # <- FALLBACK
     ]
     
     timeout_por_seletor = timeout // len(seletores_prioridade)
     
     for i, seletor in enumerate(seletores_prioridade):
         try:
-            exibir_mensagem(f"🔍 Tentativa {i+1}/{len(seletores_prioridade)} - Seletor: {seletor}")
+            exibir_mensagem(f"[BUSCAR] Tentativa {i+1}/{len(seletores_prioridade)} - Seletor: {seletor}")
             page.wait_for_selector(seletor, timeout=timeout_por_seletor)
-            exibir_mensagem(f"✅ Sugestões encontradas com seletor: {seletor}")
+            exibir_mensagem(f"[OK] Sugestões encontradas com seletor: {seletor}")
             return True
         except Exception as e:
-            exibir_mensagem(f"⚠️ Seletor {i+1} falhou: {str(e)}")
+            exibir_mensagem(f"[AVISO] Seletor {i+1} falhou: {str(e)}")
             continue
     
-    exibir_mensagem("❌ Nenhum seletor funcionou para encontrar as sugestões")
+    exibir_mensagem("[ERRO] Nenhum seletor funcionou para encontrar as sugestões")
     return False
 
 def localizar_sugestao_endereco_playwright(page: Page):
@@ -1979,22 +1979,22 @@ def localizar_sugestao_endereco_playwright(page: Page):
     3. .overflow-hidden - FALLBACK ATUAL (compatibilidade)
     """
     seletores_prioridade = [
-        '[data-testid="sugestao-endereco"]',  # ← PRINCIPAL
-        '.MuiAutocomplete-option',            # ← SECUNDÁRIO
-        '.overflow-hidden'                    # ← FALLBACK
+        '[data-testid="sugestao-endereco"]',  # <- PRINCIPAL
+        '.MuiAutocomplete-option',            # <- SECUNDÁRIO
+        '.overflow-hidden'                    # <- FALLBACK
     ]
     
     for i, seletor in enumerate(seletores_prioridade):
         try:
             elemento = page.locator(seletor)
             if elemento.count() > 0:
-                exibir_mensagem(f"✅ Sugestões localizadas com seletor: {seletor} ({elemento.count()} encontradas)")
+                exibir_mensagem(f"[OK] Sugestões localizadas com seletor: {seletor} ({elemento.count()} encontradas)")
                 return elemento
         except Exception as e:
-            exibir_mensagem(f"⚠️ Seletor {i+1} falhou: {str(e)}")
+            exibir_mensagem(f"[AVISO] Seletor {i+1} falhou: {str(e)}")
             continue
     
-    exibir_mensagem("❌ Nenhum seletor funcionou para localizar as sugestões")
+    exibir_mensagem("[ERRO] Nenhum seletor funcionou para localizar as sugestões")
     return None
 
 def navegar_tela_7_playwright(page: Page, cep: str) -> bool:
@@ -2003,7 +2003,7 @@ def navegar_tela_7_playwright(page: Page, cep: str) -> bool:
     """
     try:
         exception_handler.definir_tela_atual("TELA_7")
-        exibir_mensagem("📱 TELA 7: Aguardando carregamento...")
+        exibir_mensagem("[CELULAR] TELA 7: Aguardando carregamento...")
         
         max_tentativas = 20
         tentativa = 0
@@ -2024,17 +2024,17 @@ def navegar_tela_7_playwright(page: Page, cep: str) -> bool:
             exception_handler.capturar_warning("Tela 7 não carregou", "TELA_7")
             return False
         
-        exibir_mensagem("✅ Tela 7 carregada com sucesso")
+        exibir_mensagem("[OK] Tela 7 carregada com sucesso")
         
         # Preencher CEP
-        exibir_mensagem("📱 TELA 7: Preenchendo CEP...")
+        exibir_mensagem("[CELULAR] TELA 7: Preenchendo CEP...")
         campo_endereco.first.fill(cep)
-        exibir_mensagem(f"✅ CEP preenchido: {cep}")
+        exibir_mensagem(f"[OK] CEP preenchido: {cep}")
         # Aguardar estabilização do campo
         page.wait_for_function("document.querySelector('#enderecoTelaEndereco').value.length > 0", timeout=2000)
         
         # Aguardar carregamento do endereço
-        exibir_mensagem("⏳ Aguardando carregamento do endereço...")
+        exibir_mensagem("[AGUARDANDO] Aguardando carregamento do endereço...")
         if not aguardar_sugestao_endereco_playwright(page, 8000):
             return False
         
@@ -2045,7 +2045,7 @@ def navegar_tela_7_playwright(page: Page, cep: str) -> bool:
                 sugestao_endereco = sugestao_endereco.first
                 if sugestao_endereco.is_visible():
                     sugestao_endereco.click()
-                    exibir_mensagem("✅ Endereço sugerido selecionado")
+                    exibir_mensagem("[OK] Endereço sugerido selecionado")
                     # Aguardar estabilização da seleção
                     page.wait_for_function("document.querySelector('[data-testid=\"sugestao-endereco\"]').classList.contains('selected')", timeout=2000)
             else:
@@ -2057,7 +2057,7 @@ def navegar_tela_7_playwright(page: Page, cep: str) -> bool:
         botao_continuar = page.locator("#gtm-telaPernoiteVeiculoContinuar").first
         botao_continuar.click()
         
-        exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
+        exibir_mensagem("[OK] Botão 'Continuar' clicado com sucesso")
         # Aguardar transição para a próxima tela
         aguardar_tela_8_playwright(page, 5000)
         return True
@@ -2075,10 +2075,10 @@ def aguardar_tela_8_playwright(page: Page, timeout: int = 5000) -> bool:
     4. xpath=//*[contains(text(), 'finalidade') or contains(text(), 'uso')] - FALLBACK ATUAL
     """
     seletores = [
-        '#finalidadeVeiculoTelaUsoVeiculo',  # ← PRINCIPAL
-        '[role="radiogroup"]',                # ← SECUNDÁRIO
-        'p:has-text("Qual é o uso do veículo?")',  # ← TERCIÁRIO
-        'xpath=//*[contains(text(), "finalidade") or contains(text(), "uso")]'  # ← FALLBACK
+        '#finalidadeVeiculoTelaUsoVeiculo',  # <- PRINCIPAL
+        '[role="radiogroup"]',                # <- SECUNDÁRIO
+        'p:has-text("Qual é o uso do veículo?")',  # <- TERCIÁRIO
+        'xpath=//*[contains(text(), "finalidade") or contains(text(), "uso")]'  # <- FALLBACK
     ]
     
     for seletor in seletores:
@@ -2094,10 +2094,10 @@ def localizar_tela_8_playwright(page: Page):
     Localiza elementos da Tela 8 usando estratégia híbrida
     """
     seletores = [
-        '#finalidadeVeiculoTelaUsoVeiculo',  # ← PRINCIPAL
-        '[role="radiogroup"]',                # ← SECUNDÁRIO
-        'p:has-text("Qual é o uso do veículo?")',  # ← TERCIÁRIO
-        'xpath=//*[contains(text(), "finalidade") or contains(text(), "uso")]'  # ← FALLBACK
+        '#finalidadeVeiculoTelaUsoVeiculo',  # <- PRINCIPAL
+        '[role="radiogroup"]',                # <- SECUNDÁRIO
+        'p:has-text("Qual é o uso do veículo?")',  # <- TERCIÁRIO
+        'xpath=//*[contains(text(), "finalidade") or contains(text(), "uso")]'  # <- FALLBACK
     ]
     
     for seletor in seletores:
@@ -2127,7 +2127,7 @@ def aguardar_tela_9_playwright(page: Page, timeout: int = 5000) -> bool:
         bool: True se a tela foi detectada, False caso contrário
     """
     try:
-        exibir_mensagem("🔍 v3.7.0.5: Aguardando Tela 9 com estratégia híbrida...")
+        exibir_mensagem("[BUSCAR] v3.7.0.5: Aguardando Tela 9 com estratégia híbrida...")
         
         # Estratégia híbrida com 4 níveis de fallback
         seletores = [
@@ -2139,7 +2139,7 @@ def aguardar_tela_9_playwright(page: Page, timeout: int = 5000) -> bool:
         
         for i, seletor in enumerate(seletores, 1):
             try:
-                exibir_mensagem(f"🔍 v3.7.0.5: Tentativa {i}/4 - Testando seletor: {seletor[:50]}...")
+                exibir_mensagem(f"[BUSCAR] v3.7.0.5: Tentativa {i}/4 - Testando seletor: {seletor[:50]}...")
                 
                 # Aguardar elemento com timeout específico
                 page.wait_for_selector(seletor, timeout=timeout//4)
@@ -2147,18 +2147,18 @@ def aguardar_tela_9_playwright(page: Page, timeout: int = 5000) -> bool:
                 # Verificar se elemento existe e está visível
                 elemento = page.locator(seletor)
                 if elemento.count() > 0 and elemento.first.is_visible():
-                    exibir_mensagem(f"✅ v3.7.0.5: Tela 9 detectada com seletor {i}/4")
+                    exibir_mensagem(f"[OK] v3.7.0.5: Tela 9 detectada com seletor {i}/4")
                     return True
                     
             except Exception as e:
-                exibir_mensagem(f"⚠️ v3.7.0.5: Seletor {i}/4 falhou: {str(e)[:100]}")
+                exibir_mensagem(f"[AVISO] v3.7.0.5: Seletor {i}/4 falhou: {str(e)[:100]}")
                 continue
         
-        exibir_mensagem("❌ v3.7.0.5: Todos os seletores falharam")
+        exibir_mensagem("[ERRO] v3.7.0.5: Todos os seletores falharam")
         return False
         
     except Exception as e:
-        exibir_mensagem(f"❌ v3.7.0.5: Erro na detecção da Tela 9: {str(e)}")
+        exibir_mensagem(f"[ERRO] v3.7.0.5: Erro na detecção da Tela 9: {str(e)}")
         return False
 
 def localizar_tela_9_playwright(page: Page):
@@ -2178,7 +2178,7 @@ def localizar_tela_9_playwright(page: Page):
         Locator: Elemento encontrado ou None
     """
     try:
-        exibir_mensagem("🔍 v3.7.0.5: Localizando elementos da Tela 9...")
+        exibir_mensagem("[BUSCAR] v3.7.0.5: Localizando elementos da Tela 9...")
         
         # Estratégia híbrida com 4 níveis de fallback
         seletores = [
@@ -2192,18 +2192,18 @@ def localizar_tela_9_playwright(page: Page):
             try:
                 elemento = page.locator(seletor)
                 if elemento.count() > 0:
-                    exibir_mensagem(f"✅ v3.7.0.5: Elemento localizado com seletor {i}/4")
+                    exibir_mensagem(f"[OK] v3.7.0.5: Elemento localizado com seletor {i}/4")
                     return elemento
                     
             except Exception as e:
-                exibir_mensagem(f"⚠️ v3.7.0.5: Seletor {i}/4 falhou: {str(e)[:100]}")
+                exibir_mensagem(f"[AVISO] v3.7.0.5: Seletor {i}/4 falhou: {str(e)[:100]}")
                 continue
         
-        exibir_mensagem("❌ v3.7.0.5: Nenhum elemento foi localizado")
+        exibir_mensagem("[ERRO] v3.7.0.5: Nenhum elemento foi localizado")
         return None
         
     except Exception as e:
-        exibir_mensagem(f"❌ v3.7.0.5: Erro na localização da Tela 9: {str(e)}")
+        exibir_mensagem(f"[ERRO] v3.7.0.5: Erro na localização da Tela 9: {str(e)}")
         return None
 
 def aguardar_radio_condutor_playwright(page: Page, opcao: str, timeout: int = 3000) -> bool:
@@ -2225,7 +2225,7 @@ def aguardar_radio_condutor_playwright(page: Page, opcao: str, timeout: int = 30
         bool: True se o radio button foi detectado, False caso contrário
     """
     try:
-        exibir_mensagem(f"🔍 v3.7.0.6: Aguardando radio button '{opcao}' com estratégia híbrida...")
+        exibir_mensagem(f"[BUSCAR] v3.7.0.6: Aguardando radio button '{opcao}' com estratégia híbrida...")
         
         # Estratégia híbrida com 4 níveis de fallback
         seletores = [
@@ -2237,7 +2237,7 @@ def aguardar_radio_condutor_playwright(page: Page, opcao: str, timeout: int = 30
         
         for i, seletor in enumerate(seletores, 1):
             try:
-                exibir_mensagem(f"🔍 v3.7.0.6: Tentativa {i}/4 - Testando seletor: {seletor[:50]}...")
+                exibir_mensagem(f"[BUSCAR] v3.7.0.6: Tentativa {i}/4 - Testando seletor: {seletor[:50]}...")
                 
                 # Aguardar elemento com timeout específico
                 page.wait_for_selector(seletor, timeout=timeout//4)
@@ -2245,18 +2245,18 @@ def aguardar_radio_condutor_playwright(page: Page, opcao: str, timeout: int = 30
                 # Verificar se elemento existe e está visível
                 elemento = page.locator(seletor)
                 if elemento.count() > 0 and elemento.first.is_visible():
-                    exibir_mensagem(f"✅ v3.7.0.6: Radio button '{opcao}' detectado com seletor {i}/4")
+                    exibir_mensagem(f"[OK] v3.7.0.6: Radio button '{opcao}' detectado com seletor {i}/4")
                     return True
                     
             except Exception as e:
-                exibir_mensagem(f"⚠️ v3.7.0.6: Seletor {i}/4 falhou: {str(e)[:100]}")
+                exibir_mensagem(f"[AVISO] v3.7.0.6: Seletor {i}/4 falhou: {str(e)[:100]}")
                 continue
         
-        exibir_mensagem(f"❌ v3.7.0.6: Todos os seletores falharam para '{opcao}'")
+        exibir_mensagem(f"[ERRO] v3.7.0.6: Todos os seletores falharam para '{opcao}'")
         return False
         
     except Exception as e:
-        exibir_mensagem(f"❌ v3.7.0.6: Erro na detecção do radio button '{opcao}': {str(e)}")
+        exibir_mensagem(f"[ERRO] v3.7.0.6: Erro na detecção do radio button '{opcao}': {str(e)}")
         return False
 
 def localizar_radio_condutor_playwright(page: Page, opcao: str):
@@ -2277,7 +2277,7 @@ def localizar_radio_condutor_playwright(page: Page, opcao: str):
         Locator: Elemento encontrado ou None
     """
     try:
-        exibir_mensagem(f"🔍 v3.7.0.6: Localizando radio button '{opcao}'...")
+        exibir_mensagem(f"[BUSCAR] v3.7.0.6: Localizando radio button '{opcao}'...")
         
         # Estratégia híbrida com 4 níveis de fallback
         seletores = [
@@ -2291,18 +2291,18 @@ def localizar_radio_condutor_playwright(page: Page, opcao: str):
             try:
                 elemento = page.locator(seletor)
                 if elemento.count() > 0:
-                    exibir_mensagem(f"✅ v3.7.0.6: Radio button '{opcao}' localizado com seletor {i}/4")
+                    exibir_mensagem(f"[OK] v3.7.0.6: Radio button '{opcao}' localizado com seletor {i}/4")
                     return elemento
                     
             except Exception as e:
-                exibir_mensagem(f"⚠️ v3.7.0.6: Seletor {i}/4 falhou: {str(e)[:100]}")
+                exibir_mensagem(f"[AVISO] v3.7.0.6: Seletor {i}/4 falhou: {str(e)[:100]}")
                 continue
         
-        exibir_mensagem(f"❌ v3.7.0.6: Nenhum radio button '{opcao}' foi localizado")
+        exibir_mensagem(f"[ERRO] v3.7.0.6: Nenhum radio button '{opcao}' foi localizado")
         return None
         
     except Exception as e:
-        exibir_mensagem(f"❌ v3.7.0.6: Erro na localização do radio button '{opcao}': {str(e)}")
+        exibir_mensagem(f"[ERRO] v3.7.0.6: Erro na localização do radio button '{opcao}': {str(e)}")
         return None
 
 def localizar_estado_civil_playwright(page: Page, estado_civil: str):
@@ -2323,7 +2323,7 @@ def localizar_estado_civil_playwright(page: Page, estado_civil: str):
         Locator: Elemento encontrado ou None
     """
     try:
-        exibir_mensagem(f"🔍 v3.7.0.8: Localizando estado civil '{estado_civil}'...")
+        exibir_mensagem(f"[BUSCAR] v3.7.0.8: Localizando estado civil '{estado_civil}'...")
         
         # Mapeamento de estado civil para data-value
         mapeamento_data_value = {
@@ -2346,18 +2346,18 @@ def localizar_estado_civil_playwright(page: Page, estado_civil: str):
             try:
                 elemento = page.locator(seletor)
                 if elemento.count() > 0:
-                    exibir_mensagem(f"✅ v3.7.0.8: Estado civil '{estado_civil}' localizado com seletor {i}/4")
+                    exibir_mensagem(f"[OK] v3.7.0.8: Estado civil '{estado_civil}' localizado com seletor {i}/4")
                     return elemento
                     
             except Exception as e:
-                exibir_mensagem(f"⚠️ v3.7.0.8: Seletor {i}/4 falhou: {str(e)[:100]}")
+                exibir_mensagem(f"[AVISO] v3.7.0.8: Seletor {i}/4 falhou: {str(e)[:100]}")
                 continue
         
-        exibir_mensagem(f"❌ v3.7.0.8: Nenhum estado civil '{estado_civil}' foi localizado")
+        exibir_mensagem(f"[ERRO] v3.7.0.8: Nenhum estado civil '{estado_civil}' foi localizado")
         return None
         
     except Exception as e:
-        exibir_mensagem(f"❌ v3.7.0.8: Erro na localização do estado civil '{estado_civil}': {str(e)}")
+        exibir_mensagem(f"[ERRO] v3.7.0.8: Erro na localização do estado civil '{estado_civil}': {str(e)}")
         return None
 
 def localizar_sexo_playwright(page: Page, sexo: str):
@@ -2392,17 +2392,17 @@ def localizar_sexo_playwright(page: Page, sexo: str):
             try:
                 elemento = page.locator(seletor)
                 if elemento.is_visible():
-                    exibir_mensagem(f"✅ v3.7.0.10: Sexo '{sexo}' localizado com seletor nível {i}: {seletor}")
+                    exibir_mensagem(f"[OK] v3.7.0.10: Sexo '{sexo}' localizado com seletor nível {i}: {seletor}")
                     return elemento
             except Exception as e:
-                exibir_mensagem(f"⚠️ v3.7.0.10: Seletor nível {i} falhou: {seletor} - {str(e)}")
+                exibir_mensagem(f"[AVISO] v3.7.0.10: Seletor nível {i} falhou: {seletor} - {str(e)}")
                 continue
         
-        exibir_mensagem(f"❌ v3.7.0.10: Nenhum sexo '{sexo}' foi localizado")
+        exibir_mensagem(f"[ERRO] v3.7.0.10: Nenhum sexo '{sexo}' foi localizado")
         return None
         
     except Exception as e:
-        exibir_mensagem(f"❌ v3.7.0.10: Erro na localização do sexo '{sexo}': {str(e)}")
+        exibir_mensagem(f"[ERRO] v3.7.0.10: Erro na localização do sexo '{sexo}': {str(e)}")
         return None
 
 def localizar_botao_continuar_garagem_playwright(page: Page):
@@ -2435,17 +2435,17 @@ def localizar_botao_continuar_garagem_playwright(page: Page):
             try:
                 elemento = page.locator(seletor)
                 if elemento.is_visible():
-                    exibir_mensagem(f"✅ v3.7.0.11: Botão continuar garagem localizado com seletor nível {i}: {seletor}")
+                    exibir_mensagem(f"[OK] v3.7.0.11: Botão continuar garagem localizado com seletor nível {i}: {seletor}")
                     return elemento
             except Exception as e:
-                exibir_mensagem(f"⚠️ v3.7.0.11: Seletor nível {i} falhou: {seletor} - {str(e)}")
+                exibir_mensagem(f"[AVISO] v3.7.0.11: Seletor nível {i} falhou: {seletor} - {str(e)}")
                 continue
         
-        exibir_mensagem("❌ v3.7.0.11: Nenhum botão continuar garagem foi localizado")
+        exibir_mensagem("[ERRO] v3.7.0.11: Nenhum botão continuar garagem foi localizado")
         return None
         
     except Exception as e:
-        exibir_mensagem(f"❌ v3.7.0.11: Erro na localização do botão continuar garagem: {str(e)}")
+        exibir_mensagem(f"[ERRO] v3.7.0.11: Erro na localização do botão continuar garagem: {str(e)}")
         return None
 
 def localizar_checkbox_trabalho_playwright(page: Page):
@@ -2465,7 +2465,7 @@ def localizar_checkbox_trabalho_playwright(page: Page):
         Locator: Elemento encontrado ou None
     """
     try:
-        exibir_mensagem("🔍 v3.7.0.9: Localizando checkbox Local de Trabalho...")
+        exibir_mensagem("[BUSCAR] v3.7.0.9: Localizando checkbox Local de Trabalho...")
         
         seletores = [
             'input[value="trabalho"]',  # ESPECÍFICO
@@ -2478,17 +2478,17 @@ def localizar_checkbox_trabalho_playwright(page: Page):
             try:
                 elemento = page.locator(seletor)
                 if elemento.count() > 0:
-                    exibir_mensagem(f"✅ v3.7.0.9: Checkbox trabalho localizado com seletor {i}/4")
+                    exibir_mensagem(f"[OK] v3.7.0.9: Checkbox trabalho localizado com seletor {i}/4")
                     return elemento
             except Exception as e:
-                exibir_mensagem(f"⚠️ v3.7.0.9: Seletor {i}/4 falhou: {str(e)[:100]}")
+                exibir_mensagem(f"[AVISO] v3.7.0.9: Seletor {i}/4 falhou: {str(e)[:100]}")
                 continue
         
-        exibir_mensagem("❌ v3.7.0.9: Nenhum checkbox trabalho foi localizado")
+        exibir_mensagem("[ERRO] v3.7.0.9: Nenhum checkbox trabalho foi localizado")
         return None
         
     except Exception as e:
-        exibir_mensagem(f"❌ v3.7.0.9: Erro na localização do checkbox trabalho: {str(e)}")
+        exibir_mensagem(f"[ERRO] v3.7.0.9: Erro na localização do checkbox trabalho: {str(e)}")
         return None
 
 def localizar_switch_trabalho_playwright(page: Page):
@@ -2508,7 +2508,7 @@ def localizar_switch_trabalho_playwright(page: Page):
         Locator: Elemento encontrado ou None
     """
     try:
-        exibir_mensagem("🔍 v3.7.0.9: Localizando switch Estacionamento Trabalho...")
+        exibir_mensagem("[BUSCAR] v3.7.0.9: Localizando switch Estacionamento Trabalho...")
         
         seletores = [
             '#atividadeVeiculoTelaAtividadeVeiculo input[value="trabalho"] + * input.MuiSwitch-input',  # ESPECÍFICO
@@ -2521,17 +2521,17 @@ def localizar_switch_trabalho_playwright(page: Page):
             try:
                 elemento = page.locator(seletor)
                 if elemento.count() > 0:
-                    exibir_mensagem(f"✅ v3.7.0.9: Switch trabalho localizado com seletor {i}/4")
+                    exibir_mensagem(f"[OK] v3.7.0.9: Switch trabalho localizado com seletor {i}/4")
                     return elemento
             except Exception as e:
-                exibir_mensagem(f"⚠️ v3.7.0.9: Seletor {i}/4 falhou: {str(e)[:100]}")
+                exibir_mensagem(f"[AVISO] v3.7.0.9: Seletor {i}/4 falhou: {str(e)[:100]}")
                 continue
         
-        exibir_mensagem("❌ v3.7.0.9: Nenhum switch trabalho foi localizado")
+        exibir_mensagem("[ERRO] v3.7.0.9: Nenhum switch trabalho foi localizado")
         return None
         
     except Exception as e:
-        exibir_mensagem(f"❌ v3.7.0.9: Erro na localização do switch trabalho: {str(e)}")
+        exibir_mensagem(f"[ERRO] v3.7.0.9: Erro na localização do switch trabalho: {str(e)}")
         return None
 
 def localizar_checkbox_estudo_playwright(page: Page):
@@ -2551,7 +2551,7 @@ def localizar_checkbox_estudo_playwright(page: Page):
         Locator: Elemento encontrado ou None
     """
     try:
-        exibir_mensagem("🔍 v3.7.0.9: Localizando checkbox Local de Estudo...")
+        exibir_mensagem("[BUSCAR] v3.7.0.9: Localizando checkbox Local de Estudo...")
         
         seletores = [
             'input[value="estudo"]',  # ESPECÍFICO
@@ -2564,17 +2564,17 @@ def localizar_checkbox_estudo_playwright(page: Page):
             try:
                 elemento = page.locator(seletor)
                 if elemento.count() > 0:
-                    exibir_mensagem(f"✅ v3.7.0.9: Checkbox estudo localizado com seletor {i}/4")
+                    exibir_mensagem(f"[OK] v3.7.0.9: Checkbox estudo localizado com seletor {i}/4")
                     return elemento
             except Exception as e:
-                exibir_mensagem(f"⚠️ v3.7.0.9: Seletor {i}/4 falhou: {str(e)[:100]}")
+                exibir_mensagem(f"[AVISO] v3.7.0.9: Seletor {i}/4 falhou: {str(e)[:100]}")
                 continue
         
-        exibir_mensagem("❌ v3.7.0.9: Nenhum checkbox estudo foi localizado")
+        exibir_mensagem("[ERRO] v3.7.0.9: Nenhum checkbox estudo foi localizado")
         return None
         
     except Exception as e:
-        exibir_mensagem(f"❌ v3.7.0.9: Erro na localização do checkbox estudo: {str(e)}")
+        exibir_mensagem(f"[ERRO] v3.7.0.9: Erro na localização do checkbox estudo: {str(e)}")
         return None
 
 def localizar_switch_estudo_playwright(page: Page):
@@ -2594,7 +2594,7 @@ def localizar_switch_estudo_playwright(page: Page):
         Locator: Elemento encontrado ou None
     """
     try:
-        exibir_mensagem("🔍 v3.7.0.9: Localizando switch Estacionamento Estudo...")
+        exibir_mensagem("[BUSCAR] v3.7.0.9: Localizando switch Estacionamento Estudo...")
         
         seletores = [
             '#atividadeVeiculoTelaAtividadeVeiculo input[value="estudo"] + * input.MuiSwitch-input',  # ESPECÍFICO
@@ -2607,17 +2607,17 @@ def localizar_switch_estudo_playwright(page: Page):
             try:
                 elemento = page.locator(seletor)
                 if elemento.count() > 0:
-                    exibir_mensagem(f"✅ v3.7.0.9: Switch estudo localizado com seletor {i}/4")
+                    exibir_mensagem(f"[OK] v3.7.0.9: Switch estudo localizado com seletor {i}/4")
                     return elemento
             except Exception as e:
-                exibir_mensagem(f"⚠️ v3.7.0.9: Seletor {i}/4 falhou: {str(e)[:100]}")
+                exibir_mensagem(f"[AVISO] v3.7.0.9: Seletor {i}/4 falhou: {str(e)[:100]}")
                 continue
         
-        exibir_mensagem("❌ v3.7.0.9: Nenhum switch estudo foi localizado")
+        exibir_mensagem("[ERRO] v3.7.0.9: Nenhum switch estudo foi localizado")
         return None
         
     except Exception as e:
-        exibir_mensagem(f"❌ v3.7.0.9: Erro na localização do switch estudo: {str(e)}")
+        exibir_mensagem(f"[ERRO] v3.7.0.9: Erro na localização do switch estudo: {str(e)}")
         return None
 
 def navegar_tela_8_playwright(page: Page, uso_veiculo: str) -> bool:
@@ -2626,7 +2626,7 @@ def navegar_tela_8_playwright(page: Page, uso_veiculo: str) -> bool:
     """
     try:
         exception_handler.definir_tela_atual("TELA_8")
-        exibir_mensagem("📱 TELA 8: Aguardando carregamento...")
+        exibir_mensagem("[CELULAR] TELA 8: Aguardando carregamento...")
         
         max_tentativas = 20
         tentativa = 0
@@ -2647,8 +2647,8 @@ def navegar_tela_8_playwright(page: Page, uso_veiculo: str) -> bool:
             exception_handler.capturar_warning("Tela 8 não carregou", "TELA_8")
             return False
         
-        exibir_mensagem("✅ Tela 8 carregada com sucesso")
-        exibir_mensagem(f"📱 TELA 8: Selecionando uso do veículo...")
+        exibir_mensagem("[OK] Tela 8 carregada com sucesso")
+        exibir_mensagem(f"[CELULAR] TELA 8: Selecionando uso do veículo...")
         
         mapeamento_uso = {
             "Pessoal": "Particular",
@@ -2665,13 +2665,13 @@ def navegar_tela_8_playwright(page: Page, uso_veiculo: str) -> bool:
         
         if radio_button.is_visible():
             radio_button.click()
-            exibir_mensagem(f"✅ Uso '{uso_veiculo}' selecionado com sucesso")
+            exibir_mensagem(f"[OK] Uso '{uso_veiculo}' selecionado com sucesso")
         else:
             exception_handler.capturar_warning(f"Radio button para '{uso_veiculo}' não está visível", "TELA_8")
         
         botao_continuar = page.locator("#gtm-telaUsoVeiculoContinuar").first
         botao_continuar.click()
-        exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
+        exibir_mensagem("[OK] Botão 'Continuar' clicado com sucesso")
         aguardar_tela_8_playwright(page, 5000)
         return True
         
@@ -2685,23 +2685,23 @@ def navegar_tela_9_playwright(page: Page, nome: str, cpf: str, data_nascimento: 
     """
     try:
         exception_handler.definir_tela_atual("TELA_9")
-        exibir_mensagem("📱 TELA 9: Aguardando carregamento...")
+        exibir_mensagem("[CELULAR] TELA 9: Aguardando carregamento...")
         
         # OTIMIZAÇÃO: Detecção mais rápida da Tela 9
-        exibir_mensagem("📱 TELA 9: Aguardando carregamento...")
+        exibir_mensagem("[CELULAR] TELA 9: Aguardando carregamento...")
         
         # Estratégia otimizada: aguardar elemento específico diretamente
         try:
             # Aguardar o campo nome aparecer (mais específico que localizar_tela_9)
             page.wait_for_selector("#nomeTelaSegurado", timeout=5000)
-            exibir_mensagem("✅ Tela 9 carregada com sucesso (otimizada)")
+            exibir_mensagem("[OK] Tela 9 carregada com sucesso (otimizada)")
         except:
             # Fallback para método anterior (reduzido)
             for tentativa in range(5):  # Reduzido de 20 para 5
                 try:
                     elementos_tela = localizar_tela_9_playwright(page)
                     if elementos_tela.count() > 0:
-                        exibir_mensagem("✅ Tela 9 carregada com sucesso (fallback)")
+                        exibir_mensagem("[OK] Tela 9 carregada com sucesso (fallback)")
                         break
                 except:
                     pass
@@ -2716,39 +2716,39 @@ def navegar_tela_9_playwright(page: Page, nome: str, cpf: str, data_nascimento: 
                     pass
         
         # OTIMIZAÇÃO: Preenchimento imediato do nome (sem delays desnecessários)
-        exibir_mensagem("📱 TELA 9: Preenchendo nome...")
+        exibir_mensagem("[CELULAR] TELA 9: Preenchendo nome...")
         try:
             nome_campo = page.locator("#nomeTelaSegurado")
             # Aguardar campo estar pronto para interação
             nome_campo.wait_for(state="visible", timeout=2000)
             nome_campo.click()
             nome_campo.fill(nome)
-            exibir_mensagem(f"✅ Nome preenchido: {nome}")
+            exibir_mensagem(f"[OK] Nome preenchido: {nome}")
         except Exception as e:
             exception_handler.capturar_warning(f"Erro ao preencher nome: {str(e)}", "TELA_9")
         
         # Preencher CPF
-        exibir_mensagem("📱 TELA 9: Preenchendo CPF...")
+        exibir_mensagem("[CELULAR] TELA 9: Preenchendo CPF...")
         try:
             cpf_campo = page.locator("#cpfTelaSegurado")
             cpf_campo.click()
             cpf_campo.fill(cpf)
-            exibir_mensagem(f"✅ CPF preenchido: {cpf}")
+            exibir_mensagem(f"[OK] CPF preenchido: {cpf}")
         except Exception as e:
             exception_handler.capturar_warning(f"Erro ao preencher CPF: {str(e)}", "TELA_9")
         
         # Preencher Data de Nascimento
-        exibir_mensagem("📱 TELA 9: Preenchendo data de nascimento...")
+        exibir_mensagem("[CELULAR] TELA 9: Preenchendo data de nascimento...")
         try:
             data_campo = page.locator("#dataNascimentoTelaSegurado")
             data_campo.click()
             data_campo.fill(data_nascimento)
-            exibir_mensagem(f"✅ Data de nascimento preenchida: {data_nascimento}")
+            exibir_mensagem(f"[OK] Data de nascimento preenchida: {data_nascimento}")
         except Exception as e:
             exception_handler.capturar_warning(f"Erro ao preencher data de nascimento: {str(e)}", "TELA_9")
         
         # Selecionar Sexo
-        exibir_mensagem("📱 TELA 9: Selecionando sexo...")
+        exibir_mensagem("[CELULAR] TELA 9: Selecionando sexo...")
         try:
             campo_sexo = page.locator("#sexoTelaSegurado")
             if campo_sexo.is_visible():
@@ -2758,7 +2758,7 @@ def navegar_tela_9_playwright(page: Page, nome: str, cpf: str, data_nascimento: 
                 opcao_sexo = localizar_sexo_playwright(page, sexo)
                 if opcao_sexo.is_visible():
                     opcao_sexo.click()
-                    exibir_mensagem(f"✅ Sexo selecionado: {sexo}")
+                    exibir_mensagem(f"[OK] Sexo selecionado: {sexo}")
                 else:
                     exception_handler.capturar_warning(f"Opção de sexo '{sexo}' não encontrada", "TELA_9")
             else:
@@ -2767,7 +2767,7 @@ def navegar_tela_9_playwright(page: Page, nome: str, cpf: str, data_nascimento: 
             exception_handler.capturar_warning(f"Erro ao selecionar sexo: {str(e)}", "TELA_9")
         
         # Selecionar Estado Civil
-        exibir_mensagem("📱 TELA 9: Selecionando estado civil...")
+        exibir_mensagem("[CELULAR] TELA 9: Selecionando estado civil...")
         try:
             campo_estado_civil = page.locator("#estadoCivilTelaSegurado")
             if campo_estado_civil.is_visible():
@@ -2795,7 +2795,7 @@ def navegar_tela_9_playwright(page: Page, nome: str, cpf: str, data_nascimento: 
                             opcoes_estado_civil = localizar_estado_civil_playwright(page, variacao)
                             if opcoes_estado_civil.count() > 0:
                                 opcoes_estado_civil.first.click()
-                                exibir_mensagem(f"✅ Estado civil selecionado: {estado_civil} (encontrado como '{variacao}')")
+                                exibir_mensagem(f"[OK] Estado civil selecionado: {estado_civil} (encontrado como '{variacao}')")
                                 estado_civil_selecionado = True
                                 break
                         
@@ -2821,17 +2821,17 @@ def navegar_tela_9_playwright(page: Page, nome: str, cpf: str, data_nascimento: 
             exception_handler.capturar_warning(f"Erro ao selecionar estado civil: {str(e)}", "TELA_9")
         
         # Preencher Email
-        exibir_mensagem("📱 TELA 9: Preenchendo email...")
+        exibir_mensagem("[CELULAR] TELA 9: Preenchendo email...")
         try:
             email_campo = page.locator("#emailTelaSegurado")
             email_campo.click()
             email_campo.fill(email)
-            exibir_mensagem(f"✅ Email preenchido: {email}")
+            exibir_mensagem(f"[OK] Email preenchido: {email}")
         except Exception as e:
             exception_handler.capturar_warning(f"Erro ao preencher email: {str(e)}", "TELA_9")
         
         # Preencher Celular
-        exibir_mensagem("📱 TELA 9: Preenchendo celular...")
+        exibir_mensagem("[CELULAR] TELA 9: Preenchendo celular...")
         try:
             celular_campo = page.locator("#celularTelaSegurado")
             celular_campo.click()
@@ -2850,7 +2850,7 @@ def navegar_tela_9_playwright(page: Page, nome: str, cpf: str, data_nascimento: 
             
             # Verificar se foi preenchido corretamente
             valor_preenchido = celular_campo.input_value()
-            exibir_mensagem(f"✅ Celular preenchido: {celular} (valor no campo: {valor_preenchido})")
+            exibir_mensagem(f"[OK] Celular preenchido: {celular} (valor no campo: {valor_preenchido})")
             
             if valor_preenchido != celular:
                 exception_handler.capturar_warning(f"ATENÇÃO: Valor no campo ({valor_preenchido}) diferente do esperado ({celular})", "TELA_9")
@@ -2861,7 +2861,7 @@ def navegar_tela_9_playwright(page: Page, nome: str, cpf: str, data_nascimento: 
         # Clicar em Continuar
         botao_continuar = page.locator("#gtm-telaDadosSeguradoContinuar").first
         botao_continuar.click()
-        exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
+        exibir_mensagem("[OK] Botão 'Continuar' clicado com sucesso")
         page.wait_for_selector("#gtm-telaCondutorPrincipalContinuar", timeout=5000)
         return True
         
@@ -2897,44 +2897,44 @@ def navegar_tela_10_playwright(page, condutor_principal, nome_condutor=None, cpf
     """
     try:
         exibir_mensagem("\n" + "="*50)
-        exibir_mensagem("🎯 TELA 10: CONDUTOR PRINCIPAL")
+        exibir_mensagem("[OBJETIVO] TELA 10: CONDUTOR PRINCIPAL")
         exibir_mensagem("="*50)
         
         # Aguarda o carregamento da Tela 10
-        exibir_mensagem("⏳ Aguardando carregamento da Tela 10...")
+        exibir_mensagem("[AGUARDANDO] Aguardando carregamento da Tela 10...")
         page.wait_for_selector("#gtm-telaCondutorPrincipalContinuar", timeout=10000)
         page.wait_for_selector('input[name="condutorPrincipalTelaCondutorPrincipal"]', timeout=3000)
         
-        exibir_mensagem("✅ Tela 10 carregada - condutor principal detectado!")
+        exibir_mensagem("[OK] Tela 10 carregada - condutor principal detectado!")
         
         # PASSO 1: Selecionar se é condutor principal ou não
         if condutor_principal:
-            exibir_mensagem("👤 Selecionando 'Sim' - segurado é condutor principal")
+            exibir_mensagem("[USUARIO] Selecionando 'Sim' - segurado é condutor principal")
             radio_sim = localizar_radio_condutor_playwright(page, "sim")
             if radio_sim.is_visible():
                 radio_sim.click()
-                exibir_mensagem("✅ Radio 'Sim' selecionado com sucesso")
+                exibir_mensagem("[OK] Radio 'Sim' selecionado com sucesso")
             else:
                 exception_handler.capturar_warning("Radio 'Sim' não encontrado", "TELA_10")
         else:
-            exibir_mensagem("👤 Selecionando 'Não' - segurado não é condutor principal")
+            exibir_mensagem("[USUARIO] Selecionando 'Não' - segurado não é condutor principal")
             radio_nao = localizar_radio_condutor_playwright(page, "nao")
             if radio_nao.is_visible():
                 radio_nao.click()
-                exibir_mensagem("✅ Radio 'Não' selecionado com sucesso")
+                exibir_mensagem("[OK] Radio 'Não' selecionado com sucesso")
                 
                 # Aguardar campos do condutor aparecerem
                 page.wait_for_selector("#nomeTelaCondutorPrincipal", timeout=3000)
                 
                 # PASSO 2: Preencher dados do condutor
-                exibir_mensagem("📝 Preenchendo dados do condutor...")
+                exibir_mensagem("[NOTA] Preenchendo dados do condutor...")
                 
                 # Nome do condutor
                 if nome_condutor:
                     nome_campo = page.locator("#nomeTelaCondutorPrincipal")
                     if nome_campo.is_visible():
                         nome_campo.fill(nome_condutor)
-                        exibir_mensagem(f"✅ Nome do condutor: {nome_condutor}")
+                        exibir_mensagem(f"[OK] Nome do condutor: {nome_condutor}")
                     else:
                         exception_handler.capturar_warning("Campo nome não encontrado", "TELA_10")
                 
@@ -2943,7 +2943,7 @@ def navegar_tela_10_playwright(page, condutor_principal, nome_condutor=None, cpf
                     cpf_campo = page.locator("#cpfTelaCondutorPrincipal")
                     if cpf_campo.is_visible():
                         cpf_campo.fill(cpf_condutor)
-                        exibir_mensagem(f"✅ CPF do condutor: {cpf_condutor}")
+                        exibir_mensagem(f"[OK] CPF do condutor: {cpf_condutor}")
                     else:
                         exception_handler.capturar_warning("Campo CPF não encontrado", "TELA_10")
                 
@@ -2952,7 +2952,7 @@ def navegar_tela_10_playwright(page, condutor_principal, nome_condutor=None, cpf
                     data_campo = page.locator("#dataNascimentoTelaCondutorPrincipal")
                     if data_campo.is_visible():
                         data_campo.fill(data_nascimento_condutor)
-                        exibir_mensagem(f"✅ Data de nascimento: {data_nascimento_condutor}")
+                        exibir_mensagem(f"[OK] Data de nascimento: {data_nascimento_condutor}")
                     else:
                         exception_handler.capturar_warning("Campo data de nascimento não encontrado", "TELA_10")
                 
@@ -2968,7 +2968,7 @@ def navegar_tela_10_playwright(page, condutor_principal, nome_condutor=None, cpf
                             opcao_sexo = page.locator(f'xpath=//li[contains(text(), "{sexo_condutor}")]')
                             if opcao_sexo.is_visible():
                                 opcao_sexo.click()
-                                exibir_mensagem(f"✅ Sexo do condutor: {sexo_condutor}")
+                                exibir_mensagem(f"[OK] Sexo do condutor: {sexo_condutor}")
                             else:
                                 exception_handler.capturar_warning(f"Opção de sexo '{sexo_condutor}' não encontrada", "TELA_10")
                         except:
@@ -2996,7 +2996,7 @@ def navegar_tela_10_playwright(page, condutor_principal, nome_condutor=None, cpf
                             
                             if opcao_estado_civil.is_visible():
                                 opcao_estado_civil.click()
-                                exibir_mensagem(f"✅ Estado civil do condutor: {estado_civil_condutor}")
+                                exibir_mensagem(f"[OK] Estado civil do condutor: {estado_civil_condutor}")
                             else:
                                 exception_handler.capturar_warning(f"Opção de estado civil '{estado_civil_condutor}' não encontrada", "TELA_10")
                         except:
@@ -3010,11 +3010,11 @@ def navegar_tela_10_playwright(page, condutor_principal, nome_condutor=None, cpf
         page.wait_for_selector("#gtm-telaCondutorPrincipalContinuar", timeout=3000)
         
         # PASSO 3: Clicar em Continuar
-        exibir_mensagem("⏳ Clicando em 'Continuar'...")
+        exibir_mensagem("[AGUARDANDO] Clicando em 'Continuar'...")
         botao_continuar = page.locator("#gtm-telaCondutorPrincipalContinuar")
         if botao_continuar.is_visible():
             botao_continuar.click()
-            exibir_mensagem("✅ Botão 'Continuar' clicado com sucesso")
+            exibir_mensagem("[OK] Botão 'Continuar' clicado com sucesso")
             page.wait_for_selector("#gtm-telaAtividadeVeiculoContinuar", timeout=5000)
             return True
         else:
@@ -3049,98 +3049,98 @@ def navegar_tela_11_playwright(page, local_de_trabalho, estacionamento_proprio_l
     """
     try:
         exibir_mensagem("\n" + "="*50)
-        exibir_mensagem("🎯 TELA 11: ATIVIDADE DO VEÍCULO")
+        exibir_mensagem("[OBJETIVO] TELA 11: ATIVIDADE DO VEÍCULO")
         exibir_mensagem("="*50)
         
         # Aguarda o carregamento da Tela 11
-        exibir_mensagem("⏳ Aguardando carregamento da Tela 11...")
+        exibir_mensagem("[AGUARDANDO] Aguardando carregamento da Tela 11...")
         page.wait_for_selector("#gtm-telaAtividadeVeiculoContinuar", timeout=10000)
         page.wait_for_selector('input[type="checkbox"][value="trabalho"]', timeout=3000)
         
-        exibir_mensagem("✅ Tela 11 carregada - atividade do veículo detectada!")
+        exibir_mensagem("[OK] Tela 11 carregada - atividade do veículo detectada!")
         
         # PASSO 1: Seleciona checkbox Local de Trabalho se necessário
         if local_de_trabalho:
-            exibir_mensagem("📋 Marcando checkbox 'Local de Trabalho'...")
+            exibir_mensagem("[INFO] Marcando checkbox 'Local de Trabalho'...")
             checkbox_trabalho = localizar_checkbox_trabalho_playwright(page)
             if not checkbox_trabalho.is_checked():
                 checkbox_trabalho.check()
-                exibir_mensagem("✅ Checkbox 'Local de Trabalho' marcado!")
+                exibir_mensagem("[OK] Checkbox 'Local de Trabalho' marcado!")
                 page.wait_for_selector('input[type="checkbox"][data-gtm-form-interact-field-id="10"]', timeout=2000)
             else:
-                exibir_mensagem("ℹ️ Checkbox 'Local de Trabalho' já estava marcado")
+                exibir_mensagem("[INFO]️ Checkbox 'Local de Trabalho' já estava marcado")
         else:
-            exibir_mensagem("ℹ️ Local de Trabalho: Não selecionado")
+            exibir_mensagem("[INFO]️ Local de Trabalho: Não selecionado")
         
         # PASSO 2: Seleciona checkbox Local de Estudo se necessário
         if local_de_estudo:
-            exibir_mensagem("📋 Marcando checkbox 'Local de Estudo'...")
+            exibir_mensagem("[INFO] Marcando checkbox 'Local de Estudo'...")
             checkbox_estudo = localizar_checkbox_estudo_playwright(page)
             if not checkbox_estudo.is_checked():
                 checkbox_estudo.check()
-                exibir_mensagem("✅ Checkbox 'Local de Estudo' marcado!")
+                exibir_mensagem("[OK] Checkbox 'Local de Estudo' marcado!")
                 page.wait_for_selector('input[type="checkbox"][data-gtm-form-interact-field-id="11"]', timeout=2000)
             else:
-                exibir_mensagem("ℹ️ Checkbox 'Local de Estudo' já estava marcado")
+                exibir_mensagem("[INFO]️ Checkbox 'Local de Estudo' já estava marcado")
         else:
-            exibir_mensagem("ℹ️ Local de Estudo: Não selecionado")
+            exibir_mensagem("[INFO]️ Local de Estudo: Não selecionado")
         
         # PASSO 3: Configurar estacionamento do trabalho (se local_de_trabalho = true)
         if local_de_trabalho:
-            exibir_mensagem("🅿️ Configurando estacionamento do trabalho...")
+            exibir_mensagem("[P]️ Configurando estacionamento do trabalho...")
             try:
                 checkbox_estacionamento_trabalho = localizar_switch_trabalho_playwright(page)
                 if checkbox_estacionamento_trabalho.is_visible():
                     if estacionamento_proprio_local_de_trabalho and not checkbox_estacionamento_trabalho.is_checked():
                         checkbox_estacionamento_trabalho.check()
-                        exibir_mensagem("✅ Estacionamento próprio do trabalho: MARCADO")
+                        exibir_mensagem("[OK] Estacionamento próprio do trabalho: MARCADO")
                     elif not estacionamento_proprio_local_de_trabalho and checkbox_estacionamento_trabalho.is_checked():
                         checkbox_estacionamento_trabalho.uncheck()
-                        exibir_mensagem("✅ Estacionamento próprio do trabalho: DESMARCADO")
+                        exibir_mensagem("[OK] Estacionamento próprio do trabalho: DESMARCADO")
                     else:
                         estado = "MARCADO" if estacionamento_proprio_local_de_trabalho else "DESMARCADO"
-                        exibir_mensagem(f"✅ Estacionamento próprio do trabalho: {estado} (já estava correto)")
+                        exibir_mensagem(f"[OK] Estacionamento próprio do trabalho: {estado} (já estava correto)")
                 else:
-                    exibir_mensagem("⚠️ Checkbox estacionamento do trabalho não encontrado")
+                    exibir_mensagem("[AVISO] Checkbox estacionamento do trabalho não encontrado")
             except Exception as e:
-                exibir_mensagem(f"⚠️ Erro ao configurar estacionamento do trabalho: {str(e)}")
+                exibir_mensagem(f"[AVISO] Erro ao configurar estacionamento do trabalho: {str(e)}")
         
         # PASSO 4: Configurar estacionamento do estudo (se local_de_estudo = true)
         if local_de_estudo:
-            exibir_mensagem("🅿️ Configurando estacionamento do estudo...")
+            exibir_mensagem("[P]️ Configurando estacionamento do estudo...")
             try:
                 checkbox_estacionamento_estudo = localizar_switch_estudo_playwright(page)
                 if checkbox_estacionamento_estudo.is_visible():
                     if estacionamento_proprio_local_de_estudo and not checkbox_estacionamento_estudo.is_checked():
                         checkbox_estacionamento_estudo.check()
-                        exibir_mensagem("✅ Estacionamento próprio do estudo: MARCADO")
+                        exibir_mensagem("[OK] Estacionamento próprio do estudo: MARCADO")
                     elif not estacionamento_proprio_local_de_estudo and checkbox_estacionamento_estudo.is_checked():
                         checkbox_estacionamento_estudo.uncheck()
-                        exibir_mensagem("✅ Estacionamento próprio do estudo: DESMARCADO")
+                        exibir_mensagem("[OK] Estacionamento próprio do estudo: DESMARCADO")
                     else:
                         estado = "MARCADO" if estacionamento_proprio_local_de_estudo else "DESMARCADO"
-                        exibir_mensagem(f"✅ Estacionamento próprio do estudo: {estado} (já estava correto)")
+                        exibir_mensagem(f"[OK] Estacionamento próprio do estudo: {estado} (já estava correto)")
                 else:
-                    exibir_mensagem("⚠️ Checkbox estacionamento do estudo não encontrado")
+                    exibir_mensagem("[AVISO] Checkbox estacionamento do estudo não encontrado")
             except Exception as e:
-                exibir_mensagem(f"⚠️ Erro ao configurar estacionamento do estudo: {str(e)}")
+                exibir_mensagem(f"[AVISO] Erro ao configurar estacionamento do estudo: {str(e)}")
         
         # PASSO 5: Aguardar estabilização após todas as configurações
         page.wait_for_selector("#gtm-telaAtividadeVeiculoContinuar", timeout=3000)
         
         # PASSO 6: Clica no botão Continuar
-        exibir_mensagem("🔄 Clicando em 'Continuar'...")
+        exibir_mensagem("[ATUALIZANDO] Clicando em 'Continuar'...")
         botao_continuar = page.locator("#gtm-telaAtividadeVeiculoContinuar")
         botao_continuar.click()
         
         # PASSO 7: Aguarda navegação
         page.wait_for_selector("input[name='possuiGaragemTelaGaragemResidencia']", timeout=5000)
-        exibir_mensagem("✅ Navegação para próxima tela realizada!")
+        exibir_mensagem("[OK] Navegação para próxima tela realizada!")
         
         return True
         
     except Exception as e:
-        exibir_mensagem(f"❌ ERRO na Tela 11: {str(e)}")
+        exibir_mensagem(f"[ERRO] ERRO na Tela 11: {str(e)}")
         return False
 
 def navegar_tela_12_playwright(page, garagem_residencia, portao_eletronico):
@@ -3163,87 +3163,87 @@ def navegar_tela_12_playwright(page, garagem_residencia, portao_eletronico):
     """
     try:
         exibir_mensagem("\n" + "="*50)
-        exibir_mensagem("🏠 TELA 12: GARAGEM NA RESIDÊNCIA")
+        exibir_mensagem("[CASA] TELA 12: GARAGEM NA RESIDÊNCIA")
         exibir_mensagem("="*50)
         
         # Aguarda o carregamento da Tela 12
-        exibir_mensagem("1️⃣ ⏳ Aguardando carregamento da Tela 12...")
+        exibir_mensagem("1 [AGUARDANDO] Aguardando carregamento da Tela 12...")
         botao_continuar = localizar_botao_continuar_garagem_playwright(page)
         if not botao_continuar:
-            exibir_mensagem("❌ v3.7.0.11: Botão continuar não encontrado no carregamento")
+            exibir_mensagem("[ERRO] v3.7.0.11: Botão continuar não encontrado no carregamento")
             return False
         page.wait_for_selector('input[name="possuiGaragemTelaGaragemResidencia"]', timeout=3000)
         
-        exibir_mensagem("2️⃣ ✅ Tela 12 carregada - garagem na residência detectada!")
+        exibir_mensagem("2 [OK] Tela 12 carregada - garagem na residência detectada!")
         
         # Seleciona Sim ou Não para garagem
         if garagem_residencia:
-            exibir_mensagem("3️⃣ 📋 Selecionando 'Sim' para garagem na residência...")
+            exibir_mensagem("3 [INFO] Selecionando 'Sim' para garagem na residência...")
             
             # Localizar e clicar no radio button "Sim"
             radio_sim = page.locator('input[value="sim"][name="possuiGaragemTelaGaragemResidencia"]')
             if radio_sim.is_visible():
                 radio_sim.click()
-                exibir_mensagem("4️⃣ ✅ Radio 'Sim' para garagem selecionado com sucesso")
+                exibir_mensagem("4 [OK] Radio 'Sim' para garagem selecionado com sucesso")
             else:
-                exibir_mensagem("4️⃣ ⚠️ Radio 'Sim' para garagem não encontrado")
+                exibir_mensagem("4 [AVISO] Radio 'Sim' para garagem não encontrado")
                 return False
             
             # Aguarda campo de portão aparecer
-            exibir_mensagem("5️⃣ ⏳ Aguardando campo de portão aparecer...")
+            exibir_mensagem("5 [AGUARDANDO] Aguardando campo de portão aparecer...")
             page.wait_for_selector('input[name="tipoPortaoTelaGaragemResidencia"]', timeout=3000)
             
             # Seleciona tipo de portão
             if portao_eletronico == "Eletronico":
-                exibir_mensagem("6️⃣ 📋 Selecionando 'Eletrônico' para portão...")
+                exibir_mensagem("6 [INFO] Selecionando 'Eletrônico' para portão...")
                 
                 radio_eletronico = page.locator('input[value="eletronico"][name="tipoPortaoTelaGaragemResidencia"]')
                 if radio_eletronico.is_visible():
                     radio_eletronico.click()
-                    exibir_mensagem("7️⃣ ✅ Radio 'Eletrônico' para portão selecionado com sucesso")
+                    exibir_mensagem("7 [OK] Radio 'Eletrônico' para portão selecionado com sucesso")
                 else:
-                    exibir_mensagem("7️⃣ ⚠️ Radio 'Eletrônico' para portão não encontrado")
+                    exibir_mensagem("7 [AVISO] Radio 'Eletrônico' para portão não encontrado")
                     return False
                     
             elif portao_eletronico == "Manual":
-                exibir_mensagem("6️⃣ 📋 Selecionando 'Manual' para portão...")
+                exibir_mensagem("6 [INFO] Selecionando 'Manual' para portão...")
                 
                 radio_manual = page.locator('input[value="manual"][name="tipoPortaoTelaGaragemResidencia"]')
                 if radio_manual.is_visible():
                     radio_manual.click()
-                    exibir_mensagem("7️⃣ ✅ Radio 'Manual' para portão selecionado com sucesso")
+                    exibir_mensagem("7 [OK] Radio 'Manual' para portão selecionado com sucesso")
                 else:
-                    exibir_mensagem("7️⃣ ⚠️ Radio 'Manual' para portão não encontrado")
+                    exibir_mensagem("7 [AVISO] Radio 'Manual' para portão não encontrado")
                     return False
             else:
-                exibir_mensagem("6️⃣ ℹ️ Tipo de portão: Não possui")
+                exibir_mensagem("6 [INFO]️ Tipo de portão: Não possui")
         else:
-            exibir_mensagem("3️⃣ 📋 Selecionando 'Não' para garagem na residência...")
+            exibir_mensagem("3 [INFO] Selecionando 'Não' para garagem na residência...")
             
             # Localizar e clicar no radio button "Não"
             radio_nao = page.locator('input[value="nao"][name="possuiGaragemTelaGaragemResidencia"]')
             if radio_nao.is_visible():
                 radio_nao.click()
-                exibir_mensagem("4️⃣ ✅ Radio 'Não' para garagem selecionado com sucesso")
+                exibir_mensagem("4 [OK] Radio 'Não' para garagem selecionado com sucesso")
             else:
-                exibir_mensagem("4️⃣ ⚠️ Radio 'Não' para garagem não encontrado")
+                exibir_mensagem("4 [AVISO] Radio 'Não' para garagem não encontrado")
                 return False
         
         # Aguarda estabilização após seleções
-        exibir_mensagem("7️⃣ ⏳ Aguardando estabilização do botão continuar...")
+        exibir_mensagem("7 [AGUARDANDO] Aguardando estabilização do botão continuar...")
         botao_continuar = localizar_botao_continuar_garagem_playwright(page)
         if not botao_continuar:
-            exibir_mensagem("❌ v3.7.0.11: Botão continuar não encontrado após estabilização")
+            exibir_mensagem("[ERRO] v3.7.0.11: Botão continuar não encontrado após estabilização")
             return False
         
         # Clica no botão Continuar
-        exibir_mensagem("8️⃣ 🔄 Clicando em 'Continuar'...")
+        exibir_mensagem("8 [ATUALIZANDO] Clicando em 'Continuar'...")
         botao_continuar = localizar_botao_continuar_garagem_playwright(page)
         if botao_continuar and botao_continuar.is_visible():
             botao_continuar.click()
-            exibir_mensagem("9️⃣ ✅ Botão 'Continuar' clicado com sucesso")
+            exibir_mensagem("9 [OK] Botão 'Continuar' clicado com sucesso")
         else:
-            exibir_mensagem("9️⃣ ⚠️ Botão 'Continuar' não encontrado")
+            exibir_mensagem("9 [AVISO] Botão 'Continuar' não encontrado")
             return False
         
         # Aguarda navegação - verifica se chegou na próxima tela ou se ainda está na atual
@@ -3251,25 +3251,25 @@ def navegar_tela_12_playwright(page, garagem_residencia, portao_eletronico):
             # Tenta aguardar elemento da próxima tela
 #            page.wait_for_selector("input[name='resideMenoresTelaResidenciaMenores']", timeout=3000)
             page.wait_for_selector("input[name='usoDependenteTelaUsoResidentes']", timeout=10000)
-            exibir_mensagem("🔟 ✅ Navegação para próxima tela realizada!")
+            exibir_mensagem("[10] [OK] Navegação para próxima tela realizada!")
         except:
             # Se não encontrar, verifica se ainda está na tela atual
             try:
                 botao_continuar = localizar_botao_continuar_garagem_playwright(page)
                 if botao_continuar and botao_continuar.is_visible():
-                    exibir_mensagem("🔟 ⚠️ Ainda na tela atual - tentando clicar novamente...")
+                    exibir_mensagem("[10] [AVISO] Ainda na tela atual - tentando clicar novamente...")
                     botao_continuar.click()
                 else:
-                    exibir_mensagem("🔟 ⚠️ Botão continuar não encontrado para segundo clique")
+                    exibir_mensagem("[10] [AVISO] Botão continuar não encontrado para segundo clique")
 #                page.wait_for_selector("input[name='resideMenoresTelaResidenciaMenores']", timeout=5000)
-                exibir_mensagem("🔟 ✅ Navegação para próxima tela realizada!")
+                exibir_mensagem("[10] [OK] Navegação para próxima tela realizada!")
             except:
-                exibir_mensagem("🔟 ✅ Navegação para próxima tela realizada!")
+                exibir_mensagem("[10] [OK] Navegação para próxima tela realizada!")
         
         return True
         
     except Exception as e:
-        exibir_mensagem(f"❌ ERRO na Tela 12: {str(e)}")
+        exibir_mensagem(f"[ERRO] ERRO na Tela 12: {str(e)}")
         return False
 
 def localizar_botao_continuar_menores_playwright(page: Page):
@@ -3292,7 +3292,7 @@ def localizar_botao_continuar_menores_playwright(page: Page):
         try:
             elemento = page.locator("#gtm-telaUsoResidentesContinuar")
             if elemento.is_visible(timeout=1000):
-                exibir_mensagem("🔍 v3.7.0.12: Botão continuar localizado por ID específico (nível 1)")
+                exibir_mensagem("[BUSCAR] v3.7.0.12: Botão continuar localizado por ID específico (nível 1)")
                 return elemento
         except:
             pass
@@ -3301,7 +3301,7 @@ def localizar_botao_continuar_menores_playwright(page: Page):
         try:
             elemento = page.locator('button[data-testid="continuar-menores"]')
             if elemento.is_visible(timeout=1000):
-                exibir_mensagem("🔍 v3.7.0.12: Botão continuar localizado por data-testid (nível 2)")
+                exibir_mensagem("[BUSCAR] v3.7.0.12: Botão continuar localizado por data-testid (nível 2)")
                 return elemento
         except:
             pass
@@ -3310,7 +3310,7 @@ def localizar_botao_continuar_menores_playwright(page: Page):
         try:
             elemento = page.locator('p:has-text("Continuar")')
             if elemento.is_visible(timeout=1000):
-                exibir_mensagem("🔍 v3.7.0.12: Botão continuar localizado por texto semântico (nível 3)")
+                exibir_mensagem("[BUSCAR] v3.7.0.12: Botão continuar localizado por texto semântico (nível 3)")
                 return elemento
         except:
             pass
@@ -3319,7 +3319,7 @@ def localizar_botao_continuar_menores_playwright(page: Page):
         try:
             elemento = page.locator('button:has-text("Continuar")')
             if elemento.is_visible(timeout=1000):
-                exibir_mensagem("🔍 v3.7.0.12: Botão continuar localizado por botão com texto (nível 4)")
+                exibir_mensagem("[BUSCAR] v3.7.0.12: Botão continuar localizado por botão com texto (nível 4)")
                 return elemento
         except:
             pass
@@ -3328,17 +3328,17 @@ def localizar_botao_continuar_menores_playwright(page: Page):
         try:
             elemento = page.locator('p.font-semibold.font-workSans.cursor-pointer')
             if elemento.is_visible(timeout=1000):
-                exibir_mensagem("🔍 v3.7.0.12: Botão continuar localizado por classes CSS (nível 5 - fallback)")
+                exibir_mensagem("[BUSCAR] v3.7.0.12: Botão continuar localizado por classes CSS (nível 5 - fallback)")
                 return elemento
         except:
             pass
         
         # Se nenhum nível funcionou, retornar o fallback padrão
-        exibir_mensagem("⚠️ v3.7.0.12: Usando fallback padrão para botão continuar")
+        exibir_mensagem("[AVISO] v3.7.0.12: Usando fallback padrão para botão continuar")
         return page.locator('p.font-semibold.font-workSans.cursor-pointer')
         
     except Exception as e:
-        exibir_mensagem(f"❌ v3.7.0.12: Erro ao localizar botão continuar: {str(e)}")
+        exibir_mensagem(f"[ERRO] v3.7.0.12: Erro ao localizar botão continuar: {str(e)}")
         # Fallback final
         return page.locator('p.font-semibold.font-workSans.cursor-pointer')
 
@@ -3371,16 +3371,16 @@ def navegar_tela_13_playwright(page, reside_18_26, sexo_do_menor, faixa_etaria_m
     """
     try:
         exibir_mensagem("\n" + "="*50)
-        exibir_mensagem("👥 TELA 13: RESIDÊNCIA COM MENORES DE 18-26 ANOS")
+        exibir_mensagem("[USUARIOS] TELA 13: RESIDÊNCIA COM MENORES DE 18-26 ANOS")
         exibir_mensagem("="*50)
         
         # PASSO 1: Aguardar carregamento da tela
-        exibir_mensagem("1️⃣ ⏳ Aguardando carregamento da Tela 13...")
+        exibir_mensagem("1 [AGUARDANDO] Aguardando carregamento da Tela 13...")
         page.wait_for_selector("p.font-semibold.font-workSans.cursor-pointer:has-text('Continuar')", timeout=10000)
-        exibir_mensagem("2️⃣ ✅ Tela 13 carregada - residência com menores detectada!")
+        exibir_mensagem("2 [OK] Tela 13 carregada - residência com menores detectada!")
         
         # PASSO 2: Selecionar resposta principal
-        exibir_mensagem(f"3️⃣ 👥 Selecionando resposta principal: '{reside_18_26}'...")
+        exibir_mensagem(f"3 [USUARIOS] Selecionando resposta principal: '{reside_18_26}'...")
         
         # Mapear valores para os selectors da gravação
         if reside_18_26 == "Não":
@@ -3388,65 +3388,65 @@ def navegar_tela_13_playwright(page, reside_18_26, sexo_do_menor, faixa_etaria_m
             try:
                 # Primeira tentativa: usar o seletor original
                 page.locator("input[type='radio'][value='nao']").first.check()
-                exibir_mensagem("4️⃣ ✅ Radio 'Não' selecionado com sucesso")
+                exibir_mensagem("4 [OK] Radio 'Não' selecionado com sucesso")
             except:
                 try:
                     # Segunda tentativa: usar texto
                     page.locator("text=Não").first.click()
-                    exibir_mensagem("4️⃣ ✅ Radio 'Não' selecionado com sucesso (texto)")
+                    exibir_mensagem("4 [OK] Radio 'Não' selecionado com sucesso (texto)")
                 except:
                     # Terceira tentativa: usar label
                     page.locator("label:has-text('Não')").first.click()
-                    exibir_mensagem("4️⃣ ✅ Radio 'Não' selecionado com sucesso (label)")
+                    exibir_mensagem("4 [OK] Radio 'Não' selecionado com sucesso (label)")
             
         elif reside_18_26 == "Sim, mas não utilizam o veículo":
             # Selecionar "Sim, mas não utilizam o veículo"
             try:
                 page.locator("input[type='radio'][value='sim_nao_utilizam']").check()
-                exibir_mensagem("4️⃣ ✅ Radio 'Sim, mas não utilizam o veículo' selecionado com sucesso")
+                exibir_mensagem("4 [OK] Radio 'Sim, mas não utilizam o veículo' selecionado com sucesso")
             except:
                 page.locator("text=Sim, mas não utilizam o veículo").first.click()
-                exibir_mensagem("4️⃣ ✅ Radio 'Sim, mas não utilizam o veículo' selecionado com sucesso (texto)")
+                exibir_mensagem("4 [OK] Radio 'Sim, mas não utilizam o veículo' selecionado com sucesso (texto)")
             
         elif reside_18_26 == "Sim e utilizam o veículo":
             # Selecionar "Sim e utilizam o veículo"
             try:
                 page.locator("input[type='radio'][value='sim_utilizam']").check()
-                exibir_mensagem("4️⃣ ✅ Radio 'Sim e utilizam o veículo' selecionado com sucesso")
+                exibir_mensagem("4 [OK] Radio 'Sim e utilizam o veículo' selecionado com sucesso")
             except:
                 page.locator("text=Sim e utilizam o veículo").first.click()
-                exibir_mensagem("4️⃣ ✅ Radio 'Sim e utilizam o veículo' selecionado com sucesso (texto)")
+                exibir_mensagem("4 [OK] Radio 'Sim e utilizam o veículo' selecionado com sucesso (texto)")
             
             # PASSO 3: Se "Sim e utilizam o veículo", selecionar campos condicionais
             if sexo_do_menor != "N/A":
-                exibir_mensagem(f"5️⃣ 👤 Selecionando sexo do menor: '{sexo_do_menor}'...")
+                exibir_mensagem(f"5 [USUARIO] Selecionando sexo do menor: '{sexo_do_menor}'...")
                 
                 if sexo_do_menor == "Feminino":
                     page.locator("input[type='radio'][value='feminino']").check()
-                    exibir_mensagem("6️⃣ ✅ Radio 'Feminino' para sexo selecionado com sucesso")
+                    exibir_mensagem("6 [OK] Radio 'Feminino' para sexo selecionado com sucesso")
                 elif sexo_do_menor == "Masculino":
                     page.locator("input[type='radio'][value='masculino']").check()
-                    exibir_mensagem("6️⃣ ✅ Radio 'Masculino' para sexo selecionado com sucesso")
+                    exibir_mensagem("6 [OK] Radio 'Masculino' para sexo selecionado com sucesso")
                 elif sexo_do_menor == "Ambos":
                     page.locator("input[type='radio'][value='ambos']").check()
-                    exibir_mensagem("6️⃣ ✅ Radio 'Ambos' para sexo selecionado com sucesso")
+                    exibir_mensagem("6 [OK] Radio 'Ambos' para sexo selecionado com sucesso")
             
             if faixa_etaria_menor_mais_novo != "N/A":
-                exibir_mensagem(f"7️⃣ 📅 Selecionando faixa etária: '{faixa_etaria_menor_mais_novo}'...")
+                exibir_mensagem(f"7 [DATA] Selecionando faixa etária: '{faixa_etaria_menor_mais_novo}'...")
                 
                 if faixa_etaria_menor_mais_novo == "18 a 24 anos":
                     page.locator("input[type='radio'][value='18_24']").check()
-                    exibir_mensagem("8️⃣ ✅ Radio '18 a 24 anos' para faixa etária selecionado com sucesso")
+                    exibir_mensagem("8 [OK] Radio '18 a 24 anos' para faixa etária selecionado com sucesso")
                 elif faixa_etaria_menor_mais_novo == "25 anos":
                     page.locator("input[type='radio'][value='25']").check()
-                    exibir_mensagem("8️⃣ ✅ Radio '25 anos' para faixa etária selecionado com sucesso")
+                    exibir_mensagem("8 [OK] Radio '25 anos' para faixa etária selecionado com sucesso")
         else:
-            exibir_mensagem("4️⃣ ⚠️ Resposta não reconhecida, usando 'Não'")
+            exibir_mensagem("4 [AVISO] Resposta não reconhecida, usando 'Não'")
             page.locator("input[type='radio'][value='nao']").first.check()
         
         # PASSO 4: Clicar no botão Continuar
         # ========================================
-        # 🔄 MUDANÇA DE SELETOR - COMPATIBILIDADE REGIONAL
+        # [ATUALIZANDO] MUDANÇA DE SELETOR - COMPATIBILIDADE REGIONAL
         # ========================================
         # ANTES (Seletor Genérico - Problemático em Portugal):
         # page.wait_for_selector("p.font-semibold.font-workSans.cursor-pointer:has-text('Continuar')", timeout=5000)
@@ -3462,71 +3462,71 @@ def navegar_tela_13_playwright(page, reside_18_26, sexo_do_menor, faixa_etaria_m
         # Solução: Usar ID específico que é sempre presente no HTML
         # independente do estado de renderização CSS
         # ========================================
-        exibir_mensagem("9️⃣ ⏳ Aguardando botão 'Continuar'...")
+        exibir_mensagem("9 [AGUARDANDO] Aguardando botão 'Continuar'...")
         page.wait_for_selector("#gtm-telaUsoResidentesContinuar", timeout=5000)
         
-        exibir_mensagem("🔟 🔄 Clicando no botão 'Continuar'...")
+        exibir_mensagem("[10] [ATUALIZANDO] Clicando no botão 'Continuar'...")
         botao_continuar = localizar_botao_continuar_menores_playwright(page)
         botao_continuar.click()
-        exibir_mensagem("1️⃣1️⃣ ✅ Botão 'Continuar' clicado com sucesso")
+        exibir_mensagem("11 [OK] Botão 'Continuar' clicado com sucesso")
         
         # PASSO 5: Aguardar transição para próxima tela
-        exibir_mensagem("1️⃣2️⃣ ⏳ Aguardando transição para próxima tela...")
-        exibir_mensagem("1️⃣3️⃣ 🔍 Iniciando sistema de detecção inteligente (Tela 14 → Tela 15)")
+        exibir_mensagem("12 [AGUARDANDO] Aguardando transição para próxima tela...")
+        exibir_mensagem("13 [BUSCAR] Iniciando sistema de detecção inteligente (Tela 14 -> Tela 15)")
         
         # Tentar detectar Tela 14 primeiro
         try:
-            exibir_mensagem("1️⃣4️⃣ 🎯 Tentativa 1: Detectando Tela 14...")
+            exibir_mensagem("14 [OBJETIVO] Tentativa 1: Detectando Tela 14...")
             page.wait_for_selector("#gtm-telaCorretorAnteriorContinuar", timeout=5000)
-            exibir_mensagem("1️⃣5️⃣ ✅ Tela 14 detectada - transição bem-sucedida!")
-            exibir_mensagem("1️⃣6️⃣ 📋 Fluxo normal: Tela 13 → Tela 14 → Tela 15")
+            exibir_mensagem("15 [OK] Tela 14 detectada - transição bem-sucedida!")
+            exibir_mensagem("16 [INFO] Fluxo normal: Tela 13 -> Tela 14 -> Tela 15")
         except Exception as e:
-            exibir_mensagem(f"1️⃣4️⃣ ⚠️ Tela 14 não detectada: {str(e)}")
-            exibir_mensagem("1️⃣5️⃣ 🔄 Ativando fallback: Tentando detectar Tela 15 diretamente...")
-            exibir_mensagem("1️⃣6️⃣ 📋 Fluxo otimizado: Tela 13 → Tela 15 (pulando Tela 14)")
+            exibir_mensagem(f"14 [AVISO] Tela 14 não detectada: {str(e)}")
+            exibir_mensagem("15 [ATUALIZANDO] Ativando fallback: Tentando detectar Tela 15 diretamente...")
+            exibir_mensagem("16 [INFO] Fluxo otimizado: Tela 13 -> Tela 15 (pulando Tela 14)")
             
             # Fallback: tentar detectar Tela 15
             try:
-                exibir_mensagem("1️⃣7️⃣ 🎯 Tentativa 2: Detectando Tela 15 como fallback...")
+                exibir_mensagem("17 [OBJETIVO] Tentativa 2: Detectando Tela 15 como fallback...")
                 
                 # Tentar detectar Tela 15 com diferentes textos possíveis
                 try:
                     # Primeira tentativa: texto original (quando vai para Tela 14 primeiro)
-                    exibir_mensagem("1️⃣7️⃣a️⃣ 🎯 Tentativa 2a: Detectando Tela 15 (texto original)...")
+                    exibir_mensagem("17a [OBJETIVO] Tentativa 2a: Detectando Tela 15 (texto original)...")
                     page.wait_for_selector("text=Por favor, aguarde. Estamos buscando o corretor ideal para você!", timeout=3000)
-                    exibir_mensagem("1️⃣7️⃣a️⃣ ✅ Tela 15 detectada com texto original!")
+                    exibir_mensagem("17a [OK] Tela 15 detectada com texto original!")
                 except:
                     try:
                         # Segunda tentativa: texto quando pula diretamente da Tela 13
-                        exibir_mensagem("1️⃣7️⃣b️⃣ 🎯 Tentativa 2b: Detectando Tela 15 (texto direto)...")
+                        exibir_mensagem("17b [OBJETIVO] Tentativa 2b: Detectando Tela 15 (texto direto)...")
                         page.wait_for_selector("text=Por favor, aguarde. Estamos realizando o cálculo para você!", timeout=3000)
-                        exibir_mensagem("1️⃣7️⃣b️⃣ ✅ Tela 15 detectada com texto direto!")
+                        exibir_mensagem("17b [OK] Tela 15 detectada com texto direto!")
                     except:
                         # Terceira tentativa: texto final de sucesso
-                        exibir_mensagem("1️⃣7️⃣c️⃣ 🎯 Tentativa 2c: Detectando Tela 15 (texto final)...")
+                        exibir_mensagem("17c [OBJETIVO] Tentativa 2c: Detectando Tela 15 (texto final)...")
                         page.wait_for_selector("text=Parabéns, chegamos ao resultado final da cotação!", timeout=180000)
-                        exibir_mensagem("1️⃣7️⃣c️⃣ ✅ Tela 15 detectada com texto final!")
+                        exibir_mensagem("17c [OK] Tela 15 detectada com texto final!")
 
-                exibir_mensagem("1️⃣8️⃣ ✅ Tela 15 detectada - transição bem-sucedida!")
-                exibir_mensagem("1️⃣9️⃣ 🚀 Fallback executado com sucesso!")
+                exibir_mensagem("18 [OK] Tela 15 detectada - transição bem-sucedida!")
+                exibir_mensagem("19 [INICIANDO] Fallback executado com sucesso!")
                 
                 # Definir variável global quando Tela 15 é detectada diretamente da Tela 13
                 global tela_15_detectada
                 tela_15_detectada = True
-                exibir_mensagem("2️⃣0️⃣ 🏷️ Flag global 'tela_15_detectada' definida como True")
-                exibir_mensagem("2️⃣1️⃣ 📊 Status atualizado: Tela 14 será pulada na próxima execução")
+                exibir_mensagem("20 [TAG]️ Flag global 'tela_15_detectada' definida como True")
+                exibir_mensagem("21 [DADOS] Status atualizado: Tela 14 será pulada na próxima execução")
                 
             except Exception as e2:
-                exibir_mensagem(f"1️⃣7️⃣ ❌ Tela 15 também não detectada: {str(e2)}")
-                exibir_mensagem("1️⃣8️⃣ ❌ ABEND: Falha na transição da Tela 13")
-                exibir_mensagem("1️⃣9️⃣ 🚫 Nenhuma tela subsequente foi detectada")
+                exibir_mensagem(f"17 [ERRO] Tela 15 também não detectada: {str(e2)}")
+                exibir_mensagem("18 [ERRO] ABEND: Falha na transição da Tela 13")
+                exibir_mensagem("19 [PROIBIDO] Nenhuma tela subsequente foi detectada")
                 raise Exception("Falha na transição da Tela 13 - nem Tela 14 nem Tela 15 detectadas")
-        exibir_mensagem("2️⃣2️⃣ ✅ TELA 13 CONCLUÍDA!")
+        exibir_mensagem("22 [OK] TELA 13 CONCLUÍDA!")
         
         return True
         
     except Exception as e:
-        exibir_mensagem(f"❌ ERRO na Tela 13: {str(e)}")
+        exibir_mensagem(f"[ERRO] ERRO na Tela 13: {str(e)}")
         return False
 
 def navegar_tela_14_playwright(page, continuar_com_corretor_anterior):
@@ -3552,11 +3552,11 @@ def navegar_tela_14_playwright(page, continuar_com_corretor_anterior):
     """
     try:
         exibir_mensagem("\n" + "="*50)
-        exibir_mensagem("👨‍💼 TELA 14: CORRETOR ANTERIOR (CONDICIONAL)")
+        exibir_mensagem("[HOMEM]‍[TRABALHO] TELA 14: CORRETOR ANTERIOR (CONDICIONAL)")
         exibir_mensagem("="*50)
         
         # PASSO 1: Verificar se a Tela 14 aparece (é condicional)
-        exibir_mensagem("1️⃣ 🔍 Verificando se a Tela 14 (Corretor Anterior) aparece...")
+        exibir_mensagem("1 [BUSCAR] Verificando se a Tela 14 (Corretor Anterior) aparece...")
         
         # Aguardar um tempo para ver se a tela aparece
         page.wait_for_selector("#gtm-telaCorretorAnteriorContinuar", timeout=5000)
@@ -3566,72 +3566,72 @@ def navegar_tela_14_playwright(page, continuar_com_corretor_anterior):
             # Tentar encontrar o botão da Tela 14
             botao_tela14 = page.locator("#gtm-telaCorretorAnteriorContinuar")
             if botao_tela14.count() > 0 and botao_tela14.first.is_visible():
-                exibir_mensagem("2️⃣ ✅ Tela 14 detectada - Corretor Anterior aparece!")
+                exibir_mensagem("2 [OK] Tela 14 detectada - Corretor Anterior aparece!")
                 
                 # PASSO 2: Processar a Tela 14
-                exibir_mensagem(f"3️⃣ 👨‍💼 Processando Tela 14: continuar_com_corretor_anterior = {continuar_com_corretor_anterior}")
+                exibir_mensagem(f"3 [HOMEM]‍[TRABALHO] Processando Tela 14: continuar_com_corretor_anterior = {continuar_com_corretor_anterior}")
                 
                 # Selecionar opção baseada no parâmetro
                 if continuar_com_corretor_anterior:
-                    exibir_mensagem("4️⃣ ✅ Selecionando 'Continuar com corretor anterior'...")
+                    exibir_mensagem("4 [OK] Selecionando 'Continuar com corretor anterior'...")
                     # Tentar seletores mais simples e robustos
                     try:
                         # Primeiro tentar por texto
                         page.locator("text=Continuar com corretor anterior").first.click()
-                        exibir_mensagem("5️⃣ ✅ Opção 'Continuar com corretor anterior' selecionada por texto")
+                        exibir_mensagem("5 [OK] Opção 'Continuar com corretor anterior' selecionada por texto")
                     except:
                         try:
                             # Tentar por radio button
                             page.locator("input[type='radio'][value='sim']").first.click()
-                            exibir_mensagem("5️⃣ ✅ Opção 'Continuar com corretor anterior' selecionada por radio")
+                            exibir_mensagem("5 [OK] Opção 'Continuar com corretor anterior' selecionada por radio")
                         except:
                             # Tentar por label
                             page.locator("label:has-text('Continuar')").first.click()
-                            exibir_mensagem("5️⃣ ✅ Opção 'Continuar com corretor anterior' selecionada por label")
+                            exibir_mensagem("5 [OK] Opção 'Continuar com corretor anterior' selecionada por label")
                 else:
-                    exibir_mensagem("4️⃣ ✅ Selecionando 'Não continuar com corretor anterior'...")
+                    exibir_mensagem("4 [OK] Selecionando 'Não continuar com corretor anterior'...")
                     try:
                         # Primeiro tentar por texto
                         page.locator("text=Não continuar com corretor anterior").first.click()
-                        exibir_mensagem("5️⃣ ✅ Opção 'Não continuar com corretor anterior' selecionada por texto")
+                        exibir_mensagem("5 [OK] Opção 'Não continuar com corretor anterior' selecionada por texto")
                     except:
                         try:
                             # Tentar por radio button
                             page.locator("input[type='radio'][value='nao']").first.click()
-                            exibir_mensagem("5️⃣ ✅ Opção 'Não continuar com corretor anterior' selecionada por radio")
+                            exibir_mensagem("5 [OK] Opção 'Não continuar com corretor anterior' selecionada por radio")
                         except:
                             # Tentar por label
                             page.locator("label:has-text('Não')").first.click()
-                            exibir_mensagem("5️⃣ ✅ Opção 'Não continuar com corretor anterior' selecionada por label")
+                            exibir_mensagem("5 [OK] Opção 'Não continuar com corretor anterior' selecionada por label")
                 
                 # PASSO 3: Clicar no botão Continuar
-                exibir_mensagem("6️⃣ 🔄 Clicando no botão 'Continuar'...")
+                exibir_mensagem("6 [ATUALIZANDO] Clicando no botão 'Continuar'...")
                 botao_continuar = page.locator('p.font-semibold.font-workSans.cursor-pointer.text-sm.leading-6:has-text("Continuar")')
                 if botao_continuar.is_visible():
                     botao_continuar.click()
-                    exibir_mensagem("7️⃣ ✅ Botão 'Continuar' clicado com sucesso")
+                    exibir_mensagem("7 [OK] Botão 'Continuar' clicado com sucesso")
                 else:
-                    exibir_mensagem("7️⃣ ⚠️ Botão 'Continuar' não encontrado")
+                    exibir_mensagem("7 [AVISO] Botão 'Continuar' não encontrado")
                     return False
                 
                 # PASSO 4: Aguardar transição para próxima tela
-                exibir_mensagem("8️⃣ ⏳ Aguardando transição para próxima tela...")
+                exibir_mensagem("8 [AGUARDANDO] Aguardando transição para próxima tela...")
                 page.wait_for_selector("text=Por favor, aguarde. Estamos buscando o corretor ideal para você!", timeout=5000)
-                exibir_mensagem("9️⃣ ✅ TELA 14 CONCLUÍDA!")
+                exibir_mensagem("9 [OK] TELA 14 CONCLUÍDA!")
                 
                 return True
             else:
-                exibir_mensagem("2️⃣ ℹ️ Tela 14 não aparece - não há cotação anterior para este cliente")
-                exibir_mensagem("3️⃣ ℹ️ Pulando para próxima tela...")
+                exibir_mensagem("2 [INFO]️ Tela 14 não aparece - não há cotação anterior para este cliente")
+                exibir_mensagem("3 [INFO]️ Pulando para próxima tela...")
                 return True  # Retorna True mesmo não aparecendo, pois é condicional
                 
         except Exception as e:
-            exibir_mensagem(f"2️⃣ ℹ️ Tela 14 não detectada: {str(e)}")
-            exibir_mensagem("3️⃣ ℹ️ Pulando para próxima tela...")
+            exibir_mensagem(f"2 [INFO]️ Tela 14 não detectada: {str(e)}")
+            exibir_mensagem("3 [INFO]️ Pulando para próxima tela...")
             return True  # Retorna True mesmo não aparecendo, pois é condicional
         
     except Exception as e:
-        exibir_mensagem(f"❌ ERRO na Tela 14: {str(e)}")
+        exibir_mensagem(f"[ERRO] ERRO na Tela 14: {str(e)}")
         return False
 
 def navegar_tela_15_playwright(page, email_login, senha_login, parametros_tempo, parametros):
@@ -3666,28 +3666,28 @@ def navegar_tela_15_playwright(page, email_login, senha_login, parametros_tempo,
     """
     try:
         exibir_mensagem("\n" + "="*50)
-        exibir_mensagem("🎯 TELA 15: RESULTADO FINAL (DUAS FASES)")
+        exibir_mensagem("[OBJETIVO] TELA 15: RESULTADO FINAL (DUAS FASES)")
         exibir_mensagem("="*50)
         
         # ========================================
         # FASE 1: MAPA + TIMER REGRESSIVO
         # ========================================
-        exibir_mensagem("🔄 FASE 1: Aguardando mapa e timer regressivo...")
+        exibir_mensagem("[ATUALIZANDO] FASE 1: Aguardando mapa e timer regressivo...")
         
         # PASSO 1: Aguardar modal com timer aparecer
-        exibir_mensagem("⏳ Aguardando modal com timer...")
+        exibir_mensagem("[AGUARDANDO] Aguardando modal com timer...")
         
         try:
             # Aguardar especificamente pelo modal com timer (timeout otimizado)
             modal_timer = page.locator("text=Por favor, aguarde. Estamos buscando o corretor ideal para você!")
             modal_timer.wait_for(timeout=5000)
-            exibir_mensagem("✅ Modal com timer detectado!")
+            exibir_mensagem("[OK] Modal com timer detectado!")
         except Exception as e:
-            exibir_mensagem(f"⚠️ Modal com timer não detectado: {str(e)}")
-            exibir_mensagem("ℹ️ Continuando para Fase 2...")
+            exibir_mensagem(f"[AVISO] Modal com timer não detectado: {str(e)}")
+            exibir_mensagem("[INFO]️ Continuando para Fase 2...")
         
         # PASSO 2: Aguardar timer regressivo (aproximadamente 2:43 minutos)
-        exibir_mensagem("⏳ Aguardando timer regressivo (2:43 minutos)...")
+        exibir_mensagem("[AGUARDANDO] Aguardando timer regressivo (2:43 minutos)...")
         
         # Aguardar aproximadamente 2:43 minutos (163 segundos)
         tempo_timer = 163
@@ -3700,9 +3700,9 @@ def navegar_tela_15_playwright(page, email_login, senha_login, parametros_tempo,
                 if timer_atual.count() > 0:
                     tempo_decorrido = int(time.time() - tempo_inicio_timer)
                     tempo_restante = tempo_timer - tempo_decorrido
-                    exibir_mensagem(f"⏳ Timer em andamento... ({tempo_restante}s restantes)")
+                    exibir_mensagem(f"[AGUARDANDO] Timer em andamento... ({tempo_restante}s restantes)")
                 else:
-                    exibir_mensagem("✅ Timer concluído!")
+                    exibir_mensagem("[OK] Timer concluído!")
                     break
             except:
                 pass
@@ -3712,134 +3712,134 @@ def navegar_tela_15_playwright(page, email_login, senha_login, parametros_tempo,
             except:
                 break
         
-        exibir_mensagem("✅ FASE 1 CONCLUÍDA!")
+        exibir_mensagem("[OK] FASE 1 CONCLUÍDA!")
         
         # ========================================
         # FASE 2: TELA DE CÁLCULO + MODAL LOGIN
         # ========================================
-        exibir_mensagem("🔄 FASE 2: Aguardando tela de cálculo e modal de login...")
+        exibir_mensagem("[ATUALIZANDO] FASE 2: Aguardando tela de cálculo e modal de login...")
         
         # PASSO 3: Aguardar tela de cálculo aparecer
-        exibir_mensagem("⏳ Aguardando tela de cálculo...")
+        exibir_mensagem("[AGUARDANDO] Aguardando tela de cálculo...")
         page.wait_for_selector("text=Acesse sua conta para visualizar o resultado final", timeout=8000)
         
         # PASSO 4: Aguardar modal de login aparecer OU tela de cotação manual
-        exibir_mensagem("⏳ Aguardando modal de login...")
+        exibir_mensagem("[AGUARDANDO] Aguardando modal de login...")
         
         try:
             # Aguardar especificamente pelo modal de login (timeout otimizado)
             modal_login = page.locator("text=Acesse sua conta para visualizar o resultado final")
             modal_login.wait_for(timeout=5000)
-            exibir_mensagem("✅ Modal de login detectado!")
+            exibir_mensagem("[OK] Modal de login detectado!")
             
         except Exception as e:
-            exibir_mensagem(f"⚠️ Modal de login não detectado: {str(e)}")
-            exibir_mensagem("🔍 Verificando se apareceu tela de cotação manual...")
+            exibir_mensagem(f"[AVISO] Modal de login não detectado: {str(e)}")
+            exibir_mensagem("[BUSCAR] Verificando se apareceu tela de cotação manual...")
             
             # Verificar se apareceu tela de cotação manual
             try:
                 tela_cotacao_manual = page.locator('p.text-center.text-base')
                 tela_cotacao_manual.wait_for(timeout=3000)
-                exibir_mensagem("✅ TELA DE COTAÇÃO MANUAL DETECTADA!")
+                exibir_mensagem("[OK] TELA DE COTAÇÃO MANUAL DETECTADA!")
                 
                 # Processar cotação manual
                 if processar_cotacao_manual(page, parametros):
-                    exibir_mensagem("✅ COTAÇÃO MANUAL PROCESSADA COM SUCESSO!")
+                    exibir_mensagem("[OK] COTAÇÃO MANUAL PROCESSADA COM SUCESSO!")
                     return True
                 else:
-                    exibir_mensagem("❌ ERRO AO PROCESSAR COTAÇÃO MANUAL!")
+                    exibir_mensagem("[ERRO] ERRO AO PROCESSAR COTAÇÃO MANUAL!")
                     return False
                     
             except Exception as e2:
-                exibir_mensagem(f"❌ Tela de cotação manual também não detectada: {str(e2)}")
-                exibir_mensagem("❌ Nenhuma tela esperada encontrada!")
+                exibir_mensagem(f"[ERRO] Tela de cotação manual também não detectada: {str(e2)}")
+                exibir_mensagem("[ERRO] Nenhuma tela esperada encontrada!")
                 return False
         
         # PASSO 5: Preencher email
-        exibir_mensagem("📧 Preenchendo email...")
+        exibir_mensagem("[EMAIL] Preenchendo email...")
         
         try:
             # Aguardar especificamente pelo campo de email estar pronto
             campo_email = page.locator("#emailTelaLogin")
             campo_email.wait_for(timeout=3000)
             campo_email.fill(email_login)
-            exibir_mensagem(f"✅ Email preenchido: {email_login}")
+            exibir_mensagem(f"[OK] Email preenchido: {email_login}")
         except Exception as e:
-            exibir_mensagem(f"❌ Erro ao preencher email: {str(e)}")
+            exibir_mensagem(f"[ERRO] Erro ao preencher email: {str(e)}")
             return False
         
         # PASSO 6: Preencher senha
-        exibir_mensagem("🔒 Preenchendo senha...")
+        exibir_mensagem("[BLOQUEADO] Preenchendo senha...")
         
         try:
             # Aguardar especificamente pelo campo de senha estar pronto
             campo_senha = page.locator("#senhaTelaLogin")
             campo_senha.wait_for(timeout=3000)
             campo_senha.fill(senha_login)
-            exibir_mensagem("✅ Senha preenchida")
+            exibir_mensagem("[OK] Senha preenchida")
         except Exception as e:
-            exibir_mensagem(f"❌ Erro ao preencher senha: {str(e)}")
+            exibir_mensagem(f"[ERRO] Erro ao preencher senha: {str(e)}")
             return False
         
         # PASSO 7: CAPTURA DE TELA E LOGS DETALHADOS DO MODAL
-        exibir_mensagem("📸 CAPTURANDO TELA DO MODAL DE LOGIN...")
+        exibir_mensagem("[FOTO] CAPTURANDO TELA DO MODAL DE LOGIN...")
         
         try:
             # Capturar screenshot do modal
             timestamp = time.strftime('%Y%m%d_%H%M%S')
             screenshot_path = f"modal_login_{timestamp}.png"
             page.screenshot(path=screenshot_path, full_page=True)
-            exibir_mensagem(f"📸 Screenshot salvo: {screenshot_path}")
+            exibir_mensagem(f"[FOTO] Screenshot salvo: {screenshot_path}")
             
             # Verificar se os campos estão realmente preenchidos
             valor_email_campo = campo_email.input_value()
             valor_senha_campo = campo_senha.input_value()
             
-            exibir_mensagem(f"🔍 VERIFICAÇÃO DOS CAMPOS:")
-            exibir_mensagem(f"   📧 Email no campo: '{valor_email_campo}'")
-            exibir_mensagem(f"   🔒 Senha no campo: '{valor_senha_campo}'")
-            exibir_mensagem(f"   📧 Email esperado: '{email_login}'")
-            exibir_mensagem(f"   🔒 Senha esperada: '{senha_login}'")
+            exibir_mensagem(f"[BUSCAR] VERIFICAÇÃO DOS CAMPOS:")
+            exibir_mensagem(f"   [EMAIL] Email no campo: '{valor_email_campo}'")
+            exibir_mensagem(f"   [BLOQUEADO] Senha no campo: '{valor_senha_campo}'")
+            exibir_mensagem(f"   [EMAIL] Email esperado: '{email_login}'")
+            exibir_mensagem(f"   [BLOQUEADO] Senha esperada: '{senha_login}'")
             
             # Verificar se os campos estão corretos
             if valor_email_campo.lower() == email_login.lower():
-                exibir_mensagem("✅ Email preenchido corretamente!")
+                exibir_mensagem("[OK] Email preenchido corretamente!")
             else:
-                exibir_mensagem("❌ Email NÃO foi preenchido corretamente!")
+                exibir_mensagem("[ERRO] Email NÃO foi preenchido corretamente!")
             
             if valor_senha_campo == senha_login:
-                exibir_mensagem("✅ Senha preenchida corretamente!")
+                exibir_mensagem("[OK] Senha preenchida corretamente!")
             else:
-                exibir_mensagem("❌ Senha NÃO foi preenchida corretamente!")
+                exibir_mensagem("[ERRO] Senha NÃO foi preenchida corretamente!")
             
             # Verificar se o botão "Acessar" está visível
             botao_acessar = page.locator("#gtm-telaLoginBotaoAcessar")
             if botao_acessar.is_visible():
-                exibir_mensagem("✅ Botão 'Acessar' está visível e pronto para clicar!")
+                exibir_mensagem("[OK] Botão 'Acessar' está visível e pronto para clicar!")
                 texto_botao = botao_acessar.text_content()
-                exibir_mensagem(f"   📝 Texto do botão: '{texto_botao}'")
+                exibir_mensagem(f"   [NOTA] Texto do botão: '{texto_botao}'")
             else:
-                exibir_mensagem("❌ Botão 'Acessar' NÃO está visível!")
+                exibir_mensagem("[ERRO] Botão 'Acessar' NÃO está visível!")
             
             # Verificar se o modal está realmente presente
             modal_presente = page.locator("text=Acesse sua conta para visualizar o resultado final")
             if modal_presente.count() > 0:
-                exibir_mensagem("✅ Modal de login está presente na tela!")
+                exibir_mensagem("[OK] Modal de login está presente na tela!")
             else:
-                exibir_mensagem("❌ Modal de login NÃO está presente na tela!")
+                exibir_mensagem("[ERRO] Modal de login NÃO está presente na tela!")
             
             # Capturar HTML do modal para debug
             try:
                 modal_html = page.locator(".MuiBackdrop-root").inner_html()
-                exibir_mensagem(f"🔍 HTML do modal capturado (primeiros 200 chars): {modal_html[:200]}...")
+                exibir_mensagem(f"[BUSCAR] HTML do modal capturado (primeiros 200 chars): {modal_html[:200]}...")
             except Exception as e:
-                exibir_mensagem(f"⚠️ Erro ao capturar HTML do modal: {str(e)}")
+                exibir_mensagem(f"[AVISO] Erro ao capturar HTML do modal: {str(e)}")
             
         except Exception as e:
-            exibir_mensagem(f"❌ Erro durante captura de tela/logs: {str(e)}")
+            exibir_mensagem(f"[ERRO] Erro durante captura de tela/logs: {str(e)}")
         
         # PASSO 8: Clicar em "Acessar"
-        exibir_mensagem("🔄 Clicando em 'Acessar'...")
+        exibir_mensagem("[ATUALIZANDO] Clicando em 'Acessar'...")
         
         try:
             # Aguardar especificamente pelo botão estar pronto
@@ -3848,161 +3848,161 @@ def navegar_tela_15_playwright(page, email_login, senha_login, parametros_tempo,
             
             if botao_acessar.is_visible():
                 botao_acessar.click()
-                exibir_mensagem("✅ Botão 'Acessar' clicado com sucesso!")
+                exibir_mensagem("[OK] Botão 'Acessar' clicado com sucesso!")
                 
                 # Aguardar possível redirecionamento ou modal CPF divergente
-                exibir_mensagem("⏳ Aguardando resposta do login...")
+                exibir_mensagem("[AGUARDANDO] Aguardando resposta do login...")
                 
                 # DETECTAR FECHAMENTO DO MODAL DE LOGIN
-                exibir_mensagem("🔍 Detectando fechamento do modal de login...")
+                exibir_mensagem("[BUSCAR] Detectando fechamento do modal de login...")
                 try:
                     # Aguardar o modal de login desaparecer (indicando que o login foi processado)
                     modal_login = page.locator("text=Acesse sua conta para visualizar o resultado final")
                     modal_login.wait_for(state="hidden", timeout=10000)
-                    exibir_mensagem("✅ Modal de login fechado - login processado!")
+                    exibir_mensagem("[OK] Modal de login fechado - login processado!")
                 except Exception as e:
-                    exibir_mensagem(f"⚠️ Modal de login não fechou no tempo esperado: {str(e)}")
-                    exibir_mensagem("ℹ️ Continuando com time.sleep como fallback...")
+                    exibir_mensagem(f"[AVISO] Modal de login não fechou no tempo esperado: {str(e)}")
+                    exibir_mensagem("[INFO]️ Continuando com time.sleep como fallback...")
                     time.sleep(parametros_tempo['tempo_carregamento'])  # Fallback
                 
                 # Verificar se apareceu modal CPF divergente
                 try:
                     modal_cpf = page.locator("text=CPF informado não corresponde à conta")
                     if modal_cpf.count() > 0:
-                        exibir_mensagem("✅ Modal CPF divergente detectado!")
-                        exibir_mensagem("🎯 MODAL CPF DIVERGENTE DETECTADO: 'CPF informado não corresponde à conta'")
+                        exibir_mensagem("[OK] Modal CPF divergente detectado!")
+                        exibir_mensagem("[OBJETIVO] MODAL CPF DIVERGENTE DETECTADO: 'CPF informado não corresponde à conta'")
                         
                         # Clicar no botão "Manter Login atual"
                         try:
-                            exibir_mensagem("🔍 Procurando botão 'Manter Login atual'...")
+                            exibir_mensagem("[BUSCAR] Procurando botão 'Manter Login atual'...")
                             
                             # Tentar pelo ID específico
                             botao_manter_login = page.locator("#manterLoginAtualModalAssociarUsuario")
                             if botao_manter_login.is_visible():
                                 botao_manter_login.click()
-                                exibir_mensagem("✅ Botão 'Manter Login atual' clicado pelo ID!")
+                                exibir_mensagem("[OK] Botão 'Manter Login atual' clicado pelo ID!")
                                 
                                 # DETECTAR FECHAMENTO DO MODAL CPF DIVERGENTE
-                                exibir_mensagem("🔍 Detectando fechamento do modal CPF divergente...")
+                                exibir_mensagem("[BUSCAR] Detectando fechamento do modal CPF divergente...")
                                 try:
                                     modal_cpf.wait_for(state="hidden", timeout=5000)
-                                    exibir_mensagem("✅ Modal CPF divergente fechado!")
+                                    exibir_mensagem("[OK] Modal CPF divergente fechado!")
                                 except Exception as e:
-                                    exibir_mensagem(f"⚠️ Modal CPF divergente não fechou no tempo esperado: {str(e)}")
+                                    exibir_mensagem(f"[AVISO] Modal CPF divergente não fechou no tempo esperado: {str(e)}")
                                     time.sleep(parametros_tempo['tempo_estabilizacao'])
                             else:
                                 # Tentar pelo texto
                                 botao_manter_login = page.locator("text=Manter Login atual")
                                 if botao_manter_login.is_visible():
                                     botao_manter_login.click()
-                                    exibir_mensagem("✅ Botão 'Manter Login atual' clicado pelo texto!")
+                                    exibir_mensagem("[OK] Botão 'Manter Login atual' clicado pelo texto!")
                                     
                                     # DETECTAR FECHAMENTO DO MODAL CPF DIVERGENTE
-                                    exibir_mensagem("🔍 Detectando fechamento do modal CPF divergente...")
+                                    exibir_mensagem("[BUSCAR] Detectando fechamento do modal CPF divergente...")
                                     try:
                                         modal_cpf.wait_for(state="hidden", timeout=5000)
-                                        exibir_mensagem("✅ Modal CPF divergente fechado!")
+                                        exibir_mensagem("[OK] Modal CPF divergente fechado!")
                                     except Exception as e:
-                                        exibir_mensagem(f"⚠️ Modal CPF divergente não fechou no tempo esperado: {str(e)}")
+                                        exibir_mensagem(f"[AVISO] Modal CPF divergente não fechou no tempo esperado: {str(e)}")
                                         time.sleep(parametros_tempo['tempo_estabilizacao'])
                                 else:
-                                    exibir_mensagem("⚠️ Botão 'Manter Login atual' não encontrado")
+                                    exibir_mensagem("[AVISO] Botão 'Manter Login atual' não encontrado")
                         except Exception as e:
-                            exibir_mensagem(f"⚠️ Erro ao clicar no botão 'Manter Login atual': {str(e)}")
+                            exibir_mensagem(f"[AVISO] Erro ao clicar no botão 'Manter Login atual': {str(e)}")
                     else:
-                        exibir_mensagem("ℹ️ Modal CPF divergente não apareceu - login pode ter sido bem-sucedido")
-                        exibir_mensagem("❌ MODAL CPF DIVERGENTE NÃO DETECTADO: 'CPF informado não corresponde à conta'")
+                        exibir_mensagem("[INFO]️ Modal CPF divergente não apareceu - login pode ter sido bem-sucedido")
+                        exibir_mensagem("[ERRO] MODAL CPF DIVERGENTE NÃO DETECTADO: 'CPF informado não corresponde à conta'")
                 except Exception as e:
-                    exibir_mensagem(f"⚠️ Erro ao verificar modal CPF: {str(e)}")
+                    exibir_mensagem(f"[AVISO] Erro ao verificar modal CPF: {str(e)}")
                 
                 # VERIFICAR OUTROS MODAIS QUE PODEM APARECER
-                exibir_mensagem("🔍 Verificando outros modais que podem aparecer...")
+                exibir_mensagem("[BUSCAR] Verificando outros modais que podem aparecer...")
                 try:
                     # Verificar modal de erro de login
                     modal_erro_login = page.locator("text=Erro ao fazer login")
                     if modal_erro_login.count() > 0:
-                        exibir_mensagem("⚠️ MODAL DE ERRO DE LOGIN DETECTADO!")
+                        exibir_mensagem("[AVISO] MODAL DE ERRO DE LOGIN DETECTADO!")
                     
                     # Verificar modal de sessão expirada
                     modal_sessao_expirada = page.locator("text=sessão expirada")
                     if modal_sessao_expirada.count() > 0:
-                        exibir_mensagem("⚠️ MODAL DE SESSÃO EXPIRADA DETECTADO!")
+                        exibir_mensagem("[AVISO] MODAL DE SESSÃO EXPIRADA DETECTADO!")
                     
                     # Verificar modal de manutenção
                     modal_manutencao = page.locator("text=manutenção")
                     if modal_manutencao.count() > 0:
-                        exibir_mensagem("⚠️ MODAL DE MANUTENÇÃO DETECTADO!")
+                        exibir_mensagem("[AVISO] MODAL DE MANUTENÇÃO DETECTADO!")
                     
                     # Verificar modal de captcha
                     modal_captcha = page.locator("text=captcha")
                     if modal_captcha.count() > 0:
-                        exibir_mensagem("⚠️ MODAL DE CAPTCHA DETECTADO!")
+                        exibir_mensagem("[AVISO] MODAL DE CAPTCHA DETECTADO!")
                     
                     # Verificar modal de confirmação de dados
                     modal_confirmacao = page.locator("text=confirmação")
                     if modal_confirmacao.count() > 0:
-                        exibir_mensagem("⚠️ MODAL DE CONFIRMAÇÃO DETECTADO!")
+                        exibir_mensagem("[AVISO] MODAL DE CONFIRMAÇÃO DETECTADO!")
                     
-                    exibir_mensagem("✅ Verificação de modais concluída")
+                    exibir_mensagem("[OK] Verificação de modais concluída")
                 except Exception as e:
-                    exibir_mensagem(f"⚠️ Erro ao verificar outros modais: {str(e)}")
+                    exibir_mensagem(f"[AVISO] Erro ao verificar outros modais: {str(e)}")
                 
             else:
-                exibir_mensagem("❌ Botão 'Acessar' não está visível!")
+                exibir_mensagem("[ERRO] Botão 'Acessar' não está visível!")
                 return False
         except Exception as e:
-            exibir_mensagem(f"❌ Erro ao clicar em 'Acessar': {str(e)}")
+            exibir_mensagem(f"[ERRO] Erro ao clicar em 'Acessar': {str(e)}")
             return False
         
-        exibir_mensagem("✅ LOGIN CONCLUÍDO!")
+        exibir_mensagem("[OK] LOGIN CONCLUÍDO!")
         
         # ========================================
         # CAPTURA DE DADOS DOS PLANOS DE SEGURO
         # ========================================
-        exibir_mensagem("📊 INICIANDO CAPTURA DE DADOS DOS PLANOS...")
+        exibir_mensagem("[DADOS] INICIANDO CAPTURA DE DADOS DOS PLANOS...")
         
         # Aguardar carregamento dos planos (aguardando botão específico)
-        exibir_mensagem("⏳ Aguardando carregamento da página principal dos planos...")
+        exibir_mensagem("[AGUARDANDO] Aguardando carregamento da página principal dos planos...")
         try:
             # Aguardar pelo texto de sucesso final que indica que a página foi carregada
             page.wait_for_selector("text=Parabéns, chegamos ao resultado final da cotação!", timeout=180000)
-            exibir_mensagem("✅ Página principal dos planos carregada!")
-            exibir_mensagem("🎯 MODAL DE SUCESSO DETECTADO: 'Parabéns, chegamos ao resultado final da cotação!'")
+            exibir_mensagem("[OK] Página principal dos planos carregada!")
+            exibir_mensagem("[OBJETIVO] MODAL DE SUCESSO DETECTADO: 'Parabéns, chegamos ao resultado final da cotação!'")
         except Exception as e:
-            exibir_mensagem(f"⚠️ Texto de sucesso final não encontrado: {str(e)}")
-            exibir_mensagem("❌ MODAL DE SUCESSO NÃO DETECTADO: 'Parabéns, chegamos ao resultado final da cotação!'")
-            exibir_mensagem("ℹ️ Usando fallback com time.sleep...")
+            exibir_mensagem(f"[AVISO] Texto de sucesso final não encontrado: {str(e)}")
+            exibir_mensagem("[ERRO] MODAL DE SUCESSO NÃO DETECTADO: 'Parabéns, chegamos ao resultado final da cotação!'")
+            exibir_mensagem("[INFO]️ Usando fallback com time.sleep...")
             time.sleep(parametros_tempo['tempo_carregamento'])  # Fallback para time.sleep
         
         # Capturar dados dos planos
         dados_planos = capturar_dados_planos_seguro(page, parametros_tempo)
         
         if dados_planos:
-            exibir_mensagem("✅ DADOS DOS PLANOS CAPTURADOS COM SUCESSO!")
-            exibir_mensagem("📋 RESUMO DOS DADOS CAPTURADOS:")
-            exibir_mensagem(f"   📊 Plano Recomendado: {dados_planos['plano_recomendado'].get('valor', 'N/A')}")
-            exibir_mensagem(f"   📊 Plano Alternativo: {dados_planos['plano_alternativo'].get('valor', 'N/A')}")
+            exibir_mensagem("[OK] DADOS DOS PLANOS CAPTURADOS COM SUCESSO!")
+            exibir_mensagem("[INFO] RESUMO DOS DADOS CAPTURADOS:")
+            exibir_mensagem(f"   [DADOS] Plano Recomendado: {dados_planos['plano_recomendado'].get('valor', 'N/A')}")
+            exibir_mensagem(f"   [DADOS] Plano Alternativo: {dados_planos['plano_alternativo'].get('valor', 'N/A')}")
             
             # RETORNO FINAL SIMPLES
             exibir_mensagem("\n" + "="*60)
-            exibir_mensagem("📋 RETORNO FINAL - TELA 15")
+            exibir_mensagem("[INFO] RETORNO FINAL - TELA 15")
             exibir_mensagem("="*60)
             exibir_mensagem(json.dumps(dados_planos, indent=2, ensure_ascii=False))
             exibir_mensagem("="*60)
         else:
-            exibir_mensagem("⚠️ FALHA NA CAPTURA DE DADOS DOS PLANOS")
+            exibir_mensagem("[AVISO] FALHA NA CAPTURA DE DADOS DOS PLANOS")
         
-        exibir_mensagem("🎯 TELA 15 FINALIZADA COM SUCESSO!")
+        exibir_mensagem("[OBJETIVO] TELA 15 FINALIZADA COM SUCESSO!")
         
         # Delay para inspeção da tela
-        # exibir_mensagem("⏳ Aguardando 60 segundos para inspeção da tela...")
+        # exibir_mensagem("[AGUARDANDO] Aguardando 60 segundos para inspeção da tela...")
         # time.sleep(60)
-        # exibir_mensagem("✅ Tempo de inspeção concluído!")
+        # exibir_mensagem("[OK] Tempo de inspeção concluído!")
         
         return True
         
     except Exception as e:
-        exibir_mensagem(f"❌ ERRO na Tela 15: {str(e)}")
+        exibir_mensagem(f"[ERRO] ERRO na Tela 15: {str(e)}")
         return False
 
 # ========================================
@@ -4069,11 +4069,11 @@ def capturar_dados_carrossel_estimativas_playwright(page: Page) -> Dict[str, Any
         }
     
     LOGS:
-        - "🔍 Encontrados {X} cards de cobertura (bg-primary)"
-        - "📋 Card {X}: {cobertura} - De {valor} até {valor}"
-        - "💾 DADOS SALVOS: {caminho_arquivo}"
-        - "📊 RESUMO: {X} coberturas detalhadas, {X} benefícios gerais"
-        - "❌ ERRO na captura de dados: {erro}"
+        - "[BUSCAR] Encontrados {X} cards de cobertura (bg-primary)"
+        - "[INFO] Card {X}: {cobertura} - De {valor} até {valor}"
+        - "[SALVAR] DADOS SALVOS: {caminho_arquivo}"
+        - "[DADOS] RESUMO: {X} coberturas detalhadas, {X} benefícios gerais"
+        - "[ERRO] ERRO na captura de dados: {erro}"
     ================================================================================
     """
     try:
@@ -4093,33 +4093,33 @@ def capturar_dados_carrossel_estimativas_playwright(page: Page) -> Dict[str, Any
         }
         
         # DEBUG: Verificar quais elementos estão na página
-        exibir_mensagem("🔍 DEBUG: Verificando elementos na página...")
+        exibir_mensagem("[BUSCAR] DEBUG: Verificando elementos na página...")
         
         # ESTRATÉGIA 1: Tentar capturar cards usando seletores mais específicos
         # Primeiro, vamos tentar encontrar os cards de cobertura usando diferentes estratégias
         
         # Estratégia 1.1: Buscar por elementos que contenham "Cobertura" e valores monetários
-        exibir_mensagem("🔍 DEBUG: Estratégia 1.1 - Buscando cards com 'Cobertura'...")
+        exibir_mensagem("[BUSCAR] DEBUG: Estratégia 1.1 - Buscando cards com 'Cobertura'...")
         
         # Buscar por elementos que contenham "Cobertura" e "R$" no mesmo contexto
         cards_cobertura = page.locator("div:has-text('Cobertura'):has-text('R$')")
-        exibir_mensagem(f"🔍 DEBUG: Cards com 'Cobertura' e 'R$' encontrados: {cards_cobertura.count()}")
+        exibir_mensagem(f"[BUSCAR] DEBUG: Cards com 'Cobertura' e 'R$' encontrados: {cards_cobertura.count()}")
         
         if cards_cobertura.count() > 0:
-            exibir_mensagem(f"✅ Encontrados {cards_cobertura.count()} cards de cobertura com valores")
+            exibir_mensagem(f"[OK] Encontrados {cards_cobertura.count()} cards de cobertura com valores")
             
             for i in range(cards_cobertura.count()):
                 try:
                     card = cards_cobertura.nth(i)
                     card_text = card.text_content().strip() if card.text_content() else ""
                     
-                    exibir_mensagem(f"🔍 DEBUG: Card {i+1} texto completo: '{card_text}'")
+                    exibir_mensagem(f"[BUSCAR] DEBUG: Card {i+1} texto completo: '{card_text}'")
                     
                     if len(card_text) < 20:  # Se o texto for muito curto, tentar pegar o elemento pai
-                        exibir_mensagem(f"🔍 DEBUG: Card {i+1} texto muito curto, buscando elemento pai...")
+                        exibir_mensagem(f"[BUSCAR] DEBUG: Card {i+1} texto muito curto, buscando elemento pai...")
                         card = card.locator("..").first  # Elemento pai
                         card_text = card.text_content().strip() if card.text_content() else ""
-                        exibir_mensagem(f"🔍 DEBUG: Card {i+1} texto do pai: '{card_text[:200]}...'")
+                        exibir_mensagem(f"[BUSCAR] DEBUG: Card {i+1} texto do pai: '{card_text[:200]}...'")
                     
                     cobertura_info = {
                         "indice": i + 1,
@@ -4152,7 +4152,7 @@ def capturar_dados_carrossel_estimativas_playwright(page: Page) -> Dict[str, Any
                                 cobertura_info["nome_cobertura"] = "Cobertura RCF"
                             else:
                                 cobertura_info["nome_cobertura"] = match.group(1).strip()
-                            exibir_mensagem(f"🔍 DEBUG: Nome encontrado via regex: '{cobertura_info['nome_cobertura']}'")
+                            exibir_mensagem(f"[BUSCAR] DEBUG: Nome encontrado via regex: '{cobertura_info['nome_cobertura']}'")
                             break
                     
                     # Extrair valores monetários usando regex mais específico
@@ -4167,7 +4167,7 @@ def capturar_dados_carrossel_estimativas_playwright(page: Page) -> Dict[str, Any
                         if match:
                             cobertura_info["valores"]["de"] = f"R$ {match.group(1)}"
                             cobertura_info["valores"]["ate"] = f"R$ {match.group(2)}"
-                            exibir_mensagem(f"🔍 DEBUG: Valores extraídos: De {cobertura_info['valores']['de']} até {cobertura_info['valores']['ate']}")
+                            exibir_mensagem(f"[BUSCAR] DEBUG: Valores extraídos: De {cobertura_info['valores']['de']} até {cobertura_info['valores']['ate']}")
                             break
                     
                     # Extrair benefícios conhecidos do texto do card
@@ -4187,23 +4187,23 @@ def capturar_dados_carrossel_estimativas_playwright(page: Page) -> Dict[str, Any
                             })
                     
                     dados_carrossel["coberturas_detalhadas"].append(cobertura_info)
-                    exibir_mensagem(f"📋 Card {len(dados_carrossel['coberturas_detalhadas'])}: {cobertura_info['nome_cobertura']} - De {cobertura_info['valores']['de']} até {cobertura_info['valores']['ate']}")
+                    exibir_mensagem(f"[INFO] Card {len(dados_carrossel['coberturas_detalhadas'])}: {cobertura_info['nome_cobertura']} - De {cobertura_info['valores']['de']} até {cobertura_info['valores']['ate']}")
                     
                 except Exception as e:
-                    exibir_mensagem(f"⚠️ Erro ao processar card {i+1}: {str(e)}")
+                    exibir_mensagem(f"[AVISO] Erro ao processar card {i+1}: {str(e)}")
                     continue
         
         # ESTRATÉGIA 1.2: Se não encontrou cards com a estratégia anterior, tentar seletores específicos
         if len(dados_carrossel["coberturas_detalhadas"]) == 0:
-            exibir_mensagem("🔍 DEBUG: Estratégia 1.2 - Tentando seletores específicos...")
+            exibir_mensagem("[BUSCAR] DEBUG: Estratégia 1.2 - Tentando seletores específicos...")
             
             # Tentar diferentes seletores para encontrar os cards
             # v3.7.0.2: Estratégia híbrida robusta para seletores de cards
             seletores_cards = [
-                'div[role="group"][aria-roledescription="slide"]',  # ← NOVO PRINCIPAL
-                'div:has(p:has-text("Cobertura")):has(span:has-text("R$"))',  # ← NOVO CONTEÚDO
-                'div.border-primary.rounded-xl:has(.bg-primary)',  # ← NOVO LAYOUT
-                "div.bg-primary",  # ← FALLBACK ATUAL
+                'div[role="group"][aria-roledescription="slide"]',  # <- NOVO PRINCIPAL
+                'div:has(p:has-text("Cobertura")):has(span:has-text("R$"))',  # <- NOVO CONTEÚDO
+                'div.border-primary.rounded-xl:has(.bg-primary)',  # <- NOVO LAYOUT
+                "div.bg-primary",  # <- FALLBACK ATUAL
                 "div[class*='bg-primary']",
                 "div[class*='card']",
                 "div[class*='cobertura']",
@@ -4214,7 +4214,7 @@ def capturar_dados_carrossel_estimativas_playwright(page: Page) -> Dict[str, Any
             for seletor in seletores_cards:
                 try:
                     cards = page.locator(seletor)
-                    exibir_mensagem(f"🔍 DEBUG: Seletor '{seletor}' encontrou: {cards.count()} elementos")
+                    exibir_mensagem(f"[BUSCAR] DEBUG: Seletor '{seletor}' encontrou: {cards.count()} elementos")
                     
                     if cards.count() > 0:
                         for i in range(min(cards.count(), 5)):  # Limitar a 5 cards
@@ -4222,7 +4222,7 @@ def capturar_dados_carrossel_estimativas_playwright(page: Page) -> Dict[str, Any
                                 card = cards.nth(i)
                                 card_text = card.text_content().strip() if card.text_content() else ""
                                 
-                                exibir_mensagem(f"🔍 DEBUG: Card {i+1} com seletor '{seletor}': '{card_text[:100]}...'")
+                                exibir_mensagem(f"[BUSCAR] DEBUG: Card {i+1} com seletor '{seletor}': '{card_text[:100]}...'")
                                 
                                 # Verificar se o card tem conteúdo relevante
                                 if "cobertura" in card_text.lower() or "r$" in card_text.lower():
@@ -4238,26 +4238,26 @@ def capturar_dados_carrossel_estimativas_playwright(page: Page) -> Dict[str, Any
                                     # ... (código de extração)
                                     
                                     dados_carrossel["coberturas_detalhadas"].append(cobertura_info)
-                                    exibir_mensagem(f"📋 Card encontrado via '{seletor}': {cobertura_info['nome_cobertura']}")
+                                    exibir_mensagem(f"[INFO] Card encontrado via '{seletor}': {cobertura_info['nome_cobertura']}")
                                     
                             except Exception as e:
-                                exibir_mensagem(f"⚠️ Erro ao processar card com seletor '{seletor}': {str(e)}")
+                                exibir_mensagem(f"[AVISO] Erro ao processar card com seletor '{seletor}': {str(e)}")
                                 continue
                         
                         if len(dados_carrossel["coberturas_detalhadas"]) > 0:
                             break  # Se encontrou cards, parar de tentar outros seletores
                             
                 except Exception as e:
-                    exibir_mensagem(f"⚠️ Erro com seletor '{seletor}': {str(e)}")
+                    exibir_mensagem(f"[AVISO] Erro com seletor '{seletor}': {str(e)}")
                     continue
         
         # ESTRATÉGIA 2: Fallback - Buscar por valores monetários na página inteira
         if len(dados_carrossel["coberturas_detalhadas"]) == 0:
-            exibir_mensagem("🔍 DEBUG: Estratégia 2 - Fallback: buscando valores monetários na página...")
+            exibir_mensagem("[BUSCAR] DEBUG: Estratégia 2 - Fallback: buscando valores monetários na página...")
             
             # Buscar por todos os elementos que contenham "R$"
             elementos_r = page.locator("text=R$")
-            exibir_mensagem(f"🔍 DEBUG: Elementos com 'R$' encontrados: {elementos_r.count()}")
+            exibir_mensagem(f"[BUSCAR] DEBUG: Elementos com 'R$' encontrados: {elementos_r.count()}")
             
             if elementos_r.count() > 0:
                 for i in range(min(elementos_r.count(), 10)):  # Limitar a 10 elementos
@@ -4269,7 +4269,7 @@ def capturar_dados_carrossel_estimativas_playwright(page: Page) -> Dict[str, Any
                         contexto = elemento.locator("..").first
                         contexto_text = contexto.text_content().strip() if contexto.text_content() else ""
                         
-                        exibir_mensagem(f"🔍 DEBUG: Elemento R$ {i+1}: '{elemento_text}' | Contexto: '{contexto_text[:100]}...'")
+                        exibir_mensagem(f"[BUSCAR] DEBUG: Elemento R$ {i+1}: '{elemento_text}' | Contexto: '{contexto_text[:100]}...'")
                         
                         # Se o contexto contém "Cobertura", pode ser um card válido
                         if "cobertura" in contexto_text.lower():
@@ -4295,10 +4295,10 @@ def capturar_dados_carrossel_estimativas_playwright(page: Page) -> Dict[str, Any
                                     break
                             
                             dados_carrossel["coberturas_detalhadas"].append(cobertura_info)
-                            exibir_mensagem(f"📋 Valor encontrado: De {cobertura_info['valores']['de']} até {cobertura_info['valores']['ate']}")
+                            exibir_mensagem(f"[INFO] Valor encontrado: De {cobertura_info['valores']['de']} até {cobertura_info['valores']['ate']}")
                             
                     except Exception as e:
-                        exibir_mensagem(f"⚠️ Erro ao processar elemento R$ {i+1}: {str(e)}")
+                        exibir_mensagem(f"[AVISO] Erro ao processar elemento R$ {i+1}: {str(e)}")
                         continue
         
         # Contar valores encontrados
@@ -4368,13 +4368,13 @@ def capturar_dados_carrossel_estimativas_playwright(page: Page) -> Dict[str, Any
         with open(json_path, 'w', encoding='utf-8') as f:
             json.dump(dados_carrossel, f, indent=2, ensure_ascii=False)
         
-        exibir_mensagem(f"💾 DADOS SALVOS: {json_path}")
-        exibir_mensagem(f"📊 RESUMO: {len(dados_carrossel['coberturas_detalhadas'])} coberturas detalhadas, {len(dados_carrossel['beneficios_gerais'])} benefícios gerais")
+        exibir_mensagem(f"[SALVAR] DADOS SALVOS: {json_path}")
+        exibir_mensagem(f"[DADOS] RESUMO: {len(dados_carrossel['coberturas_detalhadas'])} coberturas detalhadas, {len(dados_carrossel['beneficios_gerais'])} benefícios gerais")
         
         return dados_carrossel
         
     except Exception as e:
-        exibir_mensagem(f"❌ ERRO na captura de dados: {str(e)}")
+        exibir_mensagem(f"[ERRO] ERRO na captura de dados: {str(e)}")
         return None
 
 def processar_cotacao_manual(page: Page, parametros: Dict[str, Any]) -> bool:
@@ -4386,13 +4386,13 @@ def processar_cotacao_manual(page: Page, parametros: Dict[str, Any]) -> bool:
     """
     try:
         exception_handler.definir_tela_atual("COTACAO_MANUAL")
-        exibir_mensagem("📋 PROCESSANDO COTAÇÃO MANUAL...")
+        exibir_mensagem("[INFO] PROCESSANDO COTAÇÃO MANUAL...")
         
         # 1. CAPTURAR MENSAGEM COMPLETA
         mensagem_elemento = page.locator('p.text-center.text-base').first
         mensagem_completa = mensagem_elemento.text_content() if mensagem_elemento.is_visible() else "Mensagem não capturada"
         
-        exibir_mensagem(f"📝 Mensagem capturada: {mensagem_completa}")
+        exibir_mensagem(f"[NOTA] Mensagem capturada: {mensagem_completa}")
         
         # 2. CRIAR ESTRUTURA DE DADOS
         dados_cotacao_manual = {
@@ -4430,15 +4430,15 @@ def processar_cotacao_manual(page: Page, parametros: Dict[str, Any]) -> bool:
         with open(json_path, 'w', encoding='utf-8') as f:
             json.dump(dados_cotacao_manual, f, ensure_ascii=False, indent=2)
         
-        exibir_mensagem(f"💾 DADOS SALVOS: {json_path}")
+        exibir_mensagem(f"[SALVAR] DADOS SALVOS: {json_path}")
         
         # 4. LOGS DETALHADOS
-        exibir_mensagem("ℹ️ Cotação será feita manualmente pelo corretor")
-        exibir_mensagem(f"📊 Dados coletados para análise:")
-        exibir_mensagem(f"   🚗 Veículo: {parametros.get('marca')} {parametros.get('modelo')} {parametros.get('ano')}")
-        exibir_mensagem(f"   📍 Placa: {parametros.get('placa')}")
-        exibir_mensagem(f"   👤 Segurado: {parametros.get('nome')}")
-        exibir_mensagem(f"   📧 Email: {parametros.get('email')}")
+        exibir_mensagem("[INFO]️ Cotação será feita manualmente pelo corretor")
+        exibir_mensagem(f"[DADOS] Dados coletados para análise:")
+        exibir_mensagem(f"   [VEICULO] Veículo: {parametros.get('marca')} {parametros.get('modelo')} {parametros.get('ano')}")
+        exibir_mensagem(f"   [LOCALIZACAO] Placa: {parametros.get('placa')}")
+        exibir_mensagem(f"   [USUARIO] Segurado: {parametros.get('nome')}")
+        exibir_mensagem(f"   [EMAIL] Email: {parametros.get('email')}")
         
         return True
         
@@ -4531,7 +4531,7 @@ def capturar_dados_planos_seguro(page: Page, parametros_tempo) -> Dict[str, Any]
     """
     try:
         exception_handler.definir_tela_atual("CAPTURA_DADOS_PLANOS")
-        exibir_mensagem("📊 CAPTURANDO DADOS DOS PLANOS DE SEGURO - ABORDAGEM HÍBRIDA")
+        exibir_mensagem("[DADOS] CAPTURANDO DADOS DOS PLANOS DE SEGURO - ABORDAGEM HÍBRIDA")
         exibir_mensagem("=" * 70)
         
         # Aguardar carregamento dos planos (estratégia simples)
@@ -4573,18 +4573,18 @@ def capturar_dados_planos_seguro(page: Page, parametros_tempo) -> Dict[str, Any]
         # ========================================
         # ETAPA 1: ENCONTRAR CONTAINERS DOS PLANOS (ESTRUTURA HTML CORRETA)
         # ========================================
-        exibir_mensagem("🔍 ETAPA 1: Encontrando containers dos planos usando estrutura HTML correta...")
+        exibir_mensagem("[BUSCAR] ETAPA 1: Encontrando containers dos planos usando estrutura HTML correta...")
         
         # Usar a estrutura HTML correta identificada
         try:
             # Encontrar o container principal com grid
             container_principal = page.locator("div.grid-cols-\\[250px__1fr__1fr\\]")
             if container_principal.count() == 0:
-                exibir_mensagem("⚠️ Container principal não encontrado, usando fallback...")
+                exibir_mensagem("[AVISO] Container principal não encontrado, usando fallback...")
                 # Fallback para método anterior
                 container_principal = page.locator("div")
             
-            exibir_mensagem(f"📊 CONTAINER PRINCIPAL ENCONTRADO: {container_principal.count()}")
+            exibir_mensagem(f"[DADOS] CONTAINER PRINCIPAL ENCONTRADO: {container_principal.count()}")
             
             # Extrair planos diretamente da estrutura correta
             tabelas_planos = []
@@ -4593,17 +4593,17 @@ def capturar_dados_planos_seguro(page: Page, parametros_tempo) -> Dict[str, Any]
             plano_recomendado = container_principal.locator("div.md\\:w-80.border-4.border-primary")
             if plano_recomendado.count() > 0:
                 tabelas_planos.append(plano_recomendado.first)
-                exibir_mensagem("✅ PLANO RECOMENDADO ENCONTRADO na estrutura correta")
+                exibir_mensagem("[OK] PLANO RECOMENDADO ENCONTRADO na estrutura correta")
             
             # Plano Alternativo: div com border-4 mas sem border-primary
             plano_alternativo = container_principal.locator("div.md\\:w-80.border-4:not(.border-primary)")
             if plano_alternativo.count() > 0:
                 tabelas_planos.append(plano_alternativo.first)
-                exibir_mensagem("✅ PLANO ALTERNATIVO ENCONTRADO na estrutura correta")
+                exibir_mensagem("[OK] PLANO ALTERNATIVO ENCONTRADO na estrutura correta")
             
             # Se não encontrou na estrutura correta, usar fallback
             if len(tabelas_planos) == 0:
-                exibir_mensagem("⚠️ Usando fallback para detecção de planos...")
+                exibir_mensagem("[AVISO] Usando fallback para detecção de planos...")
                 # Fallback: procurar por divs com classes específicas
                 planos_divs = page.locator("//div[contains(@class, 'md:w-80') or contains(@class, 'border-4')]").all()
                 for elem in planos_divs:
@@ -4611,12 +4611,12 @@ def capturar_dados_planos_seguro(page: Page, parametros_tempo) -> Dict[str, Any]
                         texto = elem.text_content()
                         if texto and len(texto) > 100:
                             tabelas_planos.append(elem)
-                            exibir_mensagem(f"📋 CONTAINER FALLBACK: {len(texto)} caracteres - {texto[:100]}...")
+                            exibir_mensagem(f"[INFO] CONTAINER FALLBACK: {len(texto)} caracteres - {texto[:100]}...")
                     except:
                         continue
             
         except Exception as e:
-            exibir_mensagem(f"⚠️ Erro na detecção por estrutura: {str(e)}")
+            exibir_mensagem(f"[AVISO] Erro na detecção por estrutura: {str(e)}")
             # Fallback completo
             tabelas_planos = []
             elementos_valores = page.locator("//*[contains(text(), 'R$')]").all()
@@ -4625,53 +4625,53 @@ def capturar_dados_planos_seguro(page: Page, parametros_tempo) -> Dict[str, Any]
                     texto = elem.text_content()
                     if texto and len(texto) > 100:
                         tabelas_planos.append(elem)
-                        exibir_mensagem(f"📋 CONTAINER FALLBACK COMPLETO: {len(texto)} caracteres - {texto[:100]}...")
+                        exibir_mensagem(f"[INFO] CONTAINER FALLBACK COMPLETO: {len(texto)} caracteres - {texto[:100]}...")
                 except:
                     continue
         
-        exibir_mensagem(f"📊 CONTAINERS DE PLANOS ENCONTRADOS: {len(tabelas_planos)}")
+        exibir_mensagem(f"[DADOS] CONTAINERS DE PLANOS ENCONTRADOS: {len(tabelas_planos)}")
         
         # ========================================
         # ETAPA 2: ANALISAR CADA CONTAINER
         # ========================================
-        exibir_mensagem(f"🔍 PROCESSANDO {len(tabelas_planos)} CONTAINERS...")
+        exibir_mensagem(f"[BUSCAR] PROCESSANDO {len(tabelas_planos)} CONTAINERS...")
         for i, elemento in enumerate(tabelas_planos):  # Processar todos os containers
             try:
                 tabela_text = elemento.text_content().strip()
                 if not tabela_text or len(tabela_text) < 30:
                     continue
                 
-                exibir_mensagem(f"📋 ANALISANDO CONTAINER {i+1}/{len(tabelas_planos)}: {len(tabela_text)} caracteres")
-                exibir_mensagem(f"🔍 DEBUG: Texto completo da tabela: '{tabela_text}'")
+                exibir_mensagem(f"[INFO] ANALISANDO CONTAINER {i+1}/{len(tabelas_planos)}: {len(tabela_text)} caracteres")
+                exibir_mensagem(f"[BUSCAR] DEBUG: Texto completo da tabela: '{tabela_text}'")
                 
                 # DEBUG: Capturar HTML completo do container
                 try:
                     html_completo = elemento.inner_html()
-                    exibir_mensagem(f"🔍 DEBUG: HTML completo do container (primeiros 500 chars): {html_completo[:500]}...")
+                    exibir_mensagem(f"[BUSCAR] DEBUG: HTML completo do container (primeiros 500 chars): {html_completo[:500]}...")
                 except Exception as e:
-                    exibir_mensagem(f"⚠️ Erro ao capturar HTML: {str(e)}")
+                    exibir_mensagem(f"[AVISO] Erro ao capturar HTML: {str(e)}")
                 
                 # Determinar tipo de plano baseado na estrutura HTML
                 if "plano recomendado" in tabela_text.lower():
                     plano_tipo = "plano_recomendado"
-                    exibir_mensagem("✅ PLANO RECOMENDADO DETECTADO")
+                    exibir_mensagem("[OK] PLANO RECOMENDADO DETECTADO")
                 elif "plano alternativo" in tabela_text.lower():
                     plano_tipo = "plano_alternativo"
-                    exibir_mensagem("✅ PLANO ALTERNATIVO DETECTADO")
+                    exibir_mensagem("[OK] PLANO ALTERNATIVO DETECTADO")
                 elif tabela_text.startswith("R$") and "anual" in tabela_text.lower():
                     # Container que começa com R$ e tem "anual" é provavelmente Plano Alternativo
                     plano_tipo = "plano_alternativo"
-                    exibir_mensagem("✅ PLANO ALTERNATIVO DETECTADO (por padrão)")
+                    exibir_mensagem("[OK] PLANO ALTERNATIVO DETECTADO (por padrão)")
                 else:
                     # Detectar por posição na lista (primeiro = recomendado, segundo = alternativo)
                     if i == 0:
                         plano_tipo = "plano_recomendado"
-                        exibir_mensagem("✅ PLANO RECOMENDADO DETECTADO (por posição)")
+                        exibir_mensagem("[OK] PLANO RECOMENDADO DETECTADO (por posição)")
                     elif i == 1:
                         plano_tipo = "plano_alternativo"
-                        exibir_mensagem("✅ PLANO ALTERNATIVO DETECTADO (por posição)")
+                        exibir_mensagem("[OK] PLANO ALTERNATIVO DETECTADO (por posição)")
                     else:
-                        exibir_mensagem(f"⚠️ TIPO DE PLANO NÃO IDENTIFICADO - Container {i+1}: {tabela_text[:200]}...")
+                        exibir_mensagem(f"[AVISO] TIPO DE PLANO NÃO IDENTIFICADO - Container {i+1}: {tabela_text[:200]}...")
                         continue
                 
                 # ETAPA 3: PARSE ESTRUTURADO BASEADO NA POSIÇÃO
@@ -4682,13 +4682,13 @@ def capturar_dados_planos_seguro(page: Page, parametros_tempo) -> Dict[str, Any]
                 # DEBUG: Verificar elementos no container (mantido para debug)
                 try:
                     todos_elementos = elemento.locator("*").all()
-                    exibir_mensagem(f"🔍 Total de elementos no container: {len(todos_elementos)}")
+                    exibir_mensagem(f"[BUSCAR] Total de elementos no container: {len(todos_elementos)}")
                 except Exception as e:
-                    exibir_mensagem(f"⚠️ Erro ao contar elementos: {str(e)}")
+                    exibir_mensagem(f"[AVISO] Erro ao contar elementos: {str(e)}")
                 
                 # Se o split por \n resultou em apenas 1 linha, tentar dividir por padrões específicos
                 if len(linhas) == 1:
-                    exibir_mensagem("⚠️ Apenas 1 linha detectada - aplicando divisão por padrões")
+                    exibir_mensagem("[AVISO] Apenas 1 linha detectada - aplicando divisão por padrões")
                     texto_original = linhas[0]
                     
                     # Padrões para dividir o texto em campos individuais (em ordem de prioridade)
@@ -4751,16 +4751,16 @@ def capturar_dados_planos_seguro(page: Page, parametros_tempo) -> Dict[str, Any]
                             tipo_franquia = match_franquia.group(2).strip()
                             linhas_corrigidas.append(valor_franquia)
                             linhas_corrigidas.append(tipo_franquia)
-                            exibir_mensagem(f"✅ FRANQUIA SEPARADA: '{valor_franquia}' + '{tipo_franquia}'")
+                            exibir_mensagem(f"[OK] FRANQUIA SEPARADA: '{valor_franquia}' + '{tipo_franquia}'")
                         else:
                             linhas_corrigidas.append(linha)
                     
                     linhas = linhas_corrigidas
                     
-                    exibir_mensagem(f"✅ DIVISÃO POR PADRÕES APLICADA: {len(linhas)} campos encontrados")
+                    exibir_mensagem(f"[OK] DIVISÃO POR PADRÕES APLICADA: {len(linhas)} campos encontrados")
                 
-                exibir_mensagem(f"🔍 ANALISANDO ESTRUTURA: {len(linhas)} linhas encontradas")
-                exibir_mensagem(f"🔍 DEBUG: Linhas da tabela: {linhas}")
+                exibir_mensagem(f"[BUSCAR] ANALISANDO ESTRUTURA: {len(linhas)} linhas encontradas")
+                exibir_mensagem(f"[BUSCAR] DEBUG: Linhas da tabela: {linhas}")
                 
                 # Determinar se tem título e ajustar índice de início
                 tem_titulo = False
@@ -4771,22 +4771,22 @@ def capturar_dados_planos_seguro(page: Page, parametros_tempo) -> Dict[str, Any]
                     if "plano recomendado" in primeira_linha or "recomendado" in primeira_linha:
                         tem_titulo = True
                         indice_inicio = 1  # Pular o título
-                        exibir_mensagem("✅ TÍTULO DETECTADO - PULANDO PRIMEIRA LINHA")
+                        exibir_mensagem("[OK] TÍTULO DETECTADO - PULANDO PRIMEIRA LINHA")
                 
                 # Parse estruturado baseado na especificação
                 if len(linhas) >= indice_inicio + 8:  # Mínimo de 8 campos após título
                     try:
-                        exibir_mensagem("🔍 Iniciando mapeamento dinâmico de dados...")
+                        exibir_mensagem("[BUSCAR] Iniciando mapeamento dinâmico de dados...")
                         
                         # 7-9. Processar ícones de cobertura usando estrutura HTML correta
-                        exibir_mensagem("🔍 Detectando ícones de cobertura usando estrutura HTML correta...")
+                        exibir_mensagem("[BUSCAR] Detectando ícones de cobertura usando estrutura HTML correta...")
                         try:
                             # Detectar ícones diretamente no container
                             icones_ok = elemento.locator("img[src='/icone-ok.svg']").all()
                             icones_nok = elemento.locator("img[src='/icone-nok.svg']").all()
                             
-                            exibir_mensagem(f"🔍 Ícones de OK encontrados: {len(icones_ok)}")
-                            exibir_mensagem(f"🔍 Ícones de NOK encontrados: {len(icones_nok)}")
+                            exibir_mensagem(f"[BUSCAR] Ícones de OK encontrados: {len(icones_ok)}")
+                            exibir_mensagem(f"[BUSCAR] Ícones de NOK encontrados: {len(icones_nok)}")
                             
                             # Mapear ícones por ordem de aparição na estrutura HTML
                             coberturas_campos = ['assistencia', 'vidros', 'carro_reserva']
@@ -4796,31 +4796,31 @@ def capturar_dados_planos_seguro(page: Page, parametros_tempo) -> Dict[str, Any]
                                     # Verificar se há ícone de OK na posição i
                                     if len(icones_ok) > i and icones_ok[i].is_visible():
                                         dados_planos[plano_tipo][campo] = True
-                                        exibir_mensagem(f"✅ {campo.title()}: True (ícone OK detectado na posição {i})")
+                                        exibir_mensagem(f"[OK] {campo.title()}: True (ícone OK detectado na posição {i})")
                                     elif len(icones_nok) > i and icones_nok[i].is_visible():
                                         dados_planos[plano_tipo][campo] = False
-                                        exibir_mensagem(f"❌ {campo.title()}: False (ícone NOK detectado na posição {i})")
+                                        exibir_mensagem(f"[ERRO] {campo.title()}: False (ícone NOK detectado na posição {i})")
                                     else:
                                         # Fallback: verificar se existe o texto da cobertura
                                         if campo.title() in tabela_text:
                                             dados_planos[plano_tipo][campo] = True
-                                            exibir_mensagem(f"✅ {campo.title()}: True (texto detectado como fallback)")
+                                            exibir_mensagem(f"[OK] {campo.title()}: True (texto detectado como fallback)")
                                         else:
                                             dados_planos[plano_tipo][campo] = False
-                                            exibir_mensagem(f"❌ {campo.title()}: False (nenhum ícone ou texto encontrado)")
+                                            exibir_mensagem(f"[ERRO] {campo.title()}: False (nenhum ícone ou texto encontrado)")
                                         
                                 except Exception as e:
-                                    exibir_mensagem(f"⚠️ Erro ao processar ícone para {campo}: {str(e)}")
+                                    exibir_mensagem(f"[AVISO] Erro ao processar ícone para {campo}: {str(e)}")
                                     dados_planos[plano_tipo][campo] = False
                             
                         except Exception as e:
-                            exibir_mensagem(f"⚠️ Erro na detecção de ícones: {str(e)}")
+                            exibir_mensagem(f"[AVISO] Erro na detecção de ícones: {str(e)}")
                             # Fallback: definir todos como False
                             for cobertura in ['assistencia', 'vidros', 'carro_reserva']:
                                 dados_planos[plano_tipo][cobertura] = False
                         
                         # 8-11. Mapear dados por padrões (NOVA LÓGICA DINÂMICA)
-                        exibir_mensagem("🔍 Mapeando dados por padrões dinâmicos...")
+                        exibir_mensagem("[BUSCAR] Mapeando dados por padrões dinâmicos...")
                         try:
                             # Detectar valores monetários
                             valores_monetarios = []
@@ -4828,7 +4828,7 @@ def capturar_dados_planos_seguro(page: Page, parametros_tempo) -> Dict[str, Any]
                                 if re.match(r'^R\$\s*[0-9.,]+$', linha):
                                     valores_monetarios.append(linha)
                             
-                            exibir_mensagem(f"🔍 Valores monetários encontrados: {valores_monetarios}")
+                            exibir_mensagem(f"[BUSCAR] Valores monetários encontrados: {valores_monetarios}")
                             
                             # Detectar textos específicos
                             textos_especificos = {}
@@ -4842,7 +4842,7 @@ def capturar_dados_planos_seguro(page: Page, parametros_tempo) -> Dict[str, Any]
                                 elif linha.lower() in ['normal', 'reduzida']:
                                     textos_especificos["tipo_franquia"] = linha
                             
-                            exibir_mensagem(f"🔍 Textos específicos encontrados: {textos_especificos}")
+                            exibir_mensagem(f"[BUSCAR] Textos específicos encontrados: {textos_especificos}")
                             
                             # Mapear valores monetários por ordem de aparição
                             if len(valores_monetarios) >= 6:
@@ -4853,26 +4853,26 @@ def capturar_dados_planos_seguro(page: Page, parametros_tempo) -> Dict[str, Any]
                                 dados_planos[plano_tipo]["danos_morais"] = valores_monetarios[4]  # Quinto valor
                                 dados_planos[plano_tipo]["morte_invalidez"] = valores_monetarios[5]  # Sexto valor
                                 
-                                exibir_mensagem(f"✅ VALORES MONETÁRIOS MAPEADOS: {len(valores_monetarios)} valores")
+                                exibir_mensagem(f"[OK] VALORES MONETÁRIOS MAPEADOS: {len(valores_monetarios)} valores")
                             
                             # Mapear textos específicos
                             for campo, valor in textos_especificos.items():
                                 dados_planos[plano_tipo][campo] = valor
-                                exibir_mensagem(f"✅ {campo.upper()}: {valor}")
+                                exibir_mensagem(f"[OK] {campo.upper()}: {valor}")
                             
                             # Definir tipo_franquia padrão se não encontrado
                             if "tipo_franquia" not in dados_planos[plano_tipo]:
                                 dados_planos[plano_tipo]["tipo_franquia"] = "Normal"
-                                exibir_mensagem("✅ TIPO_FRANQUIA: Normal (padrão)")
+                                exibir_mensagem("[OK] TIPO_FRANQUIA: Normal (padrão)")
                             
                         except Exception as e:
-                            exibir_mensagem(f"⚠️ Erro no mapeamento dinâmico: {str(e)}")
+                            exibir_mensagem(f"[AVISO] Erro no mapeamento dinâmico: {str(e)}")
                             # Fallback para lógica anterior se necessário
                         
                     except Exception as e:
                         exception_handler.capturar_warning(f"ERRO NO PARSE ESTRUTURADO: {str(e)}", "CAPTURA_DADOS_PLANOS")
                         # Fallback para método anterior se o parse estruturado falhar
-                        exibir_mensagem("🔄 FALLBACK: Usando método anterior de extração")
+                        exibir_mensagem("[ATUALIZANDO] FALLBACK: Usando método anterior de extração")
                         
                         # Extrair valores monetários com padrões mais específicos
                         valor_patterns = [
@@ -4905,7 +4905,7 @@ def capturar_dados_planos_seguro(page: Page, parametros_tempo) -> Dict[str, Any]
                                 if "Crédito em até" in pattern:
                                     dados_planos[plano_tipo]["parcelamento"] = f"{match.group(1)} sem juros"
                                     if match.group(2):
-                                        exibir_mensagem(f"✅ VALOR PARCELA (fallback): R$ {match.group(2)}")
+                                        exibir_mensagem(f"[OK] VALOR PARCELA (fallback): R$ {match.group(2)}")
                                 else:
                                     dados_planos[plano_tipo]["parcelamento"] = match.group(0)
                                 break
@@ -4942,7 +4942,7 @@ def capturar_dados_planos_seguro(page: Page, parametros_tempo) -> Dict[str, Any]
                     exception_handler.capturar_warning(f"DADOS INSUFICIENTES: Apenas {len(linhas)} linhas encontradas", "CAPTURA_DADOS_PLANOS")
                     # MELHORIA: Parse inteligente para planos com poucas linhas
                     try:
-                        exibir_mensagem("🔍 ANALISANDO PLANO COM POUCAS LINHAS")
+                        exibir_mensagem("[BUSCAR] ANALISANDO PLANO COM POUCAS LINHAS")
                         
                         # Tentar extrair pelo menos o preço anual e forma de pagamento
                         if len(linhas) >= 2:
@@ -4953,11 +4953,11 @@ def capturar_dados_planos_seguro(page: Page, parametros_tempo) -> Dict[str, Any]
                                 preco_anual = linhas[1].strip()
                                 if re.match(r'^[0-9.,]+$', preco_anual):
                                     dados_planos[plano_tipo]["valor"] = f"R$ {preco_anual}"
-                                    exibir_mensagem(f"✅ PREÇO ANUAL EXTRAÍDO: R$ {preco_anual}")
+                                    exibir_mensagem(f"[OK] PREÇO ANUAL EXTRAÍDO: R$ {preco_anual}")
                             elif re.match(r'^[0-9.,]+$', primeira_linha):
                                 # Formato: preço / anual
                                 dados_planos[plano_tipo]["valor"] = f"R$ {primeira_linha}"
-                                exibir_mensagem(f"✅ PREÇO ANUAL EXTRAÍDO: R$ {primeira_linha}")
+                                exibir_mensagem(f"[OK] PREÇO ANUAL EXTRAÍDO: R$ {primeira_linha}")
                         
                         # Procurar forma de pagamento no texto completo
                         pagamento_match = re.search(r'Crédito em até (\d+x)\s*(?:sem juros|com juros)?\s*(?:ou \d+x de R\$\s*([0-9.,]+))?', tabela_text)
@@ -4967,9 +4967,9 @@ def capturar_dados_planos_seguro(page: Page, parametros_tempo) -> Dict[str, Any]
                             
                             dados_planos[plano_tipo]["parcelamento"] = f"{parcelas} sem juros"
                             if valor_parcela:
-                                exibir_mensagem(f"✅ VALOR PARCELA EXTRAÍDO: R$ {valor_parcela}")
+                                exibir_mensagem(f"[OK] VALOR PARCELA EXTRAÍDO: R$ {valor_parcela}")
                             
-                            exibir_mensagem(f"✅ FORMA PAGAMENTO EXTRAÍDA: {parcelas} sem juros")
+                            exibir_mensagem(f"[OK] FORMA PAGAMENTO EXTRAÍDA: {parcelas} sem juros")
                         
                         # Procurar outros valores monetários no texto completo
                         valores_monetarios = re.findall(r'R\$\s*([0-9.,]+)', tabela_text)
@@ -5007,10 +5007,10 @@ def capturar_dados_planos_seguro(page: Page, parametros_tempo) -> Dict[str, Any]
                                         dados_planos[plano_tipo]["morte_invalidez"] = valor_completo
                         
                     except Exception as e:
-                        exibir_mensagem(f"⚠️ ERRO NO PARSE INTELIGENTE: {str(e)}")
+                        exibir_mensagem(f"[AVISO] ERRO NO PARSE INTELIGENTE: {str(e)}")
                 
                 # ETAPA 4: DETECTAR COBERTURAS (ÍCONES DE OK)
-                exibir_mensagem("🔍 ETAPA 4: Detectando coberturas...")
+                exibir_mensagem("[BUSCAR] ETAPA 4: Detectando coberturas...")
                 
                 coberturas = ['assistencia', 'vidros', 'carro_reserva']
                 
@@ -5021,66 +5021,66 @@ def capturar_dados_planos_seguro(page: Page, parametros_tempo) -> Dict[str, Any]
                         
                         if len(icones_ok) > j and icones_ok[j].is_visible():
                             dados_planos[plano_tipo][cobertura] = True
-                            exibir_mensagem(f"✅ {cobertura.title()}: True (ícone detectado)")
+                            exibir_mensagem(f"[OK] {cobertura.title()}: True (ícone detectado)")
                         else:
                             # Verificar se existe o texto da cobertura - se existe, é True
                             if cobertura.title() in tabela_text:
                                 dados_planos[plano_tipo][cobertura] = True
-                                exibir_mensagem(f"✅ {cobertura.title()}: True (texto detectado)")
+                                exibir_mensagem(f"[OK] {cobertura.title()}: True (texto detectado)")
                             else:
                                 # Se não encontrou nem ícone nem texto, verificar se há elementos específicos
                                 elementos_cobertura = elemento.locator(f"div:has-text('{cobertura.title()}')").all()
                                 if len(elementos_cobertura) > 0:
                                     dados_planos[plano_tipo][cobertura] = True
-                                    exibir_mensagem(f"✅ {cobertura.title()}: True (elemento encontrado)")
+                                    exibir_mensagem(f"[OK] {cobertura.title()}: True (elemento encontrado)")
                                 else:
                                     dados_planos[plano_tipo][cobertura] = False
-                                    exibir_mensagem(f"❌ {cobertura.title()}: False")
+                                    exibir_mensagem(f"[ERRO] {cobertura.title()}: False")
                     except Exception as e:
                         # Em caso de erro, verificar se o texto da cobertura existe no container
                         if cobertura.title() in tabela_text:
                             dados_planos[plano_tipo][cobertura] = True
-                            exibir_mensagem(f"✅ {cobertura.title()}: True (fallback - texto detectado)")
+                            exibir_mensagem(f"[OK] {cobertura.title()}: True (fallback - texto detectado)")
                         else:
                             dados_planos[plano_tipo][cobertura] = False
                             exception_handler.capturar_warning(f"Erro ao capturar {cobertura}: {str(e)} - definindo como False", "CAPTURA_DADOS_PLANOS")
                 
                 # ETAPA 5: CAPTURA ESPECÍFICA DE VALORES DE MERCADO E DANOS
-                exibir_mensagem("🔍 ETAPA 5: Captura específica de valores...")
+                exibir_mensagem("[BUSCAR] ETAPA 5: Captura específica de valores...")
                 
                 # Valor de Mercado
                 valor_mercado_match = re.search(r'100%\s*da\s*tabela\s*FIPE', tabela_text, re.IGNORECASE)
                 if valor_mercado_match:
                     dados_planos[plano_tipo]["valor_mercado"] = "100% da tabela FIPE"
-                    exibir_mensagem("✅ Valor de Mercado: 100% da tabela FIPE")
+                    exibir_mensagem("[OK] Valor de Mercado: 100% da tabela FIPE")
                 
                 # Danos Materiais
                 danos_materiais_match = re.search(r'Danos\s+Materiais.*?R\$\s*([0-9.,]+)', tabela_text, re.IGNORECASE)
                 if danos_materiais_match:
                     dados_planos[plano_tipo]["danos_materiais"] = f"R$ {danos_materiais_match.group(1)}"
-                    exibir_mensagem(f"✅ Danos Materiais: R$ {danos_materiais_match.group(1)}")
+                    exibir_mensagem(f"[OK] Danos Materiais: R$ {danos_materiais_match.group(1)}")
                 
                 # Danos Corporais
                 danos_corporais_match = re.search(r'Danos\s+Corporais.*?R\$\s*([0-9.,]+)', tabela_text, re.IGNORECASE)
                 if danos_corporais_match:
                     dados_planos[plano_tipo]["danos_corporais"] = f"R$ {danos_corporais_match.group(1)}"
-                    exibir_mensagem(f"✅ Danos Corporais: R$ {danos_corporais_match.group(1)}")
+                    exibir_mensagem(f"[OK] Danos Corporais: R$ {danos_corporais_match.group(1)}")
                 
                 # Danos Morais
                 danos_morais_match = re.search(r'Danos\s+Morais.*?R\$\s*([0-9.,]+)', tabela_text, re.IGNORECASE)
                 if danos_morais_match:
                     dados_planos[plano_tipo]["danos_morais"] = f"R$ {danos_morais_match.group(1)}"
-                    exibir_mensagem(f"✅ Danos Morais: R$ {danos_morais_match.group(1)}")
+                    exibir_mensagem(f"[OK] Danos Morais: R$ {danos_morais_match.group(1)}")
                 
                 # Morte/Invalidez
                 morte_invalidez_match = re.search(r'Morte/Invalidez.*?R\$\s*([0-9.,]+)', tabela_text, re.IGNORECASE)
                 if morte_invalidez_match:
                     dados_planos[plano_tipo]["morte_invalidez"] = f"R$ {morte_invalidez_match.group(1)}"
-                    exibir_mensagem(f"✅ Morte/Invalidez: R$ {morte_invalidez_match.group(1)}")
+                    exibir_mensagem(f"[OK] Morte/Invalidez: R$ {morte_invalidez_match.group(1)}")
                 
                 # Se encontrou dados válidos, continuar processando outros containers
                 if dados_planos[plano_tipo]["valor"] != "N/A":
-                    exibir_mensagem(f"✅ DADOS CAPTURADOS COM SUCESSO PARA {plano_tipo.upper()}")
+                    exibir_mensagem(f"[OK] DADOS CAPTURADOS COM SUCESSO PARA {plano_tipo.upper()}")
                     # Removido o break para processar todos os containers
                     
             except Exception as e:
@@ -5090,7 +5090,7 @@ def capturar_dados_planos_seguro(page: Page, parametros_tempo) -> Dict[str, Any]
         # ========================================
         # ETAPA 5: FALLBACK REMOVIDO
         # ========================================
-        exibir_mensagem("🔍 ETAPA 5: Fallback removido - usando apenas dados dinâmicos")
+        exibir_mensagem("[BUSCAR] ETAPA 5: Fallback removido - usando apenas dados dinâmicos")
         
         # Fallback removido para evitar sobrescrever dados corretos
         # Os dados são capturados pela lógica dinâmica anterior
@@ -5105,8 +5105,8 @@ def capturar_dados_planos_seguro(page: Page, parametros_tempo) -> Dict[str, Any]
         with open(nome_arquivo, 'w', encoding='utf-8') as f:
             json.dump(dados_planos, f, indent=2, ensure_ascii=False)
         
-        exibir_mensagem(f"💾 Dados salvos em: {nome_arquivo}")
-        exibir_mensagem("✅ CAPTURA DE DADOS CONCLUÍDA!")
+        exibir_mensagem(f"[SALVAR] Dados salvos em: {nome_arquivo}")
+        exibir_mensagem("[OK] CAPTURA DE DADOS CONCLUÍDA!")
         
         return dados_planos
         
@@ -5116,6 +5116,50 @@ def capturar_dados_planos_seguro(page: Page, parametros_tempo) -> Dict[str, Any]
             "plano_recomendado": {"erro": "Falha na captura"},
             "plano_alternativo": {"erro": "Falha na captura"}
         }
+
+# ========================================
+# FUNÇÃO DE DETECÇÃO AUTOMÁTICA DE PROGRESS TRACKER
+# ========================================
+
+def detectar_progress_tracker(tipo_solicitado):
+    """
+    Detecta automaticamente o melhor progress tracker disponível
+    
+    PARÂMETROS:
+        tipo_solicitado: str - Tipo solicitado ('auto', 'redis', 'json', 'none')
+        
+    RETORNO:
+        class ou None - Classe do progress tracker ou None
+    """
+    if tipo_solicitado == 'none':
+        return None
+    
+    if tipo_solicitado == 'redis':
+        try:
+            from utils.progress_redis import RedisProgressTracker
+            return RedisProgressTracker
+        except ImportError:
+            print("⚠️  Redis não disponível, usando JSON como fallback")
+            from utils.progress_database_json import DatabaseProgressTracker
+            return DatabaseProgressTracker
+    
+    if tipo_solicitado == 'json':
+        from utils.progress_database_json import DatabaseProgressTracker
+        return DatabaseProgressTracker
+    
+    # Modo 'auto' - detectar automaticamente
+    try:
+        import redis
+        r = redis.Redis(host='localhost', port=6379)
+        r.ping()
+        print("✅ Redis detectado, usando Redis Progress Tracker")
+        from utils.progress_redis import RedisProgressTracker
+        return RedisProgressTracker
+    except:
+        print("⚠️  Redis não disponível, usando JSON Progress Tracker")
+        from utils.progress_database_json import DatabaseProgressTracker
+        return DatabaseProgressTracker
+
 
 # ========================================
 # FUNÇÃO PRINCIPAL
@@ -5149,7 +5193,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
         # Inicializar Sistema de Timeout Inteligente (opcional)
         if TIMEOUT_SYSTEM_AVAILABLE:
             smart_timeout = SmartTimeout()
-            exibir_mensagem("✅ Sistema de timeout inteligente ativado")
+            exibir_mensagem("[OK] Sistema de timeout inteligente ativado")
         else:
             smart_timeout = None
         
@@ -5158,22 +5202,22 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             from utils.logger_rpa import RPALogger
             logger = RPALogger()
             log_info(logger, "Sistema de logger inicializado", {"versao": "3.4.0"})
-            exibir_mensagem("✅ Sistema de logger avançado ativado")
+            exibir_mensagem("[OK] Sistema de logger avançado ativado")
         else:
             logger = None
         
         # Inicializar Sistema de Comunicação Bidirecional (opcional)
         if BIDIRECTIONAL_SYSTEM_AVAILABLE:
-            exibir_mensagem("✅ Sistema de comunicação bidirecional ativado")
+            exibir_mensagem("[OK] Sistema de comunicação bidirecional ativado")
             # O sistema será usado via wrapper na execução
         else:
-            exibir_mensagem("⚠️ Executando sem comunicação bidirecional")
+            exibir_mensagem("[AVISO] Executando sem comunicação bidirecional")
         
         # Inicializar Exception Handler
         exception_handler.limpar_erros()
         exception_handler.definir_tela_atual("INICIALIZACAO")
         
-        exibir_mensagem("🚀 INICIANDO RPA PLAYWRIGHT")
+        exibir_mensagem("[INICIANDO] INICIANDO RPA PLAYWRIGHT")
         exibir_mensagem("=" * 50)
         
         # Log de início da execução
@@ -5192,12 +5236,12 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                 # Usar sistema de validação avançado
                 validador = ValidadorParametros()
                 parametros_validados = validador.validar_parametros(parametros)
-                exibir_mensagem("✅ Validação avançada de parâmetros concluída")
+                exibir_mensagem("[OK] Validação avançada de parâmetros concluída")
             except ValidacaoParametrosError as e:
-                # ❌ INTERROMPER EXECUÇÃO - Parâmetros inválidos detectados
-                erro_msg = f"❌ VALIDAÇÃO DE PARÂMETROS FALHOU: {str(e)}"
+                # [ERRO] INTERROMPER EXECUÇÃO - Parâmetros inválidos detectados
+                erro_msg = f"[ERRO] VALIDAÇÃO DE PARÂMETROS FALHOU: {str(e)}"
                 exibir_mensagem(erro_msg)
-                exibir_mensagem("🚫 Execução interrompida devido a parâmetros inválidos")
+                exibir_mensagem("[PROIBIDO] Execução interrompida devido a parâmetros inválidos")
                 return criar_retorno_erro(
                     f"Validação de parâmetros falhou: {str(e)}",
                     "VALIDACAO",
@@ -5206,10 +5250,10 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                     exception_handler
                 )
             except Exception as e:
-                # ❌ INTERROMPER EXECUÇÃO - Erro inesperado na validação
-                erro_msg = f"❌ ERRO INESPERADO NA VALIDAÇÃO: {str(e)}"
+                # [ERRO] INTERROMPER EXECUÇÃO - Erro inesperado na validação
+                erro_msg = f"[ERRO] ERRO INESPERADO NA VALIDAÇÃO: {str(e)}"
                 exibir_mensagem(erro_msg)
-                exibir_mensagem("🚫 Execução interrompida devido a erro na validação")
+                exibir_mensagem("[PROIBIDO] Execução interrompida devido a erro na validação")
                 return criar_retorno_erro(
                     f"Erro inesperado na validação: {str(e)}",
                     "VALIDACAO",
@@ -5230,14 +5274,15 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             
             # Navegar para URL inicial
             page.goto(parametros["url"])
-            exibir_mensagem(f"✅ Navegação para {parametros['url']} realizada")
+            exibir_mensagem(f"[OK] Navegação para {parametros['url']} realizada")
             
             # Executar Telas 1-15 sequencialmente
             telas_executadas = 0
             resultado_telas = {}
             
             # TELA 1
-            progress_tracker.update_progress(1, "Selecionando Tipo de Veiculo")
+            if progress_tracker:
+                if progress_tracker: progress_tracker.update_progress(1, "Selecionando Tipo de Veiculo")
             exibir_mensagem("\n" + "="*50)
             
             # Log de início da Tela 1
@@ -5250,8 +5295,8 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             if executar_com_timeout(smart_timeout, 1, navegar_tela_1_playwright, page, parametros.get('tipo_veiculo', 'carro')):
                 telas_executadas += 1
                 resultado_telas["tela_1"] = True
-                progress_tracker.update_progress(1, "Tela 1 concluída")
-                exibir_mensagem("✅ TELA 1 CONCLUÍDA!")
+                if progress_tracker: progress_tracker.update_progress(1, "Tela 1 concluída")
+                exibir_mensagem("[OK] TELA 1 CONCLUÍDA!")
                 
                 # Log de sucesso da Tela 1
                 try:
@@ -5261,8 +5306,8 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                     pass  # Não falhar se o logger der erro
             else:
                 resultado_telas["tela_1"] = False
-                progress_tracker.update_progress(1, "Tela 1 falhou")
-                exibir_mensagem("❌ TELA 1 FALHOU!")
+                if progress_tracker: progress_tracker.update_progress(1, "Tela 1 falhou")
+                exibir_mensagem("[ERRO] TELA 1 FALHOU!")
                 
                 # Log de erro da Tela 1
                 try:
@@ -5280,17 +5325,17 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                 )
             
             # TELA 2
-            progress_tracker.update_progress(2, "Selecionando veículo com a placa informada")
+            if progress_tracker: progress_tracker.update_progress(2, "Selecionando veículo com a placa informada")
             exibir_mensagem("\n" + "="*50)
             if executar_com_timeout(smart_timeout, 2, navegar_tela_2_playwright, page, parametros['placa']):
                 telas_executadas += 1
                 resultado_telas["tela_2"] = True
-                progress_tracker.update_progress(2, "Tela 2 concluída")
-                exibir_mensagem("✅ TELA 2 CONCLUÍDA!")
+                if progress_tracker: progress_tracker.update_progress(2, "Tela 2 concluída")
+                exibir_mensagem("[OK] TELA 2 CONCLUÍDA!")
             else:
                 resultado_telas["tela_2"] = False
-                progress_tracker.update_progress(2, "Tela 2 falhou")
-                exibir_mensagem("❌ TELA 2 FALHOU!")
+                if progress_tracker: progress_tracker.update_progress(2, "Tela 2 falhou")
+                exibir_mensagem("[ERRO] TELA 2 FALHOU!")
                 return criar_retorno_erro(
                     "Tela 2 falhou",
                     "TELA_2",
@@ -5300,17 +5345,17 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                 )
             
             # TELA 3
-            progress_tracker.update_progress(3, "Confirmando seleção do veículo")
+            if progress_tracker: progress_tracker.update_progress(3, "Confirmando seleção do veículo")
             exibir_mensagem("\n" + "="*50)
             if executar_com_timeout(smart_timeout, 3, navegar_tela_3_playwright, page):
                 telas_executadas += 1
                 resultado_telas["tela_3"] = True
-                progress_tracker.update_progress(3, "Tela 3 concluída")
-                exibir_mensagem("✅ TELA 3 CONCLUÍDA!")
+                if progress_tracker: progress_tracker.update_progress(3, "Tela 3 concluída")
+                exibir_mensagem("[OK] TELA 3 CONCLUÍDA!")
             else:
                 resultado_telas["tela_3"] = False
-                progress_tracker.update_progress(3, "Tela 3 falhou")
-                exibir_mensagem("❌ TELA 3 FALHOU!")
+                if progress_tracker: progress_tracker.update_progress(3, "Tela 3 falhou")
+                exibir_mensagem("[ERRO] TELA 3 FALHOU!")
                 return criar_retorno_erro(
                     "Tela 3 falhou",
                     "TELA_3",
@@ -5320,17 +5365,17 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                 )
             
             # TELA 4
-            progress_tracker.update_progress(4, "Calculando como novo Seguro")
+            if progress_tracker: progress_tracker.update_progress(4, "Calculando como novo Seguro")
             exibir_mensagem("\n" + "="*50)
             if executar_com_timeout(smart_timeout, 4, navegar_tela_4_playwright, page, parametros['veiculo_segurado']):
                 telas_executadas += 1
                 resultado_telas["tela_4"] = True
-                progress_tracker.update_progress(4, "Tela 4 concluída")
-                exibir_mensagem("✅ TELA 4 CONCLUÍDA!")
+                if progress_tracker: progress_tracker.update_progress(4, "Tela 4 concluída")
+                exibir_mensagem("[OK] TELA 4 CONCLUÍDA!")
             else:
                 resultado_telas["tela_4"] = False
-                progress_tracker.update_progress(4, "Tela 4 falhou")
-                exibir_mensagem("❌ TELA 4 FALHOU!")
+                if progress_tracker: progress_tracker.update_progress(4, "Tela 4 falhou")
+                exibir_mensagem("[ERRO] TELA 4 FALHOU!")
                 return criar_retorno_erro(
                     "Tela 4 falhou",
                     "TELA_4",
@@ -5340,30 +5385,30 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                 )
             
             # TELA 5
-            progress_tracker.update_progress(5, "Elaborando estimativas")
+            if progress_tracker: progress_tracker.update_progress(5, "Elaborando estimativas")
             exibir_mensagem("\n" + "="*50)
             if executar_com_timeout(smart_timeout, 5, navegar_tela_5_playwright, page, parametros_tempo):
                 telas_executadas += 1
                 resultado_telas["tela_5"] = True
-                progress_tracker.update_progress(5, "Tela 5 concluída")
-                exibir_mensagem("✅ TELA 5 CONCLUÍDA!")
+                if progress_tracker: progress_tracker.update_progress(5, "Tela 5 concluída")
+                exibir_mensagem("[OK] TELA 5 CONCLUÍDA!")
                 
                 # VERIFICAR SE APARECEU TELA ZERO KM
                 try:
                     page.wait_for_selector("#gtm-telaZeroKmContinuar", timeout=2000)
-                    exibir_mensagem("🛵 TELA ZERO KM DETECTADA!")
+                    exibir_mensagem("[MOTO] TELA ZERO KM DETECTADA!")
                     
                     # TELA ZERO KM
-                    progress_tracker.update_progress(5.5, "Processando Zero KM")
+                    if progress_tracker: progress_tracker.update_progress(5.5, "Processando Zero KM")
                     if executar_com_timeout(smart_timeout, 5.5, navegar_tela_zero_km_playwright, page, parametros):
                         telas_executadas += 1
                         resultado_telas["tela_zero_km"] = True
-                        progress_tracker.update_progress(5.5, "Tela Zero KM concluída")
-                        exibir_mensagem("✅ TELA ZERO KM CONCLUÍDA!")
+                        if progress_tracker: progress_tracker.update_progress(5.5, "Tela Zero KM concluída")
+                        exibir_mensagem("[OK] TELA ZERO KM CONCLUÍDA!")
                     else:
                         resultado_telas["tela_zero_km"] = False
-                        progress_tracker.update_progress(5.5, "Tela Zero KM falhou")
-                        exibir_mensagem("❌ TELA ZERO KM FALHOU!")
+                        if progress_tracker: progress_tracker.update_progress(5.5, "Tela Zero KM falhou")
+                        exibir_mensagem("[ERRO] TELA ZERO KM FALHOU!")
                         return criar_retorno_erro(
                             "Tela Zero KM falhou",
                             "TELA_ZERO_KM",
@@ -5372,11 +5417,11 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                             exception_handler
                         )
                 except:
-                    exibir_mensagem("ℹ️ Tela Zero KM não apareceu - continuando fluxo normal")
+                    exibir_mensagem("[INFO]️ Tela Zero KM não apareceu - continuando fluxo normal")
             else:
                 resultado_telas["tela_5"] = False
-                progress_tracker.update_progress(5, "Tela 5 falhou")
-                exibir_mensagem("❌ TELA 5 FALHOU!")
+                if progress_tracker: progress_tracker.update_progress(5, "Tela 5 falhou")
+                exibir_mensagem("[ERRO] TELA 5 FALHOU!")
                 return criar_retorno_erro(
                     "Tela 5 falhou",
                     "TELA_5",
@@ -5386,17 +5431,17 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                 )
             
             # TELA 6
-            progress_tracker.update_progress(6, "Seleção de detalhes do veículo")
+            if progress_tracker: progress_tracker.update_progress(6, "Seleção de detalhes do veículo")
             exibir_mensagem("\n" + "="*50)
             if executar_com_timeout(smart_timeout, 6, navegar_tela_6_playwright, page, parametros['combustivel'], parametros.get('kit_gas', False), parametros.get('blindado', False), parametros.get('financiado', False), parametros.get('tipo_veiculo', 'carro')):
                 telas_executadas += 1
                 resultado_telas["tela_6"] = True
-                progress_tracker.update_progress(6, "Tela 6 concluída")
-                exibir_mensagem("✅ TELA 6 CONCLUÍDA!")
+                if progress_tracker: progress_tracker.update_progress(6, "Tela 6 concluída")
+                exibir_mensagem("[OK] TELA 6 CONCLUÍDA!")
             else:
                 resultado_telas["tela_6"] = False
-                progress_tracker.update_progress(6, "Tela 6 falhou")
-                exibir_mensagem("❌ TELA 6 FALHOU!")
+                if progress_tracker: progress_tracker.update_progress(6, "Tela 6 falhou")
+                exibir_mensagem("[ERRO] TELA 6 FALHOU!")
                 return criar_retorno_erro(
                     "Tela 6 falhou",
                     "TELA_6",
@@ -5406,17 +5451,17 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                 )
             
             # TELA 7
-            progress_tracker.update_progress(7, "Definição de local de pernoite com o CEP informado")
+            if progress_tracker: progress_tracker.update_progress(7, "Definição de local de pernoite com o CEP informado")
             exibir_mensagem("\n" + "="*50)
             if executar_com_timeout(smart_timeout, 7, navegar_tela_7_playwright, page, parametros['cep']):
                 telas_executadas += 1
                 resultado_telas["tela_7"] = True
-                progress_tracker.update_progress(7, "Tela 7 concluída")
-                exibir_mensagem("✅ TELA 7 CONCLUÍDA!")
+                if progress_tracker: progress_tracker.update_progress(7, "Tela 7 concluída")
+                exibir_mensagem("[OK] TELA 7 CONCLUÍDA!")
             else:
                 resultado_telas["tela_7"] = False
-                progress_tracker.update_progress(7, "Tela 7 falhou")
-                exibir_mensagem("❌ TELA 7 FALHOU!")
+                if progress_tracker: progress_tracker.update_progress(7, "Tela 7 falhou")
+                exibir_mensagem("[ERRO] TELA 7 FALHOU!")
                 return criar_retorno_erro(
                     "Tela 7 falhou",
                     "TELA_7",
@@ -5426,17 +5471,17 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                 )
             
             # TELA 8
-            progress_tracker.update_progress(8, "Definição do uso do veículo")
+            if progress_tracker: progress_tracker.update_progress(8, "Definição do uso do veículo")
             exibir_mensagem("\n" + "="*50)
             if executar_com_timeout(smart_timeout, 8, navegar_tela_8_playwright, page, parametros['uso_veiculo']):
                 telas_executadas += 1
                 resultado_telas["tela_8"] = True
-                progress_tracker.update_progress(8, "Tela 8 concluída")
-                exibir_mensagem("✅ TELA 8 CONCLUÍDA!")
+                if progress_tracker: progress_tracker.update_progress(8, "Tela 8 concluída")
+                exibir_mensagem("[OK] TELA 8 CONCLUÍDA!")
             else:
                 resultado_telas["tela_8"] = False
-                progress_tracker.update_progress(8, "Tela 8 falhou")
-                exibir_mensagem("❌ TELA 8 FALHOU!")
+                if progress_tracker: progress_tracker.update_progress(8, "Tela 8 falhou")
+                exibir_mensagem("[ERRO] TELA 8 FALHOU!")
                 return criar_retorno_erro(
                     "Tela 8 falhou",
                     "TELA_8",
@@ -5446,17 +5491,17 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                 )
             
             # TELA 9
-            progress_tracker.update_progress(9, "Preenchimento dos dados pessoais")
+            if progress_tracker: progress_tracker.update_progress(9, "Preenchimento dos dados pessoais")
             exibir_mensagem("\n" + "="*50)
             if executar_com_timeout(smart_timeout, 9, navegar_tela_9_playwright, page, parametros['nome'], parametros['cpf'], parametros['data_nascimento'], parametros['sexo'], parametros['estado_civil'], parametros['email'], parametros['celular']):
                 telas_executadas += 1
                 resultado_telas["tela_9"] = True
-                progress_tracker.update_progress(9, "Tela 9 concluída")
-                exibir_mensagem("✅ TELA 9 CONCLUÍDA!")
+                if progress_tracker: progress_tracker.update_progress(9, "Tela 9 concluída")
+                exibir_mensagem("[OK] TELA 9 CONCLUÍDA!")
             else:
                 resultado_telas["tela_9"] = False
-                progress_tracker.update_progress(9, "Tela 9 falhou")
-                exibir_mensagem("❌ TELA 9 FALHOU!")
+                if progress_tracker: progress_tracker.update_progress(9, "Tela 9 falhou")
+                exibir_mensagem("[ERRO] TELA 9 FALHOU!")
                 return criar_retorno_erro(
                     "Tela 9 falhou",
                     "TELA_9",
@@ -5466,17 +5511,17 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                 )
             
             # TELA 10
-            progress_tracker.update_progress(10, "Definição do Condutor Principal")
+            if progress_tracker: progress_tracker.update_progress(10, "Definição do Condutor Principal")
             exibir_mensagem("\n" + "="*50)
             if executar_com_timeout(smart_timeout, 10, navegar_tela_10_playwright, page, parametros['condutor_principal'], parametros['nome_condutor'], parametros['cpf_condutor'], parametros['data_nascimento_condutor'], parametros['sexo_condutor'], parametros['estado_civil_condutor']):
                 telas_executadas += 1
                 resultado_telas["tela_10"] = True
-                progress_tracker.update_progress(10, "Tela 10 concluída")
-                exibir_mensagem("✅ TELA 10 CONCLUÍDA!")
+                if progress_tracker: progress_tracker.update_progress(10, "Tela 10 concluída")
+                exibir_mensagem("[OK] TELA 10 CONCLUÍDA!")
             else:
                 resultado_telas["tela_10"] = False
-                progress_tracker.update_progress(10, "Tela 10 falhou")
-                exibir_mensagem("❌ TELA 10 FALHOU!")
+                if progress_tracker: progress_tracker.update_progress(10, "Tela 10 falhou")
+                exibir_mensagem("[ERRO] TELA 10 FALHOU!")
                 return criar_retorno_erro(
                     "Tela 10 falhou",
                     "TELA_10",
@@ -5486,17 +5531,17 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                 )
             
             # TELA 11
-            progress_tracker.update_progress(11, "Definição do uso do veículo")
+            if progress_tracker: progress_tracker.update_progress(11, "Definição do uso do veículo")
             exibir_mensagem("\n" + "="*50)
             if executar_com_timeout(smart_timeout, 11, navegar_tela_11_playwright, page, parametros['local_de_trabalho'], parametros['estacionamento_proprio_local_de_trabalho'], parametros['local_de_estudo'], parametros['estacionamento_proprio_local_de_estudo']):
                 telas_executadas += 1
                 resultado_telas["tela_11"] = True
-                progress_tracker.update_progress(11, "Tela 11 concluída")
-                exibir_mensagem("✅ TELA 11 CONCLUÍDA!")
+                if progress_tracker: progress_tracker.update_progress(11, "Tela 11 concluída")
+                exibir_mensagem("[OK] TELA 11 CONCLUÍDA!")
             else:
                 resultado_telas["tela_11"] = False
-                progress_tracker.update_progress(11, "Tela 11 falhou")
-                exibir_mensagem("❌ TELA 11 FALHOU!")
+                if progress_tracker: progress_tracker.update_progress(11, "Tela 11 falhou")
+                exibir_mensagem("[ERRO] TELA 11 FALHOU!")
                 return criar_retorno_erro(
                     "Tela 11 falhou",
                     "TELA_11",
@@ -5506,17 +5551,17 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                 )
             
             # TELA 12
-            progress_tracker.update_progress(12, "Definição do tipo de garagem")
+            if progress_tracker: progress_tracker.update_progress(12, "Definição do tipo de garagem")
             exibir_mensagem("\n" + "="*50)
             if executar_com_timeout(smart_timeout, 12, navegar_tela_12_playwright, page, parametros['garagem_residencia'], parametros['portao_eletronico']):
                 telas_executadas += 1
                 resultado_telas["tela_12"] = True
-                progress_tracker.update_progress(12, "Tela 12 concluída")
-                exibir_mensagem("✅ TELA 12 CONCLUÍDA!")
+                if progress_tracker: progress_tracker.update_progress(12, "Tela 12 concluída")
+                exibir_mensagem("[OK] TELA 12 CONCLUÍDA!")
             else:
                 resultado_telas["tela_12"] = False
-                progress_tracker.update_progress(12, "Tela 12 falhou")
-                exibir_mensagem("❌ TELA 12 FALHOU!")
+                if progress_tracker: progress_tracker.update_progress(12, "Tela 12 falhou")
+                exibir_mensagem("[ERRO] TELA 12 FALHOU!")
                 return criar_retorno_erro(
                     "Tela 12 falhou",
                     "TELA_12",
@@ -5526,17 +5571,17 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                 )
             
             # TELA 13
-            progress_tracker.update_progress(13, "Definição de residentes")
+            if progress_tracker: progress_tracker.update_progress(13, "Definição de residentes")
             exibir_mensagem("\n" + "="*50)
             if executar_com_timeout(smart_timeout, 13, navegar_tela_13_playwright, page, parametros['reside_18_26'], parametros['sexo_do_menor'], parametros['faixa_etaria_menor_mais_novo']):
                 telas_executadas += 1
                 resultado_telas["tela_13"] = True
-                progress_tracker.update_progress(13, "Tela 13 concluída")
-                exibir_mensagem("✅ TELA 13 CONCLUÍDA!")
+                if progress_tracker: progress_tracker.update_progress(13, "Tela 13 concluída")
+                exibir_mensagem("[OK] TELA 13 CONCLUÍDA!")
             else:
                 resultado_telas["tela_13"] = False
-                progress_tracker.update_progress(13, "Tela 13 falhou")
-                exibir_mensagem("❌ TELA 13 FALHOU!")
+                if progress_tracker: progress_tracker.update_progress(13, "Tela 13 falhou")
+                exibir_mensagem("[ERRO] TELA 13 FALHOU!")
                 return criar_retorno_erro(
                     "Tela 13 falhou",
                     "TELA_13",
@@ -5546,25 +5591,25 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                 )
             
             # TELA 14 (CONDICIONAL) - Só executa se Tela 15 não foi detectada diretamente da Tela 13
-            progress_tracker.update_progress(14, "Definição do Corretor")
+            if progress_tracker: progress_tracker.update_progress(14, "Definição do Corretor")
             exibir_mensagem("\n" + "="*50)
-            exibir_mensagem("🔍 ANALISANDO EXECUÇÃO DA TELA 14...")
-            exibir_mensagem(f"📊 Status da variável global 'tela_15_detectada': {tela_15_detectada}")
+            exibir_mensagem("[BUSCAR] ANALISANDO EXECUÇÃO DA TELA 14...")
+            exibir_mensagem(f"[DADOS] Status da variável global 'tela_15_detectada': {tela_15_detectada}")
             
             if not tela_15_detectada:
-                exibir_mensagem("🔄 Executando Tela 14 (Tela 15 não foi detectada diretamente da Tela 13)")
-                exibir_mensagem("📋 Motivo: Fluxo normal - Tela 14 é necessária para continuar")
+                exibir_mensagem("[ATUALIZANDO] Executando Tela 14 (Tela 15 não foi detectada diretamente da Tela 13)")
+                exibir_mensagem("[INFO] Motivo: Fluxo normal - Tela 14 é necessária para continuar")
                 if executar_com_timeout(smart_timeout, 14, navegar_tela_14_playwright, page, parametros['continuar_com_corretor_anterior']):
                     # Não incrementa telas_executadas pois é condicional
                     resultado_telas["tela_14"] = True
-                    progress_tracker.update_progress(14, "Tela 14 concluída")
-                    exibir_mensagem("✅ TELA 14 PROCESSADA COM SUCESSO!")
-                    exibir_mensagem("📈 Navegação para Tela 15 será executada normalmente")
+                    if progress_tracker: progress_tracker.update_progress(14, "Tela 14 concluída")
+                    exibir_mensagem("[OK] TELA 14 PROCESSADA COM SUCESSO!")
+                    exibir_mensagem("[GRAFICO] Navegação para Tela 15 será executada normalmente")
                 else:
                     resultado_telas["tela_14"] = False
-                    progress_tracker.update_progress(14, "Tela 14 falhou")
-                    exibir_mensagem("❌ TELA 14 FALHOU!")
-                    exibir_mensagem("🚫 RPA será interrompido devido à falha na Tela 14")
+                    if progress_tracker: progress_tracker.update_progress(14, "Tela 14 falhou")
+                    exibir_mensagem("[ERRO] TELA 14 FALHOU!")
+                    exibir_mensagem("[PROIBIDO] RPA será interrompido devido à falha na Tela 14")
                     return criar_retorno_erro(
                         "Tela 14 falhou",
                         "TELA_14",
@@ -5574,36 +5619,36 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                     )
             else:
                 exibir_mensagem("⏭️ Pulando Tela 14 (Tela 15 já foi detectada diretamente da Tela 13)")
-                exibir_mensagem("📋 Motivo: Fluxo otimizado - Tela 14 não é necessária")
-                exibir_mensagem("🔗 Transição direta da Tela 13 para Tela 15 detectada")
+                exibir_mensagem("[INFO] Motivo: Fluxo otimizado - Tela 14 não é necessária")
+                exibir_mensagem("[LINK] Transição direta da Tela 13 para Tela 15 detectada")
                 resultado_telas["tela_14"] = True  # Considera como sucesso pois foi pulada intencionalmente
-                progress_tracker.update_progress(14, "Tela 14 pulada")
-                exibir_mensagem("✅ TELA 14 PULADA COM SUCESSO!")
-                exibir_mensagem("📈 Próximo passo: Executar Tela 15 diretamente")
+                if progress_tracker: progress_tracker.update_progress(14, "Tela 14 pulada")
+                exibir_mensagem("[OK] TELA 14 PULADA COM SUCESSO!")
+                exibir_mensagem("[GRAFICO] Próximo passo: Executar Tela 15 diretamente")
             
             # TELA 15
-            progress_tracker.update_progress(15, "Aguardando cálculo completo")
+            if progress_tracker: progress_tracker.update_progress(15, "Aguardando cálculo completo")
             exibir_mensagem("\n" + "="*50)
             if executar_com_timeout(smart_timeout, 15, navegar_tela_15_playwright, page, parametros['autenticacao']['email_login'], parametros['autenticacao']['senha_login'], parametros_tempo, parametros):
                 telas_executadas += 1
                 resultado_telas["tela_15"] = True
-                progress_tracker.update_progress(15, "Tela 15 concluída")
-                exibir_mensagem("✅ TELA 15 CONCLUÍDA!")
+                if progress_tracker: progress_tracker.update_progress(15, "Tela 15 concluída")
+                exibir_mensagem("[OK] TELA 15 CONCLUÍDA!")
             else:
                 resultado_telas["tela_15"] = False
-                progress_tracker.update_progress(15, "Tela 15 falhou")
-                exibir_mensagem("❌ TELA 15 FALHOU!")
+                if progress_tracker: progress_tracker.update_progress(15, "Tela 15 falhou")
+                exibir_mensagem("[ERRO] TELA 15 FALHOU!")
                 
                 # Verificar se foi por cotação manual
                 try:
                     # Verificar se apareceu tela de cotação manual
                     page.wait_for_selector('p.text-center.text-base', timeout=2000)
-                    exibir_mensagem("📋 COTAÇÃO MANUAL DETECTADA NO FLUXO PRINCIPAL!")
+                    exibir_mensagem("[INFO] COTAÇÃO MANUAL DETECTADA NO FLUXO PRINCIPAL!")
                     
                     # Processar cotação manual
                     if processar_cotacao_manual(page, parametros):
                         resultado_telas["tela_cotacao_manual"] = True
-                        exibir_mensagem("✅ COTAÇÃO MANUAL PROCESSADA!")
+                        exibir_mensagem("[OK] COTAÇÃO MANUAL PROCESSADA!")
                         
                         # Retornar erro específico para cotação manual
                         return criar_retorno_erro_cotacao_manual(
@@ -5614,7 +5659,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                             exception_handler
                         )
                     else:
-                        exibir_mensagem("❌ ERRO AO PROCESSAR COTAÇÃO MANUAL!")
+                        exibir_mensagem("[ERRO] ERRO AO PROCESSAR COTAÇÃO MANUAL!")
                         return criar_retorno_erro(
                             "Erro ao processar cotação manual",
                             "COTACAO_MANUAL_ERROR",
@@ -5634,12 +5679,12 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                     )
             
             # Resultado final
-            progress_tracker.update_progress(15, "RPA concluído com sucesso")
+            if progress_tracker: progress_tracker.update_progress(15, "RPA concluído com sucesso")
             exibir_mensagem("\n" + "="*60)
-            exibir_mensagem("🎉 RPA TELAS 1 A 15 CONCLUÍDO COM SUCESSO!")
-            exibir_mensagem(f"✅ Total de telas executadas: {telas_executadas}/14 (Tela 14 é condicional)")
-            exibir_mensagem("✅ Todas as telas funcionaram corretamente")
-            exibir_mensagem("✅ Navegação sequencial realizada com sucesso")
+            exibir_mensagem("[SUCESSO] RPA TELAS 1 A 15 CONCLUÍDO COM SUCESSO!")
+            exibir_mensagem(f"[OK] Total de telas executadas: {telas_executadas}/14 (Tela 14 é condicional)")
+            exibir_mensagem("[OK] Todas as telas funcionaram corretamente")
+            exibir_mensagem("[OK] Navegação sequencial realizada com sucesso")
             
             # Capturar dados finais
             dados_planos = capturar_dados_planos_seguro(page, parametros_tempo)
@@ -5672,9 +5717,9 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             try:
                 progresso_final = progress_tracker.get_progress()
                 resultado_telas["progresso"] = progresso_final
-                exibir_mensagem("✅ Progresso incluído no resultado final")
+                exibir_mensagem("[OK] Progresso incluído no resultado final")
             except Exception as e:
-                exibir_mensagem(f"⚠️ Erro ao incluir progresso: {e}")
+                exibir_mensagem(f"[AVISO] Erro ao incluir progresso: {e}")
                 resultado_telas["progresso"] = {"erro": "Progresso não disponível"}
             
             return criar_retorno_sucesso(
@@ -5736,15 +5781,15 @@ if __name__ == "__main__":
             try:
                 health_checker = ConservativeHealthChecker()
                 environment = health_checker.get_environment()
-                exibir_mensagem(f"🔍 Ambiente detectado: {environment}")
+                exibir_mensagem(f"[BUSCAR] Ambiente detectado: {environment}")
                 
                 if health_checker.is_system_ready():
-                    exibir_mensagem(f"✅ Health Check {environment}: Sistema pronto")
+                    exibir_mensagem(f"[OK] Health Check {environment}: Sistema pronto")
                 else:
-                    exibir_mensagem(f"⚠️ Health Check {environment}: Problemas detectados - continuando mesmo assim")
+                    exibir_mensagem(f"[AVISO] Health Check {environment}: Problemas detectados - continuando mesmo assim")
                     
             except Exception as e:
-                exibir_mensagem(f"⚠️ Erro no health check: {e} - continuando sem verificação")
+                exibir_mensagem(f"[AVISO] Erro no health check: {e} - continuando sem verificação")
         
         # EXECUÇÃO COM CONTROLE BIDIRECIONAL SEGURO
         if BIDIRECTIONAL_SYSTEM_AVAILABLE:
@@ -5758,18 +5803,18 @@ if __name__ == "__main__":
             if resultado_wrapper["status"] == "success":
                 resultado = resultado_wrapper["result"]
                 bidirectional_used = resultado_wrapper.get("bidirectional_used", False)
-                exibir_mensagem(f"✅ Comunicação bidirecional: {'Ativa' if bidirectional_used else 'Não utilizada'}")
+                exibir_mensagem(f"[OK] Comunicação bidirecional: {'Ativa' if bidirectional_used else 'Não utilizada'}")
             else:
                 # Fallback para execução direta
                 resultado = executar_rpa_playwright(parametros)
-                exibir_mensagem("⚠️ Fallback para execução direta devido a erro no sistema bidirecional")
+                exibir_mensagem("[AVISO] Fallback para execução direta devido a erro no sistema bidirecional")
         else:
             # Executar RPA (ESTRUTURA ORIGINAL PRESERVADA)
             resultado = executar_rpa_playwright(parametros)
         
         # Exibir resultado
         exibir_mensagem("\n" + "="*50)
-        exibir_mensagem("📊 RESULTADO DA EXECUÇÃO")
+        exibir_mensagem("[DADOS] RESULTADO DA EXECUÇÃO")
         exibir_mensagem("="*50)
         exibir_mensagem(f"Status: {resultado['status']}")
         exibir_mensagem(f"Tempo: {resultado['tempo_execucao']}")
@@ -5777,18 +5822,18 @@ if __name__ == "__main__":
         exibir_mensagem(f"Warnings: {resultado['erros']['total_warnings']}")
         
         if resultado['status'] == 'success':
-            exibir_mensagem("✅ RPA executado com sucesso!")
+            exibir_mensagem("[OK] RPA executado com sucesso!")
         else:
-            exibir_mensagem("❌ RPA falhou!")
+            exibir_mensagem("[ERRO] RPA falhou!")
         
         # Delay para inspeção da tela final
-        # print("⏳ Aguardando 60 segundos para inspeção da tela final...")
+        # print("[AGUARDANDO] Aguardando 60 segundos para inspeção da tela final...")
         # time.sleep(60)
-        # print("✅ Tempo de inspeção concluído!")
+        # print("[OK] Tempo de inspeção concluído!")
         
         # Exibir retorno estruturado completo
         exibir_mensagem("\n" + "="*50)
-        exibir_mensagem("📋 RETORNO ESTRUTURADO COMPLETO")
+        exibir_mensagem("[INFO] RETORNO ESTRUTURADO COMPLETO")
         exibir_mensagem("="*50)
         import json
         exibir_mensagem(json.dumps(resultado, indent=2, ensure_ascii=False))
