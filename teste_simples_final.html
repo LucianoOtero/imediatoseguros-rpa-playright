@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Simples</title>
+</head>
+<body>
+    <h1>Teste Simples</h1>
+    <button onclick="testar()">Testar</button>
+    <div id="resultado"></div>
+    
+    <script>
+        function testar() {
+            console.log("Testando...");
+            document.getElementById("resultado").innerHTML = "Testando...";
+            
+            fetch('proxy_placa_fipe_final.php?placa=MIH5B55')
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Dados recebidos:", data);
+                    document.getElementById("resultado").innerHTML = 
+                        "<h3>Sucesso!</h3>" +
+                        "<p>Marca: " + data.informacoes_veiculo.marca + "</p>" +
+                        "<p>Modelo: " + data.informacoes_veiculo.modelo + "</p>" +
+                        "<p>Segmento: " + data.informacoes_veiculo.segmento + "</p>";
+                })
+                .catch(error => {
+                    console.error("Erro:", error);
+                    document.getElementById("resultado").innerHTML = "Erro: " + error.message;
+                });
+        }
+    </script>
+</body>
+</html>
+
+
+
+
+
+

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste CPF + API PH3A</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            background: #f8f9fa;
+            border-left: 4px solid #007bff;
+        }
+        .error {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+            color: #721c24;
+        }
+        .success {
+            background: #d4edda;
+            border-left-color: #28a745;
+            color: #155724;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #007bff;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .example-cpfs {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e9ecef;
+            border-radius: 5px;
+        }
+        .example-cpfs h4 {
+            margin-top: 0;
+            color: #495057;
+        }
+        .example-cpfs button {
+            background: #6c757d;
+            font-size: 14px;
+            padding: 8px 16px;
+            margin: 5px;
+        }
+        .example-cpfs button:hover {
+            background: #545b62;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Teste CPF + API PH3A</h1>
+        <p>Teste a validação de CPF com consulta à API PH3A para preencher dados pessoais.</p>
+        
+        <div class="form-group">
+            <label for="cpf">CPF:</label>
+            <input type="text" id="cpf" placeholder="000.000.000-00" maxlength="14">
+        </div>
+        
+        <div class="form-group">
+            <label for="sexo">Sexo:</label>
+            <select id="sexo">
+                <option value="">Selecione...</option>
+                <option value="Masculino">Masculino</option>
+                <option value="Feminino">Feminino</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="dataNascimento">Data de Nascimento:</label>
+            <input type="text" id="dataNascimento" placeholder="DD/MM/AAAA">
+        </div>
+        
+        <div class="form-group">
+            <label for="estadoCivil">Estado Civil:</label>
+            <select id="estadoCivil">
+                <option value="">Selecione...</option>
+                <option value="Solteiro">Solteiro</option>
+                <option value="Casado">Casado</option>
+                <option value="Divorciado">Divorciado</option>
+                <option value="Viúvo">Viúvo</option>
+            </select>
+        </div>
+        
+        <button onclick="testarCPF()">🔍 Validar CPF</button>
+        <button onclick="limparCampos()">🗑️ Limpar</button>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <div>Consultando API PH3A...</div>
+        </div>
+        
+        <div class="result" id="result" style="display: none;"></div>
+        
+        <div class="example-cpfs">
+            <h4>📋 CPFs de Teste:</h4>
+            <p>Clique em um CPF para testar automaticamente:</p>
+            <button onclick="testarCPFEspecifico('085.833.585-91')">085.833.585-91</button>
+            <button onclick="testarCPFEspecifico('111.444.777-35')">111.444.777-35</button>
+            <button onclick="testarCPFEspecifico('123.456.789-09')">123.456.789-09</button>
+        </div>
+    </div>
+
+    <script>
+        // Função para extrair apenas dígitos
+        function onlyDigits(str) {
+            return str.replace(/[^0-9]/g, '');
+        }
+
+        // Função para validar formato do CPF
+        function validarCPFFormato(cpf) {
+            const cpfLimpo = onlyDigits(cpf);
+            return cpfLimpo.length === 11 && !/^(\d)\1{10}$/.test(cpfLimpo);
+        }
+
+        // Função para validar CPF (algoritmo)
+        function validarCPFAlgoritmo(cpf) {
+            cpf = onlyDigits(cpf);
+            if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
+            
+            let soma = 0, resto = 0;
+            for (let i = 1; i <= 9; i++) {
+                soma += parseInt(cpf[i-1], 10) * (11 - i);
+            }
+            resto = (soma * 10) % 11;
+            if (resto === 10 || resto === 11) resto = 0;
+            if (resto !== parseInt(cpf[9], 10)) return false;
+            
+            soma = 0;
+            for (let i = 1; i <= 10; i++) {
+                soma += parseInt(cpf[i-1], 10) * (12 - i);
+            }
+            resto = (soma * 10) % 11;
+            if (resto === 10 || resto === 11) resto = 0;
+            return resto === parseInt(cpf[10], 10);
+        }
+
+        // Função para extrair dados da API PH3A
+        function extractDataFromPH3A(apiJson) {
+            const data = apiJson && apiJson.data;
+            if (!data || typeof data !== 'object') {
+                return {
+                    sexo: '',
+                    dataNascimento: '',
+                    estadoCivil: ''
+                };
+            }
+            
+            // Mapear sexo
+            let sexo = '';
+            if (data.sexo !== undefined) {
+                switch (data.sexo) {
+                    case 1: sexo = 'Masculino'; break;
+                    case 2: sexo = 'Feminino'; break;
+                    default: sexo = ''; break;
+                }
+            }
+            
+            // Mapear estado civil
+            let estadoCivil = '';
+            if (data.estado_civil !== undefined) {
+                switch (data.estado_civil) {
+                    case 0: estadoCivil = 'Solteiro'; break;
+                    case 1: estadoCivil = 'Casado'; break;
+                    case 2: estadoCivil = 'Divorciado'; break;
+                    case 3: estadoCivil = 'Viúvo'; break;
+                    default: estadoCivil = ''; break;
+                }
+            }
+            
+            // Formatar data de nascimento (de ISO para DD/MM/YYYY)
+            let dataNascimento = '';
+            if (data.data_nascimento) {
+                try {
+                    const date = new Date(data.data_nascimento);
+                    if (!isNaN(date.getTime())) {
+                        const day = String(date.getDate()).padStart(2, '0');
+                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                        const year = date.getFullYear();
+                        dataNascimento = `${day}/${month}/${year}`;
+                    }
+                } catch (e) {
+                    dataNascimento = data.data_nascimento;
+                }
+            }
+            
+            return {
+                sexo: sexo,
+                dataNascimento: dataNascimento,
+                estadoCivil: estadoCivil
+            };
+        }
+
+        // Função para validar CPF via API PH3A
+        function validarCPFApi(cpf) {
+            const cpfLimpo = onlyDigits(cpf);
+            
+            // Primeiro validar formato e algoritmo
+            if (!validarCPFFormato(cpfLimpo) || !validarCPFAlgoritmo(cpfLimpo)) {
+                return Promise.resolve({
+                    ok: false, 
+                    reason: 'formato'
+                });
+            }
+            
+            // Consultar API PH3A via proxy
+            return fetch('https://mdmidia.com.br/cpf-validate.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    cpf: cpfLimpo
+                })
+            })
+            .then(r => r.json())
+            .then(j => {
+                const ok = !!j && (j.codigo === 1 || j.success === true);
+                return {
+                    ok, 
+                    reason: ok ? 'ok' : 'nao_encontrado', 
+                    parsed: ok ? extractDataFromPH3A(j) : {
+                        sexo: '',
+                        dataNascimento: '',
+                        estadoCivil: ''
+                    },
+                    raw: j // Para debug
+                };
+            })
+            .catch(_ => ({
+                ok: false, 
+                reason: 'erro_api'
+            }));
+        }
+
+        function mostrarResultado(tipo, titulo, mensagem) {
+            const result = document.getElementById('result');
+            result.className = `result ${tipo}`;
+            result.innerHTML = `<strong>${titulo}</strong><br>${mensagem}`;
+            result.style.display = 'block';
+        }
+
+        function mostrarLoading(mostrar) {
+            document.getElementById('loading').style.display = mostrar ? 'block' : 'none';
+        }
+
+        function testarCPF() {
+            const cpf = document.getElementById('cpf').value;
+            
+            if (!cpf) {
+                mostrarResultado('error', '❌ Erro', 'Digite um CPF para validar.');
+                return;
+            }
+            
+            mostrarLoading(true);
+            document.getElementById('result').style.display = 'none';
+            
+            validarCPFApi(cpf).then(res => {
+                mostrarLoading(false);
+                
+                if (res.ok && res.parsed) {
+                    // Preencher campos automaticamente
+                    if (res.parsed.sexo) document.getElementById('sexo').value = res.parsed.sexo;
+                    if (res.parsed.dataNascimento) document.getElementById('dataNascimento').value = res.parsed.dataNascimento;
+                    if (res.parsed.estadoCivil) document.getElementById('estadoCivil').value = res.parsed.estadoCivil;
+                    
+                    mostrarResultado('success', '✅ CPF Válido e Encontrado', 
+                        `Dados encontrados na base PH3A:<br>
+                        • Sexo: ${res.parsed.sexo || 'N/A'}<br>
+                        • Data de Nascimento: ${res.parsed.dataNascimento || 'N/A'}<br>
+                        • Estado Civil: ${res.parsed.estadoCivil || 'N/A'}<br><br>
+                        <small>Resposta da API: ${JSON.stringify(res.raw, null, 2)}</small>`);
+                } else if (res.reason === 'formato') {
+                    mostrarResultado('error', '❌ CPF Inválido', 'O CPF informado não é válido (formato ou algoritmo).');
+                } else if (res.reason === 'nao_encontrado') {
+                    mostrarResultado('error', '⚠️ CPF Não Encontrado', 
+                        'O CPF é válido, mas não foi encontrado na base de dados PH3A.<br>Você pode preencher os dados manualmente.');
+                } else {
+                    mostrarResultado('error', '❌ Erro na API', 'Erro ao consultar a API PH3A. Tente novamente.');
+                }
+            }).catch(err => {
+                mostrarLoading(false);
+                mostrarResultado('error', '❌ Erro de Conexão', 'Erro ao conectar com a API. Verifique sua conexão.');
+                console.error('Erro:', err);
+            });
+        }
+
+        function testarCPFEspecifico(cpf) {
+            document.getElementById('cpf').value = cpf;
+            testarCPF();
+        }
+
+        function limparCampos() {
+            document.getElementById('cpf').value = '';
+            document.getElementById('sexo').value = '';
+            document.getElementById('dataNascimento').value = '';
+            document.getElementById('estadoCivil').value = '';
+            document.getElementById('result').style.display = 'none';
+        }
+
+        // Máscara para CPF
+        document.getElementById('cpf').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            value = value.replace(/(\d{3})(\d)/, '$1.$2');
+            value = value.replace(/(\d{3})(\d)/, '$1.$2');
+            value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+            e.target.value = value;
+        });
+    </script>
+</body>
+</html>

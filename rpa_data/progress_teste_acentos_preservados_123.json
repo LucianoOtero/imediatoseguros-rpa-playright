@@ -1,0 +1,13 @@
+{
+  "session_id": "teste_acentos_preservados_123",
+  "etapa_atual": 4,
+  "total_etapas": 15,
+  "percentual": 26.666666666666668,
+  "status": "Tela 4 falhou",
+  "descricao_etapa": "",
+  "tempo_decorrido": 3.289152,
+  "tempo_estimado_restante": 9.045168,
+  "dados_extras": null,
+  "timestamp": 1758747379.6931956,
+  "created_at": "2025-09-24T17:56:19.693195"
+}

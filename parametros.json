@@ -11,8 +11,9 @@
     "tempo_estabilizacao_tela15": 3,
     "tempo_carregamento_tela15": 5,
     "inserir_log": true,
-    "visualizar_mensagens": false,
-    "eliminar_tentativas_inuteis": true
+    "visualizar_mensagens": true,
+    "eliminar_tentativas_inuteis": true,
+    "modo_silencioso": false
   },
   "autenticacao": {
             "email_login": "aleximediatoseguros@gmail.com",

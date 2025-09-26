@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste API Placa Fipe</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 5px;
+            display: none;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .loading {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+        .result-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 3px;
+        }
+        .result-label {
+            font-weight: bold;
+            color: #495057;
+        }
+        .result-value {
+            color: #6c757d;
+        }
+        .examples {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e9ecef;
+            border-radius: 5px;
+        }
+        .examples h3 {
+            margin-top: 0;
+            color: #495057;
+        }
+        .example-placa {
+            display: inline-block;
+            margin: 5px;
+            padding: 5px 10px;
+            background: #007bff;
+            color: white;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .example-placa:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚗 Teste API Placa Fipe</h1>
+        
+        <div class="form-group">
+            <label for="placa">Digite a placa do veículo:</label>
+            <input type="text" id="placa" placeholder="Ex: ABC1234 ou ABC1D23" maxlength="8">
+        </div>
+        
+        <button onclick="testarPlaca()" id="btnTestar">Testar Placa</button>
+        
+        <div id="resultado" class="result"></div>
+        
+        <div class="examples">
+            <h3>📋 Exemplos para testar:</h3>
+            <div class="example-placa" onclick="testarExemplo('ABC1234')">ABC1234</div>
+            <div class="example-placa" onclick="testarExemplo('ABC1D23')">ABC1D23</div>
+            <div class="example-placa" onclick="testarExemplo('XYZ9876')">XYZ9876</div>
+            <div class="example-placa" onclick="testarExemplo('DEF2E45')">DEF2E45</div>
+        </div>
+    </div>
+
+    <script>
+        // Funções auxiliares necessárias
+        function toUpperNospace(str) {
+            return str ? str.toString().toUpperCase().replace(/\s/g, '') : '';
+        }
+        
+        function onlyDigits(str) {
+            return str ? str.toString().replace(/\D/g, '') : '';
+        }
+
+        // Código atualizado da validação de placa
+        function validarPlacaFormato(p){
+            p=toUpperNospace(p).replace(/[^A-Z0-9]/g,'');
+            const antigo=/^[A-Z]{3}[0-9]{4}$/;
+            const mercosul=/^[A-Z]{3}[0-9][A-Z][0-9]{2}$/;
+            return antigo.test(p)||mercosul.test(p);
+        }
+
+        function extractVehicleFromPlacaFipe(apiJson){
+            const r = apiJson && (apiJson.response || apiJson.data || apiJson);
+            if(!r || typeof r !== 'object') return {marcaTxt:'', anoModelo:'', tipoVeiculo:''};
+            
+            // Extrair dados da API Placa Fipe
+            const fabricante = r.marca || '';
+            const modelo = r.modelo || '';
+            const anoMod = r.anoModelo || r.ano || '';
+            
+            // Determinar tipo de veículo baseado na resposta da API
+            let tipoVeiculo = '';
+            if(r.tipoVeiculo) {
+                // Se a API retorna o tipo diretamente
+                tipoVeiculo = r.tipoVeiculo.toLowerCase();
+            } else if(r.categoria) {
+                // Se retorna categoria, mapear para tipo
+                const categoria = r.categoria.toLowerCase();
+                if(categoria.includes('moto') || categoria.includes('motocicleta')) {
+                    tipoVeiculo = 'moto';
+                } else if(categoria.includes('carro') || categoria.includes('automovel')) {
+                    tipoVeiculo = 'carro';
+                }
+            } else {
+                // Fallback: tentar inferir pelo modelo ou marca
+                const modeloLower = modelo.toLowerCase();
+                const marcaLower = fabricante.toLowerCase();
+                
+                if(marcaLower.includes('honda') || marcaLower.includes('yamaha') || 
+                   marcaLower.includes('suzuki') || marcaLower.includes('kawasaki') ||
+                   modeloLower.includes('cg') || modeloLower.includes('cb') || 
+                   modeloLower.includes('fazer') || modeloLower.includes('ninja')) {
+                    tipoVeiculo = 'moto';
+                } else {
+                    tipoVeiculo = 'carro'; // Default para carro
+                }
+            }
+            
+            return { 
+                marcaTxt: [fabricante, modelo].filter(Boolean).join(' / '), 
+                anoModelo: onlyDigits(String(anoMod)).slice(0,4),
+                tipoVeiculo: tipoVeiculo
+            };
+        }
+
+        function validarPlacaApi(placa){
+            const raw = toUpperNospace(placa).replace(/[^A-Z0-9]/g,'');
+            if(!validarPlacaFormato(raw)) return Promise.resolve({ok:false, reason:'formato'});
+            
+            // Usar a API da Placa Fipe
+            const token = '1696FBDDD9736D542D6958B1770B683EBBA1EFCCC4D0963A2A8A6FA9EFC29214';
+            
+            return fetch(`https://api.placafipe.com.br/getplaca?placa=${raw}&token=${token}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(r => r.json())
+                .then(j => {
+                    const ok = !!j && (j.status === 'success' || j.success === true);
+                    return {
+                        ok, 
+                        reason: ok ? 'ok' : 'nao_encontrada', 
+                        parsed: ok ? extractVehicleFromPlacaFipe(j) : {marcaTxt:'', anoModelo:'', tipoVeiculo:''},
+                        rawResponse: j // Para debug
+                    };
+                })
+                .catch(_ => ({ok:false, reason:'erro_api'}));
+        }
+
+        // Funções de interface
+        function testarPlaca() {
+            const placa = document.getElementById('placa').value.trim();
+            const resultado = document.getElementById('resultado');
+            const btnTestar = document.getElementById('btnTestar');
+            
+            if (!placa) {
+                alert('Por favor, digite uma placa!');
+                return;
+            }
+            
+            // Mostrar loading
+            resultado.className = 'result loading';
+            resultado.style.display = 'block';
+            resultado.innerHTML = '🔄 Consultando API Placa Fipe...';
+            btnTestar.disabled = true;
+            
+            validarPlacaApi(placa).then(resultado => {
+                btnTestar.disabled = false;
+                
+                if (resultado.ok) {
+                    mostrarResultadoSucesso(resultado);
+                } else {
+                    mostrarResultadoErro(resultado);
+                }
+            });
+        }
+        
+        function testarExemplo(placa) {
+            document.getElementById('placa').value = placa;
+            testarPlaca();
+        }
+        
+        function mostrarResultadoSucesso(resultado) {
+            const div = document.getElementById('resultado');
+            div.className = 'result success';
+            div.style.display = 'block';
+            
+            const parsed = resultado.parsed;
+            div.innerHTML = `
+                <h3>✅ Placa encontrada!</h3>
+                <div class="result-item">
+                    <div class="result-label">Placa:</div>
+                    <div class="result-value">${document.getElementById('placa').value.toUpperCase()}</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Marca/Modelo:</div>
+                    <div class="result-value">${parsed.marcaTxt || 'Não informado'}</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Ano do Modelo:</div>
+                    <div class="result-value">${parsed.anoModelo || 'Não informado'}</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Tipo de Veículo:</div>
+                    <div class="result-value">${parsed.tipoVeiculo || 'Não identificado'}</div>
+                </div>
+                <details style="margin-top: 15px;">
+                    <summary>🔍 Resposta completa da API</summary>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 12px;">${JSON.stringify(resultado.rawResponse, null, 2)}</pre>
+                </details>
+            `;
+        }
+        
+        function mostrarResultadoErro(resultado) {
+            const div = document.getElementById('resultado');
+            div.className = 'result error';
+            div.style.display = 'block';
+            
+            let mensagem = '';
+            switch(resultado.reason) {
+                case 'formato':
+                    mensagem = '❌ Formato de placa inválido! Use o formato ABC1234 ou ABC1D23';
+                    break;
+                case 'nao_encontrada':
+                    mensagem = '❌ Placa não encontrada na base de dados';
+                    break;
+                case 'erro_api':
+                    mensagem = '❌ Erro na comunicação com a API';
+                    break;
+                default:
+                    mensagem = '❌ Erro desconhecido';
+            }
+            
+            div.innerHTML = `
+                <h3>${mensagem}</h3>
+                <p>Motivo: ${resultado.reason}</p>
+            `;
+        }
+        
+        // Permitir Enter para testar
+        document.getElementById('placa').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                testarPlaca();
+            }
+        });
+    </script>
+</body>
+</html>

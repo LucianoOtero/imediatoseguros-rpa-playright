@@ -1,0 +1,36 @@
+{
+  "name": "rpa-websocket-server",
+  "version": "1.0.0",
+  "description": "WebSocket Server para RPA Progress Tracking com Redis",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "pm2": "pm2 start server.js --name rpa-websocket"
+  },
+  "dependencies": {
+    "ws": "^8.14.2",
+    "redis": "^4.6.10"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "websocket",
+    "redis",
+    "rpa",
+    "progress",
+    "tracking"
+  ],
+  "author": "RPA Imediato Seguros",
+  "license": "MIT"
+}
+
+
+
+
+
+

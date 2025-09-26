@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teste API Placa Fipe</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h1>🚗 Teste API Placa Fipe</h1>
+    <input type="text" id="placa" placeholder="Digite a placa (ex: ABC1234)" style="padding: 10px; font-size: 16px; width: 200px;">
+    <button onclick="testar()" style="padding: 10px 20px; font-size: 16px; margin-left: 10px;">Testar</button>
+    <div id="resultado" style="margin-top: 20px; padding: 15px; background: #f5f5f5; border-radius: 5px;"></div>
+    
+    <script>
+        function testar() {
+            const placa = document.getElementById("placa").value.trim().toUpperCase();
+            
+            if (!placa) {
+                alert("Por favor, digite uma placa!");
+                return;
+            }
+            
+            document.getElementById("resultado").innerHTML = "🔄 Consultando API via proxy...";
+            
+            // Usar proxy PHP para evitar CORS
+            const url = `proxy_placa_fipe.php?placa=${placa}`;
+            
+            console.log("URL:", url);
+            
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                console.log("Response status:", response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log("Response data:", data);
+                
+                if (data.codigo === 3974) {
+                    document.getElementById("resultado").innerHTML = 
+                        "<h3>❌ Erro de Token:</h3>" +
+                        "<p><strong>Código:</strong> " + data.codigo + "</p>" +
+                        "<p><strong>Mensagem:</strong> " + JSON.stringify(data.msg) + "</p>" +
+                        "<p><strong>Possíveis causas:</strong></p>" +
+                        "<ul>" +
+                        "<li>Token inválido ou expirado</li>" +
+                        "<li>Formato de envio incorreto</li>" +
+                        "<li>API key não configurada corretamente</li>" +
+                        "</ul>" +
+                        "<h4>🔍 Resposta completa:</h4>" +
+                        "<pre style='background: white; padding: 10px; border-radius: 3px; overflow-x: auto;'>" + 
+                        JSON.stringify(data, null, 2) + 
+                        "</pre>";
+                } else if (data.error) {
+                    document.getElementById("resultado").innerHTML = 
+                        "<h3>❌ Erro do Proxy:</h3><p style='color: red;'>" + data.error + "</p>";
+                } else {
+                    document.getElementById("resultado").innerHTML = 
+                        "<h3>✅ Sucesso!</h3>" +
+                        "<p><strong>Placa:</strong> " + placa + "</p>" +
+                        "<h4>📋 Dados do Veículo:</h4>" +
+                        "<pre style='background: white; padding: 10px; border-radius: 3px; overflow-x: auto;'>" + 
+                        JSON.stringify(data, null, 2) + 
+                        "</pre>";
+                }
+            })
+            .catch(error => {
+                console.error("Erro:", error);
+                document.getElementById("resultado").innerHTML = 
+                    "<h3>❌ Erro de Conexão:</h3><p style='color: red;'>" + error.message + "</p>";
+            });
+        }
+        
+        // Permitir Enter para testar
+        document.getElementById("placa").addEventListener("keypress", function(e) {
+            if (e.key === "Enter") {
+                testar();
+            }
+        });
+    </script>
+</body>
+</html>

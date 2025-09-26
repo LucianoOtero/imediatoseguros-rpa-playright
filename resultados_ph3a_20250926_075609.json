@@ -1,0 +1,28 @@
+[
+  {
+    "cpf": "97137189768",
+    "tipo": "Titular",
+    "nome_original": "ALEX KAMINSKI",
+    "dados": {
+      "sexo": "Masculino",
+      "data_nascimento": "25/04/1970",
+      "estado_civil": "Solteiro",
+      "nome": "ALEX KAMINSKI",
+      "idade": 55,
+      "status": 200
+    }
+  },
+  {
+    "cpf": "25151787829",
+    "tipo": "Condutor",
+    "nome_original": "SANDRA LOUREIRO",
+    "dados": {
+      "sexo": "Feminino",
+      "data_nascimento": "28/08/1975",
+      "estado_civil": "Solteiro",
+      "nome": "SANDRA CRISTINA CORREIA LOUREIRO TONINI",
+      "idade": 50,
+      "status": 200
+    }
+  }
+]

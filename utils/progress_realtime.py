@@ -8,6 +8,22 @@ from typing import Optional
 from .progress_database_json import DatabaseProgressTracker
 from .progress_redis import RedisProgressTracker
 
+# Função para exibir mensagens (sempre silenciosa para ProgressTracker)
+def exibir_mensagem(mensagem: str):
+    """Exibe mensagem apenas se não estiver em modo silencioso"""
+    try:
+        # Verificar se está em modo silencioso
+        import sys
+        if '--modo-silencioso' in sys.argv:
+            return  # Não exibir nada em modo silencioso
+        
+        # Tentar usar exibir_mensagem do arquivo principal
+        from ..executar_rpa_imediato_playwright import exibir_mensagem as exibir_mensagem_principal
+        exibir_mensagem_principal(mensagem)
+    except ImportError:
+        # Fallback se não conseguir importar
+        print(mensagem)
+
 
 def detectar_progress_tracker(tipo_solicitado: str = 'auto') -> Optional[type]:
     """
@@ -26,7 +42,7 @@ def detectar_progress_tracker(tipo_solicitado: str = 'auto') -> Optional[type]:
         try:
             return RedisProgressTracker
         except ImportError:
-            print("⚠️  Redis não disponível, usando JSON como fallback")
+            exibir_mensagem("⚠️  Redis não disponível, usando JSON como fallback")
             return DatabaseProgressTracker
     
     if tipo_solicitado == 'json':
@@ -44,10 +60,10 @@ def detectar_progress_tracker(tipo_solicitado: str = 'auto') -> Optional[type]:
             socket_timeout=2
         )
         r.ping()
-        print("✅ Redis detectado, usando Redis Progress Tracker")
+        exibir_mensagem("✅ Redis detectado, usando Redis Progress Tracker")
         return RedisProgressTracker
     except Exception:
-        print("⚠️  Redis não disponível, usando JSON Progress Tracker")
+        exibir_mensagem("⚠️  Redis não disponível, usando JSON Progress Tracker")
         return DatabaseProgressTracker
 
 

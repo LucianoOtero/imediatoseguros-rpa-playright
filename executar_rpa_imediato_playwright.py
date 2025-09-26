@@ -73,6 +73,7 @@ from typing import Dict, Any, Optional, Union
 from playwright.sync_api import sync_playwright, Page, Browser, BrowserContext
 
 # Importar Sistema de Retorno Estruturado
+# ProgressTracker será importado dinamicamente quando necessário
 from utils.retorno_estruturado import (
     RetornoEstruturado,
     criar_retorno_sucesso,
@@ -145,6 +146,8 @@ EXEMPLOS DE USO:
   python executar_rpa_imediato_playwright.py --docs json
   python executar_rpa_imediato_playwright.py --docs php
   python executar_rpa_imediato_playwright.py --docs params
+  python executar_rpa_imediato_playwright.py --modo-silencioso
+  python executar_rpa_imediato_playwright.py --modo-silencioso --progress-tracker redis
 
 DOCUMENTAÇÃO:
   --docs completa: Documentação completa do sistema
@@ -222,6 +225,12 @@ STATUS CODES:
         choices=['auto', 'redis', 'json', 'none'],
         default='auto',
         help='Tipo de progress tracker: auto (detecta automaticamente), redis, json, none'
+    )
+    
+    parser.add_argument(
+        '--modo-silencioso',
+        action='store_true',
+        help='Executa em modo silencioso (sem output adicional)'
     )
     
     return parser.parse_args()
@@ -1031,8 +1040,8 @@ def configurar_display(parametros: Dict[str, Any]):
         parametros (Dict): Parâmetros do arquivo JSON
         
     COMPORTAMENTO:
-        - Lê configuracao.display e configuracao.visualizar_mensagens
-        - Define DISPLAY_ENABLED = display AND visualizar_mensagens
+        - Lê configuracao.display, configuracao.visualizar_mensagens e configuracao.modo_silencioso
+        - Define DISPLAY_ENABLED = display AND visualizar_mensagens AND NOT modo_silencioso
         - Modo silencioso: ZERO output adicional
         - Configura também os módulos externos
     """
@@ -1041,8 +1050,9 @@ def configurar_display(parametros: Dict[str, Any]):
     configuracao = parametros.get('configuracao', {})
     display = configuracao.get('display', True)
     visualizar_mensagens = configuracao.get('visualizar_mensagens', True)
+    modo_silencioso = configuracao.get('modo_silencioso', False) or args.modo_silencioso
     
-    DISPLAY_ENABLED = display and visualizar_mensagens
+    DISPLAY_ENABLED = display and visualizar_mensagens and not modo_silencioso
     
     # Configurar módulos externos
     try:
@@ -1082,7 +1092,7 @@ def limpar_emojis_windows(mensagem: str) -> str:
         '[DADOS]': '[DADOS]', '[SUCESSO]': '[SUCESSO]', '[IDEIA]': '[DICA]', '[CONFIG]': '[CONFIG]',
         '[PASTA]': '[ARQUIVO]', '[TEMPO]': '[TEMPO]', '[PRESENTE]': '[BENEFICIO]', '[VEICULO]': '[VEICULO]',
         '[USUARIO]': '[USUARIO]', '[EMAIL]': '[EMAIL]', '[LOCALIZACAO]': '[LOCAL]', '[CONFIG]️': '[CONFIG]',
-        '[SEGURO]️': '[SEGURANCA]', '': '[LOGIN]', '': '[WEB]', '[CELULAR]': '[MOBILE]',
+        '[SEGURO]️': '[SEGURANCA]', '[CELULAR]': '[MOBILE]',
         '[COMPUTADOR]': '[SISTEMA]', '[ATUALIZANDO]': '[PROCESSANDO]', '[GRAFICO]': '[PROGRESSO]', '[EVENTO]': '[CARROSSEL]'
     }
     
@@ -1107,6 +1117,17 @@ def exibir_mensagem(mensagem: str):
         timestamp = time.strftime('%H:%M:%S')
         mensagem_limpa = limpar_emojis_windows(mensagem)
         print(f"[{timestamp}] {mensagem_limpa}")
+
+def exibir_resultado_final(mensagem: str):
+    """
+    Exibe resultado final sempre, mesmo no modo silencioso
+    
+    PARÂMETROS:
+        mensagem (str): Mensagem de resultado final
+    """
+    timestamp = time.strftime('%H:%M:%S')
+    mensagem_limpa = limpar_emojis_windows(mensagem)
+    print(f"[{timestamp}] {mensagem_limpa}")
 
 def carregar_parametros(arquivo_config: str = "parametros.json") -> Dict[str, Any]:
     """
@@ -5139,7 +5160,7 @@ def detectar_progress_tracker(tipo_solicitado):
             from utils.progress_redis import RedisProgressTracker
             return RedisProgressTracker
         except ImportError:
-            print("⚠️  Redis não disponível, usando JSON como fallback")
+            exibir_mensagem("⚠️  Redis não disponível, usando JSON como fallback")
             from utils.progress_database_json import DatabaseProgressTracker
             return DatabaseProgressTracker
     
@@ -5152,11 +5173,11 @@ def detectar_progress_tracker(tipo_solicitado):
         import redis
         r = redis.Redis(host='localhost', port=6379)
         r.ping()
-        print("✅ Redis detectado, usando Redis Progress Tracker")
+        exibir_mensagem("✅ Redis detectado, usando Redis Progress Tracker")
         from utils.progress_redis import RedisProgressTracker
         return RedisProgressTracker
     except:
-        print("⚠️  Redis não disponível, usando JSON Progress Tracker")
+        exibir_mensagem("⚠️  Redis não disponível, usando JSON Progress Tracker")
         from utils.progress_database_json import DatabaseProgressTracker
         return DatabaseProgressTracker
 
@@ -5178,17 +5199,27 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
     inicio_execucao = time.time()
     
     try:
-        # Inicializar ProgressTracker com session_id e tipo
-        import uuid
-        # Usar session_id do argumento se fornecido, senão gerar um novo
-        session_id = args.session if args.session else str(uuid.uuid4())[:8]
-        progress_tracker = ProgressTracker(
-            total_etapas=15, 
-            usar_arquivo=True, 
-            session_id=session_id,
-            tipo=args.progress_tracker
-        )
-        progress_tracker.update_progress(0, "Iniciando RPA")
+        # Importar ProgressTracker dinamicamente (só quando necessário)
+        try:
+            from utils.progress_realtime import ProgressTracker
+            
+            # Inicializar ProgressTracker com session_id e tipo
+            import uuid
+            # Usar session_id do argumento se fornecido, senão gerar um novo
+            session_id = args.session if args.session else str(uuid.uuid4())[:8]
+            progress_tracker = ProgressTracker(
+                total_etapas=15, 
+                usar_arquivo=True, 
+                session_id=session_id,
+                tipo=args.progress_tracker
+            )
+            progress_tracker.update_progress(0, "Iniciando RPA")
+            exibir_mensagem("[OK] ProgressTracker inicializado com sucesso")
+            
+        except Exception as e:
+            exibir_mensagem(f"[AVISO] Erro ao inicializar ProgressTracker: {e}")
+            exibir_mensagem("[FALLBACK] Continuando sem ProgressTracker")
+            progress_tracker = None
         
         # Inicializar Sistema de Timeout Inteligente (opcional)
         if TIMEOUT_SYSTEM_AVAILABLE:
@@ -5282,7 +5313,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             
             # TELA 1
             if progress_tracker:
-                if progress_tracker: progress_tracker.update_progress(1, "Selecionando Tipo de Veiculo")
+                progress_tracker.update_progress(1, "Selecionando Tipo de Veiculo")
             exibir_mensagem("\n" + "="*50)
             
             # Log de início da Tela 1
@@ -5680,14 +5711,23 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             
             # Resultado final
             if progress_tracker: progress_tracker.update_progress(15, "RPA concluído com sucesso")
-            exibir_mensagem("\n" + "="*60)
-            exibir_mensagem("[SUCESSO] RPA TELAS 1 A 15 CONCLUÍDO COM SUCESSO!")
-            exibir_mensagem(f"[OK] Total de telas executadas: {telas_executadas}/14 (Tela 14 é condicional)")
-            exibir_mensagem("[OK] Todas as telas funcionaram corretamente")
-            exibir_mensagem("[OK] Navegação sequencial realizada com sucesso")
+            exibir_resultado_final("\n" + "="*60)
+            exibir_resultado_final("[SUCESSO] RPA TELAS 1 A 15 CONCLUÍDO COM SUCESSO!")
+            exibir_resultado_final(f"[OK] Total de telas executadas: {telas_executadas}/14 (Tela 14 é condicional)")
+            exibir_resultado_final("[OK] Todas as telas funcionaram corretamente")
+            exibir_resultado_final("[OK] Navegação sequencial realizada com sucesso")
             
             # Capturar dados finais
             dados_planos = capturar_dados_planos_seguro(page, parametros_tempo)
+            
+            if dados_planos:
+                exibir_resultado_final("[OK] DADOS DOS PLANOS CAPTURADOS COM SUCESSO!")
+                exibir_resultado_final("[INFO] RESUMO DOS DADOS CAPTURADOS:")
+                exibir_resultado_final(f"   [DADOS] Plano Recomendado: {dados_planos['plano_recomendado'].get('valor', 'N/A')}")
+                exibir_resultado_final(f"   [DADOS] Plano Alternativo: {dados_planos['plano_alternativo'].get('valor', 'N/A')}")
+                exibir_resultado_final(f"   [ARQUIVO] Dados salvos em: dados_planos_seguro_*.json")
+            else:
+                exibir_resultado_final("[AVISO] FALHA NA CAPTURA DE DADOS DOS PLANOS")
             
             # Salvar dados
             arquivo_dados = salvar_dados_planos(dados_planos)
