@@ -216,6 +216,14 @@ STATUS CODES:
         help='ID da sessão para monitoramento em tempo real'
     )
     
+    parser.add_argument(
+        '--progress-tracker',
+        type=str,
+        choices=['auto', 'redis', 'json', 'none'],
+        default='auto',
+        help='Tipo de progress tracker: auto (detecta automaticamente), redis, json, none'
+    )
+    
     return parser.parse_args()
 
 
@@ -5126,11 +5134,16 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
     inicio_execucao = time.time()
     
     try:
-        # Inicializar ProgressTracker com session_id
+        # Inicializar ProgressTracker com session_id e tipo
         import uuid
         # Usar session_id do argumento se fornecido, senão gerar um novo
         session_id = args.session if args.session else str(uuid.uuid4())[:8]
-        progress_tracker = ProgressTracker(total_etapas=15, usar_arquivo=True, session_id=session_id)
+        progress_tracker = ProgressTracker(
+            total_etapas=15, 
+            usar_arquivo=True, 
+            session_id=session_id,
+            tipo=args.progress_tracker
+        )
         progress_tracker.update_progress(0, "Iniciando RPA")
         
         # Inicializar Sistema de Timeout Inteligente (opcional)
@@ -5634,6 +5647,9 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             # Salvar dados
             arquivo_dados = salvar_dados_planos(dados_planos)
             
+            # Finalizar progress tracker
+            progress_tracker.finalizar('success', dados_planos)
+            
             # Fechar browser
             browser.close()
             
@@ -5673,6 +5689,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
         # Atualizar progresso em caso de erro
         try:
             progress_tracker.update_progress(0, f"RPA interrompido por erro: {str(e)}")
+            progress_tracker.finalizar('error', None, str(e))
         except:
             pass  # Não falhar se o progress tracker der erro
         
