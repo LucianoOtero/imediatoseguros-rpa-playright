@@ -1313,6 +1313,32 @@ def executar_com_timeout(smart_timeout, tela_num, funcao_tela, *args, **kwargs):
 
 
 # ========================================
+# FUNÇÕES AUXILIARES
+# ========================================
+
+def validar_elemento_unico(elemento_texto: str, elementos_processados: set) -> bool:
+    """
+    Valida se elemento é único baseado em hash de conteúdo
+    
+    Args:
+        elemento_texto: Texto do elemento a ser validado
+        elementos_processados: Set com hashes de elementos já processados
+    
+    Returns:
+        bool: True se elemento é único, False se é duplicado
+    """
+    try:
+        import hashlib
+        hash_conteudo = hashlib.md5(elemento_texto.encode()).hexdigest()
+        if hash_conteudo in elementos_processados:
+            return False
+        
+        elementos_processados.add(hash_conteudo)
+        return True
+    except:
+        return True  # Fallback: permitir elemento se validação falhar
+
+# ========================================
 # FUNÇÕES DE NAVEGAÇÃO DAS TELAS
 # ========================================
 
@@ -1783,6 +1809,33 @@ def navegar_tela_5_playwright(page: Page, parametros_tempo) -> bool:
     except Exception as e:
         exception_handler.capturar_excecao(e, "TELA_5", "Erro ao processar Tela 5")
         return False
+
+def navegar_tela_5_playwright_com_dados(page: Page, parametros_tempo) -> dict:
+    """
+    Wrapper que executa navegação da Tela 5 e retorna dados capturados
+    
+    Args:
+        page: Instância do Playwright Page
+        parametros_tempo: Parâmetros de tempo para navegação
+    
+    Returns:
+        dict: Dados do carrossel capturados ou dict vazio se falhar
+    """
+    try:
+        # Executar navegação original
+        sucesso = navegar_tela_5_playwright(page, parametros_tempo)
+        
+        if sucesso:
+            # Capturar dados se navegação foi bem-sucedida
+            dados_carrossel = capturar_dados_carrossel_estimativas_playwright(page)
+            return dados_carrossel or {}
+        else:
+            exibir_mensagem("[AVISO] Navegação da Tela 5 falhou, dados não capturados")
+            return {}
+            
+    except Exception as e:
+        exibir_mensagem(f"[ERRO] Erro ao capturar dados da Tela 5: {str(e)}")
+        return {}
 
 def navegar_tela_zero_km_playwright(page: Page, parametros: Dict[str, Any]) -> bool:
     """
@@ -4113,6 +4166,9 @@ def capturar_dados_carrossel_estimativas_playwright(page: Page) -> Dict[str, Any
             "elementos_detectados": []                # Elementos especiais detectados
         }
         
+        # Controle de duplicatas para evitar elementos repetidos
+        elementos_processados = set()
+        
         # DEBUG: Verificar quais elementos estão na página
         exibir_mensagem("[BUSCAR] DEBUG: Verificando elementos na página...")
         
@@ -4207,8 +4263,12 @@ def capturar_dados_carrossel_estimativas_playwright(page: Page) -> Dict[str, Any
                                 "status": "incluido"
                             })
                     
-                    dados_carrossel["coberturas_detalhadas"].append(cobertura_info)
-                    exibir_mensagem(f"[INFO] Card {len(dados_carrossel['coberturas_detalhadas'])}: {cobertura_info['nome_cobertura']} - De {cobertura_info['valores']['de']} até {cobertura_info['valores']['ate']}")
+                    # Validar se elemento é único antes de adicionar
+                    if validar_elemento_unico(card_text, elementos_processados):
+                        dados_carrossel["coberturas_detalhadas"].append(cobertura_info)
+                        exibir_mensagem(f"[INFO] Card {len(dados_carrossel['coberturas_detalhadas'])}: {cobertura_info['nome_cobertura']} - De {cobertura_info['valores']['de']} até {cobertura_info['valores']['ate']}")
+                    else:
+                        exibir_mensagem(f"[AVISO] Card duplicado ignorado: {cobertura_info['nome_cobertura']}")
                     
                 except Exception as e:
                     exibir_mensagem(f"[AVISO] Erro ao processar card {i+1}: {str(e)}")
@@ -4258,8 +4318,12 @@ def capturar_dados_carrossel_estimativas_playwright(page: Page) -> Dict[str, Any
                                     # Extrair nome e valores (mesma lógica anterior)
                                     # ... (código de extração)
                                     
-                                    dados_carrossel["coberturas_detalhadas"].append(cobertura_info)
-                                    exibir_mensagem(f"[INFO] Card encontrado via '{seletor}': {cobertura_info['nome_cobertura']}")
+                                    # Validar se elemento é único antes de adicionar
+                                    if validar_elemento_unico(card_text, elementos_processados):
+                                        dados_carrossel["coberturas_detalhadas"].append(cobertura_info)
+                                        exibir_mensagem(f"[INFO] Card encontrado via '{seletor}': {cobertura_info['nome_cobertura']}")
+                                    else:
+                                        exibir_mensagem(f"[AVISO] Card duplicado ignorado via '{seletor}': {cobertura_info['nome_cobertura']}")
                                     
                             except Exception as e:
                                 exibir_mensagem(f"[AVISO] Erro ao processar card com seletor '{seletor}': {str(e)}")
@@ -4315,8 +4379,12 @@ def capturar_dados_carrossel_estimativas_playwright(page: Page) -> Dict[str, Any
                                     cobertura_info["valores"]["ate"] = f"R$ {match.group(2)}"
                                     break
                             
-                            dados_carrossel["coberturas_detalhadas"].append(cobertura_info)
-                            exibir_mensagem(f"[INFO] Valor encontrado: De {cobertura_info['valores']['de']} até {cobertura_info['valores']['ate']}")
+                            # Validar se elemento é único antes de adicionar
+                            if validar_elemento_unico(contexto_text, elementos_processados):
+                                dados_carrossel["coberturas_detalhadas"].append(cobertura_info)
+                                exibir_mensagem(f"[INFO] Valor encontrado: De {cobertura_info['valores']['de']} até {cobertura_info['valores']['ate']}")
+                            else:
+                                exibir_mensagem(f"[AVISO] Valor duplicado ignorado: De {cobertura_info['valores']['de']} até {cobertura_info['valores']['ate']}")
                             
                     except Exception as e:
                         exibir_mensagem(f"[AVISO] Erro ao processar elemento R$ {i+1}: {str(e)}")
@@ -5418,7 +5486,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             # TELA 5
             if progress_tracker: progress_tracker.update_progress(5, "Elaborando estimativas")
             exibir_mensagem("\n" + "="*50)
-            dados_carrossel = executar_com_timeout(smart_timeout, 5, navegar_tela_5_playwright, page, parametros_tempo)
+            dados_carrossel = executar_com_timeout(smart_timeout, 5, navegar_tela_5_playwright_com_dados, page, parametros_tempo)
             if dados_carrossel:
                 telas_executadas += 1
                 resultado_telas["tela_5"] = True
