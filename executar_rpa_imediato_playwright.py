@@ -1611,7 +1611,7 @@ def localizar_cards_estimativa_playwright(page: Page):
     exibir_mensagem("[ERRO] Nenhum seletor funcionou para localizar os cards")
     return None
 
-def navegar_tela_5_playwright(page: Page, parametros_tempo) -> bool:
+def navegar_tela_5_playwright(page: Page, parametros_tempo, progress_tracker=None) -> bool:
     """
     TELA 5: Estimativa inicial - CAPTURA DE DADOS E RETORNO INTERMEDIÁRIO
     """
@@ -1807,6 +1807,26 @@ def navegar_tela_5_playwright(page: Page, parametros_tempo) -> bool:
             exibir_mensagem("[INFO] RETORNO INTERMEDIÁRIO - TELA 5")
             exibir_mensagem("="*60)
             exibir_mensagem(json.dumps(dados_limpos, indent=2, ensure_ascii=False))
+            
+            # NOVA FUNCIONALIDADE: ProgressTracker direto
+            if progress_tracker and dados_carrossel and dados_carrossel.get('coberturas_detalhadas'):
+                try:
+                    estimativas_tela_5 = {
+                        "timestamp": datetime.now().isoformat(),
+                        "coberturas_detalhadas": dados_carrossel.get('coberturas_detalhadas', []),
+                        "resumo": {
+                            "total_coberturas": len(dados_carrossel.get('coberturas_detalhadas', [])),
+                            "total_beneficios": len(dados_carrossel.get('beneficios_gerais', [])),
+                            "valores_encontrados": dados_carrossel.get('valores_encontrados', 0)
+                        }
+                    }
+                    
+                    progress_tracker.update_progress_with_estimativas(5, "Tela 5 concluída", estimativas=estimativas_tela_5)
+                    exibir_mensagem("[OK] ProgressTracker atualizado com estimativas da Tela 5")
+                    
+                except Exception as e:
+                    exibir_mensagem(f"[AVISO] Erro ao atualizar ProgressTracker: {str(e)}")
+                    # Não falhar se ProgressTracker der erro
             exibir_mensagem("="*60)
             
         else:
@@ -1860,74 +1880,6 @@ def navegar_tela_5_playwright(page: Page, parametros_tempo) -> bool:
         exception_handler.capturar_excecao(e, "TELA_5", "Erro ao processar Tela 5")
         return False
 
-def validar_dados_capturados(dados_carrossel) -> bool:
-    """
-    Valida se dados capturados são válidos para ProgressTracker
-    
-    Args:
-        dados_carrossel: Dados retornados pela captura
-    
-    Returns:
-        bool: True se dados são válidos, False caso contrário
-    """
-    try:
-        # Verificar se dados não são None
-        if not dados_carrossel:
-            exibir_mensagem("[VALIDACAO] Dados são None")
-            return False
-        
-        # Verificar se é dicionário
-        if not isinstance(dados_carrossel, dict):
-            exibir_mensagem("[VALIDACAO] Dados não são dicionário")
-            return False
-        
-        # Verificar se tem coberturas detalhadas
-        coberturas = dados_carrossel.get('coberturas_detalhadas', [])
-        if not coberturas:
-            exibir_mensagem("[VALIDACAO] Lista de coberturas está vazia")
-            return False
-        
-        # Verificar se lista não está vazia
-        if len(coberturas) == 0:
-            exibir_mensagem("[VALIDACAO] Lista de coberturas tem tamanho zero")
-            return False
-        
-        exibir_mensagem(f"[VALIDACAO] Dados válidos: {len(coberturas)} coberturas")
-        return True
-        
-    except Exception as e:
-        exibir_mensagem(f"[VALIDACAO] Erro na validação: {str(e)}")
-        return False
-
-def navegar_tela_5_playwright_com_dados(page: Page, parametros_tempo) -> dict:
-    """
-    Wrapper que executa navegação da Tela 5 e retorna dados capturados
-    
-    CORREÇÃO: Reverter para funcionamento original
-    MANTER: Deduplicação inteligente funcionando
-    
-    Args:
-        page: Instância do Playwright Page
-        parametros_tempo: Parâmetros de tempo para navegação
-    
-    Returns:
-        dict: Dados do carrossel capturados ou dict vazio se falhar
-    """
-    try:
-        # FUNCIONAMENTO ORIGINAL: Executar navegação primeiro
-        sucesso = navegar_tela_5_playwright(page, parametros_tempo)
-        
-        if sucesso:
-            # FUNCIONAMENTO ORIGINAL: Capturar dados após navegação
-            dados_carrossel = capturar_dados_carrossel_estimativas_playwright(page)
-            return dados_carrossel or {}
-        else:
-            exibir_mensagem("[AVISO] Navegação da Tela 5 falhou, dados não capturados")
-            return {}
-            
-    except Exception as e:
-        exibir_mensagem(f"[ERRO] Erro ao capturar dados da Tela 5: {str(e)}")
-        return {}
 
 def navegar_tela_zero_km_playwright(page: Page, parametros: Dict[str, Any]) -> bool:
     """
@@ -5578,30 +5530,9 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             # TELA 5
             if progress_tracker: progress_tracker.update_progress(5, "Elaborando estimativas")
             exibir_mensagem("\n" + "="*50)
-            dados_carrossel = executar_com_timeout(smart_timeout, 5, navegar_tela_5_playwright_com_dados, page, parametros_tempo)
-            if dados_carrossel:
+            if executar_com_timeout(smart_timeout, 5, navegar_tela_5_playwright, page, parametros_tempo, progress_tracker):
                 telas_executadas += 1
                 resultado_telas["tela_5"] = True
-                
-                # Capturar estimativas da tela 5 para ProgressTracker
-                estimativas_tela_5 = None
-                try:
-                    # Usar dados do carrossel retornados pela função
-                    if dados_carrossel:
-                        estimativas_tela_5 = {
-                            "timestamp": datetime.now().isoformat(),
-                            "coberturas_detalhadas": dados_carrossel.get('coberturas_detalhadas', []),
-                            "resumo": {
-                                "total_coberturas": len(dados_carrossel.get('coberturas_detalhadas', [])),
-                                "total_beneficios": len(dados_carrossel.get('beneficios_gerais', [])),
-                                "valores_encontrados": dados_carrossel.get('valores_encontrados', 0)
-                            }
-                        }
-                except:
-                    estimativas_tela_5 = None
-                
-                if progress_tracker: 
-                    progress_tracker.update_progress_with_estimativas(5, "Tela 5 concluída", estimativas=estimativas_tela_5)
                 exibir_mensagem("[OK] TELA 5 CONCLUÍDA!")
                 
                 # VERIFICAR SE APARECEU TELA ZERO KM
