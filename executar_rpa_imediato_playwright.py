@@ -1903,8 +1903,8 @@ def navegar_tela_5_playwright_com_dados(page: Page, parametros_tempo) -> dict:
     """
     Wrapper que executa navegação da Tela 5 e retorna dados capturados
     
-    NOVA IMPLEMENTAÇÃO: Validação robusta dos dados
-    FALLBACK: Comportamento original se validação falhar
+    CORREÇÃO: Reverter para funcionamento original
+    MANTER: Deduplicação inteligente funcionando
     
     Args:
         page: Instância do Playwright Page
@@ -1914,26 +1914,19 @@ def navegar_tela_5_playwright_com_dados(page: Page, parametros_tempo) -> dict:
         dict: Dados do carrossel capturados ou dict vazio se falhar
     """
     try:
-        # LÓGICA ORIGINAL MANTIDA
+        # FUNCIONAMENTO ORIGINAL: Executar navegação primeiro
         sucesso = navegar_tela_5_playwright(page, parametros_tempo)
         
         if sucesso:
-            # LÓGICA ORIGINAL MANTIDA
+            # FUNCIONAMENTO ORIGINAL: Capturar dados após navegação
             dados_carrossel = capturar_dados_carrossel_estimativas_playwright(page)
-            
-            # NOVA VALIDAÇÃO: Verificar integridade dos dados
-            if validar_dados_capturados(dados_carrossel):
-                exibir_mensagem(f"[SUCCESS] Dados válidos retornados: {len(dados_carrossel.get('coberturas_detalhadas', []))} coberturas")
-                return dados_carrossel
-            else:
-                exibir_mensagem("[WARNING] Dados inválidos, retornando dict vazio")
-                return {}
+            return dados_carrossel or {}
         else:
-            exibir_mensagem("[ERROR] Navegação falhou")
+            exibir_mensagem("[AVISO] Navegação da Tela 5 falhou, dados não capturados")
             return {}
             
     except Exception as e:
-        exibir_mensagem(f"[ERROR] Erro na wrapper: {str(e)}")
+        exibir_mensagem(f"[ERRO] Erro ao capturar dados da Tela 5: {str(e)}")
         return {}
 
 def navegar_tela_zero_km_playwright(page: Page, parametros: Dict[str, Any]) -> bool:
