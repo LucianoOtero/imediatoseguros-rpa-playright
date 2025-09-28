@@ -1,0 +1,134 @@
+{
+  "start_time": "2025-09-28T08:36:44.365326",
+  "tests": {
+    "environment_validation": {
+      "status": "passed",
+      "platform_info": {
+        "os": "windows",
+        "os_version": "10.0.26100",
+        "architecture": "AMD64",
+        "python_version": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]",
+        "python_executable": "C:\\Users\\Luciano\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\python.exe",
+        "is_windows": true,
+        "is_linux": false,
+        "is_mac": false,
+        "shell": "powershell",
+        "path_separator": "\\",
+        "line_separator": "\r\n"
+      },
+      "validation": {
+        "python_version_ok": true,
+        "redis_available": false,
+        "websocket_available": false,
+        "platform_supported": true,
+        "permissions_ok": true
+      },
+      "timestamp": "2025-09-28T08:37:08.133862"
+    },
+    "redis_manager": {
+      "status": "passed",
+      "connection_status": false,
+      "set_result": true,
+      "get_result": true,
+      "exists_result": true,
+      "delete_result": true,
+      "stats": {
+        "redis_available": true,
+        "redis_healthy": false,
+        "fallback_cache_size": 0,
+        "fallback_cache_keys": [],
+        "last_health_check": 0
+      },
+      "timestamp": "2025-09-28T08:37:28.514494"
+    },
+    "websocket_manager": {
+      "status": "passed",
+      "stats": {
+        "websocket_available": false,
+        "is_running": false,
+        "is_fallback_mode": false,
+        "connected_clients": 0,
+        "message_handlers": 3,
+        "queue_size": 0
+      },
+      "send_result": false,
+      "handler_registered": true,
+      "timestamp": "2025-09-28T08:37:28.514600"
+    },
+    "communication_manager": {
+      "status": "passed",
+      "session_id": "87d153e1-09a3-4ab8-9f88-3b7abffe6c23",
+      "update_result": true,
+      "progress_result": true,
+      "retrieved_session": true,
+      "retrieved_progress": true,
+      "event_result": true,
+      "stats": {
+        "redis_stats": {
+          "redis_available": true,
+          "redis_healthy": false,
+          "fallback_cache_size": 2,
+          "fallback_cache_keys": [
+            "session:87d153e1-09a3-4ab8-9f88-3b7abffe6c23",
+            "progress:87d153e1-09a3-4ab8-9f88-3b7abffe6c23"
+          ],
+          "last_health_check": 0
+        },
+        "websocket_stats": {
+          "websocket_available": false,
+          "is_running": false,
+          "is_fallback_mode": false,
+          "connected_clients": 0,
+          "message_handlers": 4,
+          "queue_size": 0
+        },
+        "session_handlers": 0,
+        "is_monitoring": true
+      },
+      "timestamp": "2025-09-28T08:38:09.364529"
+    },
+    "integration": {
+      "status": "passed",
+      "session_id": "87d153e1-09a3-4ab8-9f88-3b7abffe6c23",
+      "steps_completed": 5,
+      "integration_results": [
+        {
+          "step": 1,
+          "progress_result": true,
+          "event_result": true
+        },
+        {
+          "step": 2,
+          "progress_result": true,
+          "event_result": true
+        },
+        {
+          "step": 3,
+          "progress_result": true,
+          "event_result": true
+        },
+        {
+          "step": 4,
+          "progress_result": true,
+          "event_result": true
+        },
+        {
+          "step": 5,
+          "progress_result": true,
+          "event_result": true
+        }
+      ],
+      "cleanup_result": true,
+      "timestamp": "2025-09-28T08:39:25.242395"
+    }
+  },
+  "summary": {
+    "end_time": "2025-09-28T08:39:25.242440",
+    "duration_seconds": 160.877114,
+    "total_tests": 5,
+    "passed_tests": 5,
+    "failed_tests": 0,
+    "success_rate": 100.0,
+    "overall_status": "PASSED"
+  }
+}

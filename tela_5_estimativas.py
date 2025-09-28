@@ -2,21 +2,51 @@
 # -*- coding: utf-8 -*-
 """
 Tela 5 - Carrossel de Estimativas
-Módulo isolado para navegação e captura de dados da Tela 5
+Módulo isolado para navegação e captura de dados da Tela 5 com comunicação em tempo real
 """
 
 import time
 import json
 import os
+import logging
 from datetime import datetime
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from playwright.sync_api import Page
 
+# Importar módulos de comunicação
+try:
+    from utils.communication_manager import communication_manager
+    from utils.redis_manager import redis_manager
+    from utils.websocket_manager import websocket_manager
+    COMMUNICATION_AVAILABLE = True
+except ImportError:
+    COMMUNICATION_AVAILABLE = False
+    communication_manager = None
+    redis_manager = None
+    websocket_manager = None
 
-def exibir_mensagem(mensagem: str):
-    """Exibe mensagem formatada"""
+# Configurar logging
+logger = logging.getLogger(__name__)
+
+
+def exibir_mensagem(mensagem: str, session_id: Optional[str] = None):
+    """Exibe mensagem formatada e envia via comunicação"""
     timestamp = datetime.now().strftime("%H:%M:%S")
-    print(f"[{timestamp}] {mensagem}")
+    formatted_message = f"[{timestamp}] {mensagem}"
+    
+    # Exibir no console
+    print(formatted_message)
+    
+    # Enviar via comunicação se disponível
+    if COMMUNICATION_AVAILABLE and session_id:
+        try:
+            websocket_manager.send_status_update(
+                session_id, 
+                "info", 
+                mensagem
+            )
+        except Exception as e:
+            logger.warning(f"Falha ao enviar mensagem via comunicação: {e}")
 
 
 def esperar_carregamento_pagina(page: Page, timeout: int = 30):
@@ -28,33 +58,69 @@ def esperar_carregamento_pagina(page: Page, timeout: int = 30):
         exibir_mensagem(f"⚠️ Timeout no carregamento da página: {e}")
 
 
-def navegar_tela_5_playwright(page: Page) -> bool:
+def navegar_tela_5_playwright(page: Page, session_id: Optional[str] = None) -> bool:
     """
-    Navega para a Tela 5 e aguarda carregamento do carrossel de estimativas
+    Navega para a Tela 5 e aguarda carregamento do carrossel de estimativas com comunicação em tempo real
     """
     try:
-        exibir_mensagem("🎯 NAVEGANDO PARA TELA 5 - CARROSSEL DE ESTIMATIVAS")
+        exibir_mensagem("🎯 NAVEGANDO PARA TELA 5 - CARROSSEL DE ESTIMATIVAS", session_id)
+        
+        # Atualizar progresso
+        if COMMUNICATION_AVAILABLE and session_id:
+            communication_manager.update_progress(session_id, {
+                "tela_atual": "Tela 5 - Carrossel de Estimativas",
+                "status": "iniciando",
+                "progresso": 10,
+                "timestamp": datetime.now().isoformat()
+            })
         
         # Aguardar carregamento inicial
         esperar_carregamento_pagina(page)
         
         # Aguardar carrossel de estimativas
-        exibir_mensagem("⏳ Aguardando carrossel de estimativas...")
+        exibir_mensagem("⏳ Aguardando carrossel de estimativas...", session_id)
+        
+        # Atualizar progresso
+        if COMMUNICATION_AVAILABLE and session_id:
+            communication_manager.update_progress(session_id, {
+                "tela_atual": "Tela 5 - Carrossel de Estimativas",
+                "status": "aguardando_carrossel",
+                "progresso": 30,
+                "timestamp": datetime.now().isoformat()
+            })
         
         # Aguardar elementos do carrossel
         carrossel_selector = "div[data-testid='carrossel-estimativas']"
         try:
             page.wait_for_selector(carrossel_selector, timeout=30000)
-            exibir_mensagem("✅ Carrossel de estimativas detectado")
+            exibir_mensagem("✅ Carrossel de estimativas detectado", session_id)
+            
+            # Atualizar progresso
+            if COMMUNICATION_AVAILABLE and session_id:
+                communication_manager.update_progress(session_id, {
+                    "tela_atual": "Tela 5 - Carrossel de Estimativas",
+                    "status": "carrossel_detectado",
+                    "progresso": 50,
+                    "timestamp": datetime.now().isoformat()
+                })
         except Exception as e:
-            exibir_mensagem(f"⚠️ Carrossel não encontrado com selector específico: {e}")
+            exibir_mensagem(f"⚠️ Carrossel não encontrado com selector específico: {e}", session_id)
             
             # Tentar selector alternativo
             try:
                 page.wait_for_selector(".carrossel-estimativas", timeout=10000)
-                exibir_mensagem("✅ Carrossel detectado com selector alternativo")
+                exibir_mensagem("✅ Carrossel detectado com selector alternativo", session_id)
+                
+                # Atualizar progresso
+                if COMMUNICATION_AVAILABLE and session_id:
+                    communication_manager.update_progress(session_id, {
+                        "tela_atual": "Tela 5 - Carrossel de Estimativas",
+                        "status": "carrossel_detectado_alternativo",
+                        "progresso": 50,
+                        "timestamp": datetime.now().isoformat()
+                    })
             except Exception as e2:
-                exibir_mensagem(f"⚠️ Selector alternativo também falhou: {e2}")
+                exibir_mensagem(f"⚠️ Selector alternativo também falhou: {e2}", session_id)
                 
                 # Aguardar qualquer elemento que possa ser o carrossel
                 try:
@@ -70,38 +136,75 @@ def navegar_tela_5_playwright(page: Page) -> bool:
                             );
                         }
                     """, timeout=15000)
-                    exibir_mensagem("✅ Elementos de estimativa detectados via JavaScript")
+                    exibir_mensagem("✅ Elementos de estimativa detectados via JavaScript", session_id)
+                    
+                    # Atualizar progresso
+                    if COMMUNICATION_AVAILABLE and session_id:
+                        communication_manager.update_progress(session_id, {
+                            "tela_atual": "Tela 5 - Carrossel de Estimativas",
+                            "status": "elementos_detectados_js",
+                            "progresso": 50,
+                            "timestamp": datetime.now().isoformat()
+                        })
                 except Exception as e3:
-                    exibir_mensagem(f"❌ Falha na detecção de elementos de estimativa: {e3}")
+                    exibir_mensagem(f"❌ Falha na detecção de elementos de estimativa: {e3}", session_id)
                     return False
         
         # Aguardar carregamento dos dados
-        exibir_mensagem("⏳ Aguardando carregamento dos dados...")
+        exibir_mensagem("⏳ Aguardando carregamento dos dados...", session_id)
         time.sleep(5)  # Aguarda carregamento dos dados
+        
+        # Atualizar progresso
+        if COMMUNICATION_AVAILABLE and session_id:
+            communication_manager.update_progress(session_id, {
+                "tela_atual": "Tela 5 - Carrossel de Estimativas",
+                "status": "aguardando_dados",
+                "progresso": 70,
+                "timestamp": datetime.now().isoformat()
+            })
         
         # Verificar se há skeletons de carregamento
         try:
             skeletons = page.query_selector_all(".MuiSkeleton-root")
             if skeletons:
-                exibir_mensagem(f"⏳ Aguardando {len(skeletons)} skeletons de carregamento...")
+                exibir_mensagem(f"⏳ Aguardando {len(skeletons)} skeletons de carregamento...", session_id)
                 page.wait_for_function("""
                     () => {
                         const skeletons = document.querySelectorAll('.MuiSkeleton-root');
                         return skeletons.length === 0;
                     }
                 """, timeout=20000)
-                exibir_mensagem("✅ Skeletons de carregamento finalizados")
+                exibir_mensagem("✅ Skeletons de carregamento finalizados", session_id)
         except Exception as e:
-            exibir_mensagem(f"⚠️ Não foi possível aguardar skeletons: {e}")
+            exibir_mensagem(f"⚠️ Não foi possível aguardar skeletons: {e}", session_id)
         
         # Aguarda adicional para garantir carregamento completo
         time.sleep(3)
         
-        exibir_mensagem("✅ TELA 5 CARREGADA COM SUCESSO!")
+        # Atualizar progresso final
+        if COMMUNICATION_AVAILABLE and session_id:
+            communication_manager.update_progress(session_id, {
+                "tela_atual": "Tela 5 - Carrossel de Estimativas",
+                "status": "carregada",
+                "progresso": 100,
+                "timestamp": datetime.now().isoformat()
+            })
+        
+        exibir_mensagem("✅ TELA 5 CARREGADA COM SUCESSO!", session_id)
         return True
         
     except Exception as e:
-        exibir_mensagem(f"❌ ERRO NA TELA 5: {e}")
+        error_msg = f"❌ ERRO NA TELA 5: {e}"
+        exibir_mensagem(error_msg, session_id)
+        
+        # Enviar erro via comunicação
+        if COMMUNICATION_AVAILABLE and session_id:
+            communication_manager.send_error(session_id, error_msg, {
+                "tela": "Tela 5 - Carrossel de Estimativas",
+                "erro": str(e),
+                "timestamp": datetime.now().isoformat()
+            })
+        
         return False
 
 

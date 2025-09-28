@@ -1,0 +1,39 @@
+{
+  "start_time": "2025-09-28T08:39:32.651945",
+  "tests": {
+    "tela_2_placa": {
+      "status": "failed",
+      "error": "'charmap' codec can't encode character '\\u274c' in position 11: character maps to <undefined>",
+      "timestamp": "2025-09-28T08:39:40.843797"
+    },
+    "tela_3_confirmacao_veiculo": {
+      "status": "failed",
+      "error": "'charmap' codec can't encode character '\\u274c' in position 11: character maps to <undefined>",
+      "timestamp": "2025-09-28T08:39:40.843872"
+    },
+    "tela_4_confirmacao_segurado": {
+      "status": "failed",
+      "error": "'charmap' codec can't encode character '\\u274c' in position 11: character maps to <undefined>",
+      "timestamp": "2025-09-28T08:39:40.843932"
+    },
+    "tela_5_estimativas": {
+      "status": "failed",
+      "error": "'charmap' codec can't encode character '\\u274c' in position 11: character maps to <undefined>",
+      "timestamp": "2025-09-28T08:39:40.843981"
+    },
+    "integration_between_screens": {
+      "status": "failed",
+      "error": "'charmap' codec can't encode character '\\u274c' in position 11: character maps to <undefined>",
+      "timestamp": "2025-09-28T08:39:40.844025"
+    }
+  },
+  "summary": {
+    "end_time": "2025-09-28T08:39:53.096719",
+    "duration_seconds": 20.444774,
+    "total_tests": 5,
+    "passed_tests": 0,
+    "failed_tests": 5,
+    "success_rate": 0.0,
+    "overall_status": "FAILED"
+  }
+}
