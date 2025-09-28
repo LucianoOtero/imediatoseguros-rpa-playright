@@ -110,3 +110,4 @@ echo "- Status serviços: systemctl status nginx rpa-websocket redis-server"
 
 
 
+

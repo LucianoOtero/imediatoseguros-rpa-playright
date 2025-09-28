@@ -810,3 +810,4 @@ python3 executar_rpa_imediato_playwright.py
 **Status**: ✅ **CORREÇÕES ESPECÍFICAS PARA UBUNTU/HETZNER**  
 **Recomendação**: Implementar todas as correções antes do deploy em produção
 
+

@@ -1,129 +1,121 @@
-// WebSocket Server para RPA Progress Tracking
-// Salvar como: /var/www/rpaimediatoseguros.com.br/websocket/server.js
-
 const WebSocket = require('ws');
-const redis = require('redis');
+const http = require('http');
 
-// Configuração
-const WS_PORT = 8080;
-const REDIS_HOST = 'localhost';
-const REDIS_PORT = 6379;
+const server = http.createServer();
+const wss = new WebSocket.Server({ server });
 
-// Cliente Redis
-const redisClient = redis.createClient({
-    host: REDIS_HOST,
-    port: REDIS_PORT
-});
+console.log('🚀 WebSocket Server iniciado na porta 8080');
 
-redisClient.on('error', (err) => {
-    console.error('Redis Client Error:', err);
-});
-
-redisClient.on('connect', () => {
-    console.log('✅ Conectado ao Redis');
-});
-
-// WebSocket Server
-const wss = new WebSocket.Server({ 
-    port: WS_PORT,
-    perMessageDeflate: false
-});
-
-console.log(`🚀 WebSocket Server iniciado na porta ${WS_PORT}`);
-
-// Armazenar conexões por sessão
-const sessions = new Map();
-
-wss.on('connection', (ws, req) => {
-    console.log('🔌 Nova conexão WebSocket');
+wss.on('connection', (ws) => {
+    console.log('Cliente conectado');
     
-    // Extrair session_id da URL
-    const url = new URL(req.url, `http://${req.headers.host}`);
-    const sessionId = url.searchParams.get('session_id');
-    
-    if (!sessionId) {
-        ws.close(1008, 'Session ID obrigatório');
-        return;
-    }
-    
-    // Armazenar conexão
-    if (!sessions.has(sessionId)) {
-        sessions.set(sessionId, new Set());
-    }
-    sessions.get(sessionId).add(ws);
-    
-    console.log(`📱 Cliente conectado para sessão: ${sessionId}`);
-    
-    // Configurar subscriber Redis para esta sessão
-    const subscriber = redis.createClient({
-        host: REDIS_HOST,
-        port: REDIS_PORT
-    });
-    
-    subscriber.subscribe(`rpa_progress_${sessionId}`);
-    
-    subscriber.on('message', (channel, message) => {
+    ws.on('message', (message) => {
         try {
             const data = JSON.parse(message);
-            console.log(`📨 Mensagem Redis para ${sessionId}:`, data);
             
-            // Enviar para todos os clientes desta sessão
-            sessions.get(sessionId)?.forEach(client => {
-                if (client.readyState === WebSocket.OPEN) {
-                    client.send(JSON.stringify(data));
-                }
-            });
+            // Handlers para diferentes tipos de mensagem
+            switch(data.type) {
+                case 'test_message':
+                    console.log('Test message recebida:', data);
+                    ws.send(JSON.stringify({
+                        type: 'test_response',
+                        message: 'Test message processada com sucesso',
+                        timestamp: new Date().toISOString()
+                    }));
+                    break;
+                    
+                case 'session_event':
+                    console.log('Session event recebida:', data);
+                    ws.send(JSON.stringify({
+                        type: 'session_response',
+                        message: 'Session event processada',
+                        timestamp: new Date().toISOString()
+                    }));
+                    break;
+                    
+                case 'progress_update':
+                    console.log('Progress update recebida:', data);
+                    ws.send(JSON.stringify({
+                        type: 'progress_response',
+                        message: 'Progress update processada',
+                        timestamp: new Date().toISOString()
+                    }));
+                    break;
+                    
+                case 'status_update':
+                    console.log('Status update recebida:', data);
+                    ws.send(JSON.stringify({
+                        type: 'status_response',
+                        message: 'Status update processada',
+                        timestamp: new Date().toISOString()
+                    }));
+                    break;
+                    
+                case 'progress_request':
+                    console.log('Progress request recebida:', data);
+                    ws.send(JSON.stringify({
+                        type: 'progress_data',
+                        progress: 50,
+                        status: 'running',
+                        timestamp: new Date().toISOString()
+                    }));
+                    break;
+                    
+                case 'status_request':
+                    console.log('Status request recebida:', data);
+                    ws.send(JSON.stringify({
+                        type: 'status_data',
+                        status: 'active',
+                        timestamp: new Date().toISOString()
+                    }));
+                    break;
+                    
+                case 'session_info':
+                    console.log('Session info recebida:', data);
+                    ws.send(JSON.stringify({
+                        type: 'session_data',
+                        session_id: data.session_id || 'default',
+                        timestamp: new Date().toISOString()
+                    }));
+                    break;
+                    
+                default:
+                    console.log('Tipo de mensagem não reconhecido:', data.type);
+                    ws.send(JSON.stringify({
+                        type: 'error',
+                        message: `Tipo de mensagem não reconhecido: ${data.type}`,
+                        timestamp: new Date().toISOString()
+                    }));
+            }
         } catch (error) {
-            console.error('❌ Erro ao processar mensagem Redis:', error);
+            console.error('Erro ao processar mensagem:', error);
+            ws.send(JSON.stringify({
+                type: 'error',
+                message: 'Erro ao processar mensagem',
+                error: error.message,
+                timestamp: new Date().toISOString()
+            }));
         }
     });
     
-    // Limpar quando desconectar
     ws.on('close', () => {
-        console.log(`🔌 Cliente desconectado da sessão: ${sessionId}`);
-        sessions.get(sessionId)?.delete(ws);
-        
-        if (sessions.get(sessionId)?.size === 0) {
-            sessions.delete(sessionId);
-            subscriber.unsubscribe();
-            subscriber.quit();
-        }
+        console.log('Cliente desconectado');
     });
     
     ws.on('error', (error) => {
-        console.error('❌ Erro WebSocket:', error);
-    });
-    
-    // Enviar mensagem de boas-vindas
-    ws.send(JSON.stringify({
-        type: 'connected',
-        session_id: sessionId,
-        timestamp: Date.now()
-    }));
-});
-
-// Graceful shutdown
-process.on('SIGTERM', () => {
-    console.log('🛑 Encerrando WebSocket Server...');
-    wss.close(() => {
-        redisClient.quit();
-        process.exit(0);
+        console.error('Erro no WebSocket:', error);
     });
 });
 
-process.on('SIGINT', () => {
-    console.log('🛑 Encerrando WebSocket Server...');
-    wss.close(() => {
-        redisClient.quit();
-        process.exit(0);
-    });
+server.listen(8080, () => {
+    console.log('✅ WebSocket Server configurado e pronto!');
 });
 
-console.log('✅ WebSocket Server configurado e pronto!');
+// Tratamento de erros
+process.on('uncaughtException', (error) => {
+    console.error('Erro não capturado:', error);
+});
 
-
-
-
-
-
-
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Promise rejeitada não tratada:', reason);
+});
