@@ -98,6 +98,18 @@ class ProgressTracker:
         else:
             self.tracker = None
     
+    def update_progress(self, etapa: int, mensagem: str = "", dados_extra: dict = None):
+        """
+        Atualiza o progresso da execução
+        
+        Args:
+            etapa: Número da etapa
+            mensagem: Mensagem de status
+            dados_extra: Dados extras opcionais
+        """
+        if self.tracker:
+            self.tracker.update_progress(etapa, mensagem, dados_extra)
+    
     def update_progress_with_estimativas(self, etapa: int, mensagem: str = "", dados_extra: dict = None, estimativas: dict = None):
         """
         Atualiza progresso incluindo estimativas da tela 5

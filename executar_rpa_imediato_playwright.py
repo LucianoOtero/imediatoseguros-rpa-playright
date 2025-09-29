@@ -1052,7 +1052,14 @@ def configurar_display(parametros: Dict[str, Any]):
     visualizar_mensagens = configuracao.get('visualizar_mensagens', True)
     modo_silencioso = configuracao.get('modo_silencioso', False) or args.modo_silencioso
     
+    # CORREÇÃO: Forçar headless em servidor (sem display X)
+    # Se modo_silencioso está ativo, garantir que o browser rode em headless
     DISPLAY_ENABLED = display and visualizar_mensagens and not modo_silencioso
+    
+    # Detectar se estamos em ambiente de servidor (sem display X)
+    import os
+    if not os.environ.get('DISPLAY') or modo_silencioso:
+        DISPLAY_ENABLED = False
     
     # Configurar módulos externos
     try:
@@ -5411,7 +5418,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
         
         # Inicializar Playwright
         with sync_playwright() as p:
-            browser = p.chromium.launch(headless=False)
+            browser = p.chromium.launch(headless=not DISPLAY_ENABLED)
             context = browser.new_context()
             page = context.new_page()
             
