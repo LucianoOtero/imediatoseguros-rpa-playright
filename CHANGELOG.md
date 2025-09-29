@@ -5,6 +5,33 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [v3.8.0] - 2025-09-29
+
+### 🎯 Adicionado
+- **Sistema RPA V3 com execução em background**: Nova implementação usando systemd para gerenciamento de processos
+- **API REST completa**: executar_rpa_v3.php com endpoints para start, status, stop, sessions e health
+- **Monitoramento em tempo real**: Sistema de tracking com JSON progressivo por tela
+- **Suporte a múltiplas sessões**: Execuções simultâneas isoladas por session_id
+- **Scripts de controle**: start_rpa_v3.sh, monitor_rpa_v3.sh, cleanup_rpa_v3.sh
+- **Health check do sistema**: Verificação automática de dependências e status
+- **Logs estruturados**: Sistema de logging por sessão com arquivos separados
+- **Limpeza automática**: Gerenciamento de recursos com cleanup assíncrono
+- **Documentação completa**: README_RPA_V3.md com guia de instalação e uso
+- **Script de teste**: test_rpa_v3.php para validação de funcionalidades
+
+### 🔧 Melhorado
+- **Execução confiável**: Uso de systemd para gerenciamento robusto de processos
+- **Ambiente isolado**: Configuração completa de variáveis de ambiente
+- **Display virtual**: Integração com xvfb-run para execução headless
+- **Caminho de browsers**: Configuração correta do PLAYWRIGHT_BROWSERS_PATH
+- **Escalabilidade**: Arquitetura preparada para múltiplas execuções simultâneas
+
+### ✅ Testado
+- **Funcionamento no Hetzner**: Testado e validado no servidor de produção
+- **Captura de estimativas**: Confirmado funcionamento do JSON tracker
+- **Execução em background**: Validado via systemd com logs estruturados
+- **API endpoints**: Todos os endpoints testados e funcionais
+
 ## [v2.5.0] - 2025-08-29
 
 ### 🎯 Adicionado
