@@ -5,6 +5,43 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [v4.0.1] - 2025-09-30
+
+### 🎯 Adicionado
+- **RPA V4 - Arquitetura Modular Incremental**: Nova implementação com separação de responsabilidades
+- **API REST completa**: Endpoints para gerenciamento de sessões (/api/rpa/start, /status, /health, /metrics)
+- **Dashboard web responsivo**: Interface moderna para monitoramento em tempo real
+- **Sistema de logs estruturados**: LoggerService com níveis configuráveis e rotação automática
+- **Health checks avançados**: Monitoramento de dependências e status do sistema
+- **Rate limiting**: Proteção contra abuso com controle de requisições
+- **Session management**: Gerenciamento robusto de sessões concorrentes
+- **Background execution**: Execução em segundo plano com isolamento completo
+- **Progress tracking via Redis**: Sistema de cache para performance otimizada
+- **Compatibilidade total com V3**: Suporte ao parametros.json existente
+- **Testes automatizados**: Suite completa com PHPUnit
+- **Deploy automatizado**: Script bash para instalação e configuração
+- **Documentação completa**: README.md, VERSION_CONTROL.md e guias de instalação
+
+### 🔧 Melhorado
+- **Arquitetura modular**: Separação clara entre Controllers, Services, Repositories e Interfaces
+- **Validação de entrada**: Sistema robusto com regras configuráveis (temporariamente desabilitada para compatibilidade)
+- **Monitoramento em tempo real**: Dashboard com atualizações automáticas via JavaScript
+- **Configuração centralizada**: Arquivo app.php para todas as configurações
+- **Tratamento de erros**: Sistema unificado de exceções e logs
+- **Performance**: Otimizações com Redis e cache inteligente
+
+### ✅ Testado
+- **Funcionamento no Hetzner**: Testado e validado no servidor de produção
+- **API endpoints**: Todos os endpoints testados e funcionais
+- **Dashboard responsivo**: Interface testada em diferentes dispositivos
+- **Execução concorrente**: Múltiplas sessões simultâneas validadas
+- **Compatibilidade V3**: Confirmação de funcionamento com sistema existente
+
+### 📋 Planos Registrados
+- **PLANO_PROJETO_RPA_V4_OBJETIVOS.md**: Objetivos detalhados para execução concorrente e integração Webflow
+- **PLANO_PRODUCAO_RPA_V4.md**: Próximos passos para produção (monitoramento, JSON dinâmico, migração)
+- **PROJETO_RPA_V4_INCREMENTAL.md**: Estratégia incremental de implementação
+
 ## [v3.8.0] - 2025-09-29
 
 ### 🎯 Adicionado
