@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPA V4 Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .status-badge {
+            font-size: 0.8em;
+        }
+        .session-item {
+            border-left: 4px solid #dee2e6;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 0 5px 5px 0;
+        }
+        .session-item.running {
+            border-left-color: #28a745;
+            background: #d4edda;
+        }
+        .session-item.completed {
+            border-left-color: #007bff;
+            background: #cce7ff;
+        }
+        .session-item.failed {
+            border-left-color: #dc3545;
+            background: #f8d7da;
+        }
+        .session-item.stopped {
+            border-left-color: #6c757d;
+            background: #e2e3e5;
+        }
+        .progress-container {
+            margin-top: 10px;
+        }
+        .log-entry {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            padding: 5px;
+            margin: 2px 0;
+            background: #f8f9fa;
+            border-radius: 3px;
+        }
+        .log-entry.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .log-entry.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .log-entry.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        .metrics-card {
+            text-align: center;
+        }
+        .metrics-value {
+            font-size: 2em;
+            font-weight: bold;
+        }
+        .health-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        .health-indicator.healthy {
+            background-color: #28a745;
+        }
+        .health-indicator.degraded {
+            background-color: #ffc107;
+        }
+        .health-indicator.unhealthy {
+            background-color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-robot"></i> RPA V4 Dashboard
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text">
+                    <span id="health-indicator" class="health-indicator"></span>
+                    <span id="health-status">Verificando...</span>
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Métricas do Sistema -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card metrics-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Total de Sessões</h5>
+                        <div class="metrics-value text-primary" id="total-sessions">-</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card metrics-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Sessões Ativas</h5>
+                        <div class="metrics-value text-success" id="active-sessions">-</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card metrics-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Taxa de Sucesso</h5>
+                        <div class="metrics-value text-info" id="success-rate">-</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card metrics-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Última Atualização</h5>
+                        <div class="metrics-value text-secondary" id="last-update" style="font-size: 1em;">-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controles -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="bi bi-gear"></i> Controles</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <button class="btn btn-primary" onclick="startNewSession()">
+                                    <i class="bi bi-play-circle"></i> Nova Sessão
+                                </button>
+                                <button class="btn btn-warning" onclick="refreshData()">
+                                    <i class="bi bi-arrow-clockwise"></i> Atualizar
+                                </button>
+                                <button class="btn btn-info" onclick="showHealthCheck()">
+                                    <i class="bi bi-heart-pulse"></i> Health Check
+                                </button>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="autoRefresh" checked>
+                                    <label class="form-check-label" for="autoRefresh">
+                                        Atualização Automática
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de Sessões -->
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="bi bi-list-ul"></i> Sessões RPA</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="sessions-list">
+                            <div class="text-center">
+                                <div class="spinner-border" role="status">
+                                    <span class="visually-hidden">Carregando...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="bi bi-activity"></i> Logs em Tempo Real</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="realtime-logs" style="max-height: 400px; overflow-y: auto;">
+                            <div class="text-muted">Selecione uma sessão para ver os logs</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Nova Sessão -->
+    <div class="modal fade" id="newSessionModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Nova Sessão RPA</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="newSessionForm">
+                        <div class="mb-3">
+                            <label for="cpf" class="form-label">CPF *</label>
+                            <input type="text" class="form-control" id="cpf" name="cpf" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="nome" class="form-label">Nome *</label>
+                            <input type="text" class="form-control" id="nome" name="nome" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email">
+                        </div>
+                        <div class="mb-3">
+                            <label for="telefone" class="form-label">Telefone</label>
+                            <input type="text" class="form-control" id="telefone" name="telefone">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="submitNewSession()">Iniciar Sessão</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Health Check -->
+    <div class="modal fade" id="healthModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Health Check do Sistema</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="health-details">
+                        <div class="text-center">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Verificando...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
