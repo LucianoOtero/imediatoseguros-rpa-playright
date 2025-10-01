@@ -386,13 +386,90 @@ ssh root@37.27.92.160 "systemctl restart php8.3-fpm"
 
 ---
 
+## 🛠️ FERRAMENTAS DE DEBUG RECOMENDADAS
+
+### Xdebug + Cursor (Recomendação Principal)
+**Por que usar:**
+- Debug visual com breakpoints
+- Step-through do código
+- Inspeção de variáveis em tempo real
+- Integração nativa com Cursor
+- Sem dependência de terceiros
+- Logs detalhados
+
+**Configuração no Servidor:**
+```bash
+# Instalar Xdebug
+sudo apt install php8.3-xdebug
+
+# Configurar Xdebug
+sudo tee /etc/php/8.3/fpm/conf.d/20-xdebug.ini > /dev/null << 'EOF'
+zend_extension=xdebug.so
+xdebug.mode=debug,develop
+xdebug.start_with_request=yes
+xdebug.client_host=127.0.0.1
+xdebug.client_port=9003
+xdebug.log=/var/log/xdebug.log
+xdebug.log_level=7
+xdebug.var_display_max_depth=10
+xdebug.var_display_max_children=256
+xdebug.var_display_max_data=1024
+EOF
+
+# Reiniciar PHP-FPM
+sudo systemctl restart php8.3-fpm
+```
+
+**Configuração no Cursor:**
+```json
+// .vscode/launch.json
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Listen for Xdebug",
+            "type": "php",
+            "request": "launch",
+            "port": 9003,
+            "pathMappings": {
+                "/opt/imediatoseguros-rpa-v4": "${workspaceFolder}"
+            },
+            "log": true
+        }
+    ]
+}
+```
+
+**Uso para o Problema Atual:**
+1. Definir breakpoints no `index.php` linha 78
+2. Inspecionar `$rawInput` e `$input`
+3. Rastrear fluxo de dados até o RPA
+4. Identificar onde os dados se perdem
+
+### Ferramentas Alternativas
+- **Monolog:** Logging estruturado
+- **Symfony VarDumper:** Dump de variáveis
+- **phpdbg:** Debug via linha de comando
+- **tcpdump:** Análise de tráfego HTTP (requer sudo)
+
+### Comparação de Ferramentas
+| Ferramenta | Facilidade | Visual | Tempo Real | Independência |
+|------------|------------|--------|------------|---------------|
+| Xdebug + Cursor | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
+| Logging Manual | ⭐⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐⭐⭐⭐ |
+| VarDumper | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
+| phpdbg | ⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
+
+---
+
 ## 🎯 RECOMENDAÇÕES FINAIS
 
 ### Imediato (Hoje)
-1. **Implementar Solução 3** - Correção defensiva
-2. **Executar Fase 0 e 1** - Diagnóstico
-3. **Testar com dados reais** - Validação
-4. **Monitorar logs** - Confirmar funcionamento
+1. **Instalar Xdebug + Cursor** - Debug visual
+2. **Implementar Solução 3** - Correção defensiva
+3. **Executar Fase 0 e 1** - Diagnóstico
+4. **Testar com dados reais** - Validação
+5. **Monitorar logs** - Confirmar funcionamento
 
 ### Curto Prazo (Esta Semana)
 1. **Implementar monitoramento** - Alertas automáticos
