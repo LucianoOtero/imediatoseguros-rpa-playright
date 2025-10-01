@@ -350,7 +350,7 @@ fi
 {$cleanupCommand}
 
 # Limpar script temporário
-rm -f "\$0"
+# rm -f "\$0" # TEMPORARIAMENTE DESABILITADO
 SCRIPT;
     }
 
