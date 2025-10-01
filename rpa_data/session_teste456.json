@@ -1,0 +1,9 @@
+{
+  "session_id": "teste456",
+  "timestamp_inicio": "2025-09-28T16:31:59.132479",
+  "timestamp_fim": "2025-09-28T16:32:14.628931",
+  "status": "success",
+  "total_etapas": 5,
+  "etapas_executadas": 5,
+  "backend": "json"
+}

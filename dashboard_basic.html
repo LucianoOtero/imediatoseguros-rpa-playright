@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPA Status Básico</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status { 
+            padding: 15px; 
+            margin: 15px 0; 
+            border: 1px solid #ccc; 
+            border-radius: 5px;
+        }
+        .good { 
+            background-color: #d4edda; 
+            border-color: #c3e6cb;
+        }
+        .warning { 
+            background-color: #fff3cd; 
+            border-color: #ffeaa7;
+        }
+        .error { 
+            background-color: #f8d7da; 
+            border-color: #f5c6cb;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .stat-label {
+            color: #6c757d;
+            font-size: 14px;
+        }
+        .refresh-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        .refresh-btn:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 RPA Status Básico</h1>
+            <p>Monitoramento simples do sistema RPA</p>
+        </div>
+        
+        <div id="status" class="status">
+            <h3>Status do Sistema</h3>
+            <p>Carregando...</p>
+        </div>
+        
+        <div class="stats" id="stats" style="display: none;">
+            <div class="stat-item">
+                <div class="stat-value" id="sessions-today">0</div>
+                <div class="stat-label">Sessões Hoje</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="progress-files">0</div>
+                <div class="stat-label">Arquivos de Progresso</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="last-update">--:--</div>
+                <div class="stat-label">Última Atualização</div>
+            </div>
+        </div>
+        
+        <div style="text-align: center;">
+            <button class="refresh-btn" onclick="updateStatus()">🔄 Atualizar Status</button>
+        </div>
+    </div>
+    
+    <script>
+        function updateStatus() {
+            fetch('status.php')
+                .then(response => response.json())
+                .then(data => {
+                    const statusDiv = document.getElementById('status');
+                    const statsDiv = document.getElementById('stats');
+                    
+                    // Atualizar status principal
+                    statusDiv.innerHTML = `
+                        <h3>Status do Sistema</h3>
+                        <p><strong>Timestamp:</strong> ${data.timestamp}</p>
+                        <p><strong>Status:</strong> ${data.system_status}</p>
+                        <p><strong>Última Sessão:</strong> ${data.last_session}</p>
+                        <p><strong>Servidor:</strong> ${data.server_time}</p>
+                    `;
+                    
+                    // Atualizar estatísticas
+                    document.getElementById('sessions-today').textContent = data.sessions_today;
+                    document.getElementById('progress-files').textContent = data.progress_files_count;
+                    document.getElementById('last-update').textContent = new Date().toLocaleTimeString();
+                    
+                    // Mostrar estatísticas
+                    statsDiv.style.display = 'grid';
+                    
+                    // Adicionar classe baseada no status
+                    statusDiv.className = 'status ' + getStatusClass(data.system_status);
+                })
+                .catch(error => {
+                    document.getElementById('status').innerHTML = 
+                        '<h3>Erro</h3><p>Não foi possível carregar o status</p>';
+                    document.getElementById('status').className = 'status error';
+                });
+        }
+        
+        function getStatusClass(status) {
+            if (status === 'OK') return 'good';
+            if (status.includes('WARNING')) return 'warning';
+            return 'error';
+        }
+        
+        // Atualizar a cada 60 segundos
+        setInterval(updateStatus, 60000);
+        
+        // Atualizar imediatamente
+        updateStatus();
+    </script>
+</body>
+</html>
+
+

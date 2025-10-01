@@ -1,0 +1,15 @@
+{
+  "session": "test123",
+  "dados": {
+    "placa": "ABC1234",
+    "marca": "TOYOTA",
+    "modelo": "COROLLA",
+    "ano": "2009",
+    "nome": "João Silva",
+    "cpf": "123.456.789-00",
+    "email": "joao@email.com",
+    "celular": "(11) 99999-9999"
+  }
+}
+
+

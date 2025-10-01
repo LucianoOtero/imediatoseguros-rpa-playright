@@ -1,0 +1,202 @@
+{
+  "SISTEMA": [
+    {
+      "teste": "Sistema Operacional",
+      "status": "OK",
+      "detalhes": "Linux ubuntu-2gb-hel1-1 6.8.0-71-generic #71-Ubuntu SMP PREEMPT_DYNAMIC Tue Jul 22 16:52:38 UTC 2025 x86_64 x86_64 x86_64 GNU/Linux",
+      "timestamp": "2025-09-28T21:42:12.030683"
+    },
+    {
+      "teste": "Espaço em Disco",
+      "status": "OK",
+      "detalhes": "Filesystem      Size  Used Avail Use% Mounted on\n/dev/sda1        38G   22G   14G  62% /",
+      "timestamp": "2025-09-28T21:42:12.032626"
+    },
+    {
+      "teste": "Memória",
+      "status": "OK",
+      "detalhes": "total        used        free      shared  buff/cache   available\nMem:           1.9Gi       828Mi       337Mi        24Mi       970Mi       1.1Gi\nSwap:             0B          0B          0B",
+      "timestamp": "2025-09-28T21:42:12.036177"
+    },
+    {
+      "teste": "Processos Ativos",
+      "status": "OK",
+      "detalhes": "redis     314538  0.2  0.3  67864  7296 ?        Ssl  Sep25  10:29 /usr/bin/redis-server 127.0.0.1:6379\nroot      314558  0.0  0.2  22696  4412 ?        Ss   Sep25   0:00 nginx: master process /usr/sbin/nginx -g daemon on; master_process on;\nroot      325539  0.0  0.6 229312 13056 ?        Ss   Sep25   0:23 php-fpm: master process (/etc/php/8.3/fpm/php-fpm.conf)\nwww-data  325540  0.0  0.9 229904 17964 ?        S    Sep25   0:00 php-fpm: pool www\nwww-data  325541  0.0  0.9 229904 18604 ?        S    Sep25   0:00 php-fpm: pool www\nwww-data  337199  0.0  0.4  24048  8600 ?        S    Sep26   0:01 nginx: worker process\nwww-data  337200  0.0  0.4  24048  8472 ?        S    Sep26   0:01 nginx: worker process",
+      "timestamp": "2025-09-28T21:42:12.058098"
+    }
+  ],
+  "PYTHON": [
+    {
+      "teste": "Versão Python",
+      "status": "ERRO",
+      "detalhes": "/bin/sh: 1: python: not found",
+      "timestamp": "2025-09-28T21:42:12.059864"
+    },
+    {
+      "teste": "Ambiente Virtual",
+      "status": "ERRO",
+      "detalhes": "/bin/sh: 1: source: not found",
+      "timestamp": "2025-09-28T21:42:12.061000"
+    },
+    {
+      "teste": "Playwright",
+      "status": "ERRO",
+      "detalhes": "/bin/sh: 1: source: not found",
+      "timestamp": "2025-09-28T21:42:12.062153"
+    },
+    {
+      "teste": "Dependências",
+      "status": "AVISO",
+      "detalhes": "Algumas dependências podem estar faltando",
+      "timestamp": "2025-09-28T21:42:12.063196"
+    }
+  ],
+  "REDIS": [
+    {
+      "teste": "Status Redis",
+      "status": "OK",
+      "detalhes": "PONG",
+      "timestamp": "2025-09-28T21:42:12.071525"
+    },
+    {
+      "teste": "Chaves Existentes",
+      "status": "OK",
+      "detalhes": "41 chaves encontradas",
+      "timestamp": "2025-09-28T21:42:12.080091"
+    },
+    {
+      "teste": "Chaves Existentes",
+      "status": "INFO",
+      "detalhes": "Chaves: rpa:result:test_corrigido, rpa:progress:teste_php_nohup_1759095136, rpa:session:test_redis, rpa:result:--modo-silencioso, rpa:progress:teste_debug_manual, rpa:progress:test_corrigido, rpa:result:test_redis, rpa:result:teste_www_data_nohup, rpa:progress:teste_xvfb, rpa:result:teste_www_data",
+      "timestamp": "2025-09-28T21:42:12.080116"
+    },
+    {
+      "teste": "Teste Escrita/Leitura",
+      "status": "OK",
+      "detalhes": "Funcionando corretamente",
+      "timestamp": "2025-09-28T21:42:12.097628"
+    }
+  ],
+  "NGINX": [
+    {
+      "teste": "Status Nginx",
+      "status": "OK",
+      "detalhes": "Nginx está rodando",
+      "timestamp": "2025-09-28T21:42:12.126289"
+    }
+  ],
+  "PHP": [
+    {
+      "teste": "Versão PHP",
+      "status": "OK",
+      "detalhes": "PHP 8.3.6 (cli) (built: Jul 14 2025 18:30:55) (NTS)",
+      "timestamp": "2025-09-28T21:42:12.171677"
+    },
+    {
+      "teste": "Arquivos PHP",
+      "status": "OK",
+      "detalhes": "Arquivos encontrados: -rw-r--r-- 1 www-data www-data  629 Sep 28 21:33 /var/www/rpaimediatoseguros.com.br/executar_rpa.php\n-rw-r--r-- 1 www-data www-data  290 Sep 28 20:11 /var/www/rpaimediatoseguros.com.br/get_progress.php\n-rw-r--r-- 1 root     root     5905 Sep 28 21:31 /var/www/rpaimediatoseguros.com.br/teste_php_direto.php\n-rwxr-xr-x 1 www-data www-data   20 Sep 28 19:41 /var/www/rpaimediatoseguros.com.br/test.php",
+      "timestamp": "2025-09-28T21:42:12.176151"
+    }
+  ],
+  "HTTP": [
+    {
+      "teste": "Teste Endpoint",
+      "status": "OK",
+      "detalhes": "Status: 200",
+      "timestamp": "2025-09-28T21:42:12.184669"
+    }
+  ],
+  "RPA": [
+    {
+      "teste": "Diretório RPA",
+      "status": "OK",
+      "detalhes": "Diretório existe",
+      "timestamp": "2025-09-28T21:42:12.204905"
+    },
+    {
+      "teste": "Arquivo Principal",
+      "status": "OK",
+      "detalhes": "Arquivo existe",
+      "timestamp": "2025-09-28T21:42:12.208872"
+    },
+    {
+      "teste": "Parâmetros",
+      "status": "OK",
+      "detalhes": "Arquivo existe",
+      "timestamp": "2025-09-28T21:42:12.212767"
+    },
+    {
+      "teste": "Diretórios Temp/Logs",
+      "status": "OK",
+      "detalhes": "Diretórios existem",
+      "timestamp": "2025-09-28T21:42:12.218207"
+    },
+    {
+      "teste": "ProgressTracker",
+      "status": "OK",
+      "detalhes": "Arquivo existe",
+      "timestamp": "2025-09-28T21:42:12.222996"
+    }
+  ],
+  "EXECUCAO": [
+    {
+      "teste": "Teste Help",
+      "status": "ERRO",
+      "detalhes": "/bin/sh: 1: source: not found",
+      "timestamp": "2025-09-28T21:42:12.225304"
+    },
+    {
+      "teste": "Teste Versão",
+      "status": "ERRO",
+      "detalhes": "/bin/sh: 1: source: not found",
+      "timestamp": "2025-09-28T21:42:12.226855"
+    },
+    {
+      "teste": "Teste Inicialização",
+      "status": "ERRO",
+      "detalhes": "/bin/sh: 1: source: not found",
+      "timestamp": "2025-09-28T21:42:12.228326"
+    }
+  ],
+  "API": [
+    {
+      "teste": "executar_rpa.php",
+      "status": "OK",
+      "detalhes": "PID: 403908",
+      "timestamp": "2025-09-28T21:42:12.235051"
+    },
+    {
+      "teste": "get_progress.php",
+      "status": "OK",
+      "detalhes": "Status: 200",
+      "timestamp": "2025-09-28T21:42:12.238033"
+    }
+  ],
+  "INTEGRACAO": [
+    {
+      "teste": "Execução via API",
+      "status": "OK",
+      "detalhes": "PID: 403910",
+      "timestamp": "2025-09-28T21:42:12.243886"
+    },
+    {
+      "teste": "Dados no Redis",
+      "status": "OK",
+      "detalhes": "Chaves encontradas: rpa:progress:teste_integracao_1759095732\nrpa:result:teste_integracao_1759095732",
+      "timestamp": "2025-09-28T21:42:17.256909"
+    },
+    {
+      "teste": "Arquivos JSON",
+      "status": "AVISO",
+      "detalhes": "Nenhum arquivo de progresso encontrado",
+      "timestamp": "2025-09-28T21:42:17.264537"
+    },
+    {
+      "teste": "Logs",
+      "status": "AVISO",
+      "detalhes": "Nenhum log encontrado",
+      "timestamp": "2025-09-28T21:42:17.268675"
+    }
+  ]
+}

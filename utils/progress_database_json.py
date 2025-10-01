@@ -15,7 +15,8 @@ class DatabaseProgressTracker:
     Mantém compatibilidade com a v3.4.0
     """
     
-    def __init__(self, total_etapas: int = 15, usar_arquivo: bool = True, session_id: str = None):
+    def __init__(self, total_etapas: int = 15, usar_arquivo: bool = True,
+                 session_id: str = None):
         """
         Inicializa o ProgressTracker JSON
         
@@ -41,15 +42,28 @@ class DatabaseProgressTracker:
         self.diretorio_base.mkdir(exist_ok=True)
         
         # Nome do arquivo baseado na sessão
-        self.arquivo_progresso = self.diretorio_base / f"progress_{self.session_id}.json"
-        self.arquivo_resultado = self.diretorio_base / f"result_{self.session_id}.json"
-        self.arquivo_sessao = self.diretorio_base / f"session_{self.session_id}.json"
+        self.arquivo_progresso = (self.diretorio_base /
+                                  f"progress_{self.session_id}.json")
+        self.arquivo_resultado = (self.diretorio_base /
+                                 f"result_{self.session_id}.json")
+        self.arquivo_sessao = (self.diretorio_base /
+                              f"session_{self.session_id}.json")
+        self.arquivo_historico = (self.diretorio_base /
+                                 f"history_{self.session_id}.json")
+        
+        # Histórico sequencial
+        self.historico = []
+        self.historico_habilitado = True
         
         # Inicializar arquivo de progresso
         if self.usar_arquivo:
             self._salvar_progresso()
+            if self.historico_habilitado:
+                self._adicionar_entrada_historico(
+                    "inicio", "iniciando", "ProgressTracker inicializado")
     
-    def update_progress(self, etapa: int, mensagem: str = "", dados_extra: Dict[str, Any] = None):
+    def update_progress(self, etapa: int, mensagem: str = "",
+                       dados_extra: Dict[str, Any] = None):
         """
         Atualiza o progresso da execução
         
@@ -77,6 +91,9 @@ class DatabaseProgressTracker:
         # Salvar progresso
         if self.usar_arquivo:
             self._salvar_progresso()
+            if self.historico_habilitado:
+                self._adicionar_entrada_historico(
+                    etapa, self.status, mensagem, dados_extra)
     
     def add_error(self, erro: str, contexto: str = ""):
         """
@@ -95,6 +112,9 @@ class DatabaseProgressTracker:
         
         if self.usar_arquivo:
             self._salvar_progresso()
+            if self.historico_habilitado:
+                self._adicionar_entrada_historico(
+                    "erro", "error", f"Erro: {erro}", None, erro)
     
     def add_estimativas(self, estimativas: Dict[str, Any]):
         """
@@ -109,8 +129,13 @@ class DatabaseProgressTracker:
             
             if self.usar_arquivo:
                 self._salvar_progresso()
+                if self.historico_habilitado:
+                    self._adicionar_entrada_historico(
+                        "estimativas", "completed", "Estimativas capturadas",
+                        estimativas)
     
-    def finalizar(self, status_final: str = "success", dados_finais: Dict[str, Any] = None, erro_final: str = None):
+    def finalizar(self, status_final: str = "success",
+                 dados_finais: Dict[str, Any] = None, erro_final: str = None):
         """
         Finaliza o progresso
         
@@ -135,6 +160,11 @@ class DatabaseProgressTracker:
             self._salvar_progresso()
             self._salvar_resultado(dados_finais)
             self._salvar_sessao()
+            if self.historico_habilitado:
+                self._adicionar_entrada_historico(
+                    "final", status_final, f"RPA {status_final}",
+                    dados_finais, erro_final)
+                self._salvar_historico()
     
     def get_progress(self) -> Dict[str, Any]:
         """
@@ -241,8 +271,10 @@ class DatabaseProgressTracker:
             tracker.percentual = data.get('percentual', 0.0)
             tracker.status = data.get('status', 'iniciando')
             tracker.mensagem = data.get('mensagem', '')
-            tracker.timestamp_inicio = data.get('timestamp_inicio', datetime.now().isoformat())
-            tracker.timestamp_atualizacao = data.get('timestamp_atualizacao', datetime.now().isoformat())
+            tracker.timestamp_inicio = data.get(
+                'timestamp_inicio', datetime.now().isoformat())
+            tracker.timestamp_atualizacao = data.get(
+                'timestamp_atualizacao', datetime.now().isoformat())
             tracker.dados_extra = data.get('dados_extra', {})
             tracker.erros = data.get('erros', [])
             
@@ -250,3 +282,54 @@ class DatabaseProgressTracker:
             
         except Exception:
             return None
+    
+    def _adicionar_entrada_historico(self, etapa, status, mensagem,
+                                    dados_extra=None, erro=None):
+        """
+        Adiciona entrada ao histórico sequencial
+        
+        Args:
+            etapa: Número da etapa ou identificador
+            status: Status da etapa
+            mensagem: Mensagem descritiva
+            dados_extra: Dados extras opcionais
+            erro: Erro se houver
+        """
+        entrada = {
+            "etapa": etapa,
+            "timestamp": datetime.now().isoformat(),
+            "status": status,
+            "mensagem": mensagem,
+            "dados_extra": dados_extra,
+            "erro": erro
+        }
+        self.historico.append(entrada)
+    
+    def _salvar_historico(self):
+        """Salva histórico em arquivo JSON"""
+        try:
+            historico_data = {
+                "session_id": self.session_id,
+                "timestamp_inicio": self.timestamp_inicio,
+                "timestamp_fim": self.timestamp_atualizacao,
+                "status_final": self.status,
+                "total_etapas": self.total_etapas,
+                "historico": self.historico
+            }
+            
+            with open(self.arquivo_historico, 'w', encoding='utf-8') as f:
+                json.dump(historico_data, f, indent=2, ensure_ascii=False)
+        except Exception:
+            # Não falhar se não conseguir salvar histórico
+            pass
+    
+    def get_historico(self):
+        """Retorna histórico completo da sessão"""
+        return {
+            "session_id": self.session_id,
+            "timestamp_inicio": self.timestamp_inicio,
+            "timestamp_fim": self.timestamp_atualizacao,
+            "status_final": self.status,
+            "total_etapas": self.total_etapas,
+            "historico": self.historico
+        }

@@ -1060,3 +1060,5 @@ if monitor:
 **Estratégia**: Conservadora com compatibilidade Ubuntu/Windows garantida
 
 
+
+

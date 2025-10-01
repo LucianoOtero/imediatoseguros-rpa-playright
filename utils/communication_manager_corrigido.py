@@ -354,3 +354,5 @@ def get_progress_data(session_id: str) -> Optional[Dict[str, Any]]:
     """Função de conveniência para obter dados de progresso"""
     return communication_manager.get_progress_data(session_id)
 
+
+
