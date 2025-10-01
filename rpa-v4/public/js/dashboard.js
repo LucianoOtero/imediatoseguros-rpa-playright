@@ -48,12 +48,119 @@ class RPADashboard {
             if (data.success) {
                 this.sessions = data.sessions;
                 this.renderSessions();
+                
+                // Auto-refresh progress for active sessions
+                this.refreshActiveSessionsProgress();
             } else {
                 this.showError('Erro ao carregar sessões: ' + data.error);
             }
         } catch (error) {
             console.error('Erro ao carregar sessões:', error);
             this.showError('Erro de conexão ao carregar sessões');
+        }
+    }
+
+    async refreshActiveSessionsProgress() {
+        const activeSessions = this.sessions.filter(session => 
+            session.status === 'running' || session.status === 'pending'
+        );
+
+        for (const session of activeSessions) {
+            try {
+                const response = await fetch(`${this.baseUrl}/api/rpa/progress/${session.session_id}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    this.updateSessionProgress(session.session_id, data.progress);
+                }
+            } catch (error) {
+                console.error(`Error refreshing progress for session ${session.session_id}:`, error);
+            }
+        }
+    }
+
+    updateSessionProgress(sessionId, progress) {
+        const sessionElement = document.querySelector(`[data-session-id="${sessionId}"]`);
+        if (sessionElement) {
+            // Update progress bar
+            const progressBar = sessionElement.querySelector('.progress-bar');
+            if (progressBar) {
+                progressBar.style.width = `${progress.percentual}%`;
+                progressBar.setAttribute('aria-valuenow', progress.percentual);
+            }
+
+            // Update status
+            const statusElement = sessionElement.querySelector('.badge');
+            if (statusElement) {
+                statusElement.textContent = progress.status;
+                statusElement.className = `badge ${this.getStatusClass(progress.status)}`;
+            }
+
+            // Update message
+            const messageElement = sessionElement.querySelector('.session-message');
+            if (messageElement) {
+                messageElement.textContent = progress.mensagem;
+            }
+
+            // Update estimates if available
+            if (progress.estimativas && progress.estimativas.capturadas) {
+                this.updateEstimatesDisplay(sessionId, progress.estimativas.dados);
+            }
+
+            // Update final results if available
+            if (progress.resultados_finais && progress.resultados_finais.rpa_finalizado) {
+                this.updateFinalResultsDisplay(sessionId, progress.resultados_finais.dados);
+            }
+        }
+    }
+
+    updateEstimatesDisplay(sessionId, estimatesData) {
+        const sessionElement = document.querySelector(`[data-session-id="${sessionId}"]`);
+        if (sessionElement) {
+            let estimatesElement = sessionElement.querySelector('.estimates-display');
+            if (!estimatesElement) {
+                estimatesElement = document.createElement('div');
+                estimatesElement.className = 'estimates-display mt-2';
+                sessionElement.appendChild(estimatesElement);
+            }
+
+            if (estimatesData && estimatesData.coberturas_detalhadas) {
+                estimatesElement.innerHTML = `
+                    <div class="alert alert-info">
+                        <h6>Estimativas Capturadas (Tela 4)</h6>
+                        <div class="row">
+                            ${estimatesData.coberturas_detalhadas.map(cobertura => `
+                                <div class="col-md-4 mb-2">
+                                    <strong>${cobertura.nome_cobertura}</strong><br>
+                                    <small>De: ${cobertura.valores.de}</small><br>
+                                    <small>Até: ${cobertura.valores.ate}</small>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+    }
+
+    updateFinalResultsDisplay(sessionId, resultsData) {
+        const sessionElement = document.querySelector(`[data-session-id="${sessionId}"]`);
+        if (sessionElement) {
+            let resultsElement = sessionElement.querySelector('.results-display');
+            if (!resultsElement) {
+                resultsElement = document.createElement('div');
+                resultsElement.className = 'results-display mt-2';
+                sessionElement.appendChild(resultsElement);
+            }
+
+            if (resultsData) {
+                resultsElement.innerHTML = `
+                    <div class="alert alert-success">
+                        <h6>Resultados Finais (Tela 15)</h6>
+                        <pre>${JSON.stringify(resultsData, null, 2)}</pre>
+                    </div>
+                `;
+            }
         }
     }
 

@@ -207,6 +207,12 @@ STATUS CODES:
     )
     
     parser.add_argument(
+        '--data',
+        type=str,
+        help='JSON data for RPA execution (overrides --config)'
+    )
+    
+    parser.add_argument(
         '--docs',
         type=str,
         choices=['completa', 'json', 'php', 'params'],
@@ -1136,12 +1142,13 @@ def exibir_resultado_final(mensagem: str):
     mensagem_limpa = limpar_emojis_windows(mensagem)
     print(f"[{timestamp}] {mensagem_limpa}")
 
-def carregar_parametros(arquivo_config: str = "parametros.json") -> Dict[str, Any]:
+def carregar_parametros(arquivo_config: str = "parametros.json", dados_json: str = None) -> Dict[str, Any]:
     """
-    Carrega parâmetros do arquivo JSON
+    Carrega parâmetros do arquivo JSON ou dados JSON diretos (estratégia conservadora)
     
     PARÂMETROS:
         arquivo_config: str - Caminho para o arquivo de configuração
+        dados_json: str - JSON string com dados diretos (sobrescreve arquivo_config)
         
     RETORNO:
         dict: Parâmetros carregados
@@ -1152,11 +1159,29 @@ def carregar_parametros(arquivo_config: str = "parametros.json") -> Dict[str, An
     try:
         exception_handler.definir_tela_atual("CARREGAMENTO_PARAMETROS")
         
-        if not os.path.exists(arquivo_config):
-            raise RPAException(f"Arquivo de configuração não encontrado: {arquivo_config}")
+        # Estratégia conservadora: priorizar dados JSON, fallback para arquivo
+        if dados_json:
+            try:
+                parametros = json.loads(dados_json)
+                exibir_mensagem("[INFO] Usando dados JSON dinâmicos")
+                print(f"[INFO] Dados JSON recebidos para sessão {args.session if 'args' in globals() else 'N/A'}")
+            except json.JSONDecodeError as e:
+                exibir_mensagem(f"[AVISO] JSON inválido: {e}")
+                exibir_mensagem("[FALLBACK] Usando parametros.json")
+                raise RPAException(f"JSON inválido: {e}")
+        else:
+            if not os.path.exists(arquivo_config):
+                raise RPAException(f"Arquivo de configuração não encontrado: {arquivo_config}")
+            
+            with open(arquivo_config, 'r', encoding='utf-8') as f:
+                parametros = json.load(f)
+            exibir_mensagem(f"[INFO] Usando parametros.json")
         
-        with open(arquivo_config, 'r', encoding='utf-8') as f:
-            parametros = json.load(f)
+        # Validar dados obrigatórios
+        required_fields = ['cpf', 'nome', 'placa', 'cep']
+        for field in required_fields:
+            if field not in parametros or not parametros[field]:
+                raise RPAException(f"Campo obrigatório '{field}' não encontrado ou vazio")
         
         # NOVA LINHA: Configurar display baseado nos parâmetros
         configurar_display(parametros)
@@ -5957,8 +5982,8 @@ if __name__ == "__main__":
             exibir_documentacao(args.docs)
             sys.exit(0)
         
-        # Carregar parâmetros (compatibilidade mantida)
-        parametros = carregar_parametros(args.config)
+        # Carregar parâmetros (estratégia conservadora)
+        parametros = carregar_parametros(args.config, args.data)
         
         # SISTEMA DE HEALTH CHECK ULTRA-CONSERVADOR (opcional)
         if HEALTH_CHECK_AVAILABLE:

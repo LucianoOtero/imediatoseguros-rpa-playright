@@ -196,26 +196,36 @@ class SessionService implements SessionServiceInterface
 
     private function generateStartScript(string $sessionId, array $data): string
     {
-        $dataJson = json_encode($data, JSON_UNESCAPED_UNICODE);
+        // Estratégia conservadora: validar dados e usar fallback
+        $useJsonData = !empty($data) && $this->validateData($data);
+        
+        if ($useJsonData) {
+            $dataJson = json_encode($data, JSON_UNESCAPED_UNICODE);
+            $command = "/opt/imediatoseguros-rpa/venv/bin/python executar_rpa_imediato_playwright.py --data '$dataJson' --session \$SESSION_ID";
+            $dataSource = "JSON dinâmico";
+        } else {
+            $command = "/opt/imediatoseguros-rpa/venv/bin/python executar_rpa_imediato_playwright.py --config /opt/imediatoseguros-rpa/parametros.json --session \$SESSION_ID";
+            $dataSource = "parametros.json (fallback)";
+        }
         
         return <<<SCRIPT
 #!/bin/bash
 
 # Script gerado automaticamente para sessão: {$sessionId}
 # Data: $(date)
+# Fonte de dados: {$dataSource}
 
 SESSION_ID="{$sessionId}"
-DATA='{$dataJson}'
 
 # Log de início
-echo "$(date): Iniciando RPA para sessão \$SESSION_ID" >> /opt/imediatoseguros-rpa/logs/rpa_v4_\$SESSION_ID.log
+echo "$(date): Iniciando RPA para sessão \$SESSION_ID com {$dataSource}" >> /opt/imediatoseguros-rpa/logs/rpa_v4_\$SESSION_ID.log
 
 # Atualizar status para running
 echo '{"status": "running", "started_at": "'$(date -Iseconds)'"}' > /opt/imediatoseguros-rpa/sessions/\$SESSION_ID/status.json
 
-# Executar RPA v3 existente (compatibilidade)
+# Executar RPA com estratégia conservadora
 cd /opt/imediatoseguros-rpa
-/opt/imediatoseguros-rpa/venv/bin/python executar_rpa_modular_telas_1_a_5.py --config /opt/imediatoseguros-rpa/parametros.json --session \$SESSION_ID
+{$command}
 
 # Verificar resultado
 if [ \$? -eq 0 ]; then
@@ -229,6 +239,56 @@ fi
 # Limpar script temporário
 rm -f "\$0"
 SCRIPT;
+    }
+
+    /**
+     * Validate data for RPA execution (conservative strategy)
+     */
+    private function validateData(array $data): bool
+    {
+        // Validar campos obrigatórios com dados reais
+        $required = ['cpf', 'nome', 'placa', 'cep'];
+        foreach ($required as $field) {
+            if (empty($data[$field])) {
+                $this->logger->warning('Campo obrigatório ausente', [
+                    'field' => $field,
+                    'data' => $data
+                ]);
+                return false;
+            }
+        }
+        
+        // Validar CPF (11 dígitos)
+        if (!preg_match('/^\d{11}$/', $data['cpf'])) {
+            $this->logger->warning('CPF inválido', [
+                'cpf' => $data['cpf']
+            ]);
+            return false;
+        }
+        
+        // Validar placa (formato brasileiro)
+        if (!preg_match('/^[A-Z]{3}\d{4}$/', $data['placa'])) {
+            $this->logger->warning('Placa inválida', [
+                'placa' => $data['placa']
+            ]);
+            return false;
+        }
+        
+        // Validar CEP (8 dígitos)
+        if (!preg_match('/^\d{8}$/', $data['cep'])) {
+            $this->logger->warning('CEP inválido', [
+                'cep' => $data['cep']
+            ]);
+            return false;
+        }
+        
+        $this->logger->info('Dados validados com sucesso', [
+            'cpf' => substr($data['cpf'], 0, 3) . '***',
+            'placa' => $data['placa'],
+            'cep' => $data['cep']
+        ]);
+        
+        return true;
     }
 
     private function stopSystemdService(string $sessionId): void

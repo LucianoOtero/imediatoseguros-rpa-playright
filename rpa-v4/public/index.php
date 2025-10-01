@@ -101,6 +101,9 @@ try {
                      preg_match('/^\/logs\/(.+)$/', $path, $matches)) {
                 $limit = $_GET['limit'] ?? 100;
                 $response = $controller->getLogs($matches[1], (int)$limit);
+            } elseif (preg_match('/^\/api\/rpa\/progress\/(.+)$/', $path, $matches) || 
+                     preg_match('/^\/progress\/(.+)$/', $path, $matches)) {
+                $response = $controller->getProgress($matches[1]);
             } else {
                 $response = ['success' => false, 'error' => 'Endpoint não encontrado'];
             }

@@ -32,16 +32,15 @@ class RPAController
                 return $this->errorResponse('Rate limit exceeded. Try again later.');
             }
             
-            // Validação de entrada (temporariamente desabilitada para compatibilidade com V3)
-            // TODO: Implementar validação robusta quando RPA modular suportar dados via linha de comando
-            // $validation = $this->validationService->validate($data);
-            // if ($validation->hasErrors()) {
-            //     $this->logger->warning('Validation failed', [
-            //         'errors' => $validation->getErrors(),
-            //         'data' => $data
-            //     ]);
-            //     return $this->errorResponse('Dados inválidos: ' . implode(', ', $validation->getErrors()));
-            // }
+            // Validação de entrada (reativada com estratégia conservadora)
+            $validation = $this->validationService->validate($data);
+            if ($validation->hasErrors()) {
+                $this->logger->warning('Validation failed', [
+                    'errors' => $validation->getErrors(),
+                    'data' => $data
+                ]);
+                return $this->errorResponse('Dados inválidos: ' . implode(', ', $validation->getErrors()));
+            }
             
             // Criar sessão RPA
             $result = $this->sessionService->create($data);
@@ -261,6 +260,53 @@ class RPAController
             ]);
             
             return $this->errorResponse('Erro interno: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Get progress for a specific session (real-time monitoring)
+     */
+    public function getProgress(string $sessionId): array
+    {
+        try {
+            $this->logger->info('Progress request received', ['session_id' => $sessionId]);
+            
+            // Validate session ID format
+            if (empty($sessionId) || !preg_match('/^[a-zA-Z0-9_-]+$/', $sessionId)) {
+                return $this->errorResponse('Session ID inválido');
+            }
+            
+            // Get progress from MonitorService
+            $result = $this->monitorService->getProgress($sessionId);
+            
+            if ($result['success']) {
+                $this->logger->info('Progress retrieved successfully', [
+                    'session_id' => $sessionId,
+                    'status' => $result['data']['status'] ?? 'unknown'
+                ]);
+                
+                return [
+                    'success' => true,
+                    'session_id' => $sessionId,
+                    'progress' => $result['data'],
+                    'timestamp' => date('Y-m-d H:i:s')
+                ];
+            } else {
+                $this->logger->warning('Failed to get progress', [
+                    'session_id' => $sessionId,
+                    'error' => $result['error'] ?? 'Unknown error'
+                ]);
+                
+                return $this->errorResponse($result['error'] ?? 'Erro ao obter progresso');
+            }
+            
+        } catch (\Exception $e) {
+            $this->logger->error('Failed to get progress', [
+                'session_id' => $sessionId,
+                'error' => $e->getMessage()
+            ]);
+            
+            return $this->errorResponse('Erro ao obter progresso: ' . $e->getMessage());
         }
     }
 

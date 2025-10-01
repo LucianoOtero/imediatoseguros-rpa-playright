@@ -55,6 +55,259 @@ class MonitorService implements MonitorServiceInterface
         }
     }
 
+    /**
+     * Get progress from progress tracker JSON files (real-time monitoring)
+     */
+    public function getProgress(string $sessionId): array
+    {
+        try {
+            // Detectar arquivos disponíveis
+            $history_file = "/opt/imediatoseguros-rpa/rpa_data/history_{$sessionId}.json";
+            $progress_file = "/opt/imediatoseguros-rpa/rpa_data/progress_{$sessionId}.json";
+
+            $use_history = file_exists($history_file);
+            $use_progress = file_exists($progress_file) && !$use_history;
+
+            if (!$use_history && !$use_progress) {
+                // If neither file exists, return initial status
+                return [
+                    'success' => true,
+                    'data' => [
+                        'etapa_atual' => 0,
+                        'total_etapas' => 5,
+                        'percentual' => 0.0,
+                        'status' => 'waiting',
+                        'mensagem' => 'Aguardando início da execução',
+                        'estimativas' => [
+                            'capturadas' => false,
+                            'dados' => null
+                        ],
+                        'resultados_finais' => [
+                            'rpa_finalizado' => false,
+                            'dados' => null
+                        ],
+                        'timeline' => [],
+                        'source' => 'initial'
+                    ]
+                ];
+            }
+
+            // Processar dados
+            if ($use_history) {
+                $data = $this->processarHistorico($history_file, $sessionId);
+            } else {
+                $data = $this->processarProgress($progress_file, $sessionId);
+            }
+
+            return [
+                'success' => true,
+                'data' => $data
+            ];
+
+        } catch (\Exception $e) {
+            $this->logger->error('Failed to get progress', [
+                'session_id' => $sessionId,
+                'error' => $e->getMessage()
+            ]);
+
+            return [
+                'success' => false,
+                'error' => 'Erro ao obter progresso: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Process history file (complete execution)
+     */
+    private function processarHistorico(string $history_file, string $session_id): array
+    {
+        $content = file_get_contents($history_file);
+        $history_data = json_decode($content, true);
+
+        if (!$history_data) {
+            throw new \Exception('Erro ao ler arquivo de histórico');
+        }
+
+        $historico = $history_data['historico'] ?? [];
+        $processed = $this->processarHistoricoArray($historico, $history_data);
+        
+        // Detecta estimativas (Tela 4)
+        $estimativas_info = $this->detectarEstimativas($historico);
+        
+        // Detecta resultados finais (Tela 15)
+        $resultados_info = $this->detectarResultadosFinais($historico);
+
+        return [
+            'etapa_atual' => $processed['current_etapa'],
+            'total_etapas' => $history_data['total_etapas'] ?? 5,
+            'percentual' => ($processed['current_etapa'] / 5) * 100,
+            'status' => $processed['current_status'],
+            'mensagem' => $processed['current_mensagem'],
+            'estimativas' => [
+                'capturadas' => $estimativas_info['estimativas_capturadas'],
+                'dados' => $estimativas_info['estimativas_capturadas'] 
+                    ? $this->extrairDadosEstimativas($estimativas_info['estimativas_entry'])
+                    : null
+            ],
+            'resultados_finais' => [
+                'rpa_finalizado' => $resultados_info['rpa_finalizado'],
+                'dados' => $resultados_info['rpa_finalizado'] 
+                    ? $this->processarPlanos($this->lerResultadosFinais($session_id))
+                    : null
+            ],
+            'timeline' => array_slice($processed['timeline'], -10), // Últimas 10 entradas
+            'source' => 'history'
+        ];
+    }
+
+    /**
+     * Process progress file (current execution)
+     */
+    private function processarProgress(string $progress_file, string $session_id): array
+    {
+        $content = file_get_contents($progress_file);
+        $progress_data = json_decode($content, true);
+
+        if (!$progress_data) {
+            throw new \Exception('Erro ao ler arquivo de progresso');
+        }
+
+        return [
+            'etapa_atual' => $progress_data['etapa_atual'] ?? 0,
+            'total_etapas' => $progress_data['total_etapas'] ?? 5,
+            'percentual' => $progress_data['percentual'] ?? 0.0,
+            'status' => $progress_data['status'] ?? 'unknown',
+            'mensagem' => $progress_data['mensagem'] ?? 'Status desconhecido',
+            'estimativas' => [
+                'capturadas' => isset($progress_data['dados_extra']['estimativas_tela_4']),
+                'dados' => $progress_data['dados_extra']['estimativas_tela_4'] ?? null
+            ],
+            'resultados_finais' => [
+                'rpa_finalizado' => ($progress_data['status'] ?? '') === 'success',
+                'dados' => null
+            ],
+            'timeline' => [],
+            'source' => 'progress'
+        ];
+    }
+
+    /**
+     * Process history array
+     */
+    private function processarHistoricoArray(array $historico, array $history_data): array
+    {
+        $current_etapa = 0;
+        $current_status = 'waiting';
+        $current_mensagem = 'Aguardando início';
+        $timeline = [];
+
+        foreach ($historico as $entry) {
+            $timeline[] = [
+                'etapa' => $entry['etapa'] ?? 'unknown',
+                'timestamp' => $entry['timestamp'] ?? '',
+                'status' => $entry['status'] ?? 'unknown',
+                'mensagem' => $entry['mensagem'] ?? '',
+                'dados_extra' => $entry['dados_extra'] ?? null
+            ];
+
+            // Atualizar estado atual
+            if (is_numeric($entry['etapa'])) {
+                $current_etapa = max($current_etapa, (int)$entry['etapa']);
+            }
+            $current_status = $entry['status'] ?? $current_status;
+            $current_mensagem = $entry['mensagem'] ?? $current_mensagem;
+        }
+
+        return [
+            'current_etapa' => $current_etapa,
+            'current_status' => $current_status,
+            'current_mensagem' => $current_mensagem,
+            'timeline' => $timeline
+        ];
+    }
+
+    /**
+     * Detect estimates in history
+     */
+    private function detectarEstimativas(array $historico): array
+    {
+        $estimativas_entry = null;
+        $execucao_posterior = false;
+        
+        // Busca entrada "estimativas" no histórico
+        foreach ($historico as $index => $entry) {
+            if ($entry['etapa'] === 'estimativas') {
+                $estimativas_entry = $entry;
+                break;
+            }
+        }
+        
+        // Verifica se há execução posterior (estimativas capturadas)
+        if ($estimativas_entry !== null && count($historico) > $index + 1) {
+            $execucao_posterior = true;
+        }
+        
+        return [
+            'estimativas_encontradas' => $estimativas_entry !== null,
+            'estimativas_capturadas' => $execucao_posterior,
+            'estimativas_entry' => $estimativas_entry
+        ];
+    }
+
+    /**
+     * Detect final results in history
+     */
+    private function detectarResultadosFinais(array $historico): array
+    {
+        $rpa_finalizado = false;
+        
+        // Verifica se há entrada de conclusão
+        foreach ($historico as $entry) {
+            if (($entry['status'] ?? '') === 'success' || 
+                ($entry['status'] ?? '') === 'completed') {
+                $rpa_finalizado = true;
+                break;
+            }
+        }
+        
+        return [
+            'rpa_finalizado' => $rpa_finalizado
+        ];
+    }
+
+    /**
+     * Extract estimate data
+     */
+    private function extrairDadosEstimativas(array $estimativas_entry): array
+    {
+        return $estimativas_entry['dados_extra'] ?? [];
+    }
+
+    /**
+     * Read final results
+     */
+    private function lerResultadosFinais(string $session_id): array
+    {
+        $result_file = "/opt/imediatoseguros-rpa/rpa_data/result_{$session_id}.json";
+        
+        if (!file_exists($result_file)) {
+            return [];
+        }
+        
+        $content = file_get_contents($result_file);
+        return json_decode($content, true) ?? [];
+    }
+
+    /**
+     * Process plans data
+     */
+    private function processarPlanos(array $resultados): array
+    {
+        // Processar dados dos planos conforme necessário
+        return $resultados;
+    }
+
     public function getLogs(string $sessionId, int $limit = 100): array
     {
         try {
