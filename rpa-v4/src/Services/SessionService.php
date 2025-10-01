@@ -296,13 +296,18 @@ class SessionService implements SessionServiceInterface
         // Estratégia conservadora: validar dados e usar fallback
         $useJsonData = !empty($data) && $this->validateData($data);
         
+        // ✅ CORREÇÃO: Definir variáveis sempre para evitar erro no heredoc
+        $tempJsonFile = "/tmp/rpa_data_{$sessionId}.json";
+        $jsonContent = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        
         if ($useJsonData) {
-            $dataJson = json_encode($data, JSON_UNESCAPED_UNICODE);
-            $command = "/opt/imediatoseguros-rpa/venv/bin/python executar_rpa_imediato_playwright.py --data '$dataJson' --session \$SESSION_ID --progress-tracker json";
-            $dataSource = "JSON dinâmico";
+            $command = "/opt/imediatoseguros-rpa/venv/bin/python executar_rpa_imediato_playwright.py --data @{$tempJsonFile} --session \$SESSION_ID --progress-tracker json";
+            $dataSource = "JSON dinâmico (arquivo temporário)";
+            $cleanupCommand = "rm -f {$tempJsonFile}";
         } else {
             $command = "/opt/imediatoseguros-rpa/venv/bin/python executar_rpa_imediato_playwright.py --config /opt/imediatoseguros-rpa/parametros.json --session \$SESSION_ID --progress-tracker json";
             $dataSource = "parametros.json (fallback)";
+            $cleanupCommand = "";
         }
         
         return <<<SCRIPT
@@ -320,6 +325,14 @@ echo "$(date): Iniciando RPA para sessão \$SESSION_ID com {$dataSource}" >> /op
 # Atualizar status para running
 echo '{"status": "running", "started_at": "'$(date -Iseconds)'"}' > /opt/imediatoseguros-rpa/sessions/\$SESSION_ID/status.json
 
+# Criar arquivo temporário com JSON (se necessário)
+if [ "{$dataSource}" = "JSON dinâmico (arquivo temporário)" ]; then
+    cat > {$tempJsonFile} << 'JSON_EOF'
+{$jsonContent}
+JSON_EOF
+    echo "$(date): Arquivo JSON temporário criado: {$tempJsonFile}" >> /opt/imediatoseguros-rpa/logs/rpa_v4_\$SESSION_ID.log
+fi
+
 # Executar RPA com estratégia conservadora
 cd /opt/imediatoseguros-rpa
 {$command}
@@ -332,6 +345,9 @@ else
     echo '{"status": "failed", "failed_at": "'$(date -Iseconds)'"}' > /opt/imediatoseguros-rpa/sessions/\$SESSION_ID/status.json
     echo "$(date): RPA falhou para sessão \$SESSION_ID" >> /opt/imediatoseguros-rpa/logs/rpa_v4_\$SESSION_ID.log
 fi
+
+# Limpar arquivos temporários
+{$cleanupCommand}
 
 # Limpar script temporário
 rm -f "\$0"
