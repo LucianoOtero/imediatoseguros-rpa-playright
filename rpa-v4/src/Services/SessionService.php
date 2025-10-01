@@ -301,7 +301,7 @@ class SessionService implements SessionServiceInterface
         $jsonContent = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
         
         if ($useJsonData) {
-            $command = "/opt/imediatoseguros-rpa/venv/bin/python executar_rpa_imediato_playwright.py --data \"\$(cat {$tempJsonFile})\" --session \$SESSION_ID --progress-tracker json";
+            $command = "/opt/imediatoseguros-rpa/venv/bin/python executar_rpa_imediato_playwright.py --config {$tempJsonFile} --session \$SESSION_ID --progress-tracker json";
             $dataSource = "JSON dinâmico (arquivo temporário)";
             $cleanupCommand = "rm -f {$tempJsonFile}";
         } else {
