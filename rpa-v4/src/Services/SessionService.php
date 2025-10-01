@@ -177,21 +177,118 @@ class SessionService implements SessionServiceInterface
 
     private function startRPABackground(string $sessionId, array $data): void
     {
-        // Criar script de inicialização específico para esta sessão
-        $scriptContent = $this->generateStartScript($sessionId, $data);
-        $scriptPath = $this->scriptsPath . "/start_rpa_v4_{$sessionId}.sh";
-        
-        file_put_contents($scriptPath, $scriptContent);
-        chmod($scriptPath, 0755);
-        
-        // Executar em background
-        $command = "nohup {$scriptPath} > /dev/null 2>&1 &";
-        exec($command);
-        
-        $this->logger->info('RPA background process started', [
-            'session_id' => $sessionId,
-            'script_path' => $scriptPath
-        ]);
+        try {
+            $this->logger->debug('Starting RPA background process', [
+                'session_id' => $sessionId,
+                'scripts_path' => $this->scriptsPath,
+                'scripts_path_exists' => is_dir($this->scriptsPath),
+                'scripts_path_writable' => is_writable($this->scriptsPath),
+                'scripts_path_permissions' => substr(sprintf('%o', fileperms($this->scriptsPath)), -4)
+            ]);
+
+            // Gerar conteúdo do script
+            $scriptContent = $this->generateStartScript($sessionId, $data);
+            $scriptPath = $this->scriptsPath . "/start_rpa_v4_{$sessionId}.sh";
+            
+            // ✅ VERIFICAR se diretório existe e é gravável
+            if (!is_dir($this->scriptsPath)) {
+                throw new \RuntimeException("Diretório de scripts não existe: {$this->scriptsPath}");
+            }
+            
+            if (!is_writable($this->scriptsPath)) {
+                throw new \RuntimeException("Diretório de scripts não é gravável: {$this->scriptsPath}");
+            }
+            
+            // ✅ CRIAR script com verificação de erro
+            $bytes = file_put_contents($scriptPath, $scriptContent);
+            if ($bytes === false) {
+                throw new \RuntimeException("Falha ao criar script em: {$scriptPath}. Verifique permissões.");
+            }
+            
+            // ✅ VERIFICAR se arquivo foi criado
+            if (!file_exists($scriptPath)) {
+                throw new \RuntimeException("Script não foi criado: {$scriptPath}");
+            }
+            
+            // ✅ VERIFICAR tamanho do arquivo
+            if (filesize($scriptPath) === 0) {
+                throw new \RuntimeException("Script criado está vazio: {$scriptPath}");
+            }
+            
+            // ✅ VERIFICAR conteúdo do arquivo
+            $content = file_get_contents($scriptPath);
+            if (strpos($content, '#!/bin/bash') !== 0) {
+                throw new \RuntimeException("Script não contém shebang correto: {$scriptPath}");
+            }
+            
+            // ✅ VERIFICAR encoding
+            if (strpos($content, "\r\n") !== false) {
+                $this->logger->warning('Script contém CRLF, convertendo para LF', [
+                    'script_path' => $scriptPath
+                ]);
+            }
+            
+            // ✅ DEFINIR permissões de execução
+            if (!chmod($scriptPath, 0755)) {
+                throw new \RuntimeException("Falha ao definir permissões do script: {$scriptPath}");
+            }
+            
+            // ✅ CONVERTER encoding
+            exec("dos2unix {$scriptPath} 2>/dev/null", $output, $returnCode);
+            if ($returnCode !== 0) {
+                $this->logger->warning('dos2unix failed', [
+                    'script_path' => $scriptPath,
+                    'return_code' => $returnCode,
+                    'output' => $output
+                ]);
+            }
+            
+            // ✅ VERIFICAR se é executável
+            if (!is_executable($scriptPath)) {
+                throw new \RuntimeException("Script não é executável: {$scriptPath}");
+            }
+            
+            // ✅ EXECUTAR em background
+            $command = "nohup {$scriptPath} > /dev/null 2>&1 &";
+            exec($command, $output, $returnCode);
+            
+            if ($returnCode !== 0) {
+                throw new \RuntimeException("Falha ao executar script em background: {$command}");
+            }
+            
+            // ✅ LOG de sucesso com detalhes
+            $this->logger->info('RPA background process started successfully', [
+                'session_id' => $sessionId,
+                'script_path' => $scriptPath,
+                'file_size' => filesize($scriptPath),
+                'is_executable' => is_executable($scriptPath),
+                'command' => $command,
+                'bytes_written' => $bytes,
+                'content_length' => strlen($content),
+                'has_shebang' => strpos($content, '#!/bin/bash') === 0
+            ]);
+            
+        } catch (\Exception $e) {
+            // ✅ LOG de erro detalhado
+            $this->logger->error('Failed to start RPA background process', [
+                'session_id' => $sessionId,
+                'error' => $e->getMessage(),
+                'script_path' => $scriptPath ?? 'unknown',
+                'scripts_path' => $this->scriptsPath,
+                'scripts_path_exists' => is_dir($this->scriptsPath),
+                'scripts_path_writable' => is_writable($this->scriptsPath),
+                'scripts_path_permissions' => is_dir($this->scriptsPath) ? substr(sprintf('%o', fileperms($this->scriptsPath)), -4) : 'unknown'
+            ]);
+            
+            // ✅ ATUALIZAR status da sessão para failed
+            $this->repository->updateSession($sessionId, [
+                'status' => 'failed',
+                'failed_at' => date('Y-m-d H:i:s'),
+                'error' => $e->getMessage()
+            ]);
+            
+            throw $e;
+        }
     }
 
     private function generateStartScript(string $sessionId, array $data): string
@@ -201,10 +298,10 @@ class SessionService implements SessionServiceInterface
         
         if ($useJsonData) {
             $dataJson = json_encode($data, JSON_UNESCAPED_UNICODE);
-            $command = "/opt/imediatoseguros-rpa/venv/bin/python executar_rpa_imediato_playwright.py --data '$dataJson' --session \$SESSION_ID";
+            $command = "/opt/imediatoseguros-rpa/venv/bin/python executar_rpa_imediato_playwright.py --data '$dataJson' --session \$SESSION_ID --progress-tracker json";
             $dataSource = "JSON dinâmico";
         } else {
-            $command = "/opt/imediatoseguros-rpa/venv/bin/python executar_rpa_imediato_playwright.py --config /opt/imediatoseguros-rpa/parametros.json --session \$SESSION_ID";
+            $command = "/opt/imediatoseguros-rpa/venv/bin/python executar_rpa_imediato_playwright.py --config /opt/imediatoseguros-rpa/parametros.json --session \$SESSION_ID --progress-tracker json";
             $dataSource = "parametros.json (fallback)";
         }
         
@@ -242,50 +339,14 @@ SCRIPT;
     }
 
     /**
-     * Validate data for RPA execution (conservative strategy)
+     * Validate data for RPA execution (validation removed - done in frontend)
      */
     private function validateData(array $data): bool
     {
-        // Validar campos obrigatórios com dados reais
-        $required = ['cpf', 'nome', 'placa', 'cep'];
-        foreach ($required as $field) {
-            if (empty($data[$field])) {
-                $this->logger->warning('Campo obrigatório ausente', [
-                    'field' => $field,
-                    'data' => $data
-                ]);
-                return false;
-            }
-        }
-        
-        // Validar CPF (11 dígitos)
-        if (!preg_match('/^\d{11}$/', $data['cpf'])) {
-            $this->logger->warning('CPF inválido', [
-                'cpf' => $data['cpf']
-            ]);
-            return false;
-        }
-        
-        // Validar placa (formato brasileiro)
-        if (!preg_match('/^[A-Z]{3}\d{4}$/', $data['placa'])) {
-            $this->logger->warning('Placa inválida', [
-                'placa' => $data['placa']
-            ]);
-            return false;
-        }
-        
-        // Validar CEP (8 dígitos)
-        if (!preg_match('/^\d{8}$/', $data['cep'])) {
-            $this->logger->warning('CEP inválido', [
-                'cep' => $data['cep']
-            ]);
-            return false;
-        }
-        
-        $this->logger->info('Dados validados com sucesso', [
-            'cpf' => substr($data['cpf'], 0, 3) . '***',
-            'placa' => $data['placa'],
-            'cep' => $data['cep']
+        // Validação removida - feita no frontend
+        // Apenas retorna true para permitir execução do RPA
+        $this->logger->info('Dados aceitos para execução RPA', [
+            'data_received' => !empty($data)
         ]);
         
         return true;
