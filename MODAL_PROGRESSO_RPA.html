@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modal Progresso RPA - Seguros Imediato</title>
+    
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    
+    <!-- Titillium Web Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Reset e configurações globais */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Titillium Web', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        /* Container principal */
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Header do modal */
+        .modal-header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .modal-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .modal-header h2 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .modal-header p {
+            font-size: 14px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Conteúdo do modal */
+        .modal-content {
+            padding: 30px;
+        }
+        
+        /* Barra de progresso */
+        .progress-container {
+            margin-bottom: 25px;
+        }
+        
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #555;
+        }
+        
+        .progress-percentage {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .progress-bar-wrapper {
+            position: relative;
+            background: #f0f0f0;
+            border-radius: 25px;
+            height: 12px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #3498db 0%, #2ecc71 100%);
+            border-radius: 25px;
+            transition: width 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* Fase atual */
+        .current-phase {
+            text-align: center;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .current-phase i {
+            color: #3498db;
+            margin-right: 8px;
+        }
+        
+        .current-phase-text {
+            font-size: 16px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        /* Cards de dados */
+        .data-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .data-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .data-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .data-card.has-data::before {
+            transform: scaleX(1);
+        }
+        
+        .data-card.has-data {
+            border-color: #3498db;
+            background: #fff;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.1);
+        }
+        
+        .data-card-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        
+        .data-card-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2c3e50;
+            min-height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .data-card-value.empty {
+            color: #bdc3c7;
+            font-style: italic;
+        }
+        
+        /* Botão de fechar */
+        .close-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Titillium Web', sans-serif;
+        }
+        
+        .close-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+        
+        .close-button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .modal-header {
+                padding: 20px;
+            }
+            
+            .modal-header h2 {
+                font-size: 20px;
+            }
+            
+            .modal-content {
+                padding: 20px;
+            }
+            
+            .data-cards {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .data-card {
+                padding: 15px;
+            }
+            
+            .data-card-value {
+                font-size: 16px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .modal-header h2 {
+                font-size: 18px;
+            }
+            
+            .modal-content {
+                padding: 15px;
+            }
+            
+            .current-phase-text {
+                font-size: 14px;
+            }
+        }
+        
+        /* Animações */
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container fade-in">
+        <!-- Header -->
+        <div class="modal-header">
+            <h2><i class="fas fa-cogs"></i> Processando Cotação</h2>
+            <p>Analisando seus dados para encontrar as melhores opções</p>
+        </div>
+        
+        <!-- Conteúdo -->
+        <div class="modal-content">
+            <!-- Barra de Progresso -->
+            <div class="progress-container">
+                <div class="progress-label">
+                    <span>Progresso da Execução</span>
+                    <span class="progress-percentage" id="progressPercentage">0%</span>
+                </div>
+                <div class="progress-bar-wrapper">
+                    <div class="progress-bar" id="progressBar" style="width: 0%;"></div>
+                </div>
+            </div>
+            
+            <!-- Fase Atual -->
+            <div class="current-phase">
+                <i class="fas fa-play-circle"></i>
+                <span class="current-phase-text" id="currentPhase">Iniciando processamento...</span>
+            </div>
+            
+            <!-- Cards de Dados -->
+            <div class="data-cards">
+                <div class="data-card" id="estimativaCard">
+                    <div class="data-card-title">Estimativa Inicial</div>
+                    <div class="data-card-value empty" id="estimativaValue">Aguardando...</div>
+                </div>
+                <div class="data-card" id="valorFinalCard">
+                    <div class="data-card-title">Valor Final Obtido</div>
+                    <div class="data-card-value empty" id="valorFinalValue">Aguardando...</div>
+                </div>
+            </div>
+            
+            <!-- Botão de Fechar -->
+            <button class="close-button" id="closeButton" disabled>
+                <i class="fas fa-times"></i> Fechar
+            </button>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        class RPAProgressModal {
+            constructor() {
+                this.progressBar = document.getElementById('progressBar');
+                this.progressPercentage = document.getElementById('progressPercentage');
+                this.currentPhase = document.getElementById('currentPhase');
+                this.estimativaValue = document.getElementById('estimativaValue');
+                this.valorFinalValue = document.getElementById('valorFinalValue');
+                this.estimativaCard = document.getElementById('estimativaCard');
+                this.valorFinalCard = document.getElementById('valorFinalCard');
+                this.closeButton = document.getElementById('closeButton');
+                
+                this.phases = [
+                    { text: 'Iniciando processamento...', icon: 'fas fa-play-circle' },
+                    { text: 'Validando dados do veículo...', icon: 'fas fa-car' },
+                    { text: 'Consultando dados do proprietário...', icon: 'fas fa-user' },
+                    { text: 'Analisando histórico...', icon: 'fas fa-chart-line' },
+                    { text: 'Calculando estimativas...', icon: 'fas fa-calculator' },
+                    { text: 'Processando coberturas...', icon: 'fas fa-shield-alt' },
+                    { text: 'Verificando condições...', icon: 'fas fa-check-circle' },
+                    { text: 'Gerando propostas...', icon: 'fas fa-file-contract' },
+                    { text: 'Finalizando cálculo...', icon: 'fas fa-coins' },
+                    { text: 'Concluído com sucesso!', icon: 'fas fa-check-circle' }
+                ];
+                
+                this.currentPhaseIndex = 0;
+                this.progress = 0;
+                this.isCompleted = false;
+            }
+            
+            // Simular progresso (substituir por chamadas reais da API)
+            startSimulation() {
+                const interval = setInterval(() => {
+                    this.progress += Math.random() * 15 + 5; // Incremento aleatório entre 5-20%
+                    
+                    if (this.progress >= 100) {
+                        this.progress = 100;
+                        clearInterval(interval);
+                        this.complete();
+                    }
+                    
+                    this.updateProgress();
+                }, 800);
+            }
+            
+            updateProgress() {
+                // Atualizar barra de progresso
+                this.progressBar.style.width = this.progress + '%';
+                this.progressPercentage.textContent = Math.round(this.progress) + '%';
+                
+                // Atualizar fase baseada no progresso
+                const phaseIndex = Math.floor((this.progress / 100) * (this.phases.length - 1));
+                if (phaseIndex !== this.currentPhaseIndex) {
+                    this.currentPhaseIndex = phaseIndex;
+                    this.updatePhase();
+                }
+                
+                // Simular recebimento de estimativa inicial (40% do progresso)
+                if (this.progress >= 40 && this.estimativaValue.textContent === 'Aguardando...') {
+                    this.updateEstimativaInicial('R$ 2.847,50');
+                }
+            }
+            
+            updatePhase() {
+                const phase = this.phases[this.currentPhaseIndex];
+                this.currentPhase.innerHTML = `<i class="${phase.icon}"></i> ${phase.text}`;
+                
+                // Adicionar animação de pulso para fases ativas
+                this.currentPhase.classList.add('pulse');
+                setTimeout(() => {
+                    this.currentPhase.classList.remove('pulse');
+                }, 2000);
+            }
+            
+            updateEstimativaInicial(value) {
+                this.estimativaValue.textContent = value;
+                this.estimativaValue.classList.remove('empty');
+                this.estimativaCard.classList.add('has-data');
+            }
+            
+            updateValorFinal(value) {
+                this.valorFinalValue.textContent = value;
+                this.valorFinalValue.classList.remove('empty');
+                this.valorFinalCard.classList.add('has-data');
+            }
+            
+            complete() {
+                this.isCompleted = true;
+                this.updateValorFinal('R$ 2.743,52');
+                this.closeButton.disabled = false;
+                this.closeButton.innerHTML = '<i class="fas fa-check"></i> Concluído - Fechar';
+                
+                // Adicionar efeito de sucesso
+                this.currentPhase.style.color = '#27ae60';
+                this.progressBar.style.background = 'linear-gradient(90deg, #27ae60 0%, #2ecc71 100%)';
+            }
+            
+            // Métodos para integração com API real
+            updateFromAPI(apiData) {
+                if (apiData.progress) {
+                    this.progress = apiData.progress.percentual || 0;
+                    this.updateProgress();
+                }
+                
+                if (apiData.progress && apiData.progress.estimativas && apiData.progress.estimativas.capturadas) {
+                    const estimativa = apiData.progress.estimativas.dados.plano_recomendado;
+                    this.updateEstimativaInicial(estimativa);
+                }
+                
+                if (apiData.progress && apiData.progress.resultados_finais && apiData.progress.resultados_finais.rpa_finalizado) {
+                    const valorFinal = apiData.progress.resultados_finais.dados.valor_final;
+                    this.updateValorFinal(valorFinal);
+                    this.complete();
+                }
+            }
+        }
+        
+        // Inicializar modal
+        const modal = new RPAProgressModal();
+        
+        // Event listeners
+        document.getElementById('closeButton').addEventListener('click', () => {
+            if (modal.isCompleted) {
+                // Aqui você pode adicionar lógica para fechar o modal
+                console.log('Modal fechado');
+            }
+        });
+        
+        // Iniciar simulação (remover em produção)
+        modal.startSimulation();
+        
+        // Exemplo de como integrar com API real:
+        /*
+        async function monitorarProgresso(sessionId) {
+            const response = await fetch(`https://37.27.92.160/api/rpa/progress/${sessionId}`);
+            const data = await response.json();
+            modal.updateFromAPI(data);
+            
+            if (!data.progress || data.progress.status !== 'success') {
+                setTimeout(() => monitorarProgresso(sessionId), 2000);
+            }
+        }
+        
+        // Chamar após criar sessão
+        // monitorarProgresso('session_id_aqui');
+        */
+    </script>
+</body>
+</html>
