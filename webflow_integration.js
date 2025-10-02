@@ -85,9 +85,11 @@ class WebflowRPAClient {
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', () => {
                     this.setupFormIntegration();
+                    this.setupRealTimeValidation();
                 });
             } else {
                 this.setupFormIntegration();
+                this.setupRealTimeValidation();
             }
             
             console.log('✅ Webflow RPA Client inicializado com sucesso');
@@ -124,7 +126,8 @@ class WebflowRPAClient {
             }
         ];
         
-        for (const dep of dependencies) {
+        // Carregar dependências em paralelo para melhor performance
+        const loadPromises = dependencies.map(async (dep) => {
             if (!dep.check()) {
                 console.log(`📦 Carregando ${dep.name}...`);
                 await dep.load();
@@ -132,16 +135,26 @@ class WebflowRPAClient {
             } else {
                 console.log(`✅ ${dep.name} já carregado`);
             }
-        }
+        });
+        
+        await Promise.all(loadPromises);
     }
     
     /**
-     * Carregar script dinamicamente
+     * Carregar script dinamicamente com cache
      */
     loadScript(src) {
         return new Promise((resolve, reject) => {
+            // Verificar se já existe
+            const existingScript = document.querySelector(`script[src="${src}"]`);
+            if (existingScript) {
+                resolve();
+                return;
+            }
+            
             const script = document.createElement('script');
             script.src = src;
+            script.async = true; // Carregar assíncrono para melhor performance
             script.onload = resolve;
             script.onerror = reject;
             document.head.appendChild(script);
@@ -149,10 +162,17 @@ class WebflowRPAClient {
     }
     
     /**
-     * Carregar stylesheet dinamicamente
+     * Carregar stylesheet dinamicamente com cache
      */
     loadStylesheet(href) {
         return new Promise((resolve) => {
+            // Verificar se já existe
+            const existingLink = document.querySelector(`link[href="${href}"]`);
+            if (existingLink) {
+                resolve();
+                return;
+            }
+            
             const link = document.createElement('link');
             link.rel = 'stylesheet';
             link.href = href;
@@ -245,6 +265,146 @@ class WebflowRPAClient {
         }
         
         console.log('✅ Integração com formulário configurada');
+    }
+
+    /**
+     * Configurar validação em tempo real
+     */
+    setupRealTimeValidation() {
+        console.log('🔍 Configurando validação em tempo real...');
+        
+        // Aguardar um pouco para garantir que os campos existam
+        setTimeout(() => {
+            this.setupFieldValidation();
+        }, 500);
+        
+        console.log('✅ Validação em tempo real configurada');
+    }
+
+    /**
+     * Configurar validação de campos
+     */
+    setupFieldValidation() {
+        const fields = this.getFormFields();
+        
+        fields.forEach(field => {
+            if (field) {
+                // Validação em tempo real para CPF
+                if (field.name === 'cpf' || field.id === 'cpf' || field.classList.contains('cpf')) {
+                    field.addEventListener('input', (e) => {
+                        this.validateCPFRealTime(e.target);
+                    });
+                    field.addEventListener('blur', (e) => {
+                        this.validateCPFRealTime(e.target);
+                    });
+                }
+                
+                // Validação em tempo real para placa
+                if (field.name === 'placa' || field.id === 'placa' || field.classList.contains('placa')) {
+                    field.addEventListener('input', (e) => {
+                        this.validatePlacaRealTime(e.target);
+                    });
+                    field.addEventListener('blur', (e) => {
+                        this.validatePlacaRealTime(e.target);
+                    });
+                }
+                
+                // Validação em tempo real para CEP
+                if (field.name === 'cep' || field.id === 'cep' || field.classList.contains('cep')) {
+                    field.addEventListener('input', (e) => {
+                        this.validateCEPRealTime(e.target);
+                    });
+                    field.addEventListener('blur', (e) => {
+                        this.validateCEPRealTime(e.target);
+                    });
+                }
+                
+                // Validação em tempo real para email
+                if (field.type === 'email' || field.name === 'email' || field.id === 'email') {
+                    field.addEventListener('input', (e) => {
+                        this.validateEmailRealTime(e.target);
+                    });
+                    field.addEventListener('blur', (e) => {
+                        this.validateEmailRealTime(e.target);
+                    });
+                }
+            }
+        });
+    }
+
+    /**
+     * Validar CPF em tempo real
+     */
+    validateCPFRealTime(field) {
+        const value = field.value.replace(/[^\d]/g, '');
+        const isValid = this.isValidCPF(value);
+        
+        this.updateFieldValidation(field, isValid, 'CPF inválido');
+    }
+
+    /**
+     * Validar placa em tempo real
+     */
+    validatePlacaRealTime(field) {
+        const value = field.value.toUpperCase();
+        const isValid = this.isValidPlaca(value);
+        
+        this.updateFieldValidation(field, isValid, 'Placa inválida');
+    }
+
+    /**
+     * Validar CEP em tempo real
+     */
+    validateCEPRealTime(field) {
+        const value = field.value.replace(/[^\d]/g, '');
+        const isValid = this.isValidCEP(value);
+        
+        this.updateFieldValidation(field, isValid, 'CEP inválido');
+    }
+
+    /**
+     * Validar email em tempo real
+     */
+    validateEmailRealTime(field) {
+        const value = field.value.trim();
+        const isValid = value === '' || this.isValidEmail(value);
+        
+        this.updateFieldValidation(field, isValid, 'Email inválido');
+    }
+
+    /**
+     * Atualizar validação visual do campo
+     */
+    updateFieldValidation(field, isValid, errorMessage) {
+        // Remover classes anteriores
+        field.classList.remove('valid', 'invalid');
+        
+        // Remover mensagem de erro anterior
+        const existingError = field.parentNode.querySelector('.field-error');
+        if (existingError) {
+            existingError.remove();
+        }
+        
+        if (field.value.trim() !== '') {
+            if (isValid) {
+                field.classList.add('valid');
+            } else {
+                field.classList.add('invalid');
+                
+                // Adicionar mensagem de erro
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'field-error';
+                errorDiv.textContent = errorMessage;
+                errorDiv.style.cssText = `
+                    color: #e74c3c;
+                    font-size: 12px;
+                    margin-top: 4px;
+                    display: block;
+                `;
+                
+                field.parentNode.appendChild(errorDiv);
+            }
+        }
     }
     
     /**
@@ -364,7 +524,7 @@ class WebflowRPAClient {
     }
     
     /**
-     * Validar CPF
+     * Validar CPF (básico - validação completa no frontend)
      */
     isValidCPF(cpf) {
         cpf = cpf.replace(/[^\d]/g, '');
@@ -395,24 +555,50 @@ class WebflowRPAClient {
     }
     
     /**
+     * Fetch com retry e backoff exponencial
+     */
+    async fetchWithRetry(url, options, maxRetries = 3) {
+        for (let i = 0; i < maxRetries; i++) {
+            try {
+                console.log(`🔄 Tentativa ${i + 1}/${maxRetries} para ${url}`);
+                const response = await fetch(url, options);
+                
+                if (response.ok) {
+                    console.log(`✅ Sucesso na tentativa ${i + 1}`);
+                    return response;
+                }
+                
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            } catch (error) {
+                console.warn(`⚠️ Tentativa ${i + 1} falhou:`, error.message);
+                
+                if (i === maxRetries - 1) {
+                    throw new Error(`Falha após ${maxRetries} tentativas: ${error.message}`);
+                }
+                
+                // Backoff exponencial: 1s, 2s, 4s, 8s...
+                const delay = Math.pow(2, i) * 1000;
+                console.log(`⏳ Aguardando ${delay}ms antes da próxima tentativa...`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+        }
+    }
+
+    /**
      * Iniciar RPA
      */
     async startRPA(dados) {
         try {
             console.log('🚀 Iniciando RPA...');
             
-            // Chamar API para iniciar sessão
-            const response = await fetch(`${this.apiBaseUrl}/start`, {
+            // Chamar API para iniciar sessão com retry
+            const response = await this.fetchWithRetry(`${this.apiBaseUrl}/start`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(dados)
             });
-            
-            if (!response.ok) {
-                throw new Error(`Erro HTTP: ${response.status}`);
-            }
             
             const result = await response.json();
             console.log('📡 Resposta da API:', result);
@@ -577,11 +763,13 @@ class WebflowRPAClient {
                     return;
                 }
                 
-                const response = await fetch(`${this.apiBaseUrl}/progress/${this.sessionId}`);
-                
-                if (!response.ok) {
-                    throw new Error(`Erro HTTP: ${response.status}`);
-                }
+                // Usar fetchWithRetry para monitoramento
+                const response = await this.fetchWithRetry(`${this.apiBaseUrl}/progress/${this.sessionId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                }, 2); // Menos tentativas para polling
                 
                 const data = await response.json();
                 console.log('📈 Progresso atualizado:', data);
@@ -760,21 +948,50 @@ class WebflowRPAClient {
     /**
      * Mostrar erro
      */
-    showError(titulo, mensagem) {
+    showError(titulo, mensagem, detalhes = null) {
         this.stopProgressMonitoring();
+        
+        // Preparar mensagem detalhada
+        let mensagemCompleta = mensagem;
+        if (detalhes) {
+            mensagemCompleta += `\n\nDetalhes: ${detalhes}`;
+        }
         
         Swal.fire({
             icon: 'error',
             title: titulo,
-            text: mensagem,
+            text: mensagemCompleta,
             confirmButtonText: 'Fechar',
+            showCancelButton: true,
+            cancelButtonText: 'Tentar Novamente',
+            cancelButtonColor: '#3498db',
             customClass: {
                 popup: 'rpa-modal-popup',
                 title: 'rpa-modal-title'
             }
+        }).then((result) => {
+            if (result.dismiss === Swal.DismissReason.cancel) {
+                // Tentar novamente
+                this.retryLastOperation();
+            } else {
+                this.isProcessing = false;
+            }
         });
+    }
+
+    /**
+     * Tentar novamente a última operação
+     */
+    retryLastOperation() {
+        console.log('🔄 Tentando novamente a última operação...');
         
-        this.isProcessing = false;
+        if (this.sessionId) {
+            // Se temos uma sessão, continuar monitoramento
+            this.startProgressMonitoring();
+        } else {
+            // Se não temos sessão, tentar iniciar novamente
+            this.handleFormSubmit();
+        }
     }
     
     /**

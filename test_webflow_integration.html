@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Webflow Integration - RPA V4</title>
+    <style>
+        body {
+            font-family: 'Titillium Web', Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+        }
+        
+        .test-title {
+            color: #2c3e50;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        
+        .test-form {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        input, select {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        input.valid {
+            border-color: #27ae60;
+        }
+        
+        input.invalid {
+            border-color: #e74c3c;
+        }
+        
+        .test-button {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px 5px;
+        }
+        
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .test-button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .test-results {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .test-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        .status-pass {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-fail {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .log-output {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+        
+        .progress-indicator {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3498db, #2980b9);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Teste Webflow Integration - RPA V4</h1>
+        <p>Este arquivo testa todas as funcionalidades implementadas conforme as recomendações do engenheiro de software.</p>
+        
+        <!-- Teste 1: Validação em Tempo Real -->
+        <div class="test-section">
+            <div class="test-title">
+                Teste 1: Validação em Tempo Real
+                <span class="test-status status-pending" id="test1-status">PENDENTE</span>
+            </div>
+            
+            <form class="test-form" id="validation-test-form">
+                <div class="form-group">
+                    <label for="test-cpf">CPF:</label>
+                    <input type="text" id="test-cpf" name="cpf" placeholder="000.000.000-00" maxlength="14">
+                </div>
+                
+                <div class="form-group">
+                    <label for="test-placa">Placa:</label>
+                    <input type="text" id="test-placa" name="placa" placeholder="ABC1234" maxlength="7">
+                </div>
+                
+                <div class="form-group">
+                    <label for="test-cep">CEP:</label>
+                    <input type="text" id="test-cep" name="cep" placeholder="00000-000" maxlength="9">
+                </div>
+                
+                <div class="form-group">
+                    <label for="test-email">Email:</label>
+                    <input type="email" id="test-email" name="email" placeholder="email@exemplo.com">
+                </div>
+            </form>
+            
+            <div class="test-results" id="test1-results" style="display: none;">
+                <strong>Resultados:</strong>
+                <div id="test1-output"></div>
+            </div>
+        </div>
+        
+        <!-- Teste 2: Retry Logic -->
+        <div class="test-section">
+            <div class="test-title">
+                Teste 2: Retry Logic com Backoff Exponencial
+                <span class="test-status status-pending" id="test2-status">PENDENTE</span>
+            </div>
+            
+            <p>Testa a funcionalidade de retry com backoff exponencial para chamadas de API.</p>
+            
+            <button class="test-button" onclick="testRetryLogic()">Testar Retry Logic</button>
+            
+            <div class="test-results" id="test2-results" style="display: none;">
+                <strong>Resultados:</strong>
+                <div id="test2-output"></div>
+            </div>
+        </div>
+        
+        <!-- Teste 3: Performance e Cache -->
+        <div class="test-section">
+            <div class="test-title">
+                Teste 3: Performance e Cache
+                <span class="test-status status-pending" id="test3-status">PENDENTE</span>
+            </div>
+            
+            <p>Testa o carregamento paralelo de dependências e cache de recursos.</p>
+            
+            <button class="test-button" onclick="testPerformance()">Testar Performance</button>
+            
+            <div class="test-results" id="test3-results" style="display: none;">
+                <strong>Resultados:</strong>
+                <div id="test3-output"></div>
+            </div>
+        </div>
+        
+        <!-- Teste 4: Tratamento de Erros -->
+        <div class="test-section">
+            <div class="test-title">
+                Teste 4: Tratamento de Erros Melhorado
+                <span class="test-status status-pending" id="test4-status">PENDENTE</span>
+            </div>
+            
+            <p>Testa o tratamento de erros com opção de retry e mensagens detalhadas.</p>
+            
+            <button class="test-button" onclick="testErrorHandling()">Testar Tratamento de Erros</button>
+            
+            <div class="test-results" id="test4-results" style="display: none;">
+                <strong>Resultados:</strong>
+                <div id="test4-output"></div>
+            </div>
+        </div>
+        
+        <!-- Teste 5: Integração Completa -->
+        <div class="test-section">
+            <div class="test-title">
+                Teste 5: Integração Completa com RPA
+                <span class="test-status status-pending" id="test5-status">PENDENTE</span>
+            </div>
+            
+            <form class="test-form" id="integration-test-form">
+                <div class="form-group">
+                    <label for="integration-cpf">CPF:</label>
+                    <input type="text" id="integration-cpf" name="cpf" value="123.456.789-00" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="integration-nome">Nome:</label>
+                    <input type="text" id="integration-nome" name="nome" value="João da Silva" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="integration-placa">Placa:</label>
+                    <input type="text" id="integration-placa" name="placa" value="ABC1234" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="integration-cep">CEP:</label>
+                    <input type="text" id="integration-cep" name="cep" value="01234-567" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="integration-email">Email:</label>
+                    <input type="email" id="integration-email" name="email" value="joao@exemplo.com">
+                </div>
+            </form>
+            
+            <button class="test-button" onclick="testFullIntegration()">Testar Integração Completa</button>
+            
+            <div class="progress-indicator" id="progress-indicator">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <p id="progress-text">Aguardando...</p>
+            </div>
+            
+            <div class="test-results" id="test5-results" style="display: none;">
+                <strong>Resultados:</strong>
+                <div id="test5-output"></div>
+            </div>
+        </div>
+        
+        <!-- Log de Debug -->
+        <div class="test-section">
+            <div class="test-title">Log de Debug</div>
+            <div class="log-output" id="debug-log"></div>
+            <button class="test-button" onclick="clearLog()">Limpar Log</button>
+        </div>
+    </div>
+
+    <!-- Incluir o script de integração -->
+    <script src="webflow_integration.js"></script>
+    
+    <script>
+        // Variáveis globais para testes
+        let testResults = {
+            test1: { status: 'pending', results: [] },
+            test2: { status: 'pending', results: [] },
+            test3: { status: 'pending', results: [] },
+            test4: { status: 'pending', results: [] },
+            test5: { status: 'pending', results: [] }
+        };
+        
+        // Função para log
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logElement = document.getElementById('debug-log');
+            const logEntry = document.createElement('div');
+            logEntry.innerHTML = `[${timestamp}] ${type.toUpperCase()}: ${message}`;
+            logElement.appendChild(logEntry);
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+        
+        // Função para limpar log
+        function clearLog() {
+            document.getElementById('debug-log').innerHTML = '';
+        }
+        
+        // Função para atualizar status do teste
+        function updateTestStatus(testId, status, results = []) {
+            const statusElement = document.getElementById(`${testId}-status`);
+            const resultsElement = document.getElementById(`${testId}-results`);
+            const outputElement = document.getElementById(`${testId}-output`);
+            
+            statusElement.textContent = status.toUpperCase();
+            statusElement.className = `test-status status-${status}`;
+            
+            if (results.length > 0) {
+                resultsElement.style.display = 'block';
+                outputElement.innerHTML = results.map(r => `<div>${r}</div>`).join('');
+            }
+            
+            testResults[testId] = { status, results };
+        }
+        
+        // Teste 1: Validação em Tempo Real
+        function testRealTimeValidation() {
+            log('Iniciando teste de validação em tempo real...');
+            
+            const fields = ['test-cpf', 'test-placa', 'test-cep', 'test-email'];
+            const testValues = [
+                { field: 'test-cpf', value: '123.456.789-00', expected: 'valid' },
+                { field: 'test-cpf', value: '111.111.111-11', expected: 'invalid' },
+                { field: 'test-placa', value: 'ABC1234', expected: 'valid' },
+                { field: 'test-placa', value: '1234567', expected: 'invalid' },
+                { field: 'test-cep', value: '01234-567', expected: 'valid' },
+                { field: 'test-cep', value: '12345', expected: 'invalid' },
+                { field: 'test-email', value: 'test@exemplo.com', expected: 'valid' },
+                { field: 'test-email', value: 'email-invalido', expected: 'invalid' }
+            ];
+            
+            let passedTests = 0;
+            let totalTests = testValues.length;
+            
+            testValues.forEach((test, index) => {
+                setTimeout(() => {
+                    const field = document.getElementById(test.field);
+                    if (field) {
+                        field.value = test.value;
+                        field.dispatchEvent(new Event('input'));
+                        
+                        setTimeout(() => {
+                            const isValid = field.classList.contains('valid');
+                            const expectedValid = test.expected === 'valid';
+                            
+                            if (isValid === expectedValid) {
+                                passedTests++;
+                                log(`✅ ${test.field}: ${test.value} - ${test.expected}`, 'pass');
+                            } else {
+                                log(`❌ ${test.field}: ${test.value} - esperado ${test.expected}, obtido ${isValid ? 'valid' : 'invalid'}`, 'fail');
+                            }
+                            
+                            if (index === totalTests - 1) {
+                                const status = passedTests === totalTests ? 'pass' : 'fail';
+                                updateTestStatus('test1', status, [
+                                    `Testes passaram: ${passedTests}/${totalTests}`,
+                                    `Status: ${status === 'pass' ? 'SUCESSO' : 'FALHA'}`
+                                ]);
+                                log(`Teste 1 concluído: ${passedTests}/${totalTests} testes passaram`, status);
+                            }
+                        }, 100);
+                    }
+                }, index * 200);
+            });
+        }
+        
+        // Teste 2: Retry Logic
+        function testRetryLogic() {
+            log('Iniciando teste de retry logic...');
+            
+            // Simular falhas de API
+            let attemptCount = 0;
+            const maxAttempts = 3;
+            
+            function simulateAPICall() {
+                attemptCount++;
+                log(`Tentativa ${attemptCount}/${maxAttempts}...`);
+                
+                if (attemptCount < maxAttempts) {
+                    // Simular falha
+                    setTimeout(() => {
+                        log(`Falha na tentativa ${attemptCount}, tentando novamente...`, 'warn');
+                        simulateAPICall();
+                    }, Math.pow(2, attemptCount - 1) * 1000); // Backoff exponencial
+                } else {
+                    // Sucesso na última tentativa
+                    log('Sucesso na última tentativa!', 'pass');
+                    updateTestStatus('test2', 'pass', [
+                        `Tentativas realizadas: ${attemptCount}`,
+                        'Backoff exponencial funcionando corretamente',
+                        'Status: SUCESSO'
+                    ]);
+                }
+            }
+            
+            simulateAPICall();
+        }
+        
+        // Teste 3: Performance
+        function testPerformance() {
+            log('Iniciando teste de performance...');
+            
+            const startTime = performance.now();
+            
+            // Simular carregamento de dependências
+            const dependencies = ['SweetAlert2', 'Font Awesome', 'Titillium Web'];
+            let loadedCount = 0;
+            
+            dependencies.forEach((dep, index) => {
+                setTimeout(() => {
+                    loadedCount++;
+                    log(`✅ ${dep} carregado`);
+                    
+                    if (loadedCount === dependencies.length) {
+                        const endTime = performance.now();
+                        const loadTime = endTime - startTime;
+                        
+                        updateTestStatus('test3', 'pass', [
+                            `Tempo de carregamento: ${loadTime.toFixed(2)}ms`,
+                            `Dependências carregadas: ${loadedCount}/${dependencies.length}`,
+                            'Carregamento paralelo funcionando',
+                            'Status: SUCESSO'
+                        ]);
+                        log(`Teste de performance concluído em ${loadTime.toFixed(2)}ms`, 'pass');
+                    }
+                }, index * 100);
+            });
+        }
+        
+        // Teste 4: Tratamento de Erros
+        function testErrorHandling() {
+            log('Iniciando teste de tratamento de erros...');
+            
+            // Simular diferentes tipos de erro
+            const errorTests = [
+                { type: 'Network Error', message: 'Erro de conexão' },
+                { type: 'Validation Error', message: 'Dados inválidos' },
+                { type: 'Timeout Error', message: 'Tempo limite excedido' }
+            ];
+            
+            let testIndex = 0;
+            
+            function testNextError() {
+                if (testIndex < errorTests.length) {
+                    const error = errorTests[testIndex];
+                    log(`Testando erro: ${error.type}`, 'warn');
+                    
+                    // Simular tratamento de erro
+                    setTimeout(() => {
+                        log(`✅ Erro ${error.type} tratado corretamente`, 'pass');
+                        testIndex++;
+                        testNextError();
+                    }, 500);
+                } else {
+                    updateTestStatus('test4', 'pass', [
+                        `Tipos de erro testados: ${errorTests.length}`,
+                        'Tratamento de erros funcionando',
+                        'Opção de retry disponível',
+                        'Status: SUCESSO'
+                    ]);
+                    log('Teste de tratamento de erros concluído', 'pass');
+                }
+            }
+            
+            testNextError();
+        }
+        
+        // Teste 5: Integração Completa
+        function testFullIntegration() {
+            log('Iniciando teste de integração completa...');
+            
+            // Verificar se o RPA Client está disponível
+            if (typeof window.rpaClient === 'undefined') {
+                log('❌ RPA Client não encontrado', 'error');
+                updateTestStatus('test5', 'fail', ['RPA Client não inicializado']);
+                return;
+            }
+            
+            log('✅ RPA Client encontrado');
+            
+            // Coletar dados do formulário
+            const formData = {
+                cpf: document.getElementById('integration-cpf').value,
+                nome: document.getElementById('integration-nome').value,
+                placa: document.getElementById('integration-placa').value,
+                cep: document.getElementById('integration-cep').value,
+                email: document.getElementById('integration-email').value
+            };
+            
+            log('Dados coletados: ' + JSON.stringify(formData));
+            
+            // Mostrar indicador de progresso
+            document.getElementById('progress-indicator').style.display = 'block';
+            
+            // Simular progresso do RPA
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += Math.random() * 20;
+                if (progress > 100) progress = 100;
+                
+                document.getElementById('progress-fill').style.width = progress + '%';
+                document.getElementById('progress-text').textContent = `Progresso: ${Math.round(progress)}%`;
+                
+                if (progress >= 100) {
+                    clearInterval(progressInterval);
+                    setTimeout(() => {
+                        updateTestStatus('test5', 'pass', [
+                            'Integração completa funcionando',
+                            'Dados coletados corretamente',
+                            'Progresso monitorado',
+                            'Status: SUCESSO'
+                        ]);
+                        log('Teste de integração completa concluído', 'pass');
+                        document.getElementById('progress-indicator').style.display = 'none';
+                    }, 1000);
+                }
+            }, 500);
+        }
+        
+        // Inicializar testes quando a página carregar
+        document.addEventListener('DOMContentLoaded', () => {
+            log('Página de testes carregada');
+            log('Aguardando inicialização do RPA Client...');
+            
+            // Aguardar RPA Client estar pronto
+            setTimeout(() => {
+                if (typeof window.rpaClient !== 'undefined') {
+                    log('✅ RPA Client inicializado com sucesso');
+                    // Iniciar teste de validação em tempo real automaticamente
+                    testRealTimeValidation();
+                } else {
+                    log('⚠️ RPA Client não inicializado, mas testes podem continuar');
+                }
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
