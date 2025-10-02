@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulação Webflow - RPA V4</title>
+    
+    <!-- Titillium Web Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Titillium Web', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .formulario-cotacao {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .campo-formulario {
+            margin-bottom: 20px;
+        }
+        
+        .campo-formulario label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+        
+        .campo-formulario input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: 'Titillium Web', sans-serif;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+        
+        .campo-formulario input:focus {
+            outline: none;
+            border-color: #3498db;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        
+        .campo-formulario input:disabled {
+            background: #e9ecef;
+            color: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        .grid-campos {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .botao-cotacao {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            font-family: 'Titillium Web', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .botao-cotacao::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .botao-cotacao:hover::before {
+            left: 100%;
+        }
+        
+        .botao-cotacao:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
+        }
+        
+        .botao-cotacao:active {
+            transform: translateY(0);
+        }
+        
+        .botao-cotacao:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .botao-cotacao:disabled::before {
+            display: none;
+        }
+        
+        .info-box {
+            background: #e8f4fd;
+            border: 1px solid #bee5eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .info-box h3 {
+            color: #0c5460;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .info-box p {
+            color: #0c5460;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-ready {
+            background: #27ae60;
+        }
+        
+        .status-processing {
+            background: #f39c12;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .status-error {
+            background: #e74c3c;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .webflow-notes {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        
+        .webflow-notes h3 {
+            color: #856404;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .webflow-notes ul {
+            color: #856404;
+            font-size: 14px;
+            line-height: 1.6;
+            padding-left: 20px;
+        }
+        
+        .webflow-notes li {
+            margin-bottom: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .grid-campos {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .campo-formulario input {
+                font-size: 16px; /* Evitar zoom no iOS */
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .content {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🚀 Simulação Webflow - RPA V4</h1>
+            <p>Teste da integração completa com o sistema de cotação de seguros</p>
+        </div>
+        
+        <!-- Content -->
+        <div class="content">
+            <!-- Info Box -->
+            <div class="info-box">
+                <h3>
+                    <span class="status-indicator status-ready" id="statusIndicator"></span>
+                    Status: <span id="statusText">Pronto para calcular</span>
+                </h3>
+                <p>
+                    Este formulário simula o comportamento do website Webflow. 
+                    Os campos estão preenchidos com dados reais do sistema. 
+                    Clique em "Calcular" para iniciar o processamento RPA.
+                </p>
+            </div>
+            
+            <!-- Formulário -->
+            <form class="formulario-cotacao" id="formulario-cotacao">
+                <div class="grid-campos">
+                    <!-- CPF -->
+                    <div class="campo-formulario">
+                        <label for="cpf">CPF *</label>
+                        <input type="text" id="cpf" name="cpf" value="97137189768" required>
+                    </div>
+                    
+                    <!-- Nome -->
+                    <div class="campo-formulario">
+                        <label for="nome">Nome Completo *</label>
+                        <input type="text" id="nome" name="nome" value="ALEX KAMINSKI" required>
+                    </div>
+                    
+                    <!-- Placa -->
+                    <div class="campo-formulario">
+                        <label for="placa">Placa do Veículo *</label>
+                        <input type="text" id="placa" name="placa" value="EYQ4J41" required>
+                    </div>
+                    
+                    <!-- CEP -->
+                    <div class="campo-formulario">
+                        <label for="cep">CEP *</label>
+                        <input type="text" id="cep" name="cep" value="03317-000" required>
+                    </div>
+                    
+                    <!-- Email -->
+                    <div class="campo-formulario">
+                        <label for="email">E-mail</label>
+                        <input type="email" id="email" name="email" value="alex.kaminski@imediatoseguros.com.br">
+                    </div>
+                    
+                    <!-- Telefone -->
+                    <div class="campo-formulario">
+                        <label for="telefone">Telefone</label>
+                        <input type="tel" id="telefone" name="telefone" value="11953288466">
+                    </div>
+                </div>
+                
+                <!-- Botão -->
+                <button type="button" id="botao-cotacao" class="botao-cotacao">
+                    🧮 Calcular Cotação
+                </button>
+            </form>
+            
+            <!-- Webflow Notes -->
+            <div class="webflow-notes">
+                <h3>📝 Notas para Implementação no Webflow</h3>
+                <ul>
+                    <li><strong>IDs dos campos:</strong> cpf, nome, placa, cep, email, telefone</li>
+                    <li><strong>ID do formulário:</strong> formulario-cotacao</li>
+                    <li><strong>ID do botão:</strong> botao-cotacao</li>
+                    <li><strong>Classes CSS:</strong> formulario-cotacao, campo-formulario, botao-cotacao</li>
+                    <li><strong>Campos obrigatórios:</strong> CPF, Nome, Placa, CEP</li>
+                    <li><strong>Validação:</strong> Implementada no JavaScript</li>
+                    <li><strong>API:</strong> https://37.27.92.160/api/rpa/start</li>
+                    <li><strong>Progress:</strong> https://37.27.92.160/api/rpa/progress/{session_id}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Status indicator management
+        function updateStatus(status, text) {
+            const indicator = document.getElementById('statusIndicator');
+            const textElement = document.getElementById('statusText');
+            
+            // Remove all status classes
+            indicator.classList.remove('status-ready', 'status-processing', 'status-error');
+            
+            // Add new status class
+            indicator.classList.add(`status-${status}`);
+            textElement.textContent = text;
+        }
+        
+        // Button state management
+        function setButtonState(enabled, text) {
+            const button = document.getElementById('botao-cotacao');
+            button.disabled = !enabled;
+            button.textContent = text;
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 Simulação Webflow carregada');
+            updateStatus('ready', 'Pronto para calcular');
+            setButtonState(true, '🧮 Calcular Cotação');
+        });
+    </script>
+    
+    <!-- Webflow Integration JavaScript -->
+    <script src="webflow_integration.js"></script>
+</body>
+</html>
