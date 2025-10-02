@@ -265,29 +265,262 @@
             </div>
             
             <form class="test-form" id="integration-test-form">
+                <!-- Dados Pessoais -->
                 <div class="form-group">
                     <label for="integration-cpf">CPF:</label>
-                    <input type="text" id="integration-cpf" name="cpf" value="123.456.789-00" required>
+                    <input type="text" id="integration-cpf" name="cpf" value="97137189768" required>
                 </div>
                 
                 <div class="form-group">
                     <label for="integration-nome">Nome:</label>
-                    <input type="text" id="integration-nome" name="nome" value="João da Silva" required>
+                    <input type="text" id="integration-nome" name="nome" value="ALEX KAMINSKI" required>
                 </div>
                 
                 <div class="form-group">
-                    <label for="integration-placa">Placa:</label>
-                    <input type="text" id="integration-placa" name="placa" value="ABC1234" required>
+                    <label for="integration-data-nascimento">Data de Nascimento:</label>
+                    <input type="text" id="integration-data-nascimento" name="data_nascimento" value="25/04/1970" required>
                 </div>
                 
                 <div class="form-group">
-                    <label for="integration-cep">CEP:</label>
-                    <input type="text" id="integration-cep" name="cep" value="01234-567" required>
+                    <label for="integration-sexo">Sexo:</label>
+                    <select id="integration-sexo" name="sexo" required>
+                        <option value="Masculino" selected>Masculino</option>
+                        <option value="Feminino">Feminino</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="integration-estado-civil">Estado Civil:</label>
+                    <select id="integration-estado-civil" name="estado_civil" required>
+                        <option value="Casado ou Uniao Estavel" selected>Casado ou União Estável</option>
+                        <option value="Solteiro">Solteiro</option>
+                        <option value="Divorciado">Divorciado</option>
+                        <option value="Viuvo">Viúvo</option>
+                    </select>
                 </div>
                 
                 <div class="form-group">
                     <label for="integration-email">Email:</label>
-                    <input type="email" id="integration-email" name="email" value="joao@exemplo.com">
+                    <input type="email" id="integration-email" name="email" value="alex.kaminski@imediatoseguros.com.br">
+                </div>
+                
+                <div class="form-group">
+                    <label for="integration-celular">Celular:</label>
+                    <input type="text" id="integration-celular" name="celular" value="11953288466" required>
+                </div>
+                
+                <!-- Dados do Veículo -->
+                <div class="form-group">
+                    <label for="integration-placa">Placa:</label>
+                    <input type="text" id="integration-placa" name="placa" value="EYQ4J41" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="integration-marca">Marca:</label>
+                    <input type="text" id="integration-marca" name="marca" value="TOYOTA" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="integration-modelo">Modelo:</label>
+                    <input type="text" id="integration-modelo" name="modelo" value="COROLLA XEI 1.8/1.8 FLEX 16V MEC" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="integration-ano">Ano:</label>
+                    <input type="text" id="integration-ano" name="ano" value="2009" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="integration-combustivel">Combustível:</label>
+                    <select id="integration-combustivel" name="combustivel" required>
+                        <option value="Flex" selected>Flex</option>
+                        <option value="Gasolina">Gasolina</option>
+                        <option value="Etanol">Etanol</option>
+                        <option value="Diesel">Diesel</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="integration-tipo-veiculo">Tipo de Veículo:</label>
+                    <select id="integration-tipo-veiculo" name="tipo_veiculo" required>
+                        <option value="carro" selected>Carro</option>
+                        <option value="moto">Moto</option>
+                        <option value="caminhao">Caminhão</option>
+                    </select>
+                </div>
+                
+                <!-- Dados de Endereço -->
+                <div class="form-group">
+                    <label for="integration-cep">CEP:</label>
+                    <input type="text" id="integration-cep" name="cep" value="03317-000" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="integration-endereco">Endereço:</label>
+                    <input type="text" id="integration-endereco" name="endereco" value="Rua Serra de Botucatu, Tatuapé - São Paulo/SP" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="integration-endereco-completo">Endereço Completo:</label>
+                    <input type="text" id="integration-endereco-completo" name="endereco_completo" value="Rua Serra de Botucatu, 410 APTO 11 - São Paulo, SP" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="integration-uso-veiculo">Uso do Veículo:</label>
+                    <select id="integration-uso-veiculo" name="uso_veiculo" required>
+                        <option value="Pessoal" selected>Pessoal</option>
+                        <option value="Comercial">Comercial</option>
+                        <option value="Profissional">Profissional</option>
+                    </select>
+                </div>
+                
+                <!-- Dados do Condutor -->
+                <div class="form-group">
+                    <label for="integration-condutor-principal">Condutor Principal:</label>
+                    <select id="integration-condutor-principal" name="condutor_principal" required>
+                        <option value="true" selected>Sim</option>
+                        <option value="false">Não</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="integration-nome-condutor">Nome do Condutor:</label>
+                    <input type="text" id="integration-nome-condutor" name="nome_condutor" value="SANDRA LOUREIRO" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="integration-cpf-condutor">CPF do Condutor:</label>
+                    <input type="text" id="integration-cpf-condutor" name="cpf_condutor" value="25151787829" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="integration-data-nascimento-condutor">Data de Nascimento do Condutor:</label>
+                    <input type="text" id="integration-data-nascimento-condutor" name="data_nascimento_condutor" value="28/08/1975" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="integration-sexo-condutor">Sexo do Condutor:</label>
+                    <select id="integration-sexo-condutor" name="sexo_condutor" required>
+                        <option value="Feminino" selected>Feminino</option>
+                        <option value="Masculino">Masculino</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="integration-estado-civil-condutor">Estado Civil do Condutor:</label>
+                    <select id="integration-estado-civil-condutor" name="estado_civil_condutor" required>
+                        <option value="Casado ou Uniao Estavel" selected>Casado ou União Estável</option>
+                        <option value="Solteiro">Solteiro</option>
+                        <option value="Divorciado">Divorciado</option>
+                        <option value="Viuvo">Viúvo</option>
+                    </select>
+                </div>
+                
+                <!-- Configurações de Estacionamento -->
+                <div class="form-group">
+                    <label for="integration-garagem-residencia">Garagem na Residência:</label>
+                    <select id="integration-garagem-residencia" name="garagem_residencia" required>
+                        <option value="true" selected>Sim</option>
+                        <option value="false">Não</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="integration-portao-eletronico">Portão Eletrônico:</label>
+                    <select id="integration-portao-eletronico" name="portao_eletronico" required>
+                        <option value="Eletronico" selected>Eletrônico</option>
+                        <option value="Manual">Manual</option>
+                        <option value="Nao">Não</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="integration-local-trabalho">Local de Trabalho:</label>
+                    <select id="integration-local-trabalho" name="local_de_trabalho" required>
+                        <option value="false" selected>Não</option>
+                        <option value="true">Sim</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="integration-estacionamento-trabalho">Estacionamento no Trabalho:</label>
+                    <select id="integration-estacionamento-trabalho" name="estacionamento_proprio_local_de_trabalho" required>
+                        <option value="false" selected>Não</option>
+                        <option value="true">Sim</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="integration-local-estudo">Local de Estudo:</label>
+                    <select id="integration-local-estudo" name="local_de_estudo" required>
+                        <option value="false" selected>Não</option>
+                        <option value="true">Sim</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="integration-estacionamento-estudo">Estacionamento no Estudo:</label>
+                    <select id="integration-estacionamento-estudo" name="estacionamento_proprio_local_de_estudo" required>
+                        <option value="false" selected>Não</option>
+                        <option value="true">Sim</option>
+                    </select>
+                </div>
+                
+                <!-- Configurações Adicionais -->
+                <div class="form-group">
+                    <label for="integration-zero-km">Zero KM:</label>
+                    <select id="integration-zero-km" name="zero_km" required>
+                        <option value="false" selected>Não</option>
+                        <option value="true">Sim</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="integration-veiculo-segurado">Veículo Segurado:</label>
+                    <select id="integration-veiculo-segurado" name="veiculo_segurado" required>
+                        <option value="Não" selected>Não</option>
+                        <option value="Sim">Sim</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="integration-kit-gas">Kit Gás:</label>
+                    <select id="integration-kit-gas" name="kit_gas" required>
+                        <option value="false" selected>Não</option>
+                        <option value="true">Sim</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="integration-blindado">Blindado:</label>
+                    <select id="integration-blindado" name="blindado" required>
+                        <option value="false" selected>Não</option>
+                        <option value="true">Sim</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="integration-financiado">Financiado:</label>
+                    <select id="integration-financiado" name="financiado" required>
+                        <option value="false" selected>Não</option>
+                        <option value="true">Sim</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="integration-reside-18-26">Reside com pessoa 18-26 anos:</label>
+                    <select id="integration-reside-18-26" name="reside_18_26" required>
+                        <option value="Não" selected>Não</option>
+                        <option value="Sim">Sim</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="integration-continuar-corretor">Continuar com Corretor Anterior:</label>
+                    <select id="integration-continuar-corretor" name="continuar_com_corretor_anterior" required>
+                        <option value="true" selected>Sim</option>
+                        <option value="false">Não</option>
+                    </select>
                 </div>
             </form>
             
@@ -524,13 +757,55 @@
             
             log('✅ RPA Client encontrado');
             
-            // Coletar dados do formulário
+            // Coletar dados do formulário (todos os campos do parametros.json)
             const formData = {
+                // Dados Pessoais
                 cpf: document.getElementById('integration-cpf').value,
                 nome: document.getElementById('integration-nome').value,
+                data_nascimento: document.getElementById('integration-data-nascimento').value,
+                sexo: document.getElementById('integration-sexo').value,
+                estado_civil: document.getElementById('integration-estado-civil').value,
+                email: document.getElementById('integration-email').value,
+                celular: document.getElementById('integration-celular').value,
+                
+                // Dados do Veículo
                 placa: document.getElementById('integration-placa').value,
+                marca: document.getElementById('integration-marca').value,
+                modelo: document.getElementById('integration-modelo').value,
+                ano: document.getElementById('integration-ano').value,
+                combustivel: document.getElementById('integration-combustivel').value,
+                tipo_veiculo: document.getElementById('integration-tipo-veiculo').value,
+                
+                // Dados de Endereço
                 cep: document.getElementById('integration-cep').value,
-                email: document.getElementById('integration-email').value
+                endereco: document.getElementById('integration-endereco').value,
+                endereco_completo: document.getElementById('integration-endereco-completo').value,
+                uso_veiculo: document.getElementById('integration-uso-veiculo').value,
+                
+                // Dados do Condutor
+                condutor_principal: document.getElementById('integration-condutor-principal').value === 'true',
+                nome_condutor: document.getElementById('integration-nome-condutor').value,
+                cpf_condutor: document.getElementById('integration-cpf-condutor').value,
+                data_nascimento_condutor: document.getElementById('integration-data-nascimento-condutor').value,
+                sexo_condutor: document.getElementById('integration-sexo-condutor').value,
+                estado_civil_condutor: document.getElementById('integration-estado-civil-condutor').value,
+                
+                // Configurações de Estacionamento
+                garagem_residencia: document.getElementById('integration-garagem-residencia').value === 'true',
+                portao_eletronico: document.getElementById('integration-portao-eletronico').value,
+                local_de_trabalho: document.getElementById('integration-local-trabalho').value === 'true',
+                estacionamento_proprio_local_de_trabalho: document.getElementById('integration-estacionamento-trabalho').value === 'true',
+                local_de_estudo: document.getElementById('integration-local-estudo').value === 'true',
+                estacionamento_proprio_local_de_estudo: document.getElementById('integration-estacionamento-estudo').value === 'true',
+                
+                // Configurações Adicionais
+                zero_km: document.getElementById('integration-zero-km').value === 'true',
+                veiculo_segurado: document.getElementById('integration-veiculo-segurado').value,
+                kit_gas: document.getElementById('integration-kit-gas').value === 'true',
+                blindado: document.getElementById('integration-blindado').value === 'true',
+                financiado: document.getElementById('integration-financiado').value === 'true',
+                reside_18_26: document.getElementById('integration-reside-18-26').value,
+                continuar_com_corretor_anterior: document.getElementById('integration-continuar-corretor').value === 'true'
             };
             
             log('Dados coletados: ' + JSON.stringify(formData));
