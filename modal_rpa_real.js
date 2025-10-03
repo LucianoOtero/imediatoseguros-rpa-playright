@@ -193,6 +193,7 @@ class ModalRPAReal {
      * Handle form submission
      */
     async handleFormSubmit(event) {
+        console.log('🎯 CLIQUE DETECTADO - iniciando handleFormSubmit');
         event.preventDefault();
         
         if (this.isProcessing) {
