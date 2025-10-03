@@ -333,6 +333,14 @@ class ModalRPAReal {
             
         } catch (error) {
             console.error('❌ Erro ao iniciar RPA:', error);
+            
+            // Detectar erro 502 Bad Gateway especificamente
+            if (error.message && error.message.includes('502')) {
+                throw new Error('Servidor indisponível (502 Bad Gateway). O PHP-FPM pode não estar funcionando no servidor.');
+            } else if (error.message && error.message.includes('Failed to fetch')) {
+                throw new Error('Erro de conectividade. Verifique a conexão com o servidor.');
+            }
+            
             throw error;
         }
     }
@@ -751,7 +759,7 @@ class ModalRPAReal {
                     return response;
                 }
                 
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                throw new Error(`HTTP ${response.status}: ${response.statusText} - URL: ${url}`);
             } catch (error) {
                 console.warn(`⚠️ Tentativa ${i + 1} falhou:`, error.message);
                 
