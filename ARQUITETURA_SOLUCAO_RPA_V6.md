@@ -284,12 +284,11 @@ server {
 ## 🎯 **PRÓXIMOS PASSOS PARA PRODUÇÃO**
 
 ### **📋 TAREFAS PENDENTES**
-1. **Novo HTML**: Interface otimizada para produção
-2. **Novo Modal**: Exibição em tempo real das estimativas e cálculo final
-3. **Sistema de Backups**: Implementar backups incrementais em nuvem (Amazon S3) - [Plano Completo](PLANO_BACKUPS_NUVEM_V6.md)
-4. **Testes de Carga**: Validação com múltiplos usuários simultâneos
-5. **Monitoramento**: Sistema de alertas para falhas
-6. **Backup**: Estratégia de backup dos dados (plano já elaborado)
+1. **🆕 Interface HTML/Modal V6.1.0**: Desenvolvimento da nova versão do modal para produção (prioridade máxima - desenvolvimento amanhã)
+2. **Sistema de Backups**: Implementar backups incrementais em nuvem (Amazon S3) - [Plano Completo](PLANO_BACKUPS_NUVEM_V6.md)
+3. **Testes de Carga**: Validação com múltiplos usuários simultâneos
+4. **Monitoramento**: Sistema de alertas para falhas
+5. **Backup**: Estratégia de backup dos dados (plano já elaborado)
 
 ### **🔧 MELHORIAS RECOMENDADAS**
 1. **Cache**: Implementar cache para estimativas frequentes

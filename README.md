@@ -639,7 +639,7 @@ const progressInterval = setInterval(async () => {
 - ✅ Browsers Playwright instalados
 
 #### **Próximos Passos**
-1. **Interface HTML/Modal**: Implementar nova interface para exibição em tempo real
+1. **🆕 Interface HTML/Modal V6.1.0**: Desenvolvimento da nova versão do modal para produção (prioridade máxima)
 2. **Sistema de Backups**: Implementar backups incrementais em nuvem (Amazon S3) - [Plano Completo](PLANO_BACKUPS_NUVEM_V6.md)
 3. **Testes de Carga**: Validação com múltiplos usuários simultâneos
 4. **Monitoramento**: Sistema de alertas para falhas
@@ -694,6 +694,7 @@ Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalh
 ### **📋 Documentação V6.0.0**
 - 🏗️ [Arquitetura Solução RPA V6.0.0](ARQUITETURA_SOLUCAO_RPA_V6.md) - Documentação técnica completa da versão 6.0.0
 - 💾 [Plano de Backups Nuvem V6.0.0](PLANO_BACKUPS_NUVEM_V6.md) - Sistema de backups incrementais em nuvem
+- 🆕 [Plano Desenvolvimento Modal V6.1.0](PLANO_DESENVOLVIMENTO_MODAL_V6.1.0.md) - Desenvolvimento da nova interface para produção
 - 🔧 [Correções SessionService V6.0.0](CORRECOES_SESSIONSERVICE_V6.md) - Documentação das correções críticas
 - 🚀 [Script Inicialização Hetzner V6.0.0](SCRIPT_INICIALIZACAO_HETZNER_V6.md) - Script de recuperação automática
 - 📊 [Relatório Final V5.0.0](RELATORIO_FINAL_V5_ARQUITETURA_ATUAL.md) - Arquitetura atual dos sistemas
@@ -705,4 +706,4 @@ Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalh
 
 **Status**: ✅ **RPA V6.0.0 IMPLEMENTADA - SISTEMA 100% FUNCIONAL E PRONTO PARA PRODUÇÃO**  
 **Última Atualização**: 03/10/2025  
-**Próxima Versão**: v6.1.0 - Interface HTML/Modal Otimizada
+**Próxima Versão**: v6.1.0 - Interface HTML/Modal Otimizada para Produção (Desenvolvimento Amanhã)
