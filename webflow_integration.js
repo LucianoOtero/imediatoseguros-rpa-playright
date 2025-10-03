@@ -28,7 +28,7 @@
 
 class WebflowRPAClient {
     constructor() {
-        this.apiBaseUrl = 'https://37.27.92.160/api/rpa';
+        this.apiBaseUrl = 'https://rpaimediatoseguros.com.br/api/rpa';
         this.modal = null;
         this.sessionId = null;
         this.progressInterval = null;

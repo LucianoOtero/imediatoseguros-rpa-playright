@@ -2,7 +2,7 @@
 # Configurações centralizadas para testes
 
 # URLs e endpoints
-export API_URL="http://37.27.92.160"
+export API_URL="https://rpaimediatoseguros.com.br"
 export HEALTH_ENDPOINT="/api/rpa/health"
 export START_ENDPOINT="/api/rpa/start"
 export PROGRESS_ENDPOINT="/api/rpa/progress"
