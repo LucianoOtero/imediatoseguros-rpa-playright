@@ -79,7 +79,6 @@ class ModalRPAReal {
      * Configurar validação em tempo real
      */
     setupRealTimeValidation() {
-我来修改中文的注释为英文，并继续完成JavaScript代码：
         console.log('🔍 Configurando validação em tempo real...');
         
         setTimeout(() => {
