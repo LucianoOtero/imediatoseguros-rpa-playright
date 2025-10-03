@@ -12,7 +12,7 @@
 
 class ModalRPAReal {
     constructor() {
-        this.apiBaseUrl = 'https://37.27.92.160/api/rpa';
+        this.apiBaseUrl = 'https://rpaimediatoseguros.com.br/api/rpa';
         this.sessionId = null;
         this.progressInterval = null;
         this.isProcessing = false;
