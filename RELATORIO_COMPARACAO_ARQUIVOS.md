@@ -314,3 +314,15 @@ if args.max_telas == 5:
 **📊 Status final:** ✅ ANÁLISE CONCLUÍDA
 
 
+
+
+
+
+
+
+
+
+
+
+
+

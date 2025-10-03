@@ -207,3 +207,15 @@ echo "✅ Se execução direta funcionou mas nohup não, problema é de ambiente
 echo "❌ Se execução direta não funcionou, problema é do código"
 
 
+
+
+
+
+
+
+
+
+
+
+
+

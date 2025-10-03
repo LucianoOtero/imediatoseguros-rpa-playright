@@ -459,3 +459,15 @@ sudo systemctl restart php8.3-fpm
 O plano conservador garante melhorias mínimas com zero risco e preserva completamente a integridade do sistema atual.
 
 
+
+
+
+
+
+
+
+
+
+
+
+

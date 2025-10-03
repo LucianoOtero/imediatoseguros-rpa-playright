@@ -564,3 +564,15 @@ sudo logrotate -f /etc/logrotate.d/rpa-performance
 O plano garante melhorias significativas com risco mínimo e preserva a integridade do sistema atual.
 
 
+
+
+
+
+
+
+
+
+
+
+
+

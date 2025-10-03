@@ -314,3 +314,15 @@ def execute_tela15_with_fallback(page, parametros_tempo, original_function: Call
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+

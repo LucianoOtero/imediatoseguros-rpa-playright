@@ -12,3 +12,15 @@ PLAYWRIGHT_BROWSERS_PATH=/opt/imediatoseguros-rpa/.playwright /opt/imediatosegur
 echo "[DEBUG] RPA finalizado com código: $?" >> logs/wrapper_debug.log
 
 
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Modal RPA V5.0.0</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        #results { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Teste Modal RPA V5.0.0</h1>
+    
+    <div class="test-section">
+        <h3>📋 Teste de Conectividade</h3>
+        <button onclick="testConnectivity()">Testar API Health</button>
+        <div id="connectivity-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>🚀 Teste de Execução RPA</h3>
+        <button onclick="testRPAExecution()">Testar Execução RPA</button>
+        <div id="rpa-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>📊 Teste de Progresso</h3>
+        <button onclick="testProgress()">Testar Monitoramento</button>
+        <div id="progress-result"></div>
+    </div>
+    
+    <div id="results"></div>
+
+    <script>
+        const API_BASE = 'https://rpaimediatoseguros.com.br';
+        
+        async function testConnectivity() {
+            const resultDiv = document.getElementById('connectivity-result');
+            resultDiv.innerHTML = '⏳ Testando conectividade...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/rpa/health`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            ✅ <strong>API Funcionando!</strong><br>
+                            Status: ${data.health.status}<br>
+                            Timestamp: ${data.health.timestamp}
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ API retornou erro</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Erro de conectividade: ${error.message}</div>`;
+            }
+        }
+        
+        async function testRPAExecution() {
+            const resultDiv = document.getElementById('rpa-result');
+            resultDiv.innerHTML = '⏳ Testando execução RPA...';
+            
+            try {
+                const sessionId = 'teste_v5_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                const testData = {
+                    session: sessionId,
+                    dados: {
+                        cpf: '123.456.789-00',
+                        nome: 'João Silva Teste',
+                        placa: 'TEST123',
+                        cep: '01234-567',
+                        email: 'teste@email.com',
+                        celular: '(11) 99999-9999',
+                        ano: 2020
+                    }
+                };
+                
+                const response = await fetch(`${API_BASE}/api/rpa/start`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            ✅ <strong>RPA Iniciado!</strong><br>
+                            Session ID: ${data.session_id}<br>
+                            Status: ${data.success}
+                        </div>
+                    `;
+                    
+                    // Armazenar session ID para teste de progresso
+                    window.testSessionId = data.session_id;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ Erro ao iniciar RPA: ${data.error || data.message}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Erro na execução: ${error.message}</div>`;
+            }
+        }
+        
+        async function testProgress() {
+            const resultDiv = document.getElementById('progress-result');
+            
+            if (!window.testSessionId) {
+                resultDiv.innerHTML = '<div class="error">❌ Execute primeiro o teste de RPA</div>';
+                return;
+            }
+            
+            resultDiv.innerHTML = '⏳ Testando monitoramento de progresso...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/rpa/progress/${window.testSessionId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const progress = data.progress || {};
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            ✅ <strong>Progresso Obtido!</strong><br>
+                            Status: ${progress.status || 'N/A'}<br>
+                            Etapa: ${progress.etapa_atual || 0}/${progress.total_etapas || 15}<br>
+                            Percentual: ${progress.percentual || 0}%<br>
+                            Mensagem: ${progress.mensagem || 'N/A'}
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ Erro ao obter progresso: ${data.error || data.message}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Erro no monitoramento: ${error.message}</div>`;
+            }
+        }
+        
+        // Teste automático ao carregar
+        window.addEventListener('load', () => {
+            console.log('🧪 Teste Modal RPA V5.0.0 carregado');
+            testConnectivity();
+        });
+    </script>
+</body>
+</html>

@@ -96,3 +96,15 @@ echo "📊 Verifique os resultados acima para identificar problemas"
 echo "💾 Relatório detalhado salvo em: diagnostico_hetzner_*.json"
 
 
+
+
+
+
+
+
+
+
+
+
+
+

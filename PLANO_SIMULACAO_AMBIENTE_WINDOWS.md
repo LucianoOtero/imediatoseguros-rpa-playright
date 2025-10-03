@@ -1168,3 +1168,15 @@ scripts\start_backend.bat   # Terminal 2
 **🏆 Resultado:** Simulação completa funcional
 
 
+
+
+
+
+
+
+
+
+
+
+
+

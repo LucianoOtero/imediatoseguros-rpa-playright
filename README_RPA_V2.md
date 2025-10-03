@@ -338,3 +338,15 @@ php test_rpa_v2.php
 **Data:** 10 de Janeiro de 2025  
 **Versão:** 2.0.0
 
+
+
+
+
+
+
+
+
+
+
+
+

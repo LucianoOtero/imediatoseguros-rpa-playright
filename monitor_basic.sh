@@ -41,3 +41,15 @@ echo "- Erros nas últimas 2h: $ERRORS_2H"
 echo "- Uso do disco: $DISK_USAGE%"
 
 
+
+
+
+
+
+
+
+
+
+
+
+

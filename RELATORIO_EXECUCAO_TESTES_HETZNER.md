@@ -235,3 +235,15 @@ Ambos os arquivos capturaram **exatamente os mesmos dados** na Tela 5:
 **📊 Status final:** ✅ **TODOS OS TESTES CONCLUÍDOS COM SUCESSO**
 
 
+
+
+
+
+
+
+
+
+
+
+
+

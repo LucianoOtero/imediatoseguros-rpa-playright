@@ -86,3 +86,15 @@ Adicionar logs detalhados para verificar o que está acontecendo
 O problema está na execução do comando via PHP. O RPA funciona perfeitamente quando executado manualmente, mas falha quando executado via PHP. A solução mais provável é usar um wrapper script ou corrigir as permissões do usuário www-data.
 
 
+
+
+
+
+
+
+
+
+
+
+
+

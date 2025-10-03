@@ -293,16 +293,18 @@ class SessionService implements SessionServiceInterface
 
     private function generateStartScript(string $sessionId, array $data): string
     {
-        // Estratégia conservadora: validar dados e usar fallback
-        $useJsonData = !empty($data) && $this->validateData($data);
+        // ✅ CORREÇÃO: Sempre usar dados completos (base + API)
+        //$completeData = $this->prepareCompleteData($data);
+        $completeData = $this->prepareCompleteData($data["dados"] ?? $data);
+        $useJsonData = true; // Sempre usar dados completos
         
         // ✅ CORREÇÃO: Definir variáveis sempre para evitar erro no heredoc
         $tempJsonFile = "/tmp/rpa_data_{$sessionId}.json";
-        $jsonContent = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        $jsonContent = json_encode($completeData, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
         
         if ($useJsonData) {
             $command = "/opt/imediatoseguros-rpa/venv/bin/python executar_rpa_imediato_playwright.py --config {$tempJsonFile} --session \$SESSION_ID --progress-tracker json";
-            $dataSource = "JSON dinâmico (arquivo temporário)";
+            $dataSource = "JSON completo (base + API)";
             $cleanupCommand = "rm -f {$tempJsonFile}";
         } else {
             $command = "/opt/imediatoseguros-rpa/venv/bin/python executar_rpa_imediato_playwright.py --config /opt/imediatoseguros-rpa/parametros.json --session \$SESSION_ID --progress-tracker json";
@@ -325,12 +327,12 @@ echo "$(date): Iniciando RPA para sessão \$SESSION_ID com {$dataSource}" >> /op
 # Atualizar status para running
 echo '{"status": "running", "started_at": "'$(date -Iseconds)'"}' > /opt/imediatoseguros-rpa/sessions/\$SESSION_ID/status.json
 
-# Criar arquivo temporário com JSON (se necessário)
-if [ "{$dataSource}" = "JSON dinâmico (arquivo temporário)" ]; then
+# Criar arquivo temporário com JSON completo (base + API)
+if [ "{$dataSource}" = "JSON completo (base + API)" ]; then
     cat > {$tempJsonFile} << 'JSON_EOF'
 {$jsonContent}
 JSON_EOF
-    echo "$(date): Arquivo JSON temporário criado: {$tempJsonFile}" >> /opt/imediatoseguros-rpa/logs/rpa_v4_\$SESSION_ID.log
+    echo "$(date): Arquivo JSON completo criado: {$tempJsonFile}" >> /opt/imediatoseguros-rpa/logs/rpa_v4_\$SESSION_ID.log
 fi
 
 # Executar RPA com estratégia conservadora
@@ -357,6 +359,45 @@ SCRIPT;
     /**
      * Validate data for RPA execution (validation removed - done in frontend)
      */
+    private function prepareCompleteData(array $apiData): array
+    {
+        try {
+            // ✅ CORREÇÃO: Carregar dados base do parametros.json
+            $baseDataFile = '/opt/imediatoseguros-rpa/parametros.json';
+            
+            if (!file_exists($baseDataFile)) {
+                throw new \RuntimeException("Arquivo base não encontrado: {$baseDataFile}");
+            }
+            
+            $baseData = json_decode(file_get_contents($baseDataFile), true);
+            
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new \RuntimeException("Erro ao decodificar arquivo base: " . json_last_error_msg());
+            }
+            
+            // ✅ CORREÇÃO: Complementar dados base com dados da API
+            $completeData = array_merge($baseData, $apiData);
+            
+            $this->logger->info('Dados completos preparados para RPA', [
+                'base_fields' => count($baseData),
+                'api_fields' => count($apiData),
+                'total_fields' => count($completeData),
+                'api_data_keys' => array_keys($apiData)
+            ]);
+            
+            return $completeData;
+            
+        } catch (\Exception $e) {
+            $this->logger->error('Erro ao preparar dados completos', [
+                'error' => $e->getMessage(),
+                'api_data' => $apiData
+            ]);
+            
+            // Fallback: usar apenas dados da API
+            return $apiData;
+        }
+    }
+
     private function validateData(array $data): bool
     {
         // Validação removida - feita no frontend

@@ -48,3 +48,15 @@ echo "2. Verifique status: http://seu-servidor/status.php"
 echo "3. Execute monitoramento: ./monitor_basic.sh"
 
 
+
+
+
+
+
+
+
+
+
+
+
+

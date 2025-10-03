@@ -114,3 +114,15 @@ A conexão Windows → Hetzner está funcionando perfeitamente. O problema está
 **Recomendação**: Implementar uma solução alternativa ao nohup, como systemd service ou sistema de filas.
 
 
+
+
+
+
+
+
+
+
+
+
+
+

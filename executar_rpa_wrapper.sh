@@ -14,3 +14,15 @@ echo "$(date): Starting RPA with args: $@" >> /opt/imediatoseguros-rpa/logs/wrap
 exec /opt/imediatoseguros-rpa/venv/bin/python "$@"
 
 
+
+
+
+
+
+
+
+
+
+
+
+

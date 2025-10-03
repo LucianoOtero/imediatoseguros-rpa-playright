@@ -231,3 +231,15 @@ echo json_encode([
 O problema não está no ambiente ou no código Python, mas sim na **parsing do JSON** no arquivo PHP. Todas as outras correções foram bem-sucedidas e o sistema está funcionalmente completo, necessitando apenas da correção final do parsing JSON para funcionar completamente via API.
 
 
+
+
+
+
+
+
+
+
+
+
+
+

@@ -12,7 +12,7 @@
 
 class ModalRPAReal {
     constructor() {
-        this.apiBaseUrl = 'http://37.27.92.160/api/rpa';
+        this.apiBaseUrl = 'http://rpaimediatoseguros.com.br';
         this.sessionId = null;
         this.progressInterval = null;
         this.isProcessing = false;
@@ -307,32 +307,43 @@ class ModalRPAReal {
     }
     
     /**
-     * Start RPA execution
+     * Start RPA execution - V5.0.0 Implementation
+     * Baseado no arquivo funcional simulacao/frontend/js/rpa-modal.js
      */
     async startRPA(formData) {
-        console.log('🚀 DEBUG: Iniciando execução RPA...');
+        console.log('🚀 DEBUG: Iniciando execução RPA V5.0.0...');
         console.log('🔍 DEBUG: API URL:', this.apiBaseUrl);
         console.log('🔍 DEBUG: Form Data:', formData);
         
         try {
-            // Call API to start RPA
-            console.log('🔍 DEBUG: Fazendo chamada para:', `${this.apiBaseUrl}/start`);
-            const response = await this.fetchWithRetry(`${this.apiBaseUrl}/start`, {
+            // ✅ CORREÇÃO V5.0.0: Gerar session ID como no arquivo funcional
+            const sessionId = 'modal_rpa_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            
+            // ✅ CORREÇÃO V5.0.0: Usar formato correto { session, dados }
+            const requestData = {
+                session: sessionId,
+                dados: formData
+            };
+            
+            console.log('🔍 DEBUG: Fazendo chamada para:', `${this.apiBaseUrl}/api/rpa/start`);
+            console.log('🔍 DEBUG: Request Data:', requestData);
+            
+            const response = await this.fetchWithRetry(`${this.apiBaseUrl}/api/rpa/start`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json'
                 },
-                body: JSON.stringify(formData)
+                body: JSON.stringify(requestData)
             });
             
             const result = await response.json();
             
             if (!result.success) {
-                throw new Error(result.message || 'Erro ao iniciar RPA');
+                throw new Error(result.error || result.message || 'Erro ao iniciar RPA');
             }
             
-            this.sessionId = result.session_id;
+            this.sessionId = result.session_id || sessionId;
             console.log('🆔 Session ID:', this.sessionId);
             
             // Show progress modal
@@ -456,7 +467,8 @@ class ModalRPAReal {
     }
     
     /**
-     * Check RPA progress
+     * Check RPA progress - V5.0.0 Implementation
+     * Baseado no arquivo funcional simulacao/frontend/js/rpa-modal.js
      */
     async checkProgress() {
         if (!this.sessionId) {
@@ -467,8 +479,8 @@ class ModalRPAReal {
         console.log('📊 Verificando progresso da sessão:', this.sessionId);
         
         try {
-            // Use fetchWithRetry for monitoring
-            const response = await this.fetchWithRetry(`${this.apiBaseUrl}/progress/${this.sessionId}`, {
+            // ✅ CORREÇÃO V5.0.0: Usar endpoint correto da API V5.0.0
+            const response = await this.fetchWithRetry(`${this.apiBaseUrl}/api/rpa/progress/${this.sessionId}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json'
@@ -478,7 +490,7 @@ class ModalRPAReal {
             const progressData = await response.json();
             
             if (!progressData.success) {
-                throw new Error(progressData.message || 'Erro ao obter progresso');
+                throw new Error(progressData.error || progressData.message || 'Erro ao obter progresso');
             }
             
             this.updateProgress(progressData.progress);
@@ -504,6 +516,14 @@ class ModalRPAReal {
             resultados_finais,
             total_etapas: phasesCompleted
         } = progressData;
+        
+        // ✅ DEBUG V5.0.0: Log detalhado para debug de falhas
+        console.log('🔍 DEBUG Progresso:', {
+            status,
+            currentPhase,
+            currentStage,
+            currentProgress
+        });
         
         // Update progress bar
         if (currentProgress !== undefined && this.progressFill && this.progressText) {
@@ -531,11 +551,20 @@ class ModalRPAReal {
         const finalCalculation = resultados_finais?.dados?.valor_final;
         this.updateEstimates(initialEstimate, finalCalculation);
         
-        // Check if completed
-        if (status === 'completed') {
+        // Check if completed - V5.0.0 Status Correction
+        // ✅ CORREÇÃO V5.0.0: Reconhecer status 'success' e 'concluido' como conclusão
+        if (status === 'success' || status === 'concluido' || status === 'completed') {
             this.completeProcessing(progressData);
-        } else if (status === 'failed' || status === 'error') {
+        } else if (status === 'failed' || status === 'error' || status === 'erro') {
             this.handleProcessingError(progressData);
+        } else if (currentPhase && currentPhase.toLowerCase().includes('falhou')) {
+            // ✅ CORREÇÃO V5.0.0: Detectar falhas pela mensagem também
+            console.log('🚨 Falha detectada pela mensagem:', currentPhase);
+            this.handleProcessingError({
+                ...progressData,
+                error: `Falha detectada: ${currentPhase}`,
+                status: 'failed'
+            });
         }
     }
     

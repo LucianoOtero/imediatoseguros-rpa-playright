@@ -783,3 +783,15 @@ class ProgressHandler {
 **💰 Investimento:** Baixo (apenas tempo de desenvolvimento)
 
 
+
+
+
+
+
+
+
+
+
+
+
+

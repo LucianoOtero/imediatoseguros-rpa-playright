@@ -205,3 +205,15 @@ Todas as 4 fases foram implementadas conforme planejado, respeitando a restriç�
 O sistema está **pronto para produção** e atende a todos os critérios de qualidade estabelecidos.
 
 
+
+
+
+
+
+
+
+
+
+
+
+

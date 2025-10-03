@@ -5,3 +5,15 @@ inotifywait -m -r -e create,modify,delete /opt/imediatoseguros-rpa/temp/ /opt/im
 done
 
 
+
+
+
+
+
+
+
+
+
+
+
+
