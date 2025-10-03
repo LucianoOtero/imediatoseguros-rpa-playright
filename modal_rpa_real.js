@@ -207,20 +207,27 @@ class ModalRPAReal {
         this.updateUI(true);
         
         try {
+            console.log('🔍 DEBUG: Tentando coletar dados...');
+            
             // Collect form data
             const formData = this.collectFormData();
-            console.log('📋 Dados coletados:', formData);
+            console.log('📋 DEBUG: Dados coletados:', formData);
             
             // Validate data
+            console.log('🔍 DEBUG: Validando dados...');
             if (!this.validateFormData(formData)) {
                 throw new Error('Dados do formulário inválidos');
             }
+            console.log('✅ DEBUG: Validação OK');
             
             // Start RPA
+            console.log('🔍 DEBUG: Iniciando RPA...');
             await this.startRPA(formData);
+            console.log('✅ DEBUG: RPA iniciado');
             
         } catch (error) {
-            console.error('❌ Erro no processo RPA:', error);
+            console.error('❌ DEBUG: Erro no processo RPA:', error);
+            console.error('❌ DEBUG: Stack trace:', error.stack);
             this.showError('Erro no Processamento', error.message);
             this.isProcessing = false;
             this.updateUI(false);
@@ -303,10 +310,13 @@ class ModalRPAReal {
      * Start RPA execution
      */
     async startRPA(formData) {
-        console.log('🚀 Iniciando execução RPA...');
+        console.log('🚀 DEBUG: Iniciando execução RPA...');
+        console.log('🔍 DEBUG: API URL:', this.apiBaseUrl);
+        console.log('🔍 DEBUG: Form Data:', formData);
         
         try {
             // Call API to start RPA
+            console.log('🔍 DEBUG: Fazendo chamada para:', `${this.apiBaseUrl}/start`);
             const response = await this.fetchWithRetry(`${this.apiBaseUrl}/start`, {
                 method: 'POST',
                 headers: {
@@ -349,6 +359,15 @@ class ModalRPAReal {
      * Show progress modal
      */
     showProgressModal() {
+        console.log('🔍 DEBUG: Tentando mostrar modal de progresso...');
+        
+        if (typeof Swal === 'undefined') {
+            console.error('❌ DEBUG: SweetAlert2 não está carregado!');
+            throw new Error('SweetAlert2 não está carregado');
+        }
+        
+        console.log('✅ DEBUG: SweetAlert2 disponível');
+        
         const phasesHtml = this.rpaPhases.map((phase, index) => 
             `<div class="phase-item pending" id="phase-${index}">
                 <i class="fas fa-clock"></i>

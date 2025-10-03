@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Simples Modal</title>
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+</head>
+<body>
+    <h1>Teste Simple Modal</h1>
+    <button id="testBtn">Testar Modal</button>
+    <button id="testAPIBtn">Testar API</button>
+    
+    <!-- Dashboard de informações -->
+    <div id="dashboard" style="margin-top: 20px; padding: 20px; background: #f0f0f0;">
+        <h3>Dashboard de Debug</h3>
+        <div id="status">Status: Aguardando...</div>
+        <div id="sweetalertstatus">SweetAlert2: <span id="sweetalertcheck">Verificando...</span></div>
+        <div id="apistatus">API: <span id="apicheck">Verificando...</span></div>
+    </div>
+
+    <!-- SweetAlert2 Script -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script>
+        console.log('🔍 Iniciando teste simples...');
+        
+        // Verificar se SweetAlert2 carregou
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📄 DOM carregado');
+            
+            // Verificar SweetAlert2
+            if (typeof Swal !== 'undefined') {
+                document.getElementById('sweetalertcheck').textContent = '✅ Carregado';
+                console.log('✅ SweetAlert2 carregado');
+            } else {
+                document.getElementById('sweetalertcheck').textContent = '❌ Erro';
+                console.error('❌ SweetAlert2 não carregado');
+            }
+            
+            // Verificar API
+            fetch('http://37.27.92.160/api/rpa/health')
+                .then(response => {
+                    document.getElementById('apicheck').textContent = '✅ OK (' + response.status + ')';
+                    console.log('✅ API funcionando');
+                })
+                .catch(error => {
+                    document.getElementById('apicheck').textContent = '❌ Erro: ' + error.message;
+                    console.error('❌ API erro:', error);
+                });
+        });
+        
+        // Teste do modal
+        document.getElementById('testBtn').addEventListener('click', function() {
+            console.log('🔴 Testando modal...');
+            
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: 'Teste Modal',
+                    text: 'Se você pode ver isso, o SweetAlert2 está funcionando!',
+                    icon: 'success',
+                    showConfirmButton: true
+                });
+            } else {
+                alert('SweetAlert2 não carregado!');
+            }
+        });
+        
+        // Teste da API
+        document.getElementById('testAPIBtn').addEventListener('click', async function() {
+            console.log('🔴 Testando API...');
+            
+            try {
+                const response = await fetch('http://37.27.92.160/api/rpa/health');
+                const data = await response.json();
+                
+                Swal.fire({
+                    title: 'API Teste',
+                    text: 'Sucesso! Status: ' + data.health.status,
+                    icon: 'success'
+                });
+                
+            } catch (error) {
+                Swal.fire({
+                    title: 'API Erro',
+                    text: 'Erro: ' + error.message,
+                    icon: 'error'
+                });
+            }
+        });
+        
+        console.log('🎯 Teste simples iniciado');
+    </script>
+</body>
+</html>
