@@ -481,7 +481,7 @@ class ModalRPAReal {
                 throw new Error(progressData.message || 'Erro ao obter progresso');
             }
             
-            this.updateProgress(progressData.data);
+            this.updateProgress(progressData.progress);
             
         } catch (error) {
             console.error('❌ Erro ao verificar progresso:', error);
@@ -496,13 +496,13 @@ class ModalRPAReal {
         console.log('📊 Atualizando progresso:', progressData);
         
         const {
-            current_progress: currentProgress,
-            current_stage: currentStage,
+            percentual: currentProgress,
+            etapa_atual: currentStage,
             status,
-            current_phase: currentPhase,
-            initial_estimate,
-            final_calculation,
-            phases_completed: phasesCompleted
+            mensagem: currentPhase,
+            estimativas,
+            resultados_finais,
+            total_etapas: phasesCompleted
         } = progressData;
         
         // Update progress bar
@@ -524,10 +524,12 @@ class ModalRPAReal {
         }
         
         // Update phases list
-        this.updatePhasesList(phasesCompleted);
+        this.updatePhasesList(currentStage);
         
         // Update estimates
-        this.updateEstimates(initial_estimate, final_calculation);
+        const initialEstimate = estimativas?.dados?.valor_estimativa;
+        const finalCalculation = resultados_finais?.dados?.valor_final;
+        this.updateEstimates(initialEstimate, finalCalculation);
         
         // Check if completed
         if (status === 'completed') {
