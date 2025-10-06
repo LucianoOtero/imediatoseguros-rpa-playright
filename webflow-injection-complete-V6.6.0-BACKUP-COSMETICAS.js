@@ -1,5 +1,5 @@
 /**
- * INJEÇÃO COMPLETA WEBFLOW - IMEDIATO SEGUROS V6.7.5
+ * INJEÇÃO COMPLETA WEBFLOW - IMEDIATO SEGUROS V6.6.0
  * Arquivo único para injeção no Webflow
  * 
  * Contém:
@@ -99,7 +99,6 @@
         #rpaModal .card-features li {
             font-size: var(--font-size-sm) !important;
             font-weight: 400 !important;
-            padding: 0.3rem 0 !important;
         }
         
         #rpaModal .btn {
@@ -114,17 +113,14 @@
             left: 10vw !important;
             width: 80vw !important;
             height: 80vh !important;
-            background: rgba(255, 255, 255, 0.02) !important;
+            background: rgba(0, 0, 0, 0.8) !important;
             z-index: 999999 !important;
             display: flex !important;
             flex-direction: column !important;
             margin: 0 !important;
             padding: 0 !important;
             border: none !important;
-            box-shadow: 
-                0 30px 60px rgba(0, 0, 0, 0.2),
-                0 0 0 1px rgba(255, 255, 255, 0.05) !important;
-            backdrop-filter: blur(20px) !important;
+            box-shadow: none !important;
             overflow: hidden !important;
             box-sizing: border-box !important;
             isolation: isolate !important;
@@ -140,8 +136,8 @@
         #rpaModal .modal-content {
             background: var(--imediato-white) !important;
             border-radius: 15px !important;
-            padding: 1rem !important;
-            margin: 1rem !important;
+            padding: 2rem !important;
+            margin: 2rem !important;
             box-shadow: 0 10px 30px var(--imediato-shadow) !important;
             flex: 1 !important;
             overflow-y: auto !important;
@@ -152,9 +148,10 @@
         #rpaModal .result-card {
             background: var(--imediato-white) !important;
             border-radius: 12px !important;
-            padding: 1rem !important;
+            padding: 1.5rem !important;
             box-shadow: 0 4px 15px var(--imediato-shadow) !important;
             border: 2px solid var(--imediato-border) !important;
+            margin-bottom: 1rem !important;
             font-family: 'Titillium Web', sans-serif !important;
         }
         
@@ -163,35 +160,16 @@
             display: flex !important;
             align-items: center !important;
             gap: 1rem !important;
-            justify-content: space-between !important;
-            margin-bottom: 0.75rem !important;
+            margin-bottom: 1rem !important;
         }
         
         /* Garantir que os títulos tenham estilos corretos */
         #rpaModal .card-title h3 {
-            font-size: var(--font-size-2xl) !important;
+            font-size: var(--font-size-lg) !important;
             font-weight: 600 !important;
             color: var(--imediato-dark-blue) !important;
             margin: 0 !important;
             font-family: 'Titillium Web', sans-serif !important;
-        }
-        
-        /* Garantir que o título ocupe espaço disponível */
-        #rpaModal .card-title {
-            flex: 1 !important;
-        }
-        
-        /* Estilos para o valor inline no header */
-        #rpaModal .card-value-inline {
-            text-align: right !important;
-            margin-left: auto !important;
-        }
-        
-        #rpaModal .card-value-inline .value {
-            font-size: var(--font-size-2xl) !important;
-            font-weight: 700 !important;
-            color: var(--imediato-dark-blue) !important;
-            margin: 0 !important;
         }
         
         #rpaModal .card-subtitle {
@@ -215,25 +193,13 @@
             display: grid !important;
             grid-template-columns: 1fr 1fr !important;
             gap: 1.5rem !important;
+            margin-top: 2rem !important;
         }
         
         @media (max-width: 768px) {
             #rpaModal .results-container {
                 grid-template-columns: 1fr !important;
                 gap: 1rem !important;
-            }
-            
-            /* Layout vertical para mobile */
-            #rpaModal .card-header {
-                flex-direction: column !important;
-                align-items: flex-start !important;
-                gap: 0.5rem !important;
-            }
-            
-            #rpaModal .card-value-inline {
-                text-align: left !important;
-                margin-left: 0 !important;
-                margin-top: 0.5rem !important;
             }
         }
         
@@ -308,6 +274,8 @@
         /* Restaurar estilos específicos após reset */
         #rpaModal .modal-progress-bar {
             background: var(--imediato-white);
+            box-shadow: 0 6px 25px var(--imediato-shadow);
+            border-bottom: 3px solid var(--imediato-light-blue);
             position: sticky;
             top: 0;
             z-index: 10001;
@@ -331,7 +299,7 @@
             flex: 1;
             background: linear-gradient(135deg, var(--imediato-gray), var(--imediato-white));
             overflow-y: auto;
-            padding: 1rem;
+            padding: 2rem;
         }
         
         #rpaModal .progress-header .logo-container {
@@ -401,7 +369,7 @@
         }
         
         .progress-bar-wrapper {
-            padding: 0 2rem 0;
+            padding: 0 2rem 1.2rem;
             background: var(--imediato-white);
         }
         
@@ -443,12 +411,13 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 2rem;
+            margin-top: 2rem;
         }
         
         #rpaModal .result-card {
             background: var(--imediato-white);
             border-radius: 15px;
-            padding: 1rem;
+            padding: 2rem;
             box-shadow: 0 8px 25px var(--imediato-shadow);
             border: 2px solid var(--imediato-border);
             transition: all 0.3s ease;
@@ -544,37 +513,6 @@
             display: inline-block !important;
         }
         
-        /* Botão X no canto superior direito do modal */
-        #rpaModal .modal-close-btn {
-            position: absolute !important;
-            top: 0.5rem !important;
-            right: 0.5rem !important;
-            width: 40px !important;
-            height: 40px !important;
-            background: var(--imediato-dark-blue) !important;
-            border: none !important;
-            border-radius: 8px !important;
-            color: var(--imediato-white) !important;
-            font-size: 16px !important;
-            cursor: pointer !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            z-index: 10002 !important;
-            transition: all 0.3s ease !important;
-            box-shadow: 0 2px 8px rgba(0, 51, 102, 0.3) !important;
-        }
-        
-        #rpaModal .modal-close-btn:hover {
-            background: var(--imediato-light-blue) !important;
-            transform: scale(1.1) !important;
-            box-shadow: 0 4px 12px rgba(0, 51, 102, 0.4) !important;
-        }
-        
-        #rpaModal .modal-close-btn:active {
-            transform: scale(0.95) !important;
-        }
-        
         /* Ícones nas features */
         #rpaModal .card-features i {
             font-size: 0.875rem !important;
@@ -623,11 +561,11 @@
         .card-features {
             list-style: none;
             padding: 0;
-            margin: 1.2rem 0 0 0;
+            margin: 1.5rem 0 0 0;
         }
         
         .card-features li {
-            padding: 0.3rem 0;
+            padding: 0.5rem 0;
             color: var(--imediato-text);
             font-size: 0.9rem;
             border-bottom: 1px solid var(--imediato-border);
@@ -2318,9 +2256,6 @@
             // Criar modal HTML
             const modalHTML = `
                 <div id="rpaModal" class="show">
-                    <button class="modal-close-btn" onclick="document.getElementById('rpaModal').remove()">
-                        <i class="fas fa-times"></i>
-                    </button>
                     <div class="modal-progress-bar">
                         <div class="progress-header">
                             <div class="logo-container">
@@ -2355,9 +2290,9 @@
                                     <div class="card-title">
                                         <h3>Recomendado</h3>
                                     </div>
-                                    <div class="card-value-inline">
-                                        <div class="value" id="recommendedValue">R$ 0,00</div>
-                                    </div>
+                                </div>
+                                <div class="card-value">
+                                    <div class="value" id="recommendedValue">R$ 0,00</div>
                                 </div>
                                 <ul class="card-features">
                                     <li>Forma de Pagamento: <span class="feature-value" id="recommendedFormaPagamento">-</span></li>
@@ -2384,9 +2319,9 @@
                                     <div class="card-title">
                                         <h3>Alternativo</h3>
                                     </div>
-                                    <div class="card-value-inline">
-                                        <div class="value" id="alternativeValue">R$ 0,00</div>
-                                    </div>
+                                </div>
+                                <div class="card-value">
+                                    <div class="value" id="alternativeValue">R$ 0,00</div>
                                 </div>
                                 <ul class="card-features">
                                     <li>Forma de Pagamento: <span class="feature-value" id="alternativeFormaPagamento">-</span></li>
@@ -2403,6 +2338,15 @@
                                     <li>Cobertura de Morte e Invalidez Permanente: <span class="feature-value" id="alternativeMorteInvalidez">-</span></li>
                                 </ul>
                             </div>
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <button class="btn btn-primary" onclick="window.open('https://wa.me/55' + (window.rpaData?.telefone || '11999999999'), '_blank')">
+                                <i class="fab fa-whatsapp"></i> Falar com Especialista
+                            </button>
+                            <button class="btn btn-secondary" onclick="document.getElementById('rpaModal').remove()">
+                                <i class="fas fa-times"></i> Fechar
+                            </button>
                         </div>
                     </div>
                 </div>

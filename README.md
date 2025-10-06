@@ -695,12 +695,25 @@ const progressInterval = setInterval(async () => {
 1. **🔧 Correção API Estimativas V6.3.0**: Corrigir API `get_progress.php` para retornar estimativas durante o processo (prioridade alta)
 2. **🆕 Interface HTML/Modal V6.1.0**: Desenvolvimento da nova versão do modal para produção
 3. **✅ Correção Erros Formatação V6.4.0**: Correção de vazamento de estilos CSS e seletores JavaScript incorretos - [Projeto Detalhado](PROJETO_CORRECAO_ERROS_FORMATACAO_V6.4.0.md) + [Teste Unitário](teste-unitario-modal-v6.4.0.js) - **CONCLUÍDO**
-4. **🎨 Melhorias Cosméticas V6.7.0**: Ajustes visuais e de UX do modal (cores, espaçamentos, animações, responsividade, polimento final)
-5. **🔍 Validação tipo_veiculo**: Implementar validação de domínio para campo `tipo_veiculo` (aceitar apenas "carro" ou "moto", rejeitar "sedan", "hatch", etc.) nos módulos de validação do RPA
-6. **🔐 Validação HTTPS/SSL**: ✅ **CONCLUÍDO** - HTTPS implementado e funcionando perfeitamente no servidor Hetzner (37.27.92.160), certificados SSL Let's Encrypt configurados, todas as referências HTTP atualizadas para HTTPS
-7. **Sistema de Backups**: Implementar backups incrementais em nuvem (Amazon S3) - [Plano Completo](PLANO_BACKUPS_NUVEM_V6.md)
-8. **Testes de Carga**: Validação com múltiplos usuários simultâneos
-9. **Monitoramento**: Sistema de alertas para falhas
+4. **🎨 Melhorias Cosméticas V6.7.5**: Ajustes visuais e de UX do modal (cores, espaçamentos, animações, responsividade, polimento final) - **EM PROGRESSO**
+   - ✅ Valor do seguro ao lado do título (alinhado à direita)
+   - ✅ Botão "Falar com Especialista" removido
+   - ✅ Espaçamento entre linhas reduzido em 20%
+   - ✅ Compressão vertical moderada do modal
+   - ✅ Margem inferior do results-container removida
+   - ✅ Botão "Fechar" substituído por "X" quadrado azul escuro
+   - ✅ Frame preto e borda azul removidos
+   - ✅ Gap entre progress-bar-wrapper e modal-content eliminado
+   - ✅ Margin-bottom dos result-card removido
+   - ✅ Sombra elegante com blur implementada
+   - ❌ Centralização vertical do results-container (removida - ficou ruim)
+   - ✅ Títulos "Recomendado" e "Alternativo" com fonte maior (mesmo tamanho dos valores)
+5. **📝 Revisão Mensagens RPA V6.7.0**: Revisar e modificar mensagens do RPA onde são citadas "Tela X falhou" para melhorar a experiência do usuário
+6. **🔍 Validação tipo_veiculo**: Implementar validação de domínio para campo `tipo_veiculo` (aceitar apenas "carro" ou "moto", rejeitar "sedan", "hatch", etc.) nos módulos de validação do RPA
+7. **🔐 Validação HTTPS/SSL**: ✅ **CONCLUÍDO** - HTTPS implementado e funcionando perfeitamente no servidor Hetzner (37.27.92.160), certificados SSL Let's Encrypt configurados, todas as referências HTTP atualizadas para HTTPS
+8. **Sistema de Backups**: Implementar backups incrementais em nuvem (Amazon S3) - [Plano Completo](PLANO_BACKUPS_NUVEM_V6.md)
+9. **Testes de Carga**: Validação com múltiplos usuários simultâneos
+10. **Monitoramento**: Sistema de alertas para falhas
 
 ---
 
