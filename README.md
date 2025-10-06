@@ -671,9 +671,10 @@ const progressInterval = setInterval(async () => {
 3. **✅ Correção Erros Formatação V6.4.0**: Correção de vazamento de estilos CSS e seletores JavaScript incorretos - [Projeto Detalhado](PROJETO_CORRECAO_ERROS_FORMATACAO_V6.4.0.md) + [Teste Unitário](teste-unitario-modal-v6.4.0.js) - **CONCLUÍDO**
 4. **🎨 Melhorias Cosméticas V6.6.0**: Ajustes visuais e de UX do modal (cores, espaçamentos, animações, responsividade, polimento final)
 5. **🔍 Validação tipo_veiculo**: Implementar validação de domínio para campo `tipo_veiculo` (aceitar apenas "carro" ou "moto", rejeitar "sedan", "hatch", etc.) nos módulos de validação do RPA
-6. **Sistema de Backups**: Implementar backups incrementais em nuvem (Amazon S3) - [Plano Completo](PLANO_BACKUPS_NUVEM_V6.md)
-7. **Testes de Carga**: Validação com múltiplos usuários simultâneos
-8. **Monitoramento**: Sistema de alertas para falhas
+6. **🔐 Validação HTTPS/SSL**: Documentar e validar configuração SSL atual do servidor Hetzner (37.27.92.160) e atualizar referências HTTP para HTTPS no código
+7. **Sistema de Backups**: Implementar backups incrementais em nuvem (Amazon S3) - [Plano Completo](PLANO_BACKUPS_NUVEM_V6.md)
+8. **Testes de Carga**: Validação com múltiplos usuários simultâneos
+9. **Monitoramento**: Sistema de alertas para falhas
 
 ---
 

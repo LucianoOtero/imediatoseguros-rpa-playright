@@ -1,5 +1,5 @@
 /**
- * INJEÇÃO COMPLETA WEBFLOW - IMEDIATO SEGUROS V6.5.0
+ * INJEÇÃO COMPLETA WEBFLOW - IMEDIATO SEGUROS V6.6.0
  * Arquivo único para injeção no Webflow
  * 
  * Contém:
@@ -778,7 +778,7 @@
     
     class ProgressModalRPA {
         constructor(sessionId) {
-            this.apiBaseUrl = 'http://rpaimediatoseguros.com.br';
+            this.apiBaseUrl = 'https://rpaimediatoseguros.com.br';
             this.sessionId = sessionId;
             this.progressInterval = null;
             this.isProcessing = true;
@@ -2022,7 +2022,7 @@
                 console.log('📤 Campos do formulário:', Object.keys(formData));
                 console.log('📤 Valores dos campos:', formData);
                 
-                const response = await fetch('http://rpaimediatoseguros.com.br/api/rpa/start', {
+                const response = await fetch('https://rpaimediatoseguros.com.br/api/rpa/start', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
