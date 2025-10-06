@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug - Estrutura de Dados Real</title>
+    <link rel="stylesheet" href="css/imediato-brand.css">
+    <link rel="stylesheet" href="css/main-page.css">
+    <link rel="stylesheet" href="css/modal-progress.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Debug - Estrutura de Dados Real</h1>
+        
+        <div class="test-section">
+            <h2>📊 Teste de Conexão com RPA</h2>
+            <button onclick="testarConexaoRPA()" class="btn-primary">
+                <i class="fas fa-play"></i> Testar Conexão RPA
+            </button>
+            <div id="connectionResults" class="test-results"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>🔍 Debug de Estrutura de Dados</h2>
+            <button onclick="debugEstruturaDados()" class="btn-primary">
+                <i class="fas fa-bug"></i> Debug Estrutura
+            </button>
+            <div id="debugResults" class="test-results"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>📋 Logs de Debug</h2>
+            <div id="debugLogs" class="debug-logs"></div>
+        </div>
+    </div>
+
+    <script src="js/rpa-integration.js"></script>
+    <script src="js/modal-progress.js"></script>
+    <script src="js/main-page.js"></script>
+
+    <script>
+        let debugLogs = [];
+
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logMessage = `[${timestamp}] ${message}`;
+            debugLogs.push(logMessage);
+            console.log(logMessage);
+            updateDebugLogs();
+        }
+
+        function updateDebugLogs() {
+            const logsDiv = document.getElementById('debugLogs');
+            logsDiv.innerHTML = '<h3>🔍 Logs de Debug:</h3><pre>' + debugLogs.join('\n') + '</pre>';
+        }
+
+        async function testarConexaoRPA() {
+            log('🧪 === INICIANDO TESTE DE CONEXÃO RPA ===');
+            
+            const resultsDiv = document.getElementById('connectionResults');
+            resultsDiv.innerHTML = '<p>🔄 Testando conexão...</p>';
+
+            try {
+                // Simular dados de teste
+                const testData = {
+                    cpf: '12345678901',
+                    nome: 'Teste',
+                    placa: 'ABC1234',
+                    marca: 'Toyota',
+                    cep: '01234567',
+                    data_nascimento: '1990-01-01',
+                    estado_civil: 'solteiro',
+                    sexo: 'masculino'
+                };
+
+                log('📊 Dados de teste preparados');
+                log(`📊 CPF: ${testData.cpf}`);
+                log(`📊 Nome: ${testData.nome}`);
+
+                // Chamar API do RPA
+                const response = await fetch('/api/rpa/start', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testData)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                log('✅ Resposta da API recebida');
+                log(`📊 Session ID: ${result.session_id}`);
+                log(`📊 Status: ${result.status}`);
+
+                resultsDiv.innerHTML = `
+                    <p>✅ <strong>Conexão OK!</strong></p>
+                    <p>📊 <strong>Session ID:</strong> ${result.session_id}</p>
+                    <p>📊 <strong>Status:</strong> ${result.status}</p>
+                `;
+
+                // Iniciar polling para verificar estrutura de dados
+                if (result.session_id) {
+                    log('🔄 Iniciando polling para verificar estrutura de dados...');
+                    setTimeout(() => verificarEstruturaDados(result.session_id), 2000);
+                }
+
+            } catch (error) {
+                log(`❌ Erro na conexão: ${error.message}`);
+                resultsDiv.innerHTML = `<p>❌ <strong>Erro:</strong> ${error.message}</p>`;
+            }
+        }
+
+        async function verificarEstruturaDados(sessionId) {
+            log('🔍 === VERIFICANDO ESTRUTURA DE DADOS ===');
+            
+            try {
+                const response = await fetch(`/api/rpa/progress?session=${sessionId}`);
+                const data = await response.json();
+                
+                log('📊 Dados de progresso recebidos');
+                log(`📊 Status: ${data.status}`);
+                log(`📊 Etapa atual: ${data.etapa_atual}`);
+                log(`📊 Percentual: ${data.percentual}%`);
+
+                // Debug da estrutura completa
+                log('🔍 === ESTRUTURA COMPLETA DOS DADOS ===');
+                log(`📊 progressData: ${JSON.stringify(data, null, 2)}`);
+                
+                // Verificar diferentes caminhos possíveis
+                log('🔍 === VERIFICANDO CAMINHOS POSSÍVEIS ===');
+                
+                if (data.dados_extra) {
+                    log('✅ dados_extra encontrado');
+                    log(`📊 dados_extra: ${JSON.stringify(data.dados_extra, null, 2)}`);
+                    
+                    if (data.dados_extra.estimativas_tela_5) {
+                        log('✅ estimativas_tela_5 encontrado');
+                        log(`📊 estimativas_tela_5: ${JSON.stringify(data.dados_extra.estimativas_tela_5, null, 2)}`);
+                    } else {
+                        log('❌ estimativas_tela_5 NÃO encontrado');
+                    }
+                } else {
+                    log('❌ dados_extra NÃO encontrado');
+                }
+
+                if (data.estimativas) {
+                    log('✅ estimativas encontrado');
+                    log(`📊 estimativas: ${JSON.stringify(data.estimativas, null, 2)}`);
+                } else {
+                    log('❌ estimativas NÃO encontrado');
+                }
+
+                // Verificar se há dados de estimativa em outros lugares
+                log('🔍 === BUSCANDO DADOS DE ESTIMATIVA EM OUTROS LOCAIS ===');
+                const keys = Object.keys(data);
+                keys.forEach(key => {
+                    if (key.toLowerCase().includes('estimativa') || key.toLowerCase().includes('cobertura')) {
+                        log(`📊 Chave encontrada: ${key}`);
+                        log(`📊 Valor: ${JSON.stringify(data[key], null, 2)}`);
+                    }
+                });
+
+            } catch (error) {
+                log(`❌ Erro ao verificar estrutura: ${error.message}`);
+            }
+        }
+
+        function debugEstruturaDados() {
+            log('🔍 === DEBUG MANUAL DE ESTRUTURA ===');
+            
+            // Simular diferentes estruturas possíveis
+            const estruturasPossiveis = [
+                {
+                    nome: 'Estrutura 1: dados_extra.estimativas_tela_5',
+                    dados: {
+                        dados_extra: {
+                            estimativas_tela_5: {
+                                coberturas_detalhadas: [
+                                    { valores: { de: "R$ 2.400,00" } }
+                                ]
+                            }
+                        }
+                    }
+                },
+                {
+                    nome: 'Estrutura 2: estimativas.dados',
+                    dados: {
+                        estimativas: {
+                            dados: {
+                                coberturas_detalhadas: [
+                                    { valores: { de: "R$ 2.400,00" } }
+                                ]
+                            }
+                        }
+                    }
+                },
+                {
+                    nome: 'Estrutura 3: dados_extra.estimativas',
+                    dados: {
+                        dados_extra: {
+                            estimativas: {
+                                coberturas_detalhadas: [
+                                    { valores: { de: "R$ 2.400,00" } }
+                                ]
+                            }
+                        }
+                    }
+                }
+            ];
+
+            estruturasPossiveis.forEach((estrutura, index) => {
+                log(`📊 Testando ${estrutura.nome}`);
+                
+                // Testar caminho atual (corrigido)
+                const caminhoAtual = estrutura.dados.dados_extra?.estimativas_tela_5;
+                if (caminhoAtual) {
+                    log(`✅ Caminho atual funciona para estrutura ${index + 1}`);
+                } else {
+                    log(`❌ Caminho atual NÃO funciona para estrutura ${index + 1}`);
+                }
+                
+                // Testar caminho antigo
+                const caminhoAntigo = estrutura.dados.estimativas?.dados;
+                if (caminhoAntigo) {
+                    log(`✅ Caminho antigo funciona para estrutura ${index + 1}`);
+                } else {
+                    log(`❌ Caminho antigo NÃO funciona para estrutura ${index + 1}`);
+                }
+            });
+        }
+
+        // Log quando a página carregar
+        window.addEventListener('load', function() {
+            log('🔍 Página de debug carregada');
+            log('📊 Pronto para testar estrutura de dados real');
+        });
+    </script>
+
+    <style>
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            font-family: 'Titillium Web', sans-serif;
+        }
+
+        .test-section {
+            background: var(--imediato-white);
+            border: 2px solid var(--imediato-light-blue);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .test-section h2 {
+            color: var(--imediato-dark-blue);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .test-results {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .debug-logs {
+            background: #1e1e1e;
+            color: #00ff00;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .btn-primary {
+            background: var(--imediato-dark-blue);
+            color: var(--imediato-white);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: var(--imediato-light-blue);
+            transform: translateY(-2px);
+        }
+    </style>
+</body>
+</html>
+
+

@@ -24,3 +24,5 @@ echo "[DEBUG] RPA finalizado com código: $?" >> logs/wrapper_debug.log
 
 
 
+
+

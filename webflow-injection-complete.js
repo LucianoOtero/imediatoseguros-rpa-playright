@@ -1,5 +1,5 @@
 /**
- * INJEÇÃO COMPLETA WEBFLOW - IMEDIATO SEGUROS V6.4.0
+ * INJEÇÃO COMPLETA WEBFLOW - IMEDIATO SEGUROS V6.5.0
  * Arquivo único para injeção no Webflow
  * 
  * Contém:
@@ -57,8 +57,8 @@
         
         /* Tamanhos específicos para elementos do modal */
         #rpaModal h1 {
-            font-size: var(--font-size-2xl) !important;
-            font-weight: 600 !important;
+            font-size: var(--font-size-2xl);
+            font-weight: 600;
         }
         
         #rpaModal h3 {
@@ -244,6 +244,11 @@
                 width: 96vw !important;
                 height: 96vh !important;
             }
+            
+            #rpaModal .progress-header .company-logo {
+                height: 40px;
+                width: auto;
+            }
         }
         
         /* Garantir que os ícones Font Awesome funcionem */
@@ -298,7 +303,7 @@
         }
         
         #rpaModal .progress-header .logo-container {
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
         
         #rpaModal .progress-header h1 {
@@ -317,8 +322,8 @@
         }
         
         #rpaModal .progress-header .company-logo {
-            max-width: 140px;
-            height: auto;
+            height: 60px;
+            width: auto;
             filter: none;
             object-fit: contain;
         }
@@ -564,6 +569,9 @@
             color: var(--imediato-text);
             font-size: 0.9rem;
             border-bottom: 1px solid var(--imediato-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
         .card-features li:last-child {
@@ -574,6 +582,21 @@
             color: var(--imediato-light-blue);
             margin-right: 0.5rem;
             width: 16px;
+        }
+        
+        .feature-value {
+            font-weight: 600;
+            color: var(--imediato-dark-blue);
+            text-align: right;
+            flex-shrink: 0;
+        }
+        
+        .text-success {
+            color: #28a745 !important;
+        }
+        
+        .text-danger {
+            color: #dc3545 !important;
         }
         
         .action-buttons {
@@ -656,7 +679,8 @@
             }
             
             #rpaModal .progress-header .company-logo {
-                max-width: 120px;
+                height: 50px;
+                width: auto;
             }
             
             #rpaModal .progress-info {
@@ -839,7 +863,20 @@
             }
             
             console.log('🔄 Iniciando polling do progresso...');
+            this.pollCount = 0;
+            this.maxPolls = 90; // 90 tentativas = 180 segundos (3 minutos, 2s cada)
+            
             this.progressInterval = setInterval(() => {
+                this.pollCount++;
+                console.log(`🔄 Polling ${this.pollCount}/${this.maxPolls}`);
+                
+                if (this.pollCount > this.maxPolls) {
+                    console.error('❌ Timeout: Processamento demorou mais de 3 minutos');
+                    this.stopProgressPolling();
+                    this.showErrorAlert('O processamento está demorando mais que o esperado (3 minutos). Tente novamente ou entre em contato conosco.');
+                    return;
+                }
+                
                 this.updateProgress();
             }, 2000);
         }
@@ -1410,50 +1447,128 @@
             console.log('📊 Atualizando resultados finais:', data);
             console.log('📊 Estrutura completa dos dados:', JSON.stringify(data, null, 2));
             
-            // Buscar resultados na estrutura correta do progress tracker
-            const resultados = data.resultados_finais?.dados?.dados_finais;
+            // Buscar resultados em múltiplas estruturas possíveis
+            let resultados = null;
+            let planoRecomendado = null;
+            let planoAlternativo = null;
+            
+            // Tentar estrutura 1: resultados_finais.dados.dados_finais
+            if (data.resultados_finais?.dados?.dados_finais) {
+                resultados = data.resultados_finais.dados.dados_finais;
+                planoRecomendado = resultados.plano_recomendado;
+                planoAlternativo = resultados.plano_alternativo;
+                console.log('✅ Dados encontrados em resultados_finais.dados.dados_finais');
+            }
+            
+            // Tentar estrutura 2: timeline[final].dados_extra
+            if (!planoRecomendado && data.timeline) {
+                const finalEntry = data.timeline.find(entry => entry.etapa === 'final');
+                if (finalEntry?.dados_extra) {
+                    planoRecomendado = finalEntry.dados_extra.plano_recomendado;
+                    planoAlternativo = finalEntry.dados_extra.plano_alternativo;
+                    console.log('✅ Dados encontrados em timeline[final].dados_extra');
+                }
+            }
+            
+            // Tentar estrutura 3: dados_extra direto (estrutura antiga)
+            if (!planoRecomendado && data.dados_extra) {
+                planoRecomendado = data.dados_extra.plano_recomendado;
+                planoAlternativo = data.dados_extra.plano_alternativo;
+                console.log('✅ Dados encontrados em dados_extra direto');
+            }
             
             console.log('🔍 DEBUG - Estrutura completa:', {
-                dados_extra_direto: data.dados_extra,
                 resultados_finais: data.resultados_finais,
-                dados_finais: data.resultados_finais?.dados?.dados_finais,
-                dados_extra_correto: data.resultados_finais?.dados?.dados_finais,
-                plano_recomendado: data.resultados_finais?.dados?.dados_finais?.plano_recomendado,
-                plano_alternativo: data.resultados_finais?.dados?.dados_finais?.plano_alternativo
+                timeline_final: data.timeline?.find(entry => entry.etapa === 'final'),
+                dados_extra_direto: data.dados_extra,
+                plano_recomendado_encontrado: planoRecomendado,
+                plano_alternativo_encontrado: planoAlternativo
             });
             
-            console.log('📊 Resultados encontrados em dados_extra:', resultados);
+            if (planoRecomendado && planoAlternativo) {
+                console.log('📊 Resultados encontrados:', { planoRecomendado, planoAlternativo });
+                
+                // Atualizar valores principais
+                this.updateCardValue('recommendedValue', planoRecomendado.valor);
+                this.updateCardValue('alternativeValue', planoAlternativo.valor);
+                
+                // Atualizar detalhes do plano recomendado
+                this.updateCardDetails('recommended', planoRecomendado);
+                
+                // Atualizar detalhes do plano alternativo
+                this.updateCardDetails('alternative', planoAlternativo);
+            } else {
+                console.log('⚠️ Nenhum resultado final encontrado em nenhuma estrutura');
+            }
+        }
+        
+        updateCardValue(elementId, valor) {
+            console.log(`🔍 DEBUG - updateCardValue chamado:`, { elementId, valor, tipo: typeof valor });
             
-            if (resultados) {
-                // Resultado recomendado - estrutura correta do progress tracker
-                let valorRecomendado = null;
-                if (resultados.plano_recomendado?.valor) {
-                    valorRecomendado = resultados.plano_recomendado.valor;
-                }
+            if (valor) {
+                const element = document.querySelector(`#rpaModal #${elementId}`);
+                console.log(`🔍 DEBUG - Elemento encontrado:`, element);
                 
-                if (valorRecomendado) {
-                    const recommendedValue = document.getElementById('recommendedValue');
-                    if (recommendedValue) {
-                        recommendedValue.textContent = this.formatCurrency(valorRecomendado);
-                        console.log('✅ Valor recomendado atualizado:', this.formatCurrency(valorRecomendado));
-                    }
-                }
-                
-                // Resultado alternativo - estrutura correta do progress tracker
-                let valorAlternativo = null;
-                if (resultados.plano_alternativo?.valor) {
-                    valorAlternativo = resultados.plano_alternativo.valor;
-                }
-                
-                if (valorAlternativo) {
-                    const alternativeValue = document.getElementById('alternativeValue');
-                    if (alternativeValue) {
-                        alternativeValue.textContent = this.formatCurrency(valorAlternativo);
-                        console.log('✅ Valor alternativo atualizado:', this.formatCurrency(valorAlternativo));
-                    }
+                if (element) {
+                    const valorFormatado = this.formatCurrency(valor);
+                    element.textContent = valorFormatado;
+                    console.log(`✅ Valor ${elementId} atualizado:`, valorFormatado);
+                } else {
+                    console.error(`❌ Elemento #${elementId} não encontrado no DOM`);
                 }
             } else {
-                console.log('⚠️ Nenhum resultado final encontrado em dados_extra');
+                console.warn(`⚠️ Valor vazio para ${elementId}:`, valor);
+            }
+        }
+        
+        updateCardDetails(prefix, plano) {
+            if (!plano) return;
+            
+            console.log(`🔍 DEBUG - Atualizando detalhes do plano ${prefix}:`, plano);
+            
+            // Função para formatar check positivo/negativo
+            const formatCheck = (value) => {
+                return value ? '<i class="fas fa-check text-success"></i>' : '<i class="fas fa-times text-danger"></i>';
+            };
+            
+            // Função para formatar valores monetários
+            const formatMoney = (value) => {
+                if (!value || value === '-') return '-';
+                if (typeof value === 'string' && value.includes('R$')) {
+                    return value;
+                }
+                // Se for número, formatar como moeda
+                if (typeof value === 'number') {
+                    return this.formatCurrency(value);
+                }
+                // Se for string com números, tentar converter
+                const numValue = parseFloat(value.toString().replace(/[^\d,.-]/g, '').replace(',', '.'));
+                if (!isNaN(numValue)) {
+                    return this.formatCurrency(numValue);
+                }
+                return `R$ ${value}`;
+            };
+            
+            // Atualizar todos os campos
+            this.updateField(`${prefix}FormaPagamento`, plano.forma_pagamento || '-');
+            this.updateField(`${prefix}Parcelamento`, plano.parcelamento || '-');
+            this.updateField(`${prefix}ValorMercado`, plano.valor_mercado || '-');
+            this.updateField(`${prefix}ValorFranquia`, formatMoney(plano.valor_franquia || '-'));
+            this.updateField(`${prefix}TipoFranquia`, plano.tipo_franquia || '-');
+            this.updateField(`${prefix}Assistencia`, formatCheck(plano.assistencia));
+            this.updateField(`${prefix}Vidros`, formatCheck(plano.vidros));
+            this.updateField(`${prefix}CarroReserva`, formatCheck(plano.carro_reserva));
+            this.updateField(`${prefix}DanosMateriais`, formatMoney(plano.danos_materiais || '-'));
+            this.updateField(`${prefix}DanosCorporais`, formatMoney(plano.danos_corporais || '-'));
+            this.updateField(`${prefix}DanosMorais`, formatMoney(plano.danos_morais || '-'));
+            this.updateField(`${prefix}MorteInvalidez`, formatMoney(plano.morte_invalidez || '-'));
+        }
+        
+        updateField(elementId, value) {
+            const element = document.querySelector(`#rpaModal #${elementId}`);
+            if (element) {
+                element.innerHTML = value;
+                console.log(`✅ Campo ${elementId} atualizado:`, value);
             }
         }
         
@@ -1893,6 +2008,9 @@
                 // Coletar dados do formulário
                 const formData = this.collectFormData(form);
                 
+                // Armazenar telefone globalmente para WhatsApp
+                window.rpaData = { telefone: formData.telefone };
+                
                 // Executar webhooks do Webflow ANTES do RPA
                 // await this.executeWebflowWebhooks(form, formData); // COMENTADO PARA TESTES
                 
@@ -2102,7 +2220,7 @@
                 console.log('🎨 Carregando Font Awesome...');
                 const fontAwesome = document.createElement('link');
                 fontAwesome.rel = 'stylesheet';
-                fontAwesome.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
+                fontAwesome.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css';
                 fontAwesome.crossOrigin = 'anonymous';
                 
                 fontAwesome.onload = () => {
@@ -2137,13 +2255,13 @@
             
             // Criar modal HTML
             const modalHTML = `
-                <div id="rpaModal" class="show" style="top: 80px !important; height: calc(100vh - 80px) !important;">
+                <div id="rpaModal" class="show">
                     <div class="modal-progress-bar">
                         <div class="progress-header">
                             <div class="logo-container">
                                 <img src="https://cdn.prod.website-files.com/59eb807f9d16950001e202af/5f845624fe08f9f0d0573fee_logotipo-imediato-seguros.svg" alt="Imediato Seguros" class="company-logo">
                             </div>
-                            <h1><i class="fas fa-calculator"></i> Calculadora de Seguro</h1>
+                            <h1><i class="fas fa-calculator"></i> Calculadora de Seguro da Imediato Seguros</h1>
                             <div class="progress-info">
                                 <span class="progress-text" id="progressText">0%</span>
                                 <span class="current-phase" id="currentPhase">Iniciando Multi-Cálculo...</span>
@@ -2171,17 +2289,24 @@
                                     </div>
                                     <div class="card-title">
                                         <h3>Recomendado</h3>
-                                        <p class="card-subtitle">Melhor Custo-Benefício</p>
                                     </div>
                                 </div>
                                 <div class="card-value">
                                     <div class="value" id="recommendedValue">R$ 0,00</div>
                                 </div>
                                 <ul class="card-features">
-                                    <li><i class="fas fa-check"></i> Cobertura Completa</li>
-                                    <li><i class="fas fa-check"></i> Assistência 24h</li>
-                                    <li><i class="fas fa-check"></i> Carro Reserva</li>
-                                    <li><i class="fas fa-check"></i> Franquia Reduzida</li>
+                                    <li>Forma de Pagamento: <span class="feature-value" id="recommendedFormaPagamento">-</span></li>
+                                    <li>Parcelamento: <span class="feature-value" id="recommendedParcelamento">-</span></li>
+                                    <li>Valor de Mercado: <span class="feature-value" id="recommendedValorMercado">-</span></li>
+                                    <li>Valor da Franquia: <span class="feature-value" id="recommendedValorFranquia">-</span></li>
+                                    <li>Tipo de Franquia: <span class="feature-value" id="recommendedTipoFranquia">-</span></li>
+                                    <li>Cobertura de Assistência: <span class="feature-value" id="recommendedAssistencia">-</span></li>
+                                    <li>Cobertura de Vidros: <span class="feature-value" id="recommendedVidros">-</span></li>
+                                    <li>Cobertura de Carro Reserva: <span class="feature-value" id="recommendedCarroReserva">-</span></li>
+                                    <li>Cobertura de Danos Materiais: <span class="feature-value" id="recommendedDanosMateriais">-</span></li>
+                                    <li>Cobertura de Danos Corporais: <span class="feature-value" id="recommendedDanosCorporais">-</span></li>
+                                    <li>Cobertura de Danos Morais: <span class="feature-value" id="recommendedDanosMorais">-</span></li>
+                                    <li>Cobertura de Morte e Invalidez Permanente: <span class="feature-value" id="recommendedMorteInvalidez">-</span></li>
                                 </ul>
                             </div>
                             
@@ -2193,23 +2318,30 @@
                                     </div>
                                     <div class="card-title">
                                         <h3>Alternativo</h3>
-                                        <p class="card-subtitle">Opção Econômica</p>
                                     </div>
                                 </div>
                                 <div class="card-value">
                                     <div class="value" id="alternativeValue">R$ 0,00</div>
                                 </div>
                                 <ul class="card-features">
-                                    <li><i class="fas fa-check"></i> Cobertura Básica</li>
-                                    <li><i class="fas fa-check"></i> Assistência 24h</li>
-                                    <li><i class="fas fa-check"></i> Franquia Padrão</li>
-                                    <li><i class="fas fa-check"></i> Preço Competitivo</li>
+                                    <li>Forma de Pagamento: <span class="feature-value" id="alternativeFormaPagamento">-</span></li>
+                                    <li>Parcelamento: <span class="feature-value" id="alternativeParcelamento">-</span></li>
+                                    <li>Valor de Mercado: <span class="feature-value" id="alternativeValorMercado">-</span></li>
+                                    <li>Valor da Franquia: <span class="feature-value" id="alternativeValorFranquia">-</span></li>
+                                    <li>Tipo de Franquia: <span class="feature-value" id="alternativeTipoFranquia">-</span></li>
+                                    <li>Cobertura de Assistência: <span class="feature-value" id="alternativeAssistencia">-</span></li>
+                                    <li>Cobertura de Vidros: <span class="feature-value" id="alternativeVidros">-</span></li>
+                                    <li>Cobertura de Carro Reserva: <span class="feature-value" id="alternativeCarroReserva">-</span></li>
+                                    <li>Cobertura de Danos Materiais: <span class="feature-value" id="alternativeDanosMateriais">-</span></li>
+                                    <li>Cobertura de Danos Corporais: <span class="feature-value" id="alternativeDanosCorporais">-</span></li>
+                                    <li>Cobertura de Danos Morais: <span class="feature-value" id="alternativeDanosMorais">-</span></li>
+                                    <li>Cobertura de Morte e Invalidez Permanente: <span class="feature-value" id="alternativeMorteInvalidez">-</span></li>
                                 </ul>
                             </div>
                         </div>
                         
                         <div class="action-buttons">
-                            <button class="btn btn-primary" onclick="window.open('https://wa.me/5511999999999', '_blank')">
+                            <button class="btn btn-primary" onclick="window.open('https://wa.me/55' + (window.rpaData?.telefone || '11999999999'), '_blank')">
                                 <i class="fab fa-whatsapp"></i> Falar com Especialista
                             </button>
                             <button class="btn btn-secondary" onclick="document.getElementById('rpaModal').remove()">
@@ -2245,7 +2377,7 @@
     if (!document.querySelector('link[href*="font-awesome"]') && !document.querySelector('link[href*="fontawesome"]')) {
         const fontAwesome = document.createElement('link');
         fontAwesome.rel = 'stylesheet';
-        fontAwesome.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
+        fontAwesome.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css';
         fontAwesome.crossOrigin = 'anonymous';
         document.head.appendChild(fontAwesome);
         console.log('🎨 Font Awesome carregado');

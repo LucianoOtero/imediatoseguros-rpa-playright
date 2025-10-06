@@ -1,0 +1,306 @@
+/* PÁGINA PRINCIPAL V6.2.0 - IMEDIATO SEGUROS */
+
+/* Página Principal */
+.main-page {
+    min-height: 100vh;
+    padding: 2rem 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Header da Página */
+.page-header {
+    background: linear-gradient(135deg, var(--imediato-dark-blue), var(--imediato-light-blue));
+    color: var(--imediato-white);
+    padding: 3rem 2rem;
+    text-align: center;
+    border-radius: 20px;
+    margin-bottom: 2rem;
+    box-shadow: 0 12px 40px var(--imediato-shadow);
+}
+
+.logo-container {
+    margin-bottom: 1.5rem;
+}
+
+.page-header h1 {
+    color: var(--imediato-white);
+    margin-bottom: 0.5rem;
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.page-header p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.2rem;
+    font-weight: 400;
+}
+
+/* Container do Formulário */
+.form-container {
+    background: var(--imediato-white);
+    border-radius: 20px;
+    box-shadow: 0 12px 40px var(--imediato-shadow);
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+/* Formulário */
+.rpa-form {
+    padding: 2rem;
+}
+
+.form-section {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: var(--imediato-gray);
+    border-radius: 16px;
+    border-left: 4px solid var(--imediato-light-blue);
+    transition: all 0.3s ease;
+}
+
+.form-section:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px var(--imediato-shadow);
+}
+
+.form-section h3 {
+    color: var(--imediato-dark-blue);
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: var(--imediato-dark-blue);
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.form-group input,
+.form-group select {
+    padding: 0.875rem;
+    border: 2px solid var(--imediato-border);
+    border-radius: 10px;
+    font-size: 1rem;
+    font-family: 'Titillium Web', sans-serif;
+    transition: all 0.3s ease;
+    background: var(--imediato-white);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--imediato-light-blue);
+    box-shadow: 0 0 0 3px rgba(0, 153, 204, 0.1);
+    transform: translateY(-1px);
+}
+
+.form-group input.success,
+.form-group select.success {
+    border-color: var(--imediato-light-blue);
+    background: rgba(0, 153, 204, 0.05);
+}
+
+.form-group input.error,
+.form-group select.error {
+    border-color: #E74C3C;
+    background: rgba(231, 76, 60, 0.05);
+}
+
+.field-hint {
+    color: var(--imediato-text-light);
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+/* Botão Principal */
+.form-actions {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.btn-calculate {
+    background: linear-gradient(135deg, var(--imediato-dark-blue), var(--imediato-light-blue));
+    color: var(--imediato-white);
+    border: none;
+    padding: 1.2rem 2.5rem;
+    border-radius: 15px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    font-family: 'Titillium Web', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 220px;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-calculate::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.btn-calculate:hover::before {
+    left: 100%;
+}
+
+.btn-calculate:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px var(--imediato-shadow-hover);
+}
+
+.btn-calculate:active {
+    transform: translateY(-1px);
+}
+
+.btn-calculate:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-loading {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Painel de Informações */
+.info-panel {
+    background: var(--imediato-white);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 8px 25px var(--imediato-shadow);
+}
+
+.info-panel h3 {
+    color: var(--imediato-dark-blue);
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.info-panel ul {
+    list-style: none;
+    padding: 0;
+}
+
+.info-panel li {
+    padding: 0.5rem 0;
+    color: var(--imediato-text-light);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.info-panel li i {
+    color: var(--imediato-light-blue);
+    font-size: 1rem;
+}
+
+.info-panel code {
+    background: var(--imediato-gray);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    color: var(--imediato-dark-blue);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .main-page {
+        padding: 1rem 0.5rem;
+    }
+    
+    .page-header {
+        padding: 2rem 1rem;
+    }
+    
+    .page-header h1 {
+        font-size: 2rem;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .rpa-form {
+        padding: 1.5rem;
+    }
+    
+    .form-section {
+        padding: 1rem;
+    }
+    
+    .btn-calculate {
+        width: 100%;
+        padding: 1.4rem;
+    }
+    
+    .info-panel {
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-page {
+        padding: 0.5rem;
+    }
+    
+    .page-header {
+        padding: 1.5rem 1rem;
+        border-radius: 15px;
+    }
+    
+    .page-header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .form-container,
+    .info-panel {
+        border-radius: 15px;
+    }
+    
+    .rpa-form {
+        padding: 1rem;
+    }
+    
+    .form-section {
+        padding: 0.75rem;
+    }
+}
+
+
+

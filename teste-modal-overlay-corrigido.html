@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Modal Overlay V6.2.0 - CORRIGIDO</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/imediato-brand.css">
+    <link rel="stylesheet" href="css/main-page.css">
+    <link rel="stylesheet" href="css/modal-progress.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header class="page-header">
+            <div class="logo-container">
+                <img src="https://www.segurosimediato.com.br/wp-content/uploads/2023/01/logo-imediato-seguros.png" alt="Imediato Seguros" class="logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div class="logo-fallback" style="display: none; color: var(--imediato-dark-blue); font-size: 1.5rem; font-weight: bold;">IMEDIATO SEGUROS</div>
+            </div>
+            <h1>Teste Modal Overlay V6.2.0 - CORRIGIDO</h1>
+            <p>Validação da implementação corrigida do reset forçado</p>
+        </header>
+        
+        <div class="form-container">
+            <form id="rpa-form" class="rpa-form">
+                <!-- Dados Pessoais -->
+                <div class="form-group">
+                    <label for="cpf">CPF *</label>
+                    <input type="text" id="cpf" name="cpf" required maxlength="11" placeholder="00000000000" value="97137189768">
+                </div>
+                
+                <div class="form-group">
+                    <label for="nome">Nome Completo *</label>
+                    <input type="text" id="nome" name="nome" required placeholder="Seu nome completo" value="ALEX KAMINSKI">
+                </div>
+                
+                <div class="form-group">
+                    <label for="data_nascimento">Data de Nascimento *</label>
+                    <input type="text" id="data_nascimento" name="data_nascimento" required placeholder="DD/MM/AAAA" value="25/04/1970">
+                </div>
+                
+                <div class="form-group">
+                    <label for="sexo">Sexo *</label>
+                    <select id="sexo" name="sexo" required>
+                        <option value="">Selecione</option>
+                        <option value="Masculino" selected>Masculino</option>
+                        <option value="Feminino">Feminino</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="estado_civil">Estado Civil *</label>
+                    <select id="estado_civil" name="estado_civil" required>
+                        <option value="">Selecione</option>
+                        <option value="Solteiro">Solteiro</option>
+                        <option value="Casado ou Uniao Estavel" selected>Casado ou União Estável</option>
+                        <option value="Divorciado">Divorciado</option>
+                        <option value="Viuvo">Viúvo</option>
+                    </select>
+                </div>
+                
+                <!-- Dados do Veículo -->
+                <div class="form-group">
+                    <label for="placa">Placa do Veículo *</label>
+                    <input type="text" id="placa" name="placa" required maxlength="7" placeholder="ABC1234" value="EYQ4J41">
+                </div>
+                
+                <div class="form-group">
+                    <label for="marca">Marca do Veículo *</label>
+                    <input type="text" id="marca" name="marca" required placeholder="Toyota" value="TOYOTA">
+                </div>
+                
+                <div class="form-group">
+                    <label for="cep">CEP *</label>
+                    <input type="text" id="cep" name="cep" required maxlength="8" placeholder="00000000" value="03317-000">
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn-calculate" id="btnCalculate">
+                        <i class="fas fa-calculator"></i>
+                        <span>Efetuar Cálculo</span>
+                        <div class="btn-loading" style="display: none;">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Botões de Teste -->
+        <div class="test-buttons">
+            <h3>🧪 Testes de Validação CORRIGIDOS</h3>
+            <button onclick="teste1()" class="btn-test">Teste 1: Verificar Estilos Computados</button>
+            <button onclick="teste2()" class="btn-test">Teste 2: Verificar Hierarquia do DOM</button>
+            <button onclick="teste3()" class="btn-test">Teste 3: Teste Manual de Overlay</button>
+            <button onclick="teste4()" class="btn-test">Teste 4: Verificar Responsividade</button>
+            <button onclick="teste5()" class="btn-test">Teste 5: Verificar CSS Carregado</button>
+            <button onclick="teste6()" class="btn-test">Teste 6: Verificar Logotipo</button>
+        </div>
+        
+        <!-- Console de Logs -->
+        <div class="console-logs" id="consoleLogs">
+            <h3>📊 Console de Logs</h3>
+            <div id="logOutput"></div>
+        </div>
+    </div>
+    
+    <!-- JavaScript -->
+    <script src="js/rpa-integration.js"></script>
+    <script src="js/modal-progress.js"></script>
+    <script src="js/main-page.js"></script>
+    
+    <!-- Scripts de Teste -->
+    <script>
+        // Função para log no console visual
+        function log(message, type = 'info') {
+            const logOutput = document.getElementById('logOutput');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${type}`;
+            logEntry.innerHTML = `<span class="timestamp">[${timestamp}]</span> ${message}`;
+            logOutput.appendChild(logEntry);
+            logOutput.scrollTop = logOutput.scrollHeight;
+            console.log(message);
+        }
+        
+        // Teste 1: Verificar Estilos Computados
+        function teste1() {
+            log('🧪 === TESTE 1: VERIFICAÇÃO DE ESTILOS ===', 'test');
+            const modal = document.getElementById('rpaModal');
+            
+            if (!modal) {
+                log('❌ Modal não encontrado. Execute o cálculo primeiro.', 'error');
+                return;
+            }
+            
+            const styles = window.getComputedStyle(modal);
+            log(`Position: ${styles.position}`, 'info');
+            log(`Z-index: ${styles.zIndex}`, 'info');
+            log(`Width: ${styles.width}`, 'info');
+            log(`Height: ${styles.height}`, 'info');
+            log(`Top: ${styles.top}`, 'info');
+            log(`Left: ${styles.left}`, 'info');
+            log(`Background: ${styles.background}`, 'info');
+            log(`Isolation: ${styles.isolation}`, 'info');
+            
+            // Verificar se está correto
+            const isCorrect = styles.position === 'fixed' && 
+                            styles.zIndex === '999999' && 
+                            styles.width === '100vw' && 
+                            styles.height === '100vh';
+            
+            if (isCorrect) {
+                log('✅ TESTE 1 PASSOU: Estilos corretos!', 'success');
+            } else {
+                log('❌ TESTE 1 FALHOU: Estilos incorretos!', 'error');
+            }
+        }
+        
+        // Teste 2: Verificar Hierarquia do DOM
+        function teste2() {
+            log('🧪 === TESTE 2: VERIFICAÇÃO DO DOM ===', 'test');
+            const modal = document.getElementById('rpaModal');
+            
+            if (!modal) {
+                log('❌ Modal não encontrado. Execute o cálculo primeiro.', 'error');
+                return;
+            }
+            
+            log(`Parent: ${modal.parentElement.tagName}`, 'info');
+            log(`Parent tagName: ${modal.parentElement.tagName}`, 'info');
+            log(`Body children count: ${document.body.children.length}`, 'info');
+            log(`Modal is in body: ${modal.parentElement === document.body}`, 'info');
+            log(`Modal has class 'show': ${modal.classList.contains('show')}`, 'info');
+            
+            // Verificar se está correto
+            const isCorrect = modal.parentElement === document.body && modal.classList.contains('show');
+            
+            if (isCorrect) {
+                log('✅ TESTE 2 PASSOU: Modal está no body e tem classe show!', 'success');
+            } else {
+                log('❌ TESTE 2 FALHOU: Modal não está correto!', 'error');
+            }
+        }
+        
+        // Teste 3: Teste Manual de Overlay
+        function teste3() {
+            log('🧪 === TESTE 3: TESTE MANUAL DE OVERLAY ===', 'test');
+            
+            // Criar teste manual para comparar
+            const testOverlay = document.createElement('div');
+            testOverlay.id = 'testOverlay';
+            testOverlay.style.cssText = `
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100vw !important;
+                height: 100vh !important;
+                background: rgba(255, 0, 0, 0.5) !important;
+                z-index: 999999 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+            `;
+            testOverlay.textContent = 'TESTE OVERLAY - DEVE COBRIR TELA INTEIRA';
+            testOverlay.style.color = 'white';
+            testOverlay.style.fontSize = '2rem';
+            testOverlay.style.fontWeight = 'bold';
+            testOverlay.style.textAlign = 'center';
+            
+            document.body.appendChild(testOverlay);
+            log('🔴 Overlay de teste criado (vermelho)', 'info');
+            
+            // Remover após 3 segundos
+            setTimeout(() => {
+                testOverlay.remove();
+                log('✅ Teste de overlay removido', 'success');
+            }, 3000);
+        }
+        
+        // Teste 4: Verificar Responsividade
+        function teste4() {
+            log('🧪 === TESTE 4: VERIFICAÇÃO DE RESPONSIVIDADE ===', 'test');
+            const modal = document.getElementById('rpaModal');
+            
+            if (!modal) {
+                log('❌ Modal não encontrado. Execute o cálculo primeiro.', 'error');
+                return;
+            }
+            
+            const testSizes = [
+                { width: 1920, height: 1080, name: 'Desktop' },
+                { width: 768, height: 1024, name: 'Tablet' },
+                { width: 375, height: 667, name: 'Mobile' }
+            ];
+            
+            testSizes.forEach(size => {
+                log(`=== TESTE ${size.name} ===`, 'info');
+                log(`Viewport: ${size.width}x${size.height}`, 'info');
+                log(`Modal width: ${window.getComputedStyle(modal).width}`, 'info');
+                log(`Modal height: ${window.getComputedStyle(modal).height}`, 'info');
+            });
+            
+            log('✅ TESTE 4 CONCLUÍDO: Verificação de responsividade', 'success');
+        }
+        
+        // Teste 5: Verificar CSS Carregado
+        function teste5() {
+            log('🧪 === TESTE 5: VERIFICAÇÃO DE CSS CARREGADO ===', 'test');
+            
+            // Verificar se os arquivos CSS estão carregados
+            const links = document.querySelectorAll('link[rel="stylesheet"]');
+            let cssFiles = [];
+            
+            links.forEach(link => {
+                if (link.href.includes('css/')) {
+                    cssFiles.push(link.href.split('/').pop());
+                }
+            });
+            
+            log(`Arquivos CSS carregados: ${cssFiles.join(', ')}`, 'info');
+            
+            // Verificar se modal-progress.css está carregado
+            const hasModalCSS = cssFiles.includes('modal-progress.css');
+            
+            if (hasModalCSS) {
+                log('✅ TESTE 5 PASSOU: modal-progress.css está carregado!', 'success');
+            } else {
+                log('❌ TESTE 5 FALHOU: modal-progress.css não está carregado!', 'error');
+            }
+            
+            // Verificar se as variáveis CSS estão disponíveis
+            const root = document.documentElement;
+            const computedStyle = getComputedStyle(root);
+            const imediatoDarkBlue = computedStyle.getPropertyValue('--imediato-dark-blue');
+            
+            if (imediatoDarkBlue) {
+                log(`✅ Variável CSS --imediato-dark-blue: ${imediatoDarkBlue}`, 'success');
+            } else {
+                log('❌ Variável CSS --imediato-dark-blue não encontrada', 'error');
+            }
+        }
+        
+        // Teste 6: Verificar Logotipo
+        function teste6() {
+            log('🧪 === TESTE 6: VERIFICAÇÃO DE LOGOTIPO ===', 'test');
+            
+            // Verificar logotipo na página principal
+            const mainLogo = document.querySelector('.logo img');
+            if (mainLogo) {
+                log(`Logotipo principal encontrado: ${mainLogo.src}`, 'info');
+                
+                // Verificar se carregou
+                if (mainLogo.complete && mainLogo.naturalHeight !== 0) {
+                    log('✅ Logotipo principal carregado com sucesso', 'success');
+                } else {
+                    log('❌ Logotipo principal não carregou', 'error');
+                }
+            } else {
+                log('❌ Logotipo principal não encontrado', 'error');
+            }
+            
+            // Verificar logotipo no modal (se existir)
+            const modalLogo = document.querySelector('#rpaModal .modal-logo');
+            if (modalLogo) {
+                log(`Logotipo do modal encontrado: ${modalLogo.src}`, 'info');
+                
+                // Verificar se carregou
+                if (modalLogo.complete && modalLogo.naturalHeight !== 0) {
+                    log('✅ Logotipo do modal carregado com sucesso', 'success');
+                } else {
+                    log('❌ Logotipo do modal não carregou', 'error');
+                }
+            } else {
+                log('ℹ️ Modal não está aberto ou logotipo não encontrado', 'info');
+            }
+            
+            // Verificar fallback
+            const fallback = document.querySelector('.logo-fallback');
+            if (fallback) {
+                log(`Fallback encontrado: ${fallback.textContent}`, 'info');
+                log(`Fallback visível: ${fallback.style.display !== 'none'}`, 'info');
+            }
+            
+            // Teste de carregamento de imagem
+            const testImg = new Image();
+            testImg.onload = function() {
+                log('✅ Teste de carregamento de imagem: SUCESSO', 'success');
+            };
+            testImg.onerror = function() {
+                log('❌ Teste de carregamento de imagem: FALHOU', 'error');
+            };
+            testImg.src = 'https://www.segurosimediato.com.br/wp-content/uploads/2023/01/logo-imediato-seguros.png';
+        }
+        
+        // Interceptar logs do console
+        const originalLog = console.log;
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            log(args.join(' '), 'console');
+        };
+        
+        // Interceptar erros do console
+        const originalError = console.error;
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            log(args.join(' '), 'error');
+        };
+        
+        log('🚀 Página de teste CORRIGIDA carregada', 'success');
+        log('📝 Preencha o formulário e clique em "Efetuar Cálculo"', 'info');
+        log('🧪 Depois execute os testes de validação', 'info');
+        log('🔧 Correções aplicadas:', 'info');
+        log('  - CSS modal-progress.css carregado', 'info');
+        log('  - all: unset em vez de all: initial', 'info');
+        log('  - isolation: isolate adicionado', 'info');
+        log('  - Verificação de estilos melhorada', 'info');
+        log('  - Timeout aumentado para 100ms', 'info');
+        log('  - R$ duplicado corrigido', 'info');
+        log('  - Formatação de moeda melhorada', 'info');
+        log('  - Responsividade dos valores corrigida', 'info');
+        log('  - Textos desnecessários removidos', 'info');
+        log('  - Mensagem de contato adicionada', 'info');
+        log('  - Elementos visuais dos cards removidos', 'info');
+        log('  - Mensagens das 16 fases implementadas', 'info');
+        log('  - Submensagens das 16 fases implementadas', 'info');
+        log('  - Correção de valores divididos por 1000', 'info');
+        log('  - Textos de info removidos dos cards', 'info');
+        log('  - Submensagem de contato removida da fase 15', 'info');
+        log('  - Mensagem da fase 15 alterada para processamento', 'info');
+        log('  - Fase 16 adicionada com "Cálculo finalizado"', 'info');
+        log('  - Lógica de estimativa corrigida (verificação a cada fase)', 'info');
+    </script>
+    
+    <style>
+        .test-buttons {
+            margin: 2rem 0;
+            padding: 2rem;
+            background: var(--imediato-gray);
+            border-radius: 15px;
+        }
+        
+        .test-buttons h3 {
+            color: var(--imediato-dark-blue);
+            margin-bottom: 1rem;
+        }
+        
+        .btn-test {
+            display: block;
+            width: 100%;
+            margin: 0.5rem 0;
+            padding: 1rem;
+            background: var(--imediato-light-blue);
+            color: var(--imediato-white);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-test:hover {
+            background: var(--imediato-dark-blue);
+            transform: translateY(-2px);
+        }
+        
+        .console-logs {
+            margin: 2rem 0;
+            padding: 2rem;
+            background: #1a1a1a;
+            border-radius: 15px;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .console-logs h3 {
+            color: #00ff00;
+            margin-bottom: 1rem;
+        }
+        
+        .log-output {
+            max-height: 300px;
+            overflow-y: auto;
+            background: #000;
+            padding: 1rem;
+            border-radius: 10px;
+        }
+        
+        .log-entry {
+            margin: 0.25rem 0;
+            padding: 0.25rem 0;
+        }
+        
+        .log-entry.success {
+            color: #00ff00;
+        }
+        
+        .log-entry.error {
+            color: #ff0000;
+        }
+        
+        .log-entry.test {
+            color: #ffff00;
+            font-weight: bold;
+        }
+        
+        .log-entry.info {
+            color: #00ffff;
+        }
+        
+        .log-entry.console {
+            color: #ffffff;
+        }
+        
+        .timestamp {
+            color: #888;
+        }
+    </style>
+</body>
+</html>

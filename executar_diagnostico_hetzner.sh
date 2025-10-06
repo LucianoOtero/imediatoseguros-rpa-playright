@@ -108,3 +108,5 @@ echo "💾 Relatório detalhado salvo em: diagnostico_hetzner_*.json"
 
 
 
+
+

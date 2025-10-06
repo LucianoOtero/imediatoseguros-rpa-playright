@@ -219,3 +219,5 @@ echo "❌ Se execução direta não funcionou, problema é do código"
 
 
 
+
+

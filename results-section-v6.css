@@ -1,0 +1,267 @@
+/* SEÇÃO DE RESULTADOS V6.1.0 - IDENTIDADE IMEDIATO SEGUROS */
+
+.rpa-results-section {
+    margin-top: 120px;
+    padding: 2rem;
+    background: linear-gradient(135deg, var(--imediato-gray), var(--imediato-white));
+    min-height: 100vh;
+    display: none;
+}
+
+.results-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, var(--imediato-dark-blue), var(--imediato-light-blue));
+    border-radius: 20px;
+    color: var(--imediato-white);
+    box-shadow: 0 8px 30px var(--imediato-shadow);
+}
+
+.results-header h2 {
+    color: var(--imediato-white);
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.results-header p {
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 1.2rem;
+    font-weight: 400;
+}
+
+.results-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.estimate-card,
+.calculation-card {
+    background: var(--imediato-white);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 10px 35px var(--imediato-shadow);
+    transition: all 0.4s ease;
+    border: 3px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.estimate-card::before,
+.calculation-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--imediato-dark-blue), var(--imediato-light-blue));
+}
+
+.estimate-card:hover,
+.calculation-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 50px var(--imediato-shadow-hover);
+}
+
+.calculation-card.recommended {
+    border-color: var(--imediato-light-blue);
+}
+
+.calculation-card.alternative {
+    border-color: var(--imediato-dark-blue);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.card-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.estimate-card .card-icon {
+    background: linear-gradient(135deg, var(--imediato-light-blue), var(--imediato-dark-blue));
+    color: var(--imediato-white);
+}
+
+.calculation-card.recommended .card-icon {
+    background: linear-gradient(135deg, var(--imediato-light-blue), var(--imediato-dark-blue));
+    color: var(--imediato-white);
+}
+
+.calculation-card.alternative .card-icon {
+    background: linear-gradient(135deg, var(--imediato-dark-blue), var(--imediato-light-blue));
+    color: var(--imediato-white);
+}
+
+.card-title h3 {
+    margin: 0;
+    color: var(--imediato-dark-blue);
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+.card-subtitle {
+    color: var(--imediato-text-light);
+    font-size: 0.95rem;
+    font-weight: 400;
+}
+
+.card-badge {
+    margin-left: auto;
+}
+
+.badge {
+    padding: 0.6rem 1.2rem;
+    border-radius: 25px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge.recommended {
+    background: linear-gradient(135deg, var(--imediato-light-blue), var(--imediato-dark-blue));
+    color: var(--imediato-white);
+    box-shadow: 0 4px 15px rgba(0, 153, 204, 0.3);
+}
+
+.badge.alternative {
+    background: linear-gradient(135deg, var(--imediato-dark-blue), var(--imediato-light-blue));
+    color: var(--imediato-white);
+    box-shadow: 0 4px 15px rgba(0, 51, 102, 0.3);
+}
+
+.value-display {
+    display: flex;
+    align-items: baseline;
+    margin-bottom: 0.75rem;
+}
+
+.currency {
+    font-size: 1.8rem;
+    color: var(--imediato-text-light);
+    margin-right: 0.5rem;
+    font-weight: 500;
+}
+
+.value {
+    font-size: 3.2rem;
+    font-weight: 700;
+    color: var(--imediato-dark-blue);
+    line-height: 1;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.value-info {
+    color: var(--imediato-text-light);
+    font-size: 0.95rem;
+    font-weight: 400;
+}
+
+.calculations-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.results-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 3rem;
+}
+
+.btn-primary,
+.btn-secondary {
+    padding: 1.2rem 2.5rem;
+    border-radius: 15px;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: 'Titillium Web', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    border: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--imediato-dark-blue), var(--imediato-light-blue));
+    color: var(--imediato-white);
+    box-shadow: 0 6px 20px var(--imediato-shadow);
+}
+
+.btn-secondary {
+    background: var(--imediato-white);
+    color: var(--imediato-dark-blue);
+    border: 2px solid var(--imediato-light-blue);
+    box-shadow: 0 4px 15px var(--imediato-shadow);
+}
+
+.btn-primary:hover,
+.btn-secondary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px var(--imediato-shadow-hover);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--imediato-light-blue), var(--imediato-dark-blue));
+}
+
+.btn-secondary:hover {
+    background: var(--imediato-light-blue);
+    color: var(--imediato-white);
+    border-color: var(--imediato-dark-blue);
+}
+
+/* Responsividade dos Resultados */
+@media (max-width: 768px) {
+    .results-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .calculations-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .results-header h2 {
+        font-size: 2rem;
+    }
+    
+    .value {
+        font-size: 2.8rem;
+    }
+    
+    .results-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .btn-primary,
+    .btn-secondary {
+        width: 100%;
+        max-width: 300px;
+    }
+}
+
+
+

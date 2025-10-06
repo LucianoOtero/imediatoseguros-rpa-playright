@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modal de Progresso RPA - Imediato Seguros V6.2.0</title>
+    
+    <!-- Titillium Web Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS do Modal -->
+    <link rel="stylesheet" href="css/modal-progress.css">
+    <link rel="stylesheet" href="css/imediato-brand.css">
+</head>
+<body>
+    <!-- Modal de Progresso RPA -->
+    <div class="rpa-modal" id="rpaModal">
+        <!-- Barra de Progresso Fixa no Topo -->
+        <div class="modal-progress-bar">
+            <div class="progress-header">
+                <div class="logo-container">
+                    <img src="https://www.segurosimediato.com.br/assets/logo.png" alt="Imediato Seguros" class="modal-logo">
+                </div>
+                <div class="progress-info">
+                    <span class="progress-text" id="progressText">0%</span>
+                    <span class="current-phase" id="currentPhase">Iniciando RPA...</span>
+                </div>
+                <div class="progress-stages">
+                    <span class="stage-info" id="stageInfo">Fase 0 de 15</span>
+                </div>
+            </div>
+            
+            <div class="progress-bar-wrapper">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                    <div class="progress-glow" id="progressGlow"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Container Principal -->
+        <div class="modal-content">
+            <!-- Seção de Resultados -->
+            <div class="results-section" id="resultsSection">
+                <div class="results-header">
+                    <h2><i class="fas fa-chart-line"></i> Cálculo em Andamento</h2>
+                    <p>Acompanhe o progresso do seu seguro em tempo real</p>
+                </div>
+                
+                <!-- 3 Divs de Resultados -->
+                <div class="results-container">
+                    <!-- Div 1: Estimativa Inicial 
+                    <div class="result-card estimate" id="estimateCard">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="card-title">
+                                <h3>Estimativa Inicial</h3>
+                                <span class="card-subtitle">Primeira Cotação</span>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="value-display">
+                                <span class="currency">R$</span>
+                                <span class="value" id="initialEstimate">-</span>
+                            </div>
+                            <div class="value-info">
+                                <span class="info-text">Capturado na Tela 5</span>
+                            </div>
+                        </div>
+                    </div>
+                    -->
+                    <!-- Div 2: Cálculo Recomendado -->
+                    <div class="result-card recommended" id="recommendedCard">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="card-title">
+                                <h3>Recomendado</h3>
+                                <span class="card-subtitle">Melhor Custo-Benefício</span>
+                            </div>
+                            <div class="card-badge">
+                                <span class="badge recommended">Recomendado</span>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="value-display">
+                                <span class="currency">R$</span>
+                                <span class="value" id="recommendedValue">-</span>
+                            </div>
+                            <div class="value-info">
+                                <span class="info-text">Cálculo Final - Tela 15</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Div 3: Cálculo Alternativo -->
+                    <div class="result-card alternative" id="alternativeCard">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-exchange-alt"></i>
+                            </div>
+                            <div class="card-title">
+                                <h3>Alternativo</h3>
+                                <span class="card-subtitle">Opção Adicional</span>
+                            </div>
+                            <div class="card-badge">
+                                <span class="badge alternative">Alternativo</span>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="value-display">
+                                <span class="currency">R$</span>
+                                <span class="value" id="alternativeValue">-</span>
+                            </div>
+                            <div class="value-info">
+                                <span class="info-text">Cálculo Final - Tela 15</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Ações -->
+                <div class="results-actions">
+                    <button class="btn-secondary" id="btnNewCalculation">
+                        <i class="fas fa-redo"></i>
+                        Nova Cotação
+                    </button>
+                    <button class="btn-primary" id="btnContactUs">
+                        <i class="fas fa-phone"></i>
+                        Falar com Corretor
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript do Modal -->
+    <script src="js/modal-progress.js"></script>
+    <script src="js/rpa-integration.js"></script>
+</body>
+</html>
+

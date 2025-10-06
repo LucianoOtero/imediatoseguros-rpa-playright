@@ -1,0 +1,1207 @@
+
+
+=== main-page.js ===
+
+/**
+ * PÁGINA PRINCIPAL RPA IMEDIATO SEGUROS V6.2.0
+ * JavaScript para página principal com formulário
+ * 
+ * Funcionalidades:
+ * - Validação em tempo real do formulário
+ * - Coleta de dados dos 8 campos essenciais
+ * - Abertura do modal de progresso
+ * - Integração com RPA
+ */
+
+class MainPageRPA {
+    constructor() {
+        this.apiBaseUrl = 'http://rpaimediatoseguros.com.br';
+        this.sessionId = null;
+        this.isProcessing = false;
+        
+        // Dados fixos do parametros.json
+        this.fixedData = {
+            // Configuração
+            configuracao: {
+                log: true,
+                display: true,
+                log_rotacao_dias: 90,
+                log_nivel: "INFO",
+                tempo_estabilizacao: 0.5,
+                tempo_carregamento: 0.5,
+                tempo_estabilizacao_tela5: 2,
+                tempo_carregamento_tela5: 5,
+                tempo_estabilizacao_tela15: 3,
+                tempo_carregamento_tela15: 5,
+                inserir_log: true,
+                visualizar_mensagens: true,
+                eliminar_tentativas_inuteis: true,
+                modo_silencioso: false
+            },
+            
+            // Autenticação
+            autenticacao: {
+                email_login: "aleximediatoseguros@gmail.com",
+                senha_login: "Lrotero1$",
+                manter_login_atual: true
+            },
+            
+            // URL
+            url: "https://www.app.tosegurado.com.br/imediatosolucoes",
+            
+            // Dados do Veículo (fixos)
+            modelo: "COROLLA XEI 1.8/1.8 FLEX 16V MEC",
+            ano: "2009",
+            zero_km: false,
+            combustivel: "Flex",
+            veiculo_segurado: "Não",
+            tipo_veiculo: "carro",
+            
+            // Dados de Endereço (fixos)
+            endereco_completo: "Rua Serra de Botucatu, 410 APTO 11 - São Paulo, SP",
+            uso_veiculo: "Pessoal",
+            endereco: "Rua Serra de Botucatu, Tatuapé - São Paulo/SP",
+            
+            // Dados Pessoais (fixos)
+            email: "alex.kaminski@imediatoseguros.com.br",
+            celular: "11953288466",
+            
+            // Dados do Condutor (fixos)
+            condutor_principal: true,
+            nome_condutor: "SANDRA LOUREIRO",
+            cpf_condutor: "25151787829",
+            data_nascimento_condutor: "28/08/1975",
+            sexo_condutor: "Feminino",
+            estado_civil_condutor: "Casado ou Uniao Estavel",
+            
+            // Configurações de Estacionamento (fixas)
+            local_de_trabalho: false,
+            estacionamento_proprio_local_de_trabalho: false,
+            local_de_estudo: false,
+            estacionamento_proprio_local_de_estudo: false,
+            garagem_residencia: true,
+            portao_eletronico: "Eletronico",
+            
+            // Configurações Adicionais (fixas)
+            kit_gas: false,
+            blindado: false,
+            financiado: false,
+            reside_18_26: "Não",
+            continuar_com_corretor_anterior: true
+        };
+        
+        this.init();
+    }
+    
+    /**
+     * Inicializar a aplicação
+     */
+    init() {
+        console.log('🚀 Inicializando Página Principal RPA V6.2.0...');
+        
+        // Aguardar DOM estar pronto
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => this.setupEventListeners());
+        } else {
+            this.setupEventListeners();
+        }
+        
+        // Configurar validação em tempo real
+        this.setupRealTimeValidation();
+        
+        console.log('✅ Página Principal inicializada');
+    }
+    
+    /**
+     * Configurar event listeners
+     */
+    setupEventListeners() {
+        const form = document.getElementById('rpa-form');
+        const btnCalculate = document.getElementById('btnCalculate');
+        
+        if (!form || !btnCalculate) {
+            console.error('❌ Elementos do formulário não encontrados');
+            return;
+        }
+        
+        form.addEventListener('submit', (e) => this.handleFormSubmit(e));
+        
+        console.log('📝 Event listeners configurados');
+    }
+    
+    /**
+     * Configurar validação em tempo real
+     */
+    setupRealTimeValidation() {
+        console.log('🔍 Configurando validação em tempo real...');
+        
+        setTimeout(() => {
+            this.setupFieldValidation();
+        }, 500);
+        
+        console.log('✅ Validação em tempo real configurada');
+    }
+    
+    /**
+     * Set up field validation for real-time validation
+     */
+    setupFieldValidation() {
+        // CPF validation
+        const cpfField = document.getElementById('cpf');
+        if (cpfField) {
+            cpfField.addEventListener('input', () => this.validateCPFRealTime(cpfField));
+        }
+        
+        // CEP validation
+        const cepField = document.getElementById('cep');
+        if (cepField) {
+            cepField.addEventListener('input', () => this.validateCEPRealTime(cepField));
+        }
+        
+        // Placa validation
+        const placaField = document.getElementById('placa');
+        if (placaField) {
+            placaField.addEventListener('input', () => this.validatePlacaRealTime(placaField));
+        }
+        
+        // Data nascimento validation
+        const dataNascimentoField = document.getElementById('data_nascimento');
+        if (dataNascimentoField) {
+            dataNascimentoField.addEventListener('input', () => this.validateDataNascimentoRealTime(dataNascimentoField));
+        }
+        
+        console.log('✅ Validação em tempo real configurada para todos os campos');
+    }
+    
+    /**
+     * Validar CPF em tempo real
+     */
+    validateCPFRealTime(field) {
+        const value = field.value.replace(/\D/g, '');
+        const isValid = value.length === 11 && this.isValidCPF(value);
+        
+        field.classList.remove('success', 'error');
+        field.classList.add(isValid ? 'success' : 'error');
+        
+        return isValid;
+    }
+    
+    /**
+     * Validar CEP em tempo real
+     */
+    validateCEPRealTime(field) {
+        const value = field.value.replace(/\D/g, '');
+        const isValid = value.length === 8;
+        
+        field.classList.remove('success', 'error');
+        field.classList.add(isValid ? 'success' : 'error');
+        
+        return isValid;
+    }
+    
+    /**
+     * Validar Placa em tempo real
+     */
+    validatePlacaRealTime(field) {
+        const value = field.value.toUpperCase();
+        const isValid = value.length === 7;
+        
+        field.classList.remove('success', 'error');
+        field.classList.add(isValid ? 'success' : 'error');
+        
+        return isValid;
+    }
+    
+    /**
+     * Validar Data de Nascimento em tempo real
+     */
+    validateDataNascimentoRealTime(field) {
+        const value = field.value;
+        const isValid = /^\d{2}\/\d{2}\/\d{4}$/.test(value);
+        
+        field.classList.remove('success', 'error');
+        field.classList.add(isValid ? 'success' : 'error');
+        
+        return isValid;
+    }
+    
+    /**
+     * Verificar se CPF é válido
+     */
+    isValidCPF(cpf) {
+        if (cpf.length !== 11) return false;
+        if (/^(\d)\1{10}$/.test(cpf)) return false;
+        
+        let sum = 0;
+        for (let i = 0; i < 9; i++) {
+            sum += parseInt(cpf.charAt(i)) * (10 - i);
+        }
+        let remainder = (sum * 10) % 11;
+        if (remainder === 10 || remainder === 11) remainder = 0;
+        if (remainder !== parseInt(cpf.charAt(9))) return false;
+        
+        sum = 0;
+        for (let i = 0; i < 10; i++) {
+            sum += parseInt(cpf.charAt(i)) * (11 - i);
+        }
+        remainder = (sum * 10) % 11;
+        if (remainder === 10 || remainder === 11) remainder = 0;
+        if (remainder !== parseInt(cpf.charAt(10))) return false;
+        
+        return true;
+    }
+    
+    /**
+     * Handle form submission
+     */
+    async handleFormSubmit(event) {
+        event.preventDefault();
+        
+        console.log('📝 Formulário submetido');
+        
+        if (this.isProcessing) {
+            console.log('⏳ RPA já está em execução');
+            return;
+        }
+        
+        // Validar formulário
+        if (!this.validateForm()) {
+            console.log('❌ Formulário inválido');
+            this.showError('Por favor, preencha todos os campos corretamente.');
+            return;
+        }
+        
+        // Coletar dados do formulário
+        const formData = this.collectFormData();
+        console.log('📊 Dados coletados:', formData);
+        
+        // Mesclar com dados fixos
+        const completeData = this.mergeWithFixedData(formData);
+        console.log('🔗 Dados completos:', completeData);
+        
+        // Abrir modal de progresso
+        this.openProgressModal();
+        
+        // Iniciar RPA
+        await this.startRPA(completeData);
+    }
+    
+    /**
+     * Validar formulário completo
+     */
+    validateForm() {
+        const requiredFields = ['cpf', 'nome', 'data_nascimento', 'sexo', 'estado_civil', 'placa', 'marca', 'cep'];
+        
+        for (const fieldId of requiredFields) {
+            const field = document.getElementById(fieldId);
+            if (!field || !field.value.trim()) {
+                field.classList.add('error');
+                return false;
+            }
+            
+            // Validações específicas
+            if (fieldId === 'cpf' && !this.validateCPFRealTime(field)) return false;
+            if (fieldId === 'cep' && !this.validateCEPRealTime(field)) return false;
+            if (fieldId === 'placa' && !this.validatePlacaRealTime(field)) return false;
+            if (fieldId === 'data_nascimento' && !this.validateDataNascimentoRealTime(field)) return false;
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Coletar dados do formulário
+     */
+    collectFormData() {
+        const form = document.getElementById('rpa-form');
+        const formData = new FormData(form);
+        const data = {};
+        
+        for (let [key, value] of formData.entries()) {
+            data[key] = value;
+        }
+        
+        return data;
+    }
+    
+    /**
+     * Mesclar dados do formulário com dados fixos
+     */
+    mergeWithFixedData(formData) {
+        return { ...this.fixedData, ...formData };
+    }
+    
+    /**
+     * Abrir modal de progresso
+     */
+    openProgressModal() {
+        console.log('🎭 Abrindo modal de progresso...');
+        
+        // Criar modal dinamicamente
+        const modalHTML = `
+            <div class="rpa-modal show" id="rpaModal" style="position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; background: rgba(0, 0, 0, 0.8) !important; z-index: 999999 !important; display: flex !important; flex-direction: column !important; margin: 0 !important; padding: 0 !important; border: none !important; box-shadow: none !important;">
+                <div class="modal-progress-bar">
+                    <div class="progress-header">
+                        <div class="logo-container">
+                            <img src="https://www.segurosimediato.com.br/assets/logo.png" alt="Imediato Seguros" class="modal-logo">
+                        </div>
+                        <div class="progress-info">
+                            <span class="progress-text" id="progressText">0%</span>
+                            <span class="current-phase" id="currentPhase">Iniciando RPA...</span>
+                        </div>
+                        <div class="progress-stages">
+                            <span class="stage-info" id="stageInfo">Fase 0 de 15</span>
+                        </div>
+                    </div>
+                    <div class="progress-bar-wrapper">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                            <div class="progress-glow" id="progressGlow"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-content">
+                    <div class="results-section" id="resultsSection">
+                        <div class="results-header">
+                            <h2><i class="fas fa-chart-line"></i> Cálculo em Andamento</h2>
+                            <p>Acompanhe o progresso do seu seguro em tempo real</p>
+                        </div>
+                        <div class="results-container">
+                            <div class="result-card estimate" id="estimateCard">
+                                <div class="card-header">
+                                    <div class="card-icon">
+                                        <i class="fas fa-chart-line"></i>
+                                    </div>
+                                    <div class="card-title">
+                                        <h3>Estimativa Inicial</h3>
+                                        <span class="card-subtitle">Primeira Cotação</span>
+                                    </div>
+                                </div>
+                                <div class="card-content">
+                                    <div class="value-display">
+                                        <span class="currency">R$</span>
+                                        <span class="value" id="initialEstimate">-</span>
+                                    </div>
+                                    <div class="value-info">
+                                        <span class="info-text">Capturado na Tela 5</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="result-card recommended" id="recommendedCard">
+                                <div class="card-header">
+                                    <div class="card-icon">
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                    <div class="card-title">
+                                        <h3>Recomendado</h3>
+                                        <span class="card-subtitle">Melhor Custo-Benefício</span>
+                                    </div>
+                                    <div class="card-badge">
+                                        <span class="badge recommended">Recomendado</span>
+                                    </div>
+                                </div>
+                                <div class="card-content">
+                                    <div class="value-display">
+                                        <span class="currency">R$</span>
+                                        <span class="value" id="recommendedValue">-</span>
+                                    </div>
+                                    <div class="value-info">
+                                        <span class="info-text">Cálculo Final - Tela 15</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="result-card alternative" id="alternativeCard">
+                                <div class="card-header">
+                                    <div class="card-icon">
+                                        <i class="fas fa-exchange-alt"></i>
+                                    </div>
+                                    <div class="card-title">
+                                        <h3>Alternativo</h3>
+                                        <span class="card-subtitle">Opção Adicional</span>
+                                    </div>
+                                    <div class="card-badge">
+                                        <span class="badge alternative">Alternativo</span>
+                                    </div>
+                                </div>
+                                <div class="card-content">
+                                    <div class="value-display">
+                                        <span class="currency">R$</span>
+                                        <span class="value" id="alternativeValue">-</span>
+                                    </div>
+                                    <div class="value-info">
+                                        <span class="info-text">Cálculo Final - Tela 15</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="results-actions">
+                            <button class="btn-secondary" id="btnNewCalculation">
+                                <i class="fas fa-redo"></i>
+                                Nova Cotação
+                            </button>
+                            <button class="btn-primary" id="btnContactUs">
+                                <i class="fas fa-phone"></i>
+                                Falar com Corretor
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Injetar modal no body
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        
+        // Aguardar um pouco para garantir que o DOM foi atualizado
+        setTimeout(() => {
+            // Inicializar modal de progresso (sem sessionId ainda)
+            if (window.ProgressModalRPA) {
+                this.modalProgress = new window.ProgressModalRPA(null);
+                console.log('✅ Modal de progresso inicializado');
+            } else {
+                console.error('❌ ProgressModalRPA não encontrado');
+            }
+        }, 100);
+        
+        console.log('✅ Modal de progresso aberto');
+    }
+    
+    /**
+     * Iniciar processo RPA
+     */
+    async startRPA(data) {
+        try {
+            this.isProcessing = true;
+            this.updateButtonState(true);
+            
+            console.log('🚀 Iniciando RPA...');
+            
+            // Chamar API para iniciar RPA
+            const response = await this.callRPAAPI(data);
+            
+            if (response.success) {
+                this.sessionId = response.session_id;
+                console.log('✅ RPA iniciado com sucesso. Session ID:', this.sessionId);
+                
+                // Atualizar sessionId no modal e iniciar polling
+                if (this.modalProgress) {
+                    this.modalProgress.setSessionId(this.sessionId);
+                    this.modalProgress.startProgressPolling();
+                }
+            } else {
+                throw new Error(response.message || 'Erro ao iniciar RPA');
+            }
+            
+        } catch (error) {
+            console.error('❌ Erro ao iniciar RPA:', error);
+            this.handleRPAError(error.message);
+        }
+    }
+    
+    /**
+     * Chamar API do RPA
+     */
+    async callRPAAPI(data) {
+        const url = `${this.apiBaseUrl}/api/rpa/start`;
+        
+        console.log('🌐 Chamando API:', url);
+        
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                session: this.generateSessionId(),
+                dados: data
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        return await response.json();
+    }
+    
+    /**
+     * Gerar ID de sessão único
+     */
+    generateSessionId() {
+        return 'rpa_v4_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    }
+    
+    /**
+     * Atualizar estado do botão
+     */
+    updateButtonState(loading) {
+        const btnCalculate = document.getElementById('btnCalculate');
+        const btnLoading = btnCalculate?.querySelector('.btn-loading');
+        const btnText = btnCalculate?.querySelector('span');
+        
+        if (btnCalculate) {
+            btnCalculate.disabled = loading;
+        }
+        
+        if (btnLoading) {
+            btnLoading.style.display = loading ? 'flex' : 'none';
+        }
+        
+        if (btnText) {
+            btnText.textContent = loading ? 'Processando...' : 'Efetuar Cálculo';
+        }
+    }
+    
+    /**
+     * Handle RPA error
+     */
+    handleRPAError(message) {
+        this.updateButtonState(false);
+        this.isProcessing = false;
+        
+        this.showError(message);
+        
+        console.log('❌ RPA falhou:', message);
+    }
+    
+    /**
+     * Mostrar erro
+     */
+    showError(message) {
+        // Implementar exibição de erro elegante
+        alert(`Erro: ${message}`);
+        console.error('❌ Erro:', message);
+    }
+}
+
+// Inicializar quando DOM estiver pronto
+document.addEventListener('DOMContentLoaded', () => {
+    new MainPageRPA();
+});
+
+
+=== modal-progress.js ===
+
+/**
+ * MODAL DE PROGRESSO RPA IMEDIATO SEGUROS V6.2.0
+ * JavaScript para modal de progresso separado
+ * 
+ * Funcionalidades:
+ * - Barra de progresso em tempo real
+ * - Atualização dos 3 divs de resultados
+ * - Polling do progresso do RPA
+ * - Animações e transições
+ */
+
+class ProgressModalRPA {
+    constructor(sessionId) {
+        this.apiBaseUrl = 'http://rpaimediatoseguros.com.br';
+        this.sessionId = sessionId;
+        this.progressInterval = null;
+        this.isProcessing = true;
+        
+        this.init();
+    }
+    
+    /**
+     * Inicializar o modal
+     */
+    init() {
+        console.log('🎭 Inicializando Modal de Progresso...');
+        
+        // Configurar event listeners
+        this.setupEventListeners();
+        
+        // Configurar animações
+        this.setupAnimations();
+        
+        console.log('✅ Modal de Progresso inicializado');
+    }
+    
+    /**
+     * Definir Session ID
+     */
+    setSessionId(sessionId) {
+        this.sessionId = sessionId;
+        console.log('🆔 Session ID definido:', this.sessionId);
+    }
+    
+    /**
+     * Configurar event listeners
+     */
+    setupEventListeners() {
+        // Botão Nova Cotação
+        const btnNewCalculation = document.getElementById('btnNewCalculation');
+        if (btnNewCalculation) {
+            btnNewCalculation.addEventListener('click', () => this.handleNewCalculation());
+        }
+        
+        // Botão Falar com Corretor
+        const btnContactUs = document.getElementById('btnContactUs');
+        if (btnContactUs) {
+            btnContactUs.addEventListener('click', () => this.handleContactUs());
+        }
+        
+        console.log('📝 Event listeners do modal configurados');
+    }
+    
+    /**
+     * Configurar animações
+     */
+    setupAnimations() {
+        // Adicionar animação de entrada aos cards
+        const cards = document.querySelectorAll('.result-card');
+        cards.forEach((card, index) => {
+            setTimeout(() => {
+                card.classList.add('animate-cardSlideIn');
+            }, index * 200);
+        });
+        
+        console.log('✨ Animações configuradas');
+    }
+    
+    /**
+     * Iniciar polling do progresso
+     */
+    startProgressPolling() {
+        console.log('🔄 Iniciando polling do progresso...');
+        
+        this.progressInterval = setInterval(async () => {
+            try {
+                await this.checkProgress();
+            } catch (error) {
+                console.error('❌ Erro no polling:', error);
+                this.handleProgressError('Erro ao verificar progresso');
+            }
+        }, 2000); // Polling a cada 2 segundos
+    }
+    
+    /**
+     * Parar polling do progresso
+     */
+    stopProgressPolling() {
+        if (this.progressInterval) {
+            clearInterval(this.progressInterval);
+            this.progressInterval = null;
+            console.log('⏹️ Polling do progresso parado');
+        }
+    }
+    
+    /**
+     * Verificar progresso do RPA
+     */
+    async checkProgress() {
+        if (!this.sessionId) {
+            console.log('❌ Session ID não encontrado');
+            return;
+        }
+        
+        const url = `${this.apiBaseUrl}/api/rpa/progress/${this.sessionId}`;
+        
+        try {
+            const response = await fetch(url);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const progressData = await response.json();
+            console.log('📊 Progresso recebido:', progressData);
+            
+            this.updateProgress(progressData);
+            
+        } catch (error) {
+            console.error('❌ Erro ao verificar progresso:', error);
+            throw error;
+        }
+    }
+    
+    /**
+     * Atualizar progresso na interface
+     */
+    updateProgress(data) {
+        const { status, progress, current_phase, mensagem } = data;
+        
+        // Extrair dados do progresso
+        const progressData = progress || {};
+        const currentStatus = progressData.status || status;
+        const currentMessage = progressData.mensagem || mensagem;
+        const currentPhase = progressData.etapa_atual || current_phase;
+        const percentual = progressData.percentual || 0;
+        
+        // Atualizar porcentagem
+        const progressFill = document.getElementById('progressFill');
+        const progressGlow = document.getElementById('progressGlow');
+        const progressText = document.getElementById('progressText');
+        
+        if (progressFill && progressGlow) {
+            const percentage = Math.min(100, Math.max(0, percentual || 0));
+            progressFill.style.width = `${percentage}%`;
+            progressGlow.style.width = `${percentage}%`;
+        }
+        
+        if (progressText) {
+            progressText.textContent = `${Math.round(percentual || 0)}%`;
+        }
+        
+        // Atualizar fase atual
+        const currentPhaseElement = document.getElementById('currentPhase');
+        const stageInfo = document.getElementById('stageInfo');
+        
+        if (currentPhaseElement) {
+            const phaseText = currentMessage || `Tela ${currentPhase}` || 'Processando...';
+            currentPhaseElement.textContent = phaseText;
+        }
+        
+        if (stageInfo) {
+            const stageText = `Fase ${currentPhase || 0} de 15`;
+            stageInfo.textContent = stageText;
+        }
+        
+        // Verificar se houve falha
+        if (currentMessage && currentMessage.includes('falhou')) {
+            console.log('❌ RPA falhou:', currentMessage);
+            this.handleProgressError(currentMessage);
+            return;
+        }
+        
+        // Verificar se concluído
+        if (currentStatus === 'success' || currentStatus === 'completed') {
+            console.log('✅ RPA concluído com sucesso');
+            this.handleRPASuccess(data);
+            return;
+        }
+        
+        // Verificar se falhou
+        if (currentStatus === 'failed' || currentStatus === 'error' || currentStatus === 'erro') {
+            console.log('❌ RPA falhou:', currentMessage);
+            this.handleProgressError(currentMessage || 'Erro desconhecido');
+            return;
+        }
+    }
+    
+    /**
+     * Handle RPA success
+     */
+    handleRPASuccess(data) {
+        this.stopProgressPolling();
+        this.isProcessing = false;
+        
+        // Atualizar header para sucesso
+        this.updateSuccessHeader();
+        
+        // Atualizar resultados
+        this.updateResults(data);
+        
+        console.log('🎉 RPA executado com sucesso!');
+    }
+    
+    /**
+     * Handle progress error
+     */
+    handleProgressError(message) {
+        this.stopProgressPolling();
+        this.isProcessing = false;
+        
+        // Atualizar header para erro
+        this.updateErrorHeader(message);
+        
+        console.log('❌ Processamento falhou:', message);
+    }
+    
+    /**
+     * Atualizar header para sucesso
+     */
+    updateSuccessHeader() {
+        const resultsHeader = document.querySelector('.results-header');
+        if (resultsHeader) {
+            resultsHeader.innerHTML = `
+                <h2><i class="fas fa-check-circle"></i> Cálculo Concluído</h2>
+                <p>Seu seguro foi calculado com sucesso!</p>
+            `;
+            resultsHeader.style.background = 'linear-gradient(135deg, #28a745, #20c997)';
+        }
+    }
+    
+    /**
+     * Atualizar header para erro
+     */
+    updateErrorHeader(message) {
+        const resultsHeader = document.querySelector('.results-header');
+        if (resultsHeader) {
+            resultsHeader.innerHTML = `
+                <h2><i class="fas fa-exclamation-triangle"></i> Erro no Cálculo</h2>
+                <p>${message}</p>
+            `;
+            resultsHeader.style.background = 'linear-gradient(135deg, #dc3545, #fd7e14)';
+        }
+    }
+    
+    /**
+     * Atualizar valores nos cards de resultados
+     */
+    updateResults(data) {
+        const { progress } = data;
+        
+        // Extrair dados das estimativas
+        const estimativas = progress?.estimativas?.dados;
+        const resultadosFinais = progress?.resultados_finais?.dados?.dados_finais;
+        
+        // Estimativa inicial (primeira cobertura)
+        const initialEstimateElement = document.getElementById('initialEstimate');
+        if (initialEstimateElement && estimativas?.coberturas_detalhadas?.[0]) {
+            const primeiraCobertura = estimativas.coberturas_detalhadas[0];
+            const valorInicial = primeiraCobertura.valores?.de || primeiraCobertura.valores?.ate;
+            if (valorInicial) {
+                initialEstimateElement.textContent = valorInicial;
+                initialEstimateElement.classList.add('animate-pulse');
+            }
+        }
+        
+        // Cálculo recomendado
+        const recommendedElement = document.getElementById('recommendedValue');
+        if (recommendedElement && resultadosFinais?.plano_recomendado?.valor) {
+            recommendedElement.textContent = resultadosFinais.plano_recomendado.valor;
+            recommendedElement.classList.add('animate-pulse');
+        }
+        
+        // Cálculo alternativo
+        const alternativeElement = document.getElementById('alternativeValue');
+        if (alternativeElement && resultadosFinais?.plano_alternativo?.valor) {
+            alternativeElement.textContent = resultadosFinais.plano_alternativo.valor;
+            alternativeElement.classList.add('animate-pulse');
+        }
+    }
+    
+    /**
+     * Handle Nova Cotação
+     */
+    handleNewCalculation() {
+        console.log('🔄 Nova cotação solicitada');
+        
+        // Fechar modal
+        this.closeModal();
+        
+        // Recarregar página principal
+        window.location.reload();
+    }
+    
+    /**
+     * Handle Falar com Corretor
+     */
+    handleContactUs() {
+        console.log('📞 Falar com corretor solicitado');
+        
+        // Implementar ação de contato
+        alert('Redirecionando para contato com corretor...');
+    }
+    
+    /**
+     * Fechar modal
+     */
+    closeModal() {
+        const modal = document.getElementById('rpaModal');
+        if (modal) {
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.remove();
+            }, 300);
+        }
+        
+        console.log('❌ Modal fechado');
+    }
+}
+
+// Exportar classe para uso global
+window.ProgressModalRPA = ProgressModalRPA;
+
+
+=== rpa-integration.js ===
+
+/**
+ * INTEGRAÇÃO RPA V6.2.0 - IMEDIATO SEGUROS
+ * JavaScript para integração completa com RPA
+ * 
+ * Funcionalidades:
+ * - Integração com API RPA V4
+ * - Polling de progresso
+ * - Tratamento de erros
+ * - Comunicação entre componentes
+ */
+
+class RPAIntegration {
+    constructor() {
+        this.apiBaseUrl = 'http://rpaimediatoseguros.com.br';
+        this.sessionId = null;
+        this.isProcessing = false;
+        
+        console.log('🔧 RPA Integration inicializado');
+    }
+    
+    /**
+     * Iniciar RPA com dados completos
+     */
+    async startRPA(completeData) {
+        try {
+            this.isProcessing = true;
+            
+            console.log('🚀 Iniciando RPA...');
+            
+            // Chamar API para iniciar RPA
+            const response = await this.callRPAAPI(completeData);
+            
+            if (response.success) {
+                this.sessionId = response.session_id;
+                console.log('✅ RPA iniciado com sucesso. Session ID:', this.sessionId);
+                
+                return {
+                    success: true,
+                    sessionId: this.sessionId
+                };
+            } else {
+                throw new Error(response.message || 'Erro ao iniciar RPA');
+            }
+            
+        } catch (error) {
+            console.error('❌ Erro ao iniciar RPA:', error);
+            this.isProcessing = false;
+            
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
+    
+    /**
+     * Chamar API do RPA
+     */
+    async callRPAAPI(data) {
+        const url = `${this.apiBaseUrl}/api/rpa/start`;
+        
+        console.log('🌐 Chamando API:', url);
+        
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                session: this.generateSessionId(),
+                dados: data
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        return await response.json();
+    }
+    
+    /**
+     * Verificar progresso do RPA
+     */
+    async checkProgress(sessionId) {
+        const url = `${this.apiBaseUrl}/api/rpa/progress/${sessionId}`;
+        
+        try {
+            const response = await fetch(url);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const progressData = await response.json();
+            console.log('📊 Progresso recebido:', progressData);
+            
+            return {
+                success: true,
+                data: progressData
+            };
+            
+        } catch (error) {
+            console.error('❌ Erro ao verificar progresso:', error);
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
+    
+    /**
+     * Gerar ID de sessão único
+     */
+    generateSessionId() {
+        return 'rpa_v4_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    }
+    
+    /**
+     * Verificar saúde da API
+     */
+    async checkAPIHealth() {
+        const url = `${this.apiBaseUrl}/api/rpa/health`;
+        
+        try {
+            const response = await fetch(url);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const healthData = await response.json();
+            console.log('🏥 API Health:', healthData);
+            
+            return {
+                success: true,
+                data: healthData
+            };
+            
+        } catch (error) {
+            console.error('❌ Erro ao verificar saúde da API:', error);
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
+    
+    /**
+     * Processar dados de progresso
+     */
+    processProgressData(data) {
+        const { status, progress, current_phase, mensagem } = data;
+        
+        // Extrair dados do progresso
+        const progressData = progress || {};
+        const currentStatus = progressData.status || status;
+        const currentMessage = progressData.mensagem || mensagem;
+        const currentPhase = progressData.etapa_atual || current_phase;
+        const percentual = progressData.percentual || 0;
+        
+        return {
+            status: currentStatus,
+            message: currentMessage,
+            phase: currentPhase,
+            percentage: percentual,
+            progressData: progressData
+        };
+    }
+    
+    /**
+     * Extrair dados de resultados
+     */
+    extractResultsData(progressData) {
+        const estimativas = progressData?.estimativas?.dados;
+        const resultadosFinais = progressData?.resultados_finais?.dados?.dados_finais;
+        
+        let initialEstimate = null;
+        let recommendedValue = null;
+        let alternativeValue = null;
+        
+        // Estimativa inicial (primeira cobertura)
+        if (estimativas?.coberturas_detalhadas?.[0]) {
+            const primeiraCobertura = estimativas.coberturas_detalhadas[0];
+            initialEstimate = primeiraCobertura.valores?.de || primeiraCobertura.valores?.ate;
+        }
+        
+        // Cálculo recomendado
+        if (resultadosFinais?.plano_recomendado?.valor) {
+            recommendedValue = resultadosFinais.plano_recomendado.valor;
+        }
+        
+        // Cálculo alternativo
+        if (resultadosFinais?.plano_alternativo?.valor) {
+            alternativeValue = resultadosFinais.plano_alternativo.valor;
+        }
+        
+        return {
+            initialEstimate,
+            recommendedValue,
+            alternativeValue,
+            estimativas,
+            resultadosFinais
+        };
+    }
+    
+    /**
+     * Verificar se RPA foi concluído
+     */
+    isRPACompleted(processedData) {
+        const { status, message } = processedData;
+        
+        // Verificar se concluído
+        if (status === 'success' || status === 'completed') {
+            return true;
+        }
+        
+        // Verificar se falhou
+        if (status === 'failed' || status === 'error' || status === 'erro') {
+            return true;
+        }
+        
+        // Verificar se houve falha na mensagem
+        if (message && message.includes('falhou')) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Verificar se RPA teve sucesso
+     */
+    isRPASuccessful(processedData) {
+        const { status, message } = processedData;
+        
+        // Verificar se concluído com sucesso
+        if (status === 'success' || status === 'completed') {
+            return true;
+        }
+        
+        // Verificar se houve falha
+        if (status === 'failed' || status === 'error' || status === 'erro') {
+            return false;
+        }
+        
+        // Verificar se houve falha na mensagem
+        if (message && message.includes('falhou')) {
+            return false;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Formatar valor monetário
+     */
+    formatCurrency(value) {
+        if (!value) return '-';
+        
+        // Se já está formatado (contém R$), retornar como está
+        if (typeof value === 'string' && value.includes('R$')) {
+            return value;
+        }
+        
+        const numValue = parseFloat(value);
+        if (isNaN(numValue)) return '-';
+        
+        return numValue.toLocaleString('pt-BR', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    }
+    
+    /**
+     * Limpar recursos
+     */
+    cleanup() {
+        this.sessionId = null;
+        this.isProcessing = false;
+        
+        console.log('🧹 Recursos limpos');
+    }
+}
+
+// Exportar classe para uso global
+window.RPAIntegration = RPAIntegration;

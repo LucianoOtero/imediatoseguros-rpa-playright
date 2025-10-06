@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Conectividade - Imediato Seguros V6.3.0</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .form-test {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .form-test input, .form-test select {
+            margin: 5px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Teste de Conectividade - Imediato Seguros V6.3.0</h1>
+    
+    <div class="test-container">
+        <h2>📡 Testes de Conectividade</h2>
+        <button class="test-button" onclick="testServerConnection()">Testar Conexão com Servidor</button>
+        <button class="test-button" onclick="testAPIStart()">Testar API /start</button>
+        <button class="test-button" onclick="testAPIProgress()">Testar API /progress</button>
+        <button class="test-button" onclick="testFormSubmission()">Testar Envio de Formulário</button>
+        <div id="testResults"></div>
+    </div>
+    
+    <div class="test-container">
+        <h2>📋 Formulário de Teste</h2>
+        <div class="form-test">
+            <form id="testForm">
+                <input type="text" name="cpf" placeholder="CPF" value="12345678901">
+                <input type="text" name="nome" placeholder="Nome" value="João Silva">
+                <input type="date" name="data_nascimento" value="1990-01-01">
+                <select name="sexo">
+                    <option value="M">Masculino</option>
+                    <option value="F">Feminino</option>
+                </select>
+                <select name="estado_civil">
+                    <option value="Solteiro">Solteiro</option>
+                    <option value="Casado">Casado</option>
+                </select>
+                <input type="text" name="placa" placeholder="Placa" value="ABC1234">
+                <input type="text" name="marca" placeholder="Marca" value="Honda">
+                <input type="text" name="cep" placeholder="CEP" value="01234567">
+                <button type="submit" class="test-button">Enviar Formulário</button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="test-container">
+        <h2>📊 Logs de Debug</h2>
+        <div id="debugLogs" style="background: #f8f9fa; padding: 10px; border-radius: 5px; font-family: monospace; max-height: 300px; overflow-y: auto;"></div>
+    </div>
+
+    <script>
+        // Função para adicionar logs
+        function addLog(message, type = 'info') {
+            const logsDiv = document.getElementById('debugLogs');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.innerHTML = `<span style="color: #666;">[${timestamp}]</span> ${message}`;
+            logEntry.style.color = type === 'error' ? '#dc3545' : type === 'success' ? '#28a745' : '#333';
+            logsDiv.appendChild(logEntry);
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+        }
+        
+        // Função para mostrar resultados
+        function showResult(message, type = 'info') {
+            const resultsDiv = document.getElementById('testResults');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `result ${type}`;
+            resultDiv.textContent = message;
+            resultsDiv.appendChild(resultDiv);
+        }
+        
+        // Teste de conexão com servidor
+        async function testServerConnection() {
+            addLog('🔍 Testando conexão com servidor...');
+            try {
+                const response = await fetch('https://rpaimediatoseguros.com.br/', {
+                    method: 'HEAD',
+                    mode: 'no-cors'
+                });
+                showResult('✅ Servidor acessível', 'success');
+                addLog('✅ Servidor acessível', 'success');
+            } catch (error) {
+                showResult('❌ Erro de conexão: ' + error.message, 'error');
+                addLog('❌ Erro de conexão: ' + error.message, 'error');
+            }
+        }
+        
+        // Teste da API /start
+        async function testAPIStart() {
+            addLog('🔍 Testando API /start...');
+            try {
+                const testData = {
+                    cpf: "12345678901",
+                    nome: "João Silva",
+                    data_nascimento: "1990-01-01",
+                    sexo: "M",
+                    estado_civil: "Solteiro",
+                    placa: "ABC1234",
+                    marca: "Honda",
+                    cep: "01234567",
+                    telefone: "11999999999",
+                    email: "teste@exemplo.com"
+                };
+                
+                const response = await fetch('https://rpaimediatoseguros.com.br/api/rpa/start', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testData)
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    showResult('✅ API /start funcionando. Session ID: ' + result.session_id, 'success');
+                    addLog('✅ API /start funcionando. Session ID: ' + result.session_id, 'success');
+                } else {
+                    showResult('❌ API /start retornou erro: ' + response.status, 'error');
+                    addLog('❌ API /start retornou erro: ' + response.status, 'error');
+                }
+            } catch (error) {
+                showResult('❌ Erro na API /start: ' + error.message, 'error');
+                addLog('❌ Erro na API /start: ' + error.message, 'error');
+            }
+        }
+        
+        // Teste da API /progress
+        async function testAPIProgress() {
+            addLog('🔍 Testando API /progress...');
+            try {
+                const response = await fetch('https://rpaimediatoseguros.com.br/api/rpa/progress/test123', {
+                    method: 'GET'
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    showResult('✅ API /progress funcionando', 'success');
+                    addLog('✅ API /progress funcionando', 'success');
+                } else {
+                    showResult('❌ API /progress retornou erro: ' + response.status, 'error');
+                    addLog('❌ API /progress retornou erro: ' + response.status, 'error');
+                }
+            } catch (error) {
+                showResult('❌ Erro na API /progress: ' + error.message, 'error');
+                addLog('❌ Erro na API /progress: ' + error.message, 'error');
+            }
+        }
+        
+        // Teste de envio de formulário
+        async function testFormSubmission() {
+            addLog('🔍 Testando envio de formulário...');
+            try {
+                const formData = new FormData(document.getElementById('testForm'));
+                const data = {};
+                for (let [key, value] of formData.entries()) {
+                    data[key] = value;
+                }
+                
+                // Adicionar dados fixos
+                const completeData = {
+                    ...data,
+                    telefone: "11999999999",
+                    email: "cliente@exemplo.com",
+                    profissao: "Empresário",
+                    renda_mensal: "10000",
+                    modelo: "Civic",
+                    ano: "2020",
+                    cor: "Prata",
+                    combustivel: "Flex",
+                    zero_km: "false",
+                    uso: "Particular",
+                    garagem: "true",
+                    tipo_seguro: "Comprehensive",
+                    franquia: "500",
+                    cobertura_adicional: "true",
+                    assistencia_24h: "true",
+                    cnh_categoria: "B",
+                    tempo_habilitacao: "5",
+                    sinistros_ultimos_5_anos: "0",
+                    condutores_adicionais: "1"
+                };
+                
+                addLog('📊 Dados do formulário: ' + JSON.stringify(completeData, null, 2));
+                
+                const response = await fetch('https://rpaimediatoseguros.com.br/api/rpa/start', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(completeData)
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    showResult('✅ Formulário enviado com sucesso. Session ID: ' + result.session_id, 'success');
+                    addLog('✅ Formulário enviado com sucesso. Session ID: ' + result.session_id, 'success');
+                } else {
+                    const errorText = await response.text();
+                    showResult('❌ Erro no envio: ' + response.status + ' - ' + errorText, 'error');
+                    addLog('❌ Erro no envio: ' + response.status + ' - ' + errorText, 'error');
+                }
+            } catch (error) {
+                showResult('❌ Erro no envio do formulário: ' + error.message, 'error');
+                addLog('❌ Erro no envio do formulário: ' + error.message, 'error');
+            }
+        }
+        
+        // Configurar envio do formulário
+        document.getElementById('testForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            testFormSubmission();
+        });
+        
+        // Log inicial
+        addLog('🚀 Teste de conectividade iniciado');
+        addLog('🌐 URL base: https://rpaimediatoseguros.com.br');
+    </script>
+</body>
+</html>
+
+
