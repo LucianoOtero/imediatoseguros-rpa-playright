@@ -1,5 +1,5 @@
 /**
- * INJEÇÃO COMPLETA WEBFLOW - IMEDIATO SEGUROS V6.2.2
+ * INJEÇÃO COMPLETA WEBFLOW - IMEDIATO SEGUROS V6.4.0
  * Arquivo único para injeção no Webflow
  * 
  * Contém:
@@ -297,11 +297,11 @@
             padding: 2rem;
         }
         
-        .progress-header .logo-container {
+        #rpaModal .progress-header .logo-container {
             margin-bottom: 1rem;
         }
         
-        .progress-header h1 {
+        #rpaModal .progress-header h1 {
             color: var(--imediato-dark-blue);
             font-size: 1.8rem;
             font-weight: 600;
@@ -312,18 +312,18 @@
             gap: 0.5rem;
         }
         
-        .progress-header h1 i {
+        #rpaModal .progress-header h1 i {
             color: var(--imediato-dark-blue);
         }
         
-        .progress-header .company-logo {
+        #rpaModal .progress-header .company-logo {
             max-width: 140px;
             height: auto;
             filter: none;
             object-fit: contain;
         }
         
-        .progress-info {
+        #rpaModal .progress-info {
             display: flex;
             align-items: center;
             justify-content: center;
@@ -402,14 +402,14 @@
         }
         
         /* Container dos 2 Divs */
-        .results-container {
+        #rpaModal .results-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 2rem;
             margin-top: 2rem;
         }
         
-        .result-card {
+        #rpaModal .result-card {
             background: var(--imediato-white);
             border-radius: 15px;
             padding: 2rem;
@@ -420,17 +420,17 @@
             overflow: hidden;
         }
         
-        .result-card:hover {
+        #rpaModal .result-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 15px 35px var(--imediato-shadow-hover);
         }
         
-        .result-card.recommended {
+        #rpaModal .result-card.recommended {
             border-color: var(--imediato-light-blue);
             background: linear-gradient(135deg, var(--imediato-white), #f0f8ff);
         }
         
-        .result-card.alternative {
+        #rpaModal .result-card.alternative {
             border-color: var(--imediato-border);
             background: linear-gradient(135deg, var(--imediato-white), var(--imediato-gray));
         }
@@ -512,7 +512,7 @@
         #rpaModal .card-features i {
             font-size: 0.875rem !important;
             margin-right: 0.5rem !important;
-            color: var(--imediato-success) !important;
+            color: var(--imediato-light-blue) !important;
             display: inline-block !important;
         }
         
@@ -644,22 +644,22 @@
                 height: calc(100vh - 70px) !important;
             }
             
-            .progress-header {
+            #rpaModal .progress-header {
                 padding: 1rem;
                 flex-direction: column;
                 gap: 0.75rem;
             }
             
-            .progress-header h1 {
+            #rpaModal .progress-header h1 {
                 font-size: 1.5rem;
                 margin: 0 0 0.5rem 0;
             }
             
-            .progress-header .company-logo {
+            #rpaModal .progress-header .company-logo {
                 max-width: 120px;
             }
             
-            .progress-info {
+            #rpaModal .progress-info {
                 flex-direction: column;
                 gap: 0.5rem;
             }
@@ -676,12 +676,12 @@
                 font-size: 0.85rem;
             }
             
-            .results-container {
+            #rpaModal .results-container {
                 grid-template-columns: 1fr;
                 gap: 1.5rem;
             }
             
-            .result-card {
+            #rpaModal .result-card {
                 padding: 1.5rem;
             }
             
@@ -716,7 +716,7 @@
         }
         
         @media (max-width: 480px) {
-            .progress-header {
+            #rpaModal .progress-header {
                 padding: 0.75rem;
             }
             
@@ -732,7 +732,7 @@
                 padding: 0.75rem;
             }
             
-            .result-card {
+            #rpaModal .result-card {
                 padding: 1rem;
             }
             
@@ -1311,11 +1311,11 @@
             console.log(`🔄 Atualizando elementos: ${percentual}%, Fase ${currentPhase}, Status: ${currentStatus}`);
             
             // Seletores corretos baseados no HTML injetado
-            const progressText = document.querySelector('.progress-text');
-            const currentPhaseElement = document.querySelector('.current-phase');
-            const subPhaseElement = document.querySelector('.sub-phase');
-            const stageInfo = document.querySelector('.stage-info');
-            const progressFill = document.querySelector('.progress-bar-fill');
+            const progressText = document.querySelector('#rpaModal .progress-text');
+            const currentPhaseElement = document.querySelector('#rpaModal .current-phase');
+            const subPhaseElement = document.querySelector('#rpaModal .sub-phase');
+            const stageInfo = document.querySelector('#rpaModal .stage-info');
+            const progressFill = document.querySelector('#rpaModal .progress-bar-fill');
             
             if (progressText) {
                 progressText.textContent = `${Math.round(percentual)}%`;
@@ -1400,7 +1400,7 @@
         }
         
         highlightInitialEstimate() {
-            const estimateCard = document.querySelector('.result-card.estimate');
+            const estimateCard = document.querySelector('#rpaModal .result-card.recommended');
             if (estimateCard) {
                 estimateCard.style.animation = 'pulse 2s infinite';
             }
@@ -1458,7 +1458,7 @@
         }
         
         updateSuccessHeader() {
-            const progressHeader = document.querySelector('.progress-header');
+            const progressHeader = document.querySelector('#rpaModal .progress-header');
             if (progressHeader) {
                 const contactMessage = document.createElement('p');
                 contactMessage.className = 'contact-message';
