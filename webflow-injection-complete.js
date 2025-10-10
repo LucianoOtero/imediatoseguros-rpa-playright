@@ -704,6 +704,128 @@
             transform: translateY(-2px);
         }
         
+        /* SPINNER TIMER CONTAINER */
+        .spinner-timer-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            background: var(--imediato-gray);
+            border-top: 2px solid var(--imediato-border);
+        }
+        
+        .spinner-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin-bottom: 1rem;
+        }
+        
+        /* SpinKit Modelo 8 - Circle */
+        .sk-circle {
+            width: 120px;
+            height: 120px;
+            position: relative;
+        }
+        
+        .sk-circle .sk-child {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+        
+        .sk-circle .sk-child:before {
+            content: '';
+            display: block;
+            margin: 0 auto;
+            width: 15%;
+            height: 15%;
+            background-color: var(--imediato-dark-blue);
+            border-radius: 100%;
+            animation: sk-circle-bounce-delay 1.2s infinite ease-in-out both;
+        }
+        
+        .sk-circle .sk-child:nth-child(1) { transform: rotate(30deg); }
+        .sk-circle .sk-child:nth-child(2) { transform: rotate(60deg); }
+        .sk-circle .sk-child:nth-child(3) { transform: rotate(90deg); }
+        .sk-circle .sk-child:nth-child(4) { transform: rotate(120deg); }
+        .sk-circle .sk-child:nth-child(5) { transform: rotate(150deg); }
+        .sk-circle .sk-child:nth-child(6) { transform: rotate(180deg); }
+        .sk-circle .sk-child:nth-child(7) { transform: rotate(210deg); }
+        .sk-circle .sk-child:nth-child(8) { transform: rotate(240deg); }
+        .sk-circle .sk-child:nth-child(9) { transform: rotate(270deg); }
+        .sk-circle .sk-child:nth-child(10) { transform: rotate(300deg); }
+        .sk-circle .sk-child:nth-child(11) { transform: rotate(330deg); }
+        .sk-circle .sk-child:nth-child(12) { transform: rotate(360deg); }
+        
+        .sk-circle .sk-child:nth-child(1):before { animation-delay: -1.1s; }
+        .sk-circle .sk-child:nth-child(2):before { animation-delay: -1s; }
+        .sk-circle .sk-child:nth-child(3):before { animation-delay: -0.9s; }
+        .sk-circle .sk-child:nth-child(4):before { animation-delay: -0.8s; }
+        .sk-circle .sk-child:nth-child(5):before { animation-delay: -0.7s; }
+        .sk-circle .sk-child:nth-child(6):before { animation-delay: -0.6s; }
+        .sk-circle .sk-child:nth-child(7):before { animation-delay: -0.5s; }
+        .sk-circle .sk-child:nth-child(8):before { animation-delay: -0.4s; }
+        .sk-circle .sk-child:nth-child(9):before { animation-delay: -0.3s; }
+        .sk-circle .sk-child:nth-child(10):before { animation-delay: -0.2s; }
+        .sk-circle .sk-child:nth-child(11):before { animation-delay: -0.1s; }
+        .sk-circle .sk-child:nth-child(12):before { animation-delay: 0s; }
+        
+        @keyframes sk-circle-bounce-delay {
+            0%, 80%, 100% {
+                transform: scale(0);
+            }
+            40% {
+                transform: scale(1);
+            }
+        }
+        
+        .spinner-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(45deg, var(--imediato-dark-blue), var(--imediato-light-blue));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 0 15px rgba(0, 51, 102, 0.3);
+            z-index: 10;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .timer-message {
+            text-align: center;
+            padding: 12px 20px;
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: 500;
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
         .contact-message {
             background: linear-gradient(135deg, var(--imediato-light-blue), var(--imediato-dark-blue));
             color: var(--imediato-white);
@@ -835,7 +957,125 @@
     `;
     
     // ========================================
-    // 2. CLASSE PRINCIPAL DO MODAL
+    // 2. CLASSE SPINNER TIMER
+    // ========================================
+    
+    class SpinnerTimer {
+        constructor() {
+            this.initialDuration = 180; // 3 minutos em segundos
+            this.extendedDuration = 120; // 2 minutos adicionais
+            this.totalDuration = this.initialDuration;
+            this.remainingSeconds = this.initialDuration;
+            this.isRunning = false;
+            this.isExtended = false;
+            this.interval = null;
+            
+            this.elements = {
+                spinnerCenter: null,
+                timerMessage: null
+            };
+        }
+        
+        init() {
+            this.elements.spinnerCenter = document.getElementById('spinnerCenter');
+            this.elements.timerMessage = document.getElementById('timerMessage');
+            
+            console.log('🔄 Inicializando SpinnerTimer...');
+            console.log('📍 spinnerCenter encontrado:', !!this.elements.spinnerCenter);
+            console.log('📍 timerMessage encontrado:', !!this.elements.timerMessage);
+            
+            if (!this.elements.spinnerCenter) {
+                console.warn('⚠️ Elementos do spinner timer não encontrados');
+                return;
+            }
+            
+            console.log('✅ Iniciando timer...');
+            this.start();
+        }
+        
+        start() {
+            this.isRunning = true;
+            this.isExtended = false;
+            this.totalDuration = this.initialDuration;
+            this.remainingSeconds = this.initialDuration;
+            
+            console.log('⏰ Timer iniciado:', this.remainingSeconds, 'segundos');
+            
+            this.interval = setInterval(() => {
+                this.tick();
+            }, 100);
+        }
+        
+        tick() {
+            this.remainingSeconds -= 0.1;
+            
+            if (this.remainingSeconds <= 0) {
+                if (!this.isExtended) {
+                    this.extendTimer();
+                    return;
+                } else {
+                    this.finish();
+                    return;
+                }
+            }
+            
+            this.updateDisplay();
+        }
+        
+        extendTimer() {
+            this.isExtended = true;
+            this.totalDuration += this.extendedDuration;
+            this.remainingSeconds = this.extendedDuration;
+            
+            if (this.elements.timerMessage) {
+                this.elements.timerMessage.style.display = 'block';
+            }
+        }
+        
+        finish() {
+            this.isRunning = false;
+            this.remainingSeconds = 0;
+            this.updateDisplay();
+            
+            clearInterval(this.interval);
+        }
+        
+        updateDisplay() {
+            const minutes = Math.floor(this.remainingSeconds / 60);
+            const seconds = Math.floor(this.remainingSeconds % 60);
+            const centiseconds = Math.floor((this.remainingSeconds % 1) * 10);
+            
+            const timerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${centiseconds}`;
+            
+            if (this.elements.spinnerCenter) {
+                this.elements.spinnerCenter.textContent = timerText;
+                console.log('🔄 Timer atualizado:', timerText);
+            } else {
+                console.warn('⚠️ spinnerCenter não encontrado para atualizar');
+            }
+        }
+        
+        stop() {
+            this.isRunning = false;
+            clearInterval(this.interval);
+        }
+        
+        reset() {
+            this.stop();
+            this.isExtended = false;
+            this.totalDuration = this.initialDuration;
+            this.remainingSeconds = this.initialDuration;
+            
+            if (this.elements.timerMessage) {
+                this.elements.timerMessage.style.display = 'none';
+            }
+            
+            this.updateDisplay();
+        }
+    }
+
+    // ========================================
+    // 3. CLASSE PRINCIPAL DO MODAL
     // ========================================
     
     class ProgressModalRPA {
@@ -844,6 +1084,7 @@
             this.sessionId = sessionId;
             this.progressInterval = null;
             this.isProcessing = true;
+            this.spinnerTimer = new SpinnerTimer();
             
             // Controle de atualizações
             this.initialEstimateUpdated = false;
@@ -916,6 +1157,12 @@
         setSessionId(sessionId) {
             this.sessionId = sessionId;
             console.log('🔄 SessionId atualizado:', this.sessionId);
+            
+            // Inicializar spinner timer
+            setTimeout(() => {
+                console.log('🔄 Tentando inicializar SpinnerTimer...');
+                this.spinnerTimer.init();
+            }, 1000);
         }
         
         startProgressPolling() {
@@ -2473,12 +2720,54 @@
                                 </ul>
                             </div>
                         </div>
+                        
+                        <!-- Spinner com Timer Regressivo -->
+                        <div class="spinner-timer-container" id="spinnerTimerContainer" style="display: none;">
+                            <div class="spinner-container">
+                                <div class="sk-circle" id="skCircle">
+                                    <div class="sk-child"></div>
+                                    <div class="sk-child"></div>
+                                    <div class="sk-child"></div>
+                                    <div class="sk-child"></div>
+                                    <div class="sk-child"></div>
+                                    <div class="sk-child"></div>
+                                    <div class="sk-child"></div>
+                                    <div class="sk-child"></div>
+                                    <div class="sk-child"></div>
+                                    <div class="sk-child"></div>
+                                    <div class="sk-child"></div>
+                                    <div class="sk-child"></div>
+                                </div>
+                                <div class="spinner-center" id="spinnerCenter">03:00</div>
+                            </div>
+                            <div class="timer-message" id="timerMessage" style="display: none;">
+                                ⏰ Está demorando mais que o normal. Aguardando mais 2 minutos...
+                            </div>
+                        </div>
                     </div>
                 </div>
             `;
             
             // Injetar modal no DOM
             document.body.insertAdjacentHTML('beforeend', modalHTML);
+            
+            // Mostrar spinner timer após 2 segundos
+            setTimeout(() => {
+                const spinnerContainer = document.getElementById('spinnerTimerContainer');
+                if (spinnerContainer) {
+                    spinnerContainer.style.display = 'flex';
+                    console.log('✅ Spinner timer container exibido');
+                    
+                    // Inicializar timer quando o spinner aparece
+                    setTimeout(() => {
+                        console.log('🔄 Inicializando timer após exibição do spinner...');
+                        const spinnerTimer = new SpinnerTimer();
+                        spinnerTimer.init();
+                    }, 500);
+                } else {
+                    console.warn('⚠️ spinnerTimerContainer não encontrado');
+                }
+            }, 2000);
             
             // Modal será inicializado posteriormente com Session ID
             console.log('🎭 Modal HTML criado - aguardando Session ID...');
@@ -2490,6 +2779,7 @@
     // ========================================
     
     // Expor classes globalmente
+    window.SpinnerTimer = SpinnerTimer;
     window.ProgressModalRPA = ProgressModalRPA;
     window.MainPage = MainPage;
     

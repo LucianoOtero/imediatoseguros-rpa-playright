@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpinKit - Spinners Collection</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        .spinners-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .spinner-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .spinner-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .spinner-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .spinner-container {
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        /* SpinKit Spinners */
+        
+        /* 1. Rotating Plane */
+        .sk-rotating-plane {
+            width: 40px;
+            height: 40px;
+            background-color: #ff6b6b;
+            animation: sk-rotating-plane 1.2s infinite ease-in-out;
+        }
+
+        @keyframes sk-rotating-plane {
+            0% {
+                transform: perspective(120px) rotateX(0deg) rotateY(0deg);
+            }
+            50% {
+                transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg);
+            }
+            100% {
+                transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
+            }
+        }
+
+        /* 2. Double Bounce */
+        .sk-double-bounce {
+            width: 40px;
+            height: 40px;
+            position: relative;
+        }
+
+        .sk-double-bounce .sk-child {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-color: #ff6b6b;
+            opacity: 0.6;
+            position: absolute;
+            top: 0;
+            left: 0;
+            animation: sk-double-bounce 2s infinite ease-in-out;
+        }
+
+        .sk-double-bounce .sk-child:nth-child(2) {
+            animation-delay: -1s;
+        }
+
+        @keyframes sk-double-bounce {
+            0%, 100% {
+                transform: scale(0);
+            }
+            50% {
+                transform: scale(1);
+            }
+        }
+
+        /* 3. Wave */
+        .sk-wave {
+            width: 50px;
+            height: 40px;
+            text-align: center;
+            font-size: 10px;
+        }
+
+        .sk-wave .sk-rect {
+            background-color: #ff6b6b;
+            height: 100%;
+            width: 6px;
+            display: inline-block;
+            animation: sk-wave-stretch-delay 1.2s infinite ease-in-out;
+        }
+
+        .sk-wave .sk-rect:nth-child(1) { animation-delay: -1.2s; }
+        .sk-wave .sk-rect:nth-child(2) { animation-delay: -1.1s; }
+        .sk-wave .sk-rect:nth-child(3) { animation-delay: -1s; }
+        .sk-wave .sk-rect:nth-child(4) { animation-delay: -0.9s; }
+        .sk-wave .sk-rect:nth-child(5) { animation-delay: -0.8s; }
+
+        @keyframes sk-wave-stretch-delay {
+            0%, 40%, 100% {
+                transform: scaleY(0.4);
+            }
+            20% {
+                transform: scaleY(1);
+            }
+        }
+
+        /* 4. Wandering Cubes */
+        .sk-wandering-cubes {
+            width: 40px;
+            height: 40px;
+            position: relative;
+        }
+
+        .sk-wandering-cubes .sk-cube {
+            background-color: #ff6b6b;
+            width: 10px;
+            height: 10px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            animation: sk-wandering-cubes 1.8s ease-in-out infinite both;
+        }
+
+        .sk-wandering-cubes .sk-cube:nth-child(2) {
+            animation-delay: -0.9s;
+        }
+
+        @keyframes sk-wandering-cubes {
+            0% {
+                transform: rotate(0deg);
+            }
+            25% {
+                transform: translateX(30px) rotate(-90deg) scale(0.5);
+            }
+            50% {
+                transform: translateX(30px) translateY(30px) rotate(-179deg);
+            }
+            50.1% {
+                transform: translateX(30px) translateY(30px) rotate(-180deg);
+            }
+            75% {
+                transform: translateX(0) translateY(30px) rotate(-270deg) scale(0.5);
+            }
+            100% {
+                transform: rotate(-360deg);
+            }
+        }
+
+        /* 5. Pulse */
+        .sk-pulse {
+            width: 40px;
+            height: 40px;
+            background-color: #ff6b6b;
+            border-radius: 100%;
+            animation: sk-pulse 1s infinite ease-in-out;
+        }
+
+        @keyframes sk-pulse {
+            0% {
+                transform: scale(0);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0;
+            }
+        }
+
+        /* 6. Chasing Dots */
+        .sk-chasing-dots {
+            width: 40px;
+            height: 40px;
+            position: relative;
+            animation: sk-chasing-dots 2s infinite linear;
+        }
+
+        .sk-chasing-dots .sk-dot {
+            width: 60%;
+            height: 60%;
+            display: inline-block;
+            position: absolute;
+            top: 0;
+            background-color: #ff6b6b;
+            border-radius: 100%;
+            animation: sk-chasing-dots-bounce 2s infinite ease-in-out;
+        }
+
+        .sk-chasing-dots .sk-dot:nth-child(2) {
+            top: auto;
+            bottom: 0;
+            animation-delay: -1s;
+        }
+
+        @keyframes sk-chasing-dots {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes sk-chasing-dots-bounce {
+            0%, 100% {
+                transform: scale(0);
+            }
+            50% {
+                transform: scale(1);
+            }
+        }
+
+        /* 7. Three Bounce */
+        .sk-three-bounce {
+            width: 80px;
+            text-align: center;
+        }
+
+        .sk-three-bounce .sk-child {
+            width: 18px;
+            height: 18px;
+            background-color: #ff6b6b;
+            border-radius: 100%;
+            display: inline-block;
+            animation: sk-three-bounce 1.4s ease-in-out 0s infinite both;
+        }
+
+        .sk-three-bounce .sk-child:nth-child(1) { animation-delay: -0.32s; }
+        .sk-three-bounce .sk-child:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes sk-three-bounce {
+            0%, 80%, 100% {
+                transform: scale(0);
+            }
+            40% {
+                transform: scale(1);
+            }
+        }
+
+        /* 8. Circle */
+        .sk-circle {
+            width: 40px;
+            height: 40px;
+            position: relative;
+        }
+
+        .sk-circle .sk-child {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        .sk-circle .sk-child:before {
+            content: '';
+            display: block;
+            margin: 0 auto;
+            width: 15%;
+            height: 15%;
+            background-color: #ff6b6b;
+            border-radius: 100%;
+            animation: sk-circle-bounce-delay 1.2s infinite ease-in-out both;
+        }
+
+        .sk-circle .sk-child:nth-child(1) { transform: rotate(30deg); }
+        .sk-circle .sk-child:nth-child(2) { transform: rotate(60deg); }
+        .sk-circle .sk-child:nth-child(3) { transform: rotate(90deg); }
+        .sk-circle .sk-child:nth-child(4) { transform: rotate(120deg); }
+        .sk-circle .sk-child:nth-child(5) { transform: rotate(150deg); }
+        .sk-circle .sk-child:nth-child(6) { transform: rotate(180deg); }
+        .sk-circle .sk-child:nth-child(7) { transform: rotate(210deg); }
+        .sk-circle .sk-child:nth-child(8) { transform: rotate(240deg); }
+        .sk-circle .sk-child:nth-child(9) { transform: rotate(270deg); }
+        .sk-circle .sk-child:nth-child(10) { transform: rotate(300deg); }
+        .sk-circle .sk-child:nth-child(11) { transform: rotate(330deg); }
+        .sk-circle .sk-child:nth-child(12) { transform: rotate(360deg); }
+
+        .sk-circle .sk-child:nth-child(1):before { animation-delay: -1.1s; }
+        .sk-circle .sk-child:nth-child(2):before { animation-delay: -1s; }
+        .sk-circle .sk-child:nth-child(3):before { animation-delay: -0.9s; }
+        .sk-circle .sk-child:nth-child(4):before { animation-delay: -0.8s; }
+        .sk-circle .sk-child:nth-child(5):before { animation-delay: -0.7s; }
+        .sk-circle .sk-child:nth-child(6):before { animation-delay: -0.6s; }
+        .sk-circle .sk-child:nth-child(7):before { animation-delay: -0.5s; }
+        .sk-circle .sk-child:nth-child(8):before { animation-delay: -0.4s; }
+        .sk-circle .sk-child:nth-child(9):before { animation-delay: -0.3s; }
+        .sk-circle .sk-child:nth-child(10):before { animation-delay: -0.2s; }
+        .sk-circle .sk-child:nth-child(11):before { animation-delay: -0.1s; }
+        .sk-circle .sk-child:nth-child(12):before { animation-delay: 0s; }
+
+        @keyframes sk-circle-bounce-delay {
+            0%, 80%, 100% {
+                transform: scale(0);
+            }
+            40% {
+                transform: scale(1);
+            }
+        }
+
+        /* 9. Folding Cube */
+        .sk-folding-cube {
+            width: 40px;
+            height: 40px;
+            position: relative;
+            transform: rotateZ(45deg);
+        }
+
+        .sk-folding-cube .sk-cube {
+            float: left;
+            width: 50%;
+            height: 50%;
+            position: relative;
+            transform: scale(1.1);
+        }
+
+        .sk-folding-cube .sk-cube:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #ff6b6b;
+            animation: sk-folding-cube-angle 2.4s infinite linear both;
+            transform-origin: 100% 100%;
+        }
+
+        .sk-folding-cube .sk-cube:nth-child(1) { transform: scale(1.1) rotateZ(0deg); }
+        .sk-folding-cube .sk-cube:nth-child(2) { transform: scale(1.1) rotateZ(90deg); }
+        .sk-folding-cube .sk-cube:nth-child(3) { transform: scale(1.1) rotateZ(180deg); }
+        .sk-folding-cube .sk-cube:nth-child(4) { transform: scale(1.1) rotateZ(270deg); }
+
+        .sk-folding-cube .sk-cube:nth-child(1):before { animation-delay: 0.12s; }
+        .sk-folding-cube .sk-cube:nth-child(2):before { animation-delay: 0.24s; }
+        .sk-folding-cube .sk-cube:nth-child(3):before { animation-delay: 0.36s; }
+        .sk-folding-cube .sk-cube:nth-child(4):before { animation-delay: 0.48s; }
+
+        @keyframes sk-folding-cube-angle {
+            0%, 10% {
+                transform: perspective(140px) rotateX(-180deg);
+                opacity: 0;
+            }
+            25%, 75% {
+                transform: perspective(140px) rotateX(0deg);
+                opacity: 1;
+            }
+            90%, 100% {
+                transform: perspective(140px) rotateY(180deg);
+                opacity: 0;
+            }
+        }
+
+        /* 10. Cube Grid */
+        .sk-cube-grid {
+            width: 40px;
+            height: 40px;
+        }
+
+        .sk-cube-grid .sk-cube {
+            width: 33%;
+            height: 33%;
+            background-color: #ff6b6b;
+            float: left;
+            animation: sk-cube-grid-scale-delay 1.3s infinite ease-in-out;
+        }
+
+        .sk-cube-grid .sk-cube:nth-child(1) { animation-delay: 0.2s; }
+        .sk-cube-grid .sk-cube:nth-child(2) { animation-delay: 0.3s; }
+        .sk-cube-grid .sk-cube:nth-child(3) { animation-delay: 0.4s; }
+        .sk-cube-grid .sk-cube:nth-child(4) { animation-delay: 0.1s; }
+        .sk-cube-grid .sk-cube:nth-child(5) { animation-delay: 0.2s; }
+        .sk-cube-grid .sk-cube:nth-child(6) { animation-delay: 0.3s; }
+        .sk-cube-grid .sk-cube:nth-child(7) { animation-delay: 0s; }
+        .sk-cube-grid .sk-cube:nth-child(8) { animation-delay: 0.1s; }
+        .sk-cube-grid .sk-cube:nth-child(9) { animation-delay: 0.2s; }
+
+        @keyframes sk-cube-grid-scale-delay {
+            0%, 70%, 100% {
+                transform: scale3D(1, 1, 1);
+            }
+            35% {
+                transform: scale3D(0, 0, 1);
+            }
+        }
+
+        .description {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .demo-controls {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌀 SpinKit - Spinners Collection</h1>
+        
+        <div class="spinners-grid">
+            <!-- 1. Rotating Plane -->
+            <div class="spinner-card">
+                <div class="spinner-name">1. Rotating Plane</div>
+                <div class="spinner-container">
+                    <div class="sk-rotating-plane"></div>
+                </div>
+                <div class="description">Plano 3D girando em perspectiva</div>
+            </div>
+
+            <!-- 2. Double Bounce -->
+            <div class="spinner-card">
+                <div class="spinner-name">2. Double Bounce</div>
+                <div class="spinner-container">
+                    <div class="sk-double-bounce">
+                        <div class="sk-child"></div>
+                        <div class="sk-child"></div>
+                    </div>
+                </div>
+                <div class="description">Dois círculos pulsando alternadamente</div>
+            </div>
+
+            <!-- 3. Wave -->
+            <div class="spinner-card">
+                <div class="spinner-name">3. Wave</div>
+                <div class="spinner-container">
+                    <div class="sk-wave">
+                        <div class="sk-rect"></div>
+                        <div class="sk-rect"></div>
+                        <div class="sk-rect"></div>
+                        <div class="sk-rect"></div>
+                        <div class="sk-rect"></div>
+                    </div>
+                </div>
+                <div class="description">Barras em movimento ondulante</div>
+            </div>
+
+            <!-- 4. Wandering Cubes -->
+            <div class="spinner-card">
+                <div class="spinner-name">4. Wandering Cubes</div>
+                <div class="spinner-container">
+                    <div class="sk-wandering-cubes">
+                        <div class="sk-cube"></div>
+                        <div class="sk-cube"></div>
+                    </div>
+                </div>
+                <div class="description">Cubos se movendo em padrão</div>
+            </div>
+
+            <!-- 5. Pulse -->
+            <div class="spinner-card">
+                <div class="spinner-name">5. Pulse</div>
+                <div class="spinner-container">
+                    <div class="sk-pulse"></div>
+                </div>
+                <div class="description">Círculo pulsando e desaparecendo</div>
+            </div>
+
+            <!-- 6. Chasing Dots -->
+            <div class="spinner-card">
+                <div class="spinner-name">6. Chasing Dots</div>
+                <div class="spinner-container">
+                    <div class="sk-chasing-dots">
+                        <div class="sk-dot"></div>
+                        <div class="sk-dot"></div>
+                    </div>
+                </div>
+                <div class="description">Pontos perseguindo um ao outro</div>
+            </div>
+
+            <!-- 7. Three Bounce -->
+            <div class="spinner-card">
+                <div class="spinner-name">7. Three Bounce</div>
+                <div class="spinner-container">
+                    <div class="sk-three-bounce">
+                        <div class="sk-child"></div>
+                        <div class="sk-child"></div>
+                        <div class="sk-child"></div>
+                    </div>
+                </div>
+                <div class="description">Três pontos pulsando em sequência</div>
+            </div>
+
+            <!-- 8. Circle -->
+            <div class="spinner-card">
+                <div class="spinner-name">8. Circle</div>
+                <div class="spinner-container">
+                    <div class="sk-circle">
+                        <div class="sk-child"></div>
+                        <div class="sk-child"></div>
+                        <div class="sk-child"></div>
+                        <div class="sk-child"></div>
+                        <div class="sk-child"></div>
+                        <div class="sk-child"></div>
+                        <div class="sk-child"></div>
+                        <div class="sk-child"></div>
+                        <div class="sk-child"></div>
+                        <div class="sk-child"></div>
+                        <div class="sk-child"></div>
+                        <div class="sk-child"></div>
+                    </div>
+                </div>
+                <div class="description">Pontos em círculo com delay</div>
+            </div>
+
+            <!-- 9. Folding Cube -->
+            <div class="spinner-card">
+                <div class="spinner-name">9. Folding Cube</div>
+                <div class="spinner-container">
+                    <div class="sk-folding-cube">
+                        <div class="sk-cube"></div>
+                        <div class="sk-cube"></div>
+                        <div class="sk-cube"></div>
+                        <div class="sk-cube"></div>
+                    </div>
+                </div>
+                <div class="description">Cubo se dobrando em perspectiva</div>
+            </div>
+
+            <!-- 10. Cube Grid -->
+            <div class="spinner-card">
+                <div class="spinner-name">10. Cube Grid</div>
+                <div class="spinner-container">
+                    <div class="sk-cube-grid">
+                        <div class="sk-cube"></div>
+                        <div class="sk-cube"></div>
+                        <div class="sk-cube"></div>
+                        <div class="sk-cube"></div>
+                        <div class="sk-cube"></div>
+                        <div class="sk-cube"></div>
+                        <div class="sk-cube"></div>
+                        <div class="sk-cube"></div>
+                        <div class="sk-cube"></div>
+                    </div>
+                </div>
+                <div class="description">Grade de cubos pulsando</div>
+            </div>
+        </div>
+
+        <div class="demo-controls">
+            <button class="btn" onclick="toggleAllSpinners()">⏸️ Pausar/Retomar Todos</button>
+            <button class="btn" onclick="changeColors()">🎨 Mudar Cores</button>
+        </div>
+    </div>
+
+    <script>
+        let allPaused = false;
+        let currentColor = '#ff6b6b';
+
+        function toggleAllSpinners() {
+            allPaused = !allPaused;
+            const spinners = document.querySelectorAll('.spinner-container > div');
+            
+            spinners.forEach(spinner => {
+                if (allPaused) {
+                    spinner.style.animationPlayState = 'paused';
+                } else {
+                    spinner.style.animationPlayState = 'running';
+                }
+            });
+        }
+
+        function changeColors() {
+            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3', '#54a0ff'];
+            const currentIndex = colors.indexOf(currentColor);
+            const nextIndex = (currentIndex + 1) % colors.length;
+            currentColor = colors[nextIndex];
+
+            // Atualizar cor de todos os spinners
+            const elements = document.querySelectorAll('.sk-rotating-plane, .sk-child, .sk-rect, .sk-cube, .sk-pulse, .sk-dot');
+            elements.forEach(element => {
+                element.style.backgroundColor = currentColor;
+            });
+        }
+
+        // Adicionar hover effects
+        document.querySelectorAll('.spinner-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body>
+</html>
