@@ -1,0 +1,37 @@
+{
+  "status": "success",
+  "timestamp_fim": "2025-10-09T19:25:55.365145",
+  "dados_finais": {
+    "plano_recomendado": {
+      "plano": "Plano recomendado",
+      "valor": "N/A",
+      "forma_pagamento": "N/A",
+      "parcelamento": "N/A",
+      "valor_franquia": "N/A",
+      "valor_mercado": "N/A",
+      "assistencia": false,
+      "vidros": false,
+      "carro_reserva": false,
+      "danos_materiais": "N/A",
+      "danos_corporais": "N/A",
+      "danos_morais": "N/A",
+      "morte_invalidez": "N/A"
+    },
+    "plano_alternativo": {
+      "plano": "Plano alternativo",
+      "valor": "N/A",
+      "forma_pagamento": "N/A",
+      "parcelamento": "N/A",
+      "valor_franquia": "N/A",
+      "valor_mercado": "N/A",
+      "assistencia": false,
+      "vidros": false,
+      "carro_reserva": false,
+      "danos_materiais": "N/A",
+      "danos_corporais": "N/A",
+      "danos_morais": "N/A",
+      "morte_invalidez": "N/A"
+    }
+  },
+  "session_id": "2d4c17d1"
+}

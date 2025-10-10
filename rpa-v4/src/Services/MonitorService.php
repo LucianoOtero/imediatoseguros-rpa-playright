@@ -208,7 +208,8 @@ class MonitorService implements MonitorServiceInterface
                 'timestamp' => $entry['timestamp'] ?? '',
                 'status' => $entry['status'] ?? 'unknown',
                 'mensagem' => $entry['mensagem'] ?? '',
-                'dados_extra' => $entry['dados_extra'] ?? null
+                'dados_extra' => $entry['dados_extra'] ?? null,
+                'erro' => $entry['erro'] ?? null
             ];
 
             // Atualizar estado atual

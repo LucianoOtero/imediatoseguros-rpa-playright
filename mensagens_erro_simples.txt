@@ -1,0 +1,31 @@
+MENSAGENS QUE VÃO NO CAMPO "erro" - LISTA SIMPLES
+
+1. Cotação manual necessária
+2. Tela 1 falhou
+3. Tela 2 falhou
+4. Tela 3 falhou
+5. Tela 4 falhou
+6. Tela 5 falhou
+7. Tela Zero KM falhou
+8. Tela 6 falhou
+9. Tela 7 falhou
+10. Tela 8 falhou
+11. Tela 9 falhou
+12. Tela 10 falhou
+13. Tela 11 falhou
+14. Tela 12 falhou
+15. Tela 13 falhou
+16. Tela 14 falhou
+17. Tela 15 falhou
+18. Falha na captura
+19. Progresso não disponível
+20. [ERRO] VALIDAÇÃO DE PARÂMETROS FALHOU: {detalhes}
+21. [ERRO] ERRO INESPERADO NA VALIDAÇÃO: {detalhes}
+22. TimeoutError: Page.wait_for_selector: Timeout {tempo}ms exceeded
+23. ElementNotFoundError: Element not found
+24. NavigationError: {detalhes}
+25. PlaywrightError: {detalhes}
+26. BrowserError: {detalhes}
+27. Qualquer exceção convertida para string (str(e))
+
+TOTAL: 27 mensagens diferentes

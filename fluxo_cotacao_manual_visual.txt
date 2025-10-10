@@ -1,0 +1,90 @@
+FLUXO VISUAL: COTAÇÃO MANUAL DETECTADA
+========================================
+
+1. FUNÇÃO navegar_tela_15_playwright()
+   ┌─────────────────────────────────────────────────────────────┐
+   │ Detecta: "Ops, ainda não encontramos resultados para você"  │
+   │                                                             │
+   │ ✅ Linha 4021: progress_tracker.update_progress(15,        │
+   │    "Erro: Cotação manual necessária")                      │
+   │                                                             │
+   │ ✅ Linha 4022: progress_tracker.finalizar('error', None,  │
+   │    "Cotação manual necessária")                            │
+   │                                                             │
+   │ ✅ Linha 4025: return False                                │
+   └─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+2. FLUXO PRINCIPAL executar_rpa_playwright()
+   ┌─────────────────────────────────────────────────────────────┐
+   │ Linha 5677: if executar_com_timeout(...):                  │
+   │                                                             │
+   │ ❌ BLOCO IF (não executa - retornou False)                 │
+   │    ├─ telas_executadas += 1                                │
+   │    ├─ resultado_telas["tela_15"] = True                   │
+   │    └─ progress_tracker.update_progress(15, "Tela 15       │
+   │       concluída")                                           │
+   │                                                             │
+   │ ✅ BLOCO ELSE (executa - retornou False)                   │
+   │    ├─ resultado_telas["tela_15"] = False                   │
+   │    ├─ 🚨 PROBLEMA: progress_tracker.update_progress(15,   │
+   │       "Tela 15 falhou") ← SOBRESCREVE!                     │
+   │    └─ exibir_mensagem("[ERRO] TELA 15 FALHOU!")            │
+   └─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+3. VERIFICAÇÃO DE ERRO ESPECÍFICO (linhas 5687-5700)
+   ┌─────────────────────────────────────────────────────────────┐
+   │ try:                                                        │
+   │   if hasattr(navegar_tela_15_playwright, '_ultimo_retorno'):│
+   │     ❌ NÃO EXECUTA (não há _ultimo_retorno)                │
+   │ except:                                                     │
+   │   pass                                                     │
+   └─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+4. VERIFICAÇÃO DE COTAÇÃO MANUAL (linhas 5703-5721)
+   ┌─────────────────────────────────────────────────────────────┐
+   │ try:                                                        │
+   │   page.wait_for_selector('p.text-center.text-base',        │
+   │   timeout=2000)                                            │
+   │   ❌ PODE FALHAR! (página pode ter mudado)                 │
+   │   ❌ NÃO EXECUTA (porque falhou)                           │
+   │ except:                                                     │
+   │   ✅ EXECUTA (porque falhou)                               │
+   └─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+5. RETORNO DE ERRO PADRÃO (linhas 5723-5730)
+   ┌─────────────────────────────────────────────────────────────┐
+   │ return criar_retorno_erro(                                 │
+   │   "Tela 15 falhou",                                        │
+   │   "TELA_15",                                               │
+   │   time.time() - inicio_execucao,                            │
+   │   parametros,                                               │
+   │   exception_handler                                         │
+   │ )                                                           │
+   └─────────────────────────────────────────────────────────────┘
+
+PROBLEMAS IDENTIFICADOS:
+========================
+
+🚨 PROBLEMA 1: PROGRESS TRACKER SOBRESCRITO
+   ├─ Linha 4022: progress_tracker.finalizar('error', None, "Cotação manual necessária")
+   └─ Linha 5684: progress_tracker.update_progress(15, "Tela 15 falhou") ← SOBRESCREVE!
+
+🚨 PROBLEMA 2: DETECÇÃO REDUNDANTE FALHA
+   ├─ Linha 5706: page.wait_for_selector('p.text-center.text-base', timeout=2000)
+   └─ Pode falhar se a página mudou
+
+🚨 PROBLEMA 3: STATUS FINAL INCORRETO
+   ├─ Progress tracker: "concluido" (não "error")
+   ├─ JavaScript: Não detecta como erro
+   └─ SweetAlert: Não é mostrado
+
+RESULTADO FINAL:
+================
+❌ Progress tracker com status "concluido" e mensagem "Tela 15 falhou"
+❌ JavaScript não detecta como erro
+❌ SweetAlert não é mostrado
+❌ Usuário não recebe informação sobre cotação manual

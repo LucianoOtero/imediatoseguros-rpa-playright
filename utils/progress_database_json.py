@@ -164,7 +164,10 @@ class DatabaseProgressTracker:
                 self._adicionar_entrada_historico(
                     "final", status_final, f"RPA {status_final}",
                     dados_finais, erro_final)
-                self._salvar_historico()
+                # REMOVIDO: self._salvar_historico() 
+                # Motivo: O histórico agora é salvo automaticamente após cada atualização
+                # no método _adicionar_entrada_historico(), então não é mais necessário
+                # salvar aqui no finalizar()
     
     def get_progress(self) -> Dict[str, Any]:
         """
@@ -304,6 +307,9 @@ class DatabaseProgressTracker:
             "erro": erro
         }
         self.historico.append(entrada)
+        # Salvar histórico após cada atualização para garantir persistência
+        # mesmo se o processo for interrompido antes do finalizar()
+        self._salvar_historico()
     
     def _salvar_historico(self):
         """Salva histórico em arquivo JSON"""

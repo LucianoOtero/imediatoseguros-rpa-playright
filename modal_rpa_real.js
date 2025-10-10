@@ -655,6 +655,27 @@ class ModalRPAReal {
         
         this.stopProgressMonitoring();
         
+        // Verificar se há erro na timeline (progressData pode ser o objeto completo ou apenas progress)
+        const timeline = progressData.timeline || progressData.data?.timeline;
+        const timelineWithError = timeline?.find(entry => entry.erro !== null);
+        
+        if (timelineWithError) {
+            // Mostrar SweetAlert específico para cotação manual para QUALQUER erro
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: '📞 Cotação Manual Necessária',
+                    text: 'Não foi possível efetuar o cálculo nesse momento. O corretor de seguros já foi notificado e logo entrará em contato para te auxiliar a encontrar as melhores opções.',
+                    icon: 'info',
+                    confirmButtonText: 'Entendi',
+                    confirmButtonColor: '#3085d6'
+                });
+            }
+        } else {
+            // Fallback para erro genérico se não houver timeline com erro
+            const errorMessage = progressData.error || 'Erro durante execução do RPA';
+            this.showError('Erro no Processamento', errorMessage);
+        }
+        
         // Show error in modal
         const errorMessage = progressData.error || 'Erro durante execução do RPA';
         
@@ -673,8 +694,6 @@ class ModalRPAReal {
         
         this.isProcessing = false;
         this.updateUI(false);
-        
-        this.showError('Erro no Processamento', errorMessage);
     }
     
     /**

@@ -62,3 +62,9 @@ echo "3. Execute monitoramento: ./monitor_basic.sh"
 
 
 
+
+
+
+
+
+

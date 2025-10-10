@@ -1,0 +1,147 @@
+===============================================================================
+                    DIAGRAMA DE EXECUÇÃO - TELA 15
+                    RPA Tô Segurado - Playwright
+===============================================================================
+
+INÍCIO DA FUNÇÃO navegar_tela_15_playwright()
+├── Parâmetros: page, email_login, senha_login, parametros_tempo, parametros
+├── Inicialização: navegar_tela_15_playwright._ultimo_retorno = None
+└── Try/Catch principal
+
+    ┌─────────────────────────────────────────────────────────────────────────┐
+    │                           FASE 1: TIMER REGRESSIVO                       │
+    └─────────────────────────────────────────────────────────────────────────┘
+    │
+    ├── [AGUARDANDO] Modal com timer (5s timeout)
+    │   └── Busca: "Por favor, aguarde. Estamos buscando o corretor ideal..."
+    │       ├── ✅ ENCONTRADO → Continua
+    │       └── ❌ NÃO ENCONTRADO → Continua mesmo assim
+    │
+    ├── [AGUARDANDO] Timer regressivo (163 segundos = 2:43 min)
+    │   └── Loop verificando: "Tempo estimado em"
+    │       ├── Timer ativo → Continua aguardando
+    │       └── Timer desaparece → Quebra loop
+    │
+    └── [OK] FASE 1 CONCLUÍDA!
+
+    ┌─────────────────────────────────────────────────────────────────────────┐
+    │                        FASE 2: TELA DE RESULTADOS                       │
+    └─────────────────────────────────────────────────────────────────────────┘
+    │
+    ├── [BUSCAR] ETAPA 1: Tela final com resultados (REGRA)
+    │   └── Busca: "Parabéns, chegamos ao resultado final da cotação!"
+    │       └── TIMEOUT: 180000ms (3 minutos)
+    │           │
+    │           ├── ✅ ENCONTRADO → FLUXO DE SUCESSO
+    │           │   │
+    │           │   ├── [AGUARDANDO] Modal de login
+    │           │   │   └── Busca: "Acesse sua conta para visualizar o resultado final"
+    │           │   │       ├── ✅ ENCONTRADO → Processa login
+    │           │   │       │   ├── Preenche email: #emailTelaLogin
+    │           │   │       │   ├── Preenche senha: #senhaTelaLogin
+    │           │   │       │   ├── Clica: #gtm-telaLoginBotaoAcessar
+    │           │   │       │   └── Trata modal CPF divergente se aparecer
+    │           │   │       └── ❌ NÃO ENCONTRADO → Continua sem login
+    │           │   │
+    │           │   ├── [DADOS] Captura dados dos planos
+    │           │   │   └── Chama: capturar_dados_planos_seguro()
+    │           │   │       ├── ✅ SUCESSO → Retorna dados estruturados
+    │           │   │       └── ❌ FALHA → Retorna dados vazios
+    │           │   │
+    │           │   └── [OK] TELA 15 FINALIZADA COM SUCESSO!
+    │           │       └── return True
+    │           │
+    │           └── ❌ NÃO ENCONTRADO → FLUXO DE EXCEÇÃO
+    │               │
+    │               ├── [BUSCAR] ETAPA 3: Verificar cotação manual
+    │               │   └── Busca: 'p.text-center.text-base' (10s timeout)
+    │               │       │
+    │               │       ├── ✅ ENCONTRADO → Verifica texto
+    │               │       │   └── Texto: "Ops, ainda não encontramos resultados para você"
+    │               │       │       │
+    │               │       │       ├── ✅ É COTAÇÃO MANUAL → 🚨 PROBLEMA IDENTIFICADO!
+    │               │       │       │   │
+    │               │       │       │   ├── Chama: processar_cotacao_manual()
+    │               │       │       │   │   ├── Captura dados do usuário
+    │               │       │       │   │   ├── Salva em arquivo JSON
+    │               │       │       │   │   └── return True
+    │               │       │       │   │
+    │               │       │       │   ├── ❌ ERRO: "[OK] COTAÇÃO MANUAL PROCESSADA COM SUCESSO!"
+    │               │       │       │   └── ❌ ERRO: return True (deveria ser erro!)
+    │               │       │       │
+    │               │       │       └── ❌ NÃO É COTAÇÃO MANUAL → Continua
+    │               │       │
+    │               │       └── ❌ NÃO ENCONTRADO → Continua
+    │               │
+    │               └── [ERRO] ETAPA 4: Nenhuma tela esperada encontrada
+    │                   └── Chama: criar_retorno_erro_tela_final_nao_detectada()
+    │                       ├── Código: 9004
+    │                       ├── Mensagem: "Infelizmente não foi possível..."
+    │                       └── return retorno_erro
+
+    ┌─────────────────────────────────────────────────────────────────────────┐
+    │                        TRATAMENTO DE ERROS                              │
+    └─────────────────────────────────────────────────────────────────────────┘
+    │
+    └── [ERRO] ERRO na Tela 15
+        └── return False
+
+===============================================================================
+                            PROBLEMAS IDENTIFICADOS
+===============================================================================
+
+🚨 PROBLEMA 1: Linha 4021
+   Mensagem: "[OK] COTAÇÃO MANUAL PROCESSADA COM SUCESSO!"
+   Status: INCORRETO
+   Correção: Deveria ser "[ERRO] COTAÇÃO MANUAL NECESSÁRIA!"
+
+🚨 PROBLEMA 2: Linha 4022
+   Retorno: return True
+   Status: INCORRETO
+   Correção: Deveria retornar erro específico (código 9003)
+
+🚨 PROBLEMA 3: Lógica conceitual
+   Cotação manual = ERRO do sistema automatizado
+   Status: INCORRETO
+   Correção: Tratar como falha, não sucesso
+
+===============================================================================
+                            FLUXOS POSSÍVEIS
+===============================================================================
+
+FLUXO 1: SUCESSO COMPLETO
+Tela Final → Login → Captura Dados → return True
+
+FLUXO 2: SUCESSO SEM LOGIN
+Tela Final → Sem Login → Captura Dados → return True
+
+FLUXO 3: COTAÇÃO MANUAL (ATUAL - INCORRETO)
+Timeout Tela Final → Cotação Manual → return True ❌
+
+FLUXO 4: ERRO GERAL
+Timeout Tela Final → Sem Cotação Manual → return erro 9004
+
+FLUXO 5: ERRO DE EXCEÇÃO
+Erro geral → return False
+
+===============================================================================
+                            FUNÇÕES AUXILIARES
+===============================================================================
+
+processar_cotacao_manual()
+├── Captura dados do usuário
+├── Salva em arquivo JSON
+└── return True (INCORRETO - deveria ser erro)
+
+capturar_dados_planos_seguro()
+├── Busca containers dos planos
+├── Extrai dados estruturados
+├── Salva em arquivo JSON
+└── return dados_planos ou erro
+
+criar_retorno_erro_tela_final_nao_detectada()
+├── Código: 9004
+├── Status: erro
+└── return retorno_erro
+
+===============================================================================

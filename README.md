@@ -636,40 +636,444 @@ chown -R www-data:www-data /var/www/.cache
 
 ### **Integração Webflow**
 
-#### **JavaScript para Chamada da API**
+#### **🎯 WEBHOOKS PARA BOTÃO "CALCULAR AGORA"**
+
+Quando o botão "Calcular agora" for clicado no website Webflow, o script JavaScript injetado deve disparar **4 webhooks obrigatórios**:
+
+##### **📋 WEBHOOKS EXISTENTES (MDMIDIA)**
+- **Webhook 1**: `https://mdmidia.com.br/add_travelangels.php`
+- **Webhook 2**: `https://mdmidia.com.br/add_webflow_octa.php`
+
+##### **🚀 WEBHOOKS RPA (NOVOS)**
+- **Webhook 3**: `https://rpaimediatoseguros.com.br/api/rpa/start` (Iniciar RPA)
+- **Webhook 4**: `https://rpaimediatoseguros.com.br/api/rpa/progress/{session_id}` (Monitorar RPA)
+
+#### **📋 PADRÃO DE ENVIO DE PARÂMETROS WEBFLOW**
+
+##### **🔧 ESTRUTURA PADRÃO DOS WEBHOOKS EXISTENTES**
+Os webhooks existentes (`add_travelangels.php` e `add_webflow_octa.php`) esperam receber parâmetros no formato padrão do Webflow:
+
 ```javascript
-// Criar sessão RPA
-const response = await fetch('https://37.27.92.160/api/rpa/start', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-        cpf: '12345678901',
-        nome: 'João Silva',
-        placa: 'ABC1234',
-        cep: '01234567',
-        email: 'joao@email.com',
-        telefone: '11999999999'
-    })
-});
-
-const data = await response.json();
-const sessionId = data.session_id;
-
-// Monitorar progresso
-const progressInterval = setInterval(async () => {
-    const progressResponse = await fetch(`https://37.27.92.160/api/rpa/progress/${sessionId}`);
-    const progressData = await progressResponse.json();
+// Estrutura padrão dos dados do Webflow
+const webflowData = {
+    // Dados do formulário
+    name: "Nome do usuário",
+    email: "email@exemplo.com", 
+    phone: "(11) 99999-9999",
     
-    // Atualizar modal de progresso
-    updateProgressModal(progressData.progress);
+    // Dados específicos do formulário de cotação
+    cpf: "123.456.789-00",
+    placa: "ABC1234",
+    cep: "01234-567",
+    tipo_veiculo: "carro",
     
-    if (progressData.progress.status === 'success') {
-        clearInterval(progressInterval);
-        showFinalResults(progressData.progress.resultados_finais);
+    // Metadados do Webflow
+    form_name: "Formulário de Cotação",
+    page_url: "https://segurosimediato.com.br/cotacao",
+    timestamp: "2025-01-10T15:30:00Z",
+    
+    // Dados adicionais (se necessário)
+    utm_source: "google",
+    utm_medium: "cpc",
+    utm_campaign: "seguros"
+};
+```
+
+##### **📤 MÉTODOS DE ENVIO SUPORTADOS**
+Os webhooks existentes suportam ambos os métodos:
+
+**Método GET (Parâmetros na URL):**
+```javascript
+const sendWebhookGET = (url, data) => {
+    const params = new URLSearchParams(data).toString();
+    return fetch(`${url}?${params}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+};
+```
+
+**Método POST (JSON no Body):**
+```javascript
+const sendWebhookPOST = (url, data) => {
+    return fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    });
+};
+```
+
+##### **🔗 COMPATIBILIDADE COM WEBHOOKS EXISTENTES**
+Para garantir que os webhooks existentes (`add_travelangels.php` e `add_webflow_octa.php`) continuem funcionando, o script JavaScript deve:
+
+1. **Manter o formato de dados original** do Webflow
+2. **Enviar dados em paralelo** para não afetar a performance
+3. **Tratar erros graciosamente** se algum webhook falhar
+4. **Preservar a ordem de execução** (webhooks existentes primeiro, depois RPA)
+
+```javascript
+// Exemplo de implementação compatível
+const sendExistingWebhooks = async (formData) => {
+    const webflowData = {
+        // Dados no formato esperado pelos webhooks existentes
+        name: formData.nome,
+        email: formData.email,
+        phone: formData.telefone,
+        cpf: formData.cpf,
+        placa: formData.placa,
+        cep: formData.cep,
+        tipo_veiculo: formData.tipo_veiculo,
+        form_name: "Formulário de Cotação",
+        page_url: window.location.href,
+        timestamp: new Date().toISOString()
+    };
+    
+    // Enviar para ambos os webhooks existentes em paralelo
+    const promises = [
+        fetch('https://mdmidia.com.br/add_travelangels.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(webflowData)
+        }),
+        fetch('https://mdmidia.com.br/add_webflow_octa.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(webflowData)
+        })
+    ];
+    
+    try {
+        const responses = await Promise.all(promises);
+        return responses.every(response => response.ok);
+    } catch (error) {
+        console.warn('Erro nos webhooks existentes:', error);
+        return false; // Continuar mesmo se falhar
     }
-}, 2000);
+};
+```
+
+##### **1. 🚀 WEBHOOK DE INÍCIO - Criar Sessão RPA**
+```javascript
+// Webhook 1: Iniciar processo RPA
+const startRPA = async (formData) => {
+    try {
+        const response = await fetch('https://rpaimediatoseguros.com.br/api/rpa/start', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                cpf: formData.cpf,
+                nome: formData.nome,
+                placa: formData.placa,
+                cep: formData.cep,
+                email: formData.email,
+                telefone: formData.telefone,
+                tipo_veiculo: formData.tipo_veiculo || 'carro'
+            })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            return data.session_id;
+        } else {
+            throw new Error(data.message || 'Erro ao iniciar RPA');
+        }
+    } catch (error) {
+        console.error('Erro no webhook de início:', error);
+        throw error;
+    }
+};
+```
+
+##### **2. 📊 WEBHOOK DE MONITORAMENTO - Acompanhar Progresso**
+```javascript
+// Webhook 2: Monitorar progresso em tempo real
+const monitorProgress = async (sessionId) => {
+    try {
+        const progressResponse = await fetch(`https://rpaimediatoseguros.com.br/api/rpa/progress/${sessionId}`);
+        const progressData = await progressResponse.json();
+        
+        if (progressData.success) {
+            // Atualizar modal de progresso
+            updateProgressModal(progressData.progress);
+            
+            // Verificar se processo foi concluído
+            if (progressData.progress.status === 'success') {
+                showFinalResults(progressData.progress.resultados_finais);
+                return true; // Processo concluído
+            }
+            return false; // Processo em andamento
+        } else {
+            throw new Error(progressData.message || 'Erro ao obter progresso');
+        }
+    } catch (error) {
+        console.error('Erro no webhook de monitoramento:', error);
+        throw error;
+    }
+};
+```
+
+##### **🔄 FLUXO COMPLETO DE EXECUÇÃO (4 WEBHOOKS)**
+```javascript
+// Função principal executada no clique do botão "Calcular agora"
+const handleCalculateClick = async (formData) => {
+    try {
+        // 1. Preparar dados para todos os webhooks
+        const webflowData = {
+            // Dados do formulário Webflow
+            name: formData.nome,
+            email: formData.email,
+            phone: formData.telefone,
+            cpf: formData.cpf,
+            placa: formData.placa,
+            cep: formData.cep,
+            tipo_veiculo: formData.tipo_veiculo,
+            
+            // Metadados
+            form_name: "Formulário de Cotação",
+            page_url: window.location.href,
+            timestamp: new Date().toISOString()
+        };
+        
+        // 2. Disparar webhooks existentes (MDMIDIA)
+        await Promise.all([
+            sendWebhookPOST('https://mdmidia.com.br/add_travelangels.php', webflowData),
+            sendWebhookPOST('https://mdmidia.com.br/add_webflow_octa.php', webflowData)
+        ]);
+        console.log('Webhooks MDMIDIA enviados com sucesso');
+        
+        // 3. Abrir modal de progresso RPA
+        openProgressModal();
+        
+        // 4. Disparar webhook de início RPA
+        const sessionId = await startRPA(formData);
+        console.log('Sessão RPA criada:', sessionId);
+        
+        // 5. Iniciar monitoramento RPA em tempo real
+        const progressInterval = setInterval(async () => {
+            try {
+                const isComplete = await monitorProgress(sessionId);
+                
+                if (isComplete) {
+                    clearInterval(progressInterval);
+                    console.log('Processo RPA concluído com sucesso');
+                }
+            } catch (error) {
+                clearInterval(progressInterval);
+                showError('Erro no monitoramento: ' + error.message);
+            }
+        }, 2000); // Verificar a cada 2 segundos
+        
+        // 6. Timeout de segurança (3 minutos)
+        setTimeout(() => {
+            clearInterval(progressInterval);
+            showTimeoutMessage();
+        }, 180000); // 3 minutos
+        
+    } catch (error) {
+        console.error('Erro na execução:', error);
+        showError('Erro ao iniciar cálculo: ' + error.message);
+    }
+};
+```
+
+#### **📋 CONFIGURAÇÃO NO WEBFLOW**
+
+##### **Estrutura do Formulário**
+```html
+<!-- Formulário de cotação no Webflow -->
+<form id="cotacaoForm">
+    <input type="text" name="cpf" placeholder="CPF" required>
+    <input type="text" name="nome" placeholder="Nome completo" required>
+    <input type="text" name="placa" placeholder="Placa do veículo" required>
+    <input type="text" name="cep" placeholder="CEP" required>
+    <input type="email" name="email" placeholder="E-mail" required>
+    <input type="tel" name="telefone" placeholder="Telefone" required>
+    <select name="tipo_veiculo">
+        <option value="carro">Carro</option>
+        <option value="moto">Moto</option>
+    </select>
+    <button type="submit" id="calcularAgora">Calcular Agora</button>
+</form>
+```
+
+##### **Event Listener no JavaScript**
+```javascript
+// Event listener para o botão "Calcular agora"
+document.getElementById('cotacaoForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    // Coletar dados do formulário
+    const formData = {
+        cpf: document.querySelector('[name="cpf"]').value,
+        nome: document.querySelector('[name="nome"]').value,
+        placa: document.querySelector('[name="placa"]').value,
+        cep: document.querySelector('[name="cep"]').value,
+        email: document.querySelector('[name="email"]').value,
+        telefone: document.querySelector('[name="telefone"]').value,
+        tipo_veiculo: document.querySelector('[name="tipo_veiculo"]').value
+    };
+    
+    // Executar fluxo completo
+    await handleCalculateClick(formData);
+});
+```
+
+#### **🔧 JavaScript para Chamada da API (Versão Completa - 4 Webhooks)**
+```javascript
+// Versão completa do JavaScript para integração Webflow com 4 webhooks
+const RPAIntegration = {
+    // Configurações
+    config: {
+        apiBaseUrl: 'https://rpaimediatoseguros.com.br',
+        webhookUrls: {
+            travelangels: 'https://mdmidia.com.br/add_travelangels.php',
+            webflowOcta: 'https://mdmidia.com.br/add_webflow_octa.php',
+            rpaStart: 'https://rpaimediatoseguros.com.br/api/rpa/start',
+            rpaProgress: 'https://rpaimediatoseguros.com.br/api/rpa/progress'
+        },
+        pollingInterval: 2000, // 2 segundos
+        maxPolls: 90, // 3 minutos (180 segundos)
+        timeoutMessage: 'O cálculo está demorando mais que o esperado. Tente novamente em alguns minutos.'
+    },
+    
+    // Webhook 1 & 2: Enviar para MDMIDIA
+    async sendToMDMIDIA(webflowData) {
+        const promises = [
+            fetch(this.config.webhookUrls.travelangels, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(webflowData)
+            }),
+            fetch(this.config.webhookUrls.webflowOcta, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(webflowData)
+            })
+        ];
+        
+        const responses = await Promise.all(promises);
+        return responses.every(response => response.ok);
+    },
+    
+    // Webhook 3: Iniciar RPA
+    async startRPA(formData) {
+        const response = await fetch(this.config.webhookUrls.rpaStart, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        if (!data.success) {
+            throw new Error(data.message || 'Erro ao iniciar RPA');
+        }
+        
+        return data.session_id;
+    },
+    
+    // Webhook 4: Monitorar progresso
+    async getProgress(sessionId) {
+        const response = await fetch(`${this.config.webhookUrls.rpaProgress}/${sessionId}`);
+        const data = await response.json();
+        
+        if (!data.success) {
+            throw new Error(data.message || 'Erro ao obter progresso');
+        }
+        
+        return data.progress;
+    },
+    
+    // Função principal com 4 webhooks
+    async execute(formData) {
+        try {
+            // 1. Preparar dados para webhooks MDMIDIA
+            const webflowData = {
+                name: formData.nome,
+                email: formData.email,
+                phone: formData.telefone,
+                cpf: formData.cpf,
+                placa: formData.placa,
+                cep: formData.cep,
+                tipo_veiculo: formData.tipo_veiculo,
+                form_name: "Formulário de Cotação",
+                page_url: window.location.href,
+                timestamp: new Date().toISOString()
+            };
+            
+            // 2. Enviar para webhooks MDMIDIA (1 & 2)
+            const mdmidiaSuccess = await this.sendToMDMIDIA(webflowData);
+            if (!mdmidiaSuccess) {
+                console.warn('Alguns webhooks MDMIDIA falharam, mas continuando...');
+            }
+            
+            // 3. Abrir modal de progresso
+            this.openProgressModal();
+            
+            // 4. Iniciar RPA (Webhook 3)
+            const sessionId = await this.startRPA(formData);
+            
+            // 5. Monitorar progresso (Webhook 4)
+            let pollCount = 0;
+            const progressInterval = setInterval(async () => {
+                try {
+                    pollCount++;
+                    const progress = await this.getProgress(sessionId);
+                    
+                    // Atualizar interface
+                    this.updateProgressUI(progress);
+                    
+                    // Verificar conclusão
+                    if (progress.status === 'success') {
+                        clearInterval(progressInterval);
+                        this.showResults(progress.resultados_finais);
+                        return;
+                    }
+                    
+                    // Verificar timeout
+                    if (pollCount >= this.config.maxPolls) {
+                        clearInterval(progressInterval);
+                        this.showTimeout();
+                    }
+                    
+                } catch (error) {
+                    clearInterval(progressInterval);
+                    this.showError('Erro no monitoramento: ' + error.message);
+                }
+            }, this.config.pollingInterval);
+            
+        } catch (error) {
+            this.showError('Erro ao iniciar cálculo: ' + error.message);
+        }
+    },
+    
+    // Métodos de interface (implementar conforme necessário)
+    openProgressModal() {
+        // Abrir modal de progresso
+    },
+    
+    updateProgressUI(progress) {
+        // Atualizar barra de progresso, etapa atual, etc.
+    },
+    
+    showResults(results) {
+        // Exibir resultados finais
+    },
+    
+    showError(message) {
+        // Exibir erro
+    },
+    
+    showTimeout() {
+        // Exibir mensagem de timeout
+    }
+};
 ```
 
 #### **Modal de Progresso**
@@ -693,8 +1097,8 @@ const progressInterval = setInterval(async () => {
 - ✅ Browsers Playwright instalados
 
 #### **Próximos Passos**
-1. **🔧 Correção API Estimativas V6.3.0**: Corrigir API `get_progress.php` para retornar estimativas durante o processo (prioridade alta)
-2. **🆕 Interface HTML/Modal V6.1.0**: Desenvolvimento da nova versão do modal para produção
+1. **🔧 Correção API Estimativas V6.3.0**: Corrigir API `get_progress.php` para retornar estimativas durante o processo (prioridade baixa)
+2. **✅ Interface HTML/Modal V6.1.0**: Desenvolvimento da nova versão do modal para produção - **CONCLUÍDO**
 3. **✅ Correção Erros Formatação V6.4.0**: Correção de vazamento de estilos CSS e seletores JavaScript incorretos - [Projeto Detalhado](PROJETO_CORRECAO_ERROS_FORMATACAO_V6.4.0.md) + [Teste Unitário](teste-unitario-modal-v6.4.0.js) - **CONCLUÍDO**
 4. **✅ Melhorias Cosméticas V6.7.5**: Ajustes visuais e de UX do modal (cores, espaçamentos, animações, responsividade, polimento final) - **CONCLUÍDO**
    - ✅ Valor do seguro ao lado do título (alinhado à direita)
@@ -710,12 +1114,20 @@ const progressInterval = setInterval(async () => {
    - ❌ Centralização vertical do results-container (removida - ficou ruim)
    - ✅ Títulos "Recomendado" e "Alternativo" com fonte maior (mesmo tamanho dos valores)
    - ✅ **VERSÃO VISUAL FINAL PARA PRODUÇÃO**
-5. **📝 Revisão Mensagens RPA V6.7.0**: Revisar e modificar mensagens do RPA onde são citadas "Tela X falhou" para melhorar a experiência do usuário
+5. **📝 Revisão Mensagens RPA V6.7.0 (Tela falhou)**: Revisar e modificar mensagens do RPA onde são citadas "Tela X falhou" para melhorar a experiência do usuário
 6. **🔍 Validação tipo_veiculo**: Implementar validação de domínio para campo `tipo_veiculo` (aceitar apenas "carro" ou "moto", rejeitar "sedan", "hatch", etc.) nos módulos de validação do RPA
 7. **🔐 Validação HTTPS/SSL**: ✅ **CONCLUÍDO** - HTTPS implementado e funcionando perfeitamente no servidor Hetzner (37.27.92.160), certificados SSL Let's Encrypt configurados, todas as referências HTTP atualizadas para HTTPS
-8. **Sistema de Backups**: Implementar backups incrementais em nuvem (Amazon S3) - [Plano Completo](PLANO_BACKUPS_NUVEM_V6.md)
-9. **Testes de Carga**: Validação com múltiplos usuários simultâneos
-10. **Monitoramento**: Sistema de alertas para falhas
+8. **🎯 Implementação Webhooks Webflow V6.8.0**: Implementar os 4 webhooks obrigatórios no script JavaScript injetado no Webflow:
+   - **Webhook 1**: `https://mdmidia.com.br/add_travelangels.php` - Webhook existente MDMIDIA
+   - **Webhook 2**: `https://mdmidia.com.br/add_webflow_octa.php` - Webhook existente MDMIDIA
+   - **Webhook 3**: `POST /api/rpa/start` - Criar sessão RPA e iniciar processo
+   - **Webhook 4**: `GET /api/rpa/progress/{session_id}` - Monitorar progresso em tempo real
+   - **Configuração**: Event listener no botão "Calcular agora" do formulário Webflow
+   - **Fluxo**: Coletar dados do formulário → Disparar webhooks 1&2 (MDMIDIA) → Disparar webhook 3 (RPA) → Monitorar com webhook 4 → Exibir resultados
+   - **Compatibilidade**: Garantir que os webhooks existentes continuem funcionando com o padrão de parâmetros do Webflow
+9. **Sistema de Backups**: Implementar backups incrementais em nuvem (Amazon S3) - [Plano Completo](PLANO_BACKUPS_NUVEM_V6.md)
+10. **Testes de Carga**: Validação com múltiplos usuários simultâneos
+11. **Monitoramento**: Sistema de alertas para falhas
 
 ---
 

@@ -1064,8 +1064,17 @@ def configurar_display(parametros: Dict[str, Any]):
     
     # Detectar se estamos em ambiente de servidor (sem display X)
     import os
-    if not os.environ.get('DISPLAY') or modo_silencioso:
-        DISPLAY_ENABLED = False
+    import platform
+    
+    # CORREÇÃO: Detectar sistema operacional para evitar bug no Windows
+    if platform.system() == "Windows":
+        # No Windows, só verificar modo_silencioso (DISPLAY não existe)
+        if modo_silencioso:
+            DISPLAY_ENABLED = False
+    else:
+        # No Linux/Unix, verificar DISPLAY (lógica original)
+        if not os.environ.get('DISPLAY') or modo_silencioso:
+            DISPLAY_ENABLED = False
     
     # Configurar módulos externos
     try:
@@ -3784,7 +3793,7 @@ def navegar_tela_14_playwright(page, continuar_com_corretor_anterior):
         exibir_mensagem(f"[ERRO] ERRO na Tela 14: {str(e)}")
         return False
 
-def navegar_tela_15_playwright(page, email_login, senha_login, parametros_tempo, parametros):
+def navegar_tela_15_playwright(page, email_login, senha_login, parametros_tempo, parametros, progress_tracker=None):
     """
     TELA 15: Resultado Final (DUAS FASES)
     
@@ -3812,8 +3821,10 @@ def navegar_tela_15_playwright(page, email_login, senha_login, parametros_tempo,
         senha_login: Senha para login
         
     RETORNO:
-        bool: True se sucesso, False se falha
+        bool: True se sucesso, False se falha, Dict se erro específico
     """
+    # Variável para armazenar retorno específico
+    navegar_tela_15_playwright._ultimo_retorno = None
     try:
         exibir_mensagem("\n" + "="*50)
         exibir_mensagem("[OBJETIVO] TELA 15: RESULTADO FINAL (DUAS FASES)")
@@ -3865,291 +3876,170 @@ def navegar_tela_15_playwright(page, email_login, senha_login, parametros_tempo,
         exibir_mensagem("[OK] FASE 1 CONCLUÍDA!")
         
         # ========================================
-        # FASE 2: TELA DE CÁLCULO + MODAL LOGIN
+        # FASE 2: AGUARDAR TELA POR BAIXO CARREGAR
         # ========================================
-        exibir_mensagem("[ATUALIZANDO] FASE 2: Aguardando tela de cálculo e modal de login...")
-        
-        # PASSO 3: Aguardar tela de cálculo aparecer
-        exibir_mensagem("[AGUARDANDO] Aguardando tela de cálculo...")
-        page.wait_for_selector("text=Acesse sua conta para visualizar o resultado final", timeout=8000)
-        
-        # PASSO 4: Aguardar modal de login aparecer OU tela de cotação manual
-        exibir_mensagem("[AGUARDANDO] Aguardando modal de login...")
-        
+        exibir_mensagem("[ATUALIZANDO] FASE 2: Aguardando tela por baixo carregar...")
+        exibir_mensagem("[INFO] A tela pode demorar até 10 segundos para aparecer...")
+
+        # ETAPA 1: PRIMEIRO - Aguardar tela final com resultados (REGRA)
+        exibir_mensagem("[BUSCAR] Verificando se apareceu tela final com resultados...")
         try:
-            # Aguardar especificamente pelo modal de login (timeout otimizado)
-            modal_login = page.locator("text=Acesse sua conta para visualizar o resultado final")
-            modal_login.wait_for(timeout=5000)
-            exibir_mensagem("[OK] Modal de login detectado!")
-            
-        except Exception as e:
-            exibir_mensagem(f"[AVISO] Modal de login não detectado: {str(e)}")
-            exibir_mensagem("[BUSCAR] Verificando se apareceu tela de cotação manual...")
-            
-            # Verificar se apareceu tela de cotação manual
-            try:
-                tela_cotacao_manual = page.locator('p.text-center.text-base')
-                tela_cotacao_manual.wait_for(timeout=3000)
-                exibir_mensagem("[OK] TELA DE COTAÇÃO MANUAL DETECTADA!")
-                
-                # Processar cotação manual
-                if processar_cotacao_manual(page, parametros):
-                    exibir_mensagem("[OK] COTAÇÃO MANUAL PROCESSADA COM SUCESSO!")
-                    return True
-                else:
-                    exibir_mensagem("[ERRO] ERRO AO PROCESSAR COTAÇÃO MANUAL!")
-                    return False
-                    
-            except Exception as e2:
-                exibir_mensagem(f"[ERRO] Tela de cotação manual também não detectada: {str(e2)}")
-                exibir_mensagem("[ERRO] Nenhuma tela esperada encontrada!")
-                return False
-        
-        # PASSO 5: Preencher email
-        exibir_mensagem("[EMAIL] Preenchendo email...")
-        
-        try:
-            # Aguardar especificamente pelo campo de email estar pronto
-            campo_email = page.locator("#emailTelaLogin")
-            campo_email.wait_for(timeout=3000)
-            campo_email.fill(email_login)
-            exibir_mensagem(f"[OK] Email preenchido: {email_login}")
-        except Exception as e:
-            exibir_mensagem(f"[ERRO] Erro ao preencher email: {str(e)}")
-            return False
-        
-        # PASSO 6: Preencher senha
-        exibir_mensagem("[BLOQUEADO] Preenchendo senha...")
-        
-        try:
-            # Aguardar especificamente pelo campo de senha estar pronto
-            campo_senha = page.locator("#senhaTelaLogin")
-            campo_senha.wait_for(timeout=3000)
-            campo_senha.fill(senha_login)
-            exibir_mensagem("[OK] Senha preenchida")
-        except Exception as e:
-            exibir_mensagem(f"[ERRO] Erro ao preencher senha: {str(e)}")
-            return False
-        
-        # PASSO 7: CAPTURA DE TELA E LOGS DETALHADOS DO MODAL
-        exibir_mensagem("[FOTO] CAPTURANDO TELA DO MODAL DE LOGIN...")
-        
-        try:
-            # Capturar screenshot do modal
-            timestamp = time.strftime('%Y%m%d_%H%M%S')
-            screenshot_path = f"modal_login_{timestamp}.png"
-            page.screenshot(path=screenshot_path, full_page=True)
-            exibir_mensagem(f"[FOTO] Screenshot salvo: {screenshot_path}")
-            
-            # Verificar se os campos estão realmente preenchidos
-            valor_email_campo = campo_email.input_value()
-            valor_senha_campo = campo_senha.input_value()
-            
-            exibir_mensagem(f"[BUSCAR] VERIFICAÇÃO DOS CAMPOS:")
-            exibir_mensagem(f"   [EMAIL] Email no campo: '{valor_email_campo}'")
-            exibir_mensagem(f"   [BLOQUEADO] Senha no campo: '{valor_senha_campo}'")
-            exibir_mensagem(f"   [EMAIL] Email esperado: '{email_login}'")
-            exibir_mensagem(f"   [BLOQUEADO] Senha esperada: '{senha_login}'")
-            
-            # Verificar se os campos estão corretos
-            if valor_email_campo.lower() == email_login.lower():
-                exibir_mensagem("[OK] Email preenchido corretamente!")
-            else:
-                exibir_mensagem("[ERRO] Email NÃO foi preenchido corretamente!")
-            
-            if valor_senha_campo == senha_login:
-                exibir_mensagem("[OK] Senha preenchida corretamente!")
-            else:
-                exibir_mensagem("[ERRO] Senha NÃO foi preenchida corretamente!")
-            
-            # Verificar se o botão "Acessar" está visível
-            botao_acessar = page.locator("#gtm-telaLoginBotaoAcessar")
-            if botao_acessar.is_visible():
-                exibir_mensagem("[OK] Botão 'Acessar' está visível e pronto para clicar!")
-                texto_botao = botao_acessar.text_content()
-                exibir_mensagem(f"   [NOTA] Texto do botão: '{texto_botao}'")
-            else:
-                exibir_mensagem("[ERRO] Botão 'Acessar' NÃO está visível!")
-            
-            # Verificar se o modal está realmente presente
-            modal_presente = page.locator("text=Acesse sua conta para visualizar o resultado final")
-            if modal_presente.count() > 0:
-                exibir_mensagem("[OK] Modal de login está presente na tela!")
-            else:
-                exibir_mensagem("[ERRO] Modal de login NÃO está presente na tela!")
-            
-            # Capturar HTML do modal para debug
-            try:
-                modal_html = page.locator(".MuiBackdrop-root").inner_html()
-                exibir_mensagem(f"[BUSCAR] HTML do modal capturado (primeiros 200 chars): {modal_html[:200]}...")
-            except Exception as e:
-                exibir_mensagem(f"[AVISO] Erro ao capturar HTML do modal: {str(e)}")
-            
-        except Exception as e:
-            exibir_mensagem(f"[ERRO] Erro durante captura de tela/logs: {str(e)}")
-        
-        # PASSO 8: Clicar em "Acessar"
-        exibir_mensagem("[ATUALIZANDO] Clicando em 'Acessar'...")
-        
-        try:
-            # Aguardar especificamente pelo botão estar pronto
-            botao_acessar = page.locator("#gtm-telaLoginBotaoAcessar")
-            botao_acessar.wait_for(timeout=3000)
-            
-            if botao_acessar.is_visible():
-                botao_acessar.click()
-                exibir_mensagem("[OK] Botão 'Acessar' clicado com sucesso!")
-                
-                # Aguardar possível redirecionamento ou modal CPF divergente
-                exibir_mensagem("[AGUARDANDO] Aguardando resposta do login...")
-                
-                # DETECTAR FECHAMENTO DO MODAL DE LOGIN
-                exibir_mensagem("[BUSCAR] Detectando fechamento do modal de login...")
-                try:
-                    # Aguardar o modal de login desaparecer (indicando que o login foi processado)
-                    modal_login = page.locator("text=Acesse sua conta para visualizar o resultado final")
-                    modal_login.wait_for(state="hidden", timeout=10000)
-                    exibir_mensagem("[OK] Modal de login fechado - login processado!")
-                except Exception as e:
-                    exibir_mensagem(f"[AVISO] Modal de login não fechou no tempo esperado: {str(e)}")
-                    exibir_mensagem("[INFO]️ Continuando com time.sleep como fallback...")
-                    time.sleep(parametros_tempo['tempo_carregamento'])  # Fallback
-                
-                # Verificar se apareceu modal CPF divergente
-                try:
-                    modal_cpf = page.locator("text=CPF informado não corresponde à conta")
-                    if modal_cpf.count() > 0:
-                        exibir_mensagem("[OK] Modal CPF divergente detectado!")
-                        exibir_mensagem("[OBJETIVO] MODAL CPF DIVERGENTE DETECTADO: 'CPF informado não corresponde à conta'")
-                        
-                        # Clicar no botão "Manter Login atual"
-                        try:
-                            exibir_mensagem("[BUSCAR] Procurando botão 'Manter Login atual'...")
-                            
-                            # Tentar pelo ID específico
-                            botao_manter_login = page.locator("#manterLoginAtualModalAssociarUsuario")
-                            if botao_manter_login.is_visible():
-                                botao_manter_login.click()
-                                exibir_mensagem("[OK] Botão 'Manter Login atual' clicado pelo ID!")
-                                
-                                # DETECTAR FECHAMENTO DO MODAL CPF DIVERGENTE
-                                exibir_mensagem("[BUSCAR] Detectando fechamento do modal CPF divergente...")
-                                try:
-                                    modal_cpf.wait_for(state="hidden", timeout=5000)
-                                    exibir_mensagem("[OK] Modal CPF divergente fechado!")
-                                except Exception as e:
-                                    exibir_mensagem(f"[AVISO] Modal CPF divergente não fechou no tempo esperado: {str(e)}")
-                                    time.sleep(parametros_tempo['tempo_estabilizacao'])
-                            else:
-                                # Tentar pelo texto
-                                botao_manter_login = page.locator("text=Manter Login atual")
-                                if botao_manter_login.is_visible():
-                                    botao_manter_login.click()
-                                    exibir_mensagem("[OK] Botão 'Manter Login atual' clicado pelo texto!")
-                                    
-                                    # DETECTAR FECHAMENTO DO MODAL CPF DIVERGENTE
-                                    exibir_mensagem("[BUSCAR] Detectando fechamento do modal CPF divergente...")
-                                    try:
-                                        modal_cpf.wait_for(state="hidden", timeout=5000)
-                                        exibir_mensagem("[OK] Modal CPF divergente fechado!")
-                                    except Exception as e:
-                                        exibir_mensagem(f"[AVISO] Modal CPF divergente não fechou no tempo esperado: {str(e)}")
-                                        time.sleep(parametros_tempo['tempo_estabilizacao'])
-                                else:
-                                    exibir_mensagem("[AVISO] Botão 'Manter Login atual' não encontrado")
-                        except Exception as e:
-                            exibir_mensagem(f"[AVISO] Erro ao clicar no botão 'Manter Login atual': {str(e)}")
-                    else:
-                        exibir_mensagem("[INFO]️ Modal CPF divergente não apareceu - login pode ter sido bem-sucedido")
-                        exibir_mensagem("[ERRO] MODAL CPF DIVERGENTE NÃO DETECTADO: 'CPF informado não corresponde à conta'")
-                except Exception as e:
-                    exibir_mensagem(f"[AVISO] Erro ao verificar modal CPF: {str(e)}")
-                
-                # VERIFICAR OUTROS MODAIS QUE PODEM APARECER
-                exibir_mensagem("[BUSCAR] Verificando outros modais que podem aparecer...")
-                try:
-                    # Verificar modal de erro de login
-                    modal_erro_login = page.locator("text=Erro ao fazer login")
-                    if modal_erro_login.count() > 0:
-                        exibir_mensagem("[AVISO] MODAL DE ERRO DE LOGIN DETECTADO!")
-                    
-                    # Verificar modal de sessão expirada
-                    modal_sessao_expirada = page.locator("text=sessão expirada")
-                    if modal_sessao_expirada.count() > 0:
-                        exibir_mensagem("[AVISO] MODAL DE SESSÃO EXPIRADA DETECTADO!")
-                    
-                    # Verificar modal de manutenção
-                    modal_manutencao = page.locator("text=manutenção")
-                    if modal_manutencao.count() > 0:
-                        exibir_mensagem("[AVISO] MODAL DE MANUTENÇÃO DETECTADO!")
-                    
-                    # Verificar modal de captcha
-                    modal_captcha = page.locator("text=captcha")
-                    if modal_captcha.count() > 0:
-                        exibir_mensagem("[AVISO] MODAL DE CAPTCHA DETECTADO!")
-                    
-                    # Verificar modal de confirmação de dados
-                    modal_confirmacao = page.locator("text=confirmação")
-                    if modal_confirmacao.count() > 0:
-                        exibir_mensagem("[AVISO] MODAL DE CONFIRMAÇÃO DETECTADO!")
-                    
-                    exibir_mensagem("[OK] Verificação de modais concluída")
-                except Exception as e:
-                    exibir_mensagem(f"[AVISO] Erro ao verificar outros modais: {str(e)}")
-                
-            else:
-                exibir_mensagem("[ERRO] Botão 'Acessar' não está visível!")
-                return False
-        except Exception as e:
-            exibir_mensagem(f"[ERRO] Erro ao clicar em 'Acessar': {str(e)}")
-            return False
-        
-        exibir_mensagem("[OK] LOGIN CONCLUÍDO!")
-        
-        # ========================================
-        # CAPTURA DE DADOS DOS PLANOS DE SEGURO
-        # ========================================
-        exibir_mensagem("[DADOS] INICIANDO CAPTURA DE DADOS DOS PLANOS...")
-        
-        # Aguardar carregamento dos planos (aguardando botão específico)
-        exibir_mensagem("[AGUARDANDO] Aguardando carregamento da página principal dos planos...")
-        try:
-            # Aguardar pelo texto de sucesso final que indica que a página foi carregada
-            page.wait_for_selector("text=Parabéns, chegamos ao resultado final da cotação!", timeout=180000)
+            # Aguardar até 10 segundos pela tela final
+            page.wait_for_selector("text=Parabéns, chegamos ao resultado final da cotação!", timeout=10000)  # 10 segundos
             exibir_mensagem("[OK] Página principal dos planos carregada!")
-            exibir_mensagem("[OBJETIVO] MODAL DE SUCESSO DETECTADO: 'Parabéns, chegamos ao resultado final da cotação!'")
+            
+            # ETAPA 2: Aguardar modal de login aparecer SOBRE a tela final
+            exibir_mensagem("[AGUARDANDO] Aguardando modal de login aparecer sobre a tela final...")
+            try:
+                modal_login = page.locator("text=Acesse sua conta para visualizar o resultado final")
+                modal_login.wait_for(timeout=10000)  # 10 segundos para modal aparecer
+                exibir_mensagem("[OK] Modal de login detectado sobre a tela final!")
+                
+                # ETAPA 2.1: Fazer login no modal
+                exibir_mensagem("[EMAIL] Preenchendo email...")
+                try:
+                    campo_email = page.locator("#emailTelaLogin")
+                    campo_email.wait_for(timeout=3000)
+                    campo_email.fill(email_login)
+                    exibir_mensagem(f"[OK] Email preenchido: {email_login}")
+                except Exception as e:
+                    exibir_mensagem(f"[ERRO] Erro ao preencher email: {str(e)}")
+                    return False
+                
+                exibir_mensagem("[BLOQUEADO] Preenchendo senha...")
+                try:
+                    campo_senha = page.locator("#senhaTelaLogin")
+                    campo_senha.wait_for(timeout=3000)
+                    campo_senha.fill(senha_login)
+                    exibir_mensagem("[OK] Senha preenchida")
+                except Exception as e:
+                    exibir_mensagem(f"[ERRO] Erro ao preencher senha: {str(e)}")
+                    return False
+                
+                exibir_mensagem("[ATUALIZANDO] Clicando em 'Acessar'...")
+                try:
+                    botao_acessar = page.locator("#gtm-telaLoginBotaoAcessar")
+                    botao_acessar.wait_for(timeout=3000)
+                    if botao_acessar.is_visible():
+                        botao_acessar.click()
+                        exibir_mensagem("[OK] Botão 'Acessar' clicado com sucesso!")
+                        
+                        # Aguardar possível redirecionamento ou modal CPF divergente
+                        exibir_mensagem("[AGUARDANDO] Aguardando resposta do login...")
+                        
+                        # DETECTAR FECHAMENTO DO MODAL DE LOGIN
+                        exibir_mensagem("[BUSCAR] Detectando fechamento do modal de login...")
+                        try:
+                            modal_login.wait_for(state="hidden", timeout=10000)
+                            exibir_mensagem("[OK] Modal de login fechado - login processado!")
+                        except Exception as e:
+                            exibir_mensagem(f"[AVISO] Modal de login não fechou no tempo esperado: {str(e)}")
+                            exibir_mensagem("[INFO] Continuando com time.sleep como fallback...")
+                            time.sleep(parametros_tempo['tempo_carregamento'])
+                        
+                        # Verificar se apareceu modal CPF divergente
+                        try:
+                            modal_cpf = page.locator("text=CPF informado não corresponde à conta")
+                            if modal_cpf.count() > 0:
+                                exibir_mensagem("[OK] Modal CPF divergente detectado!")
+                                
+                                # Clicar no botão "Manter Login atual"
+                                try:
+                                    botao_manter_login = page.locator("#manterLoginAtualModalAssociarUsuario")
+                                    if botao_manter_login.is_visible():
+                                        botao_manter_login.click()
+                                        exibir_mensagem("[OK] Botão 'Manter Login atual' clicado!")
+                                        
+                                        try:
+                                            modal_cpf.wait_for(state="hidden", timeout=5000)
+                                            exibir_mensagem("[OK] Modal CPF divergente fechado!")
+                                        except Exception as e:
+                                            exibir_mensagem(f"[AVISO] Modal CPF divergente não fechou: {str(e)}")
+                                            time.sleep(parametros_tempo['tempo_estabilizacao'])
+                                    else:
+                                        exibir_mensagem("[AVISO] Botão 'Manter Login atual' não encontrado")
+                                except Exception as e:
+                                    exibir_mensagem(f"[AVISO] Erro ao clicar no botão 'Manter Login atual': {str(e)}")
+                            else:
+                                exibir_mensagem("[INFO] Modal CPF divergente não apareceu - login bem-sucedido")
+                        except Exception as e:
+                            exibir_mensagem(f"[AVISO] Erro ao verificar modal CPF: {str(e)}")
+                        
+                        exibir_mensagem("[OK] LOGIN CONCLUÍDO!")
+                        
+                    else:
+                        exibir_mensagem("[ERRO] Botão 'Acessar' não está visível!")
+                        return False
+                except Exception as e:
+                    exibir_mensagem(f"[ERRO] Erro ao clicar em 'Acessar': {str(e)}")
+                    return False
+                
+            except Exception as e:
+                exibir_mensagem(f"[AVISO] Modal de login não apareceu sobre a tela final: {str(e)}")
+                exibir_mensagem("[INFO] Continuando sem modal de login...")
+            
+            # ETAPA 3: Capturar dados dos planos
+            exibir_mensagem("[DADOS] INICIANDO CAPTURA DE DADOS DOS PLANOS...")
+            dados_planos = capturar_dados_planos_seguro(page, parametros_tempo)
+            
+            if dados_planos:
+                exibir_mensagem("[OK] DADOS DOS PLANOS CAPTURADOS COM SUCESSO!")
+                exibir_mensagem("[INFO] RESUMO DOS DADOS CAPTURADOS:")
+                exibir_mensagem(f"   [DADOS] Plano Recomendado: {dados_planos['plano_recomendado'].get('valor', 'N/A')}")
+                exibir_mensagem(f"   [DADOS] Plano Alternativo: {dados_planos['plano_alternativo'].get('valor', 'N/A')}")
+                
+                # RETORNO FINAL SIMPLES
+                exibir_mensagem("\n" + "="*60)
+                exibir_mensagem("[INFO] RETORNO FINAL - TELA 15")
+                exibir_mensagem("="*60)
+                exibir_mensagem(json.dumps(dados_planos, indent=2, ensure_ascii=False))
+                exibir_mensagem("="*60)
+            else:
+                exibir_mensagem("[AVISO] FALHA NA CAPTURA DE DADOS DOS PLANOS")
+            
+            exibir_mensagem("[OBJETIVO] TELA 15 FINALIZADA COM SUCESSO!")
+            return True
+            
         except Exception as e:
             exibir_mensagem(f"[AVISO] Texto de sucesso final não encontrado: {str(e)}")
-            exibir_mensagem("[ERRO] MODAL DE SUCESSO NÃO DETECTADO: 'Parabéns, chegamos ao resultado final da cotação!'")
-            exibir_mensagem("[INFO]️ Usando fallback com time.sleep...")
-            time.sleep(parametros_tempo['tempo_carregamento'])  # Fallback para time.sleep
-        
-        # Capturar dados dos planos
-        dados_planos = capturar_dados_planos_seguro(page, parametros_tempo)
-        
-        if dados_planos:
-            exibir_mensagem("[OK] DADOS DOS PLANOS CAPTURADOS COM SUCESSO!")
-            exibir_mensagem("[INFO] RESUMO DOS DADOS CAPTURADOS:")
-            exibir_mensagem(f"   [DADOS] Plano Recomendado: {dados_planos['plano_recomendado'].get('valor', 'N/A')}")
-            exibir_mensagem(f"   [DADOS] Plano Alternativo: {dados_planos['plano_alternativo'].get('valor', 'N/A')}")
             
-            # RETORNO FINAL SIMPLES
-            exibir_mensagem("\n" + "="*60)
-            exibir_mensagem("[INFO] RETORNO FINAL - TELA 15")
-            exibir_mensagem("="*60)
-            exibir_mensagem(json.dumps(dados_planos, indent=2, ensure_ascii=False))
-            exibir_mensagem("="*60)
-        else:
-            exibir_mensagem("[AVISO] FALHA NA CAPTURA DE DADOS DOS PLANOS")
-        
-        exibir_mensagem("[OBJETIVO] TELA 15 FINALIZADA COM SUCESSO!")
-        
-        # Delay para inspeção da tela
-        # exibir_mensagem("[AGUARDANDO] Aguardando 60 segundos para inspeção da tela...")
-        # time.sleep(60)
-        # exibir_mensagem("[OK] Tempo de inspeção concluído!")
-        
-        return True
+            # ETAPA 3: SEGUNDO - Verificar se apareceu tela de cotação manual (EXCEÇÃO)
+            exibir_mensagem("[BUSCAR] Verificando se apareceu tela de cotação manual...")
+            try:
+                # Aguardar até 10 segundos pela tela de cotação manual
+                tela_cotacao_manual = page.locator('p.text-center.text-base')
+                tela_cotacao_manual.wait_for(timeout=10000)  # 10 segundos (otimizado)
+                
+                # Verificar se o texto é realmente de cotação manual
+                texto_elemento = tela_cotacao_manual.text_content()
+                if "Ops, ainda não encontramos resultados para você" in texto_elemento:
+                    exibir_mensagem("[ERRO] COTAÇÃO MANUAL NECESSÁRIA!")
+                    exibir_mensagem(f"[DADOS] Texto detectado: {texto_elemento}")
+                    
+                    # Atualizar progress tracker com erro e finalizar com status error
+                    if progress_tracker:
+                        progress_tracker.update_progress(15, "Erro: Cotação manual necessária")
+                        progress_tracker.finalizar('error', None, "Cotação manual necessária")
+                    
+                    # Retornar False para acionar o tratamento de erro padrão
+                    return False
+                else:
+                    exibir_mensagem(f"[AVISO] Elemento encontrado mas não é cotação manual: {texto_elemento}")
+                    
+            except Exception as e2:
+                exibir_mensagem(f"[INFO] Tela de cotação manual também não detectada: {str(e2)}")
+            
+            # ETAPA 4: Se nada for detectado, retornar erro 9004
+            exibir_mensagem("[ERRO] Nenhuma tela esperada encontrada!")
+            retorno_erro = criar_retorno_erro_tela_final_nao_detectada(
+                "Infelizmente não foi possível, devido a problemas técnicos, efetuar o cálculo agora. Mas a Imediato Seguros fará o cálculo manualmente em instantes e entrará em contato",
+                "TELA_FINAL_NAO_DETECTADA",
+                0.0,  # Tempo será calculado pela função principal
+                parametros,
+                exception_handler
+            )
+            navegar_tela_15_playwright._ultimo_retorno = retorno_erro
+            return retorno_erro
         
     except Exception as e:
         exibir_mensagem(f"[ERRO] ERRO na Tela 15: {str(e)}")
@@ -4542,75 +4432,6 @@ def capturar_dados_carrossel_estimativas_playwright(page: Page) -> Dict[str, Any
         exibir_mensagem(f"[ERRO] ERRO na captura de dados: {str(e)}")
         return None
 
-def processar_cotacao_manual(page: Page, parametros: Dict[str, Any]) -> bool:
-    """
-    PROCESSAR COTAÇÃO MANUAL: Quando não há cotação automática disponível
-    
-    VERSÃO: v3.4.0
-    IMPLEMENTAÇÃO: Captura dados e retorna erro específico para cotação manual
-    """
-    try:
-        exception_handler.definir_tela_atual("COTACAO_MANUAL")
-        exibir_mensagem("[INFO] PROCESSANDO COTAÇÃO MANUAL...")
-        
-        # 1. CAPTURAR MENSAGEM COMPLETA
-        mensagem_elemento = page.locator('p.text-center.text-base').first
-        mensagem_completa = mensagem_elemento.text_content() if mensagem_elemento.is_visible() else "Mensagem não capturada"
-        
-        exibir_mensagem(f"[NOTA] Mensagem capturada: {mensagem_completa}")
-        
-        # 2. CRIAR ESTRUTURA DE DADOS
-        dados_cotacao_manual = {
-            "timestamp": datetime.now().isoformat(),
-            "tela": "cotacao_manual",
-            "nome_tela": "Cotação Manual",
-            "url": page.url,
-            "titulo_pagina": page.title(),
-            "mensagem": mensagem_completa,
-            "tipo_veiculo": parametros.get('tipo_veiculo', 'carro'),
-            "placa": parametros.get('placa', ''),
-            "marca": parametros.get('marca', ''),
-            "modelo": parametros.get('modelo', ''),
-            "ano": parametros.get('ano', ''),
-            "dados_pessoais": {
-                "nome": parametros.get('nome', ''),
-                "cpf": parametros.get('cpf', ''),
-                "email": parametros.get('email', ''),
-                "celular": parametros.get('celular', '')
-            },
-            "dados_endereco": {
-                "cep": parametros.get('cep', ''),
-                "endereco_completo": parametros.get('endereco_completo', '')
-            },
-            "status": "cotacao_manual_necessaria"
-        }
-        
-        # 3. SALVAR DADOS
-        timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
-        json_path = f"temp/cotacao_manual_{timestamp_str}.json"
-        
-        # Criar diretório se não existir
-        os.makedirs("temp", exist_ok=True)
-        
-        with open(json_path, 'w', encoding='utf-8') as f:
-            json.dump(dados_cotacao_manual, f, ensure_ascii=False, indent=2)
-        
-        exibir_mensagem(f"[SALVAR] DADOS SALVOS: {json_path}")
-        
-        # 4. LOGS DETALHADOS
-        exibir_mensagem("[INFO]️ Cotação será feita manualmente pelo corretor")
-        exibir_mensagem(f"[DADOS] Dados coletados para análise:")
-        exibir_mensagem(f"   [VEICULO] Veículo: {parametros.get('marca')} {parametros.get('modelo')} {parametros.get('ano')}")
-        exibir_mensagem(f"   [LOCALIZACAO] Placa: {parametros.get('placa')}")
-        exibir_mensagem(f"   [USUARIO] Segurado: {parametros.get('nome')}")
-        exibir_mensagem(f"   [EMAIL] Email: {parametros.get('email')}")
-        
-        return True
-        
-    except Exception as e:
-        exception_handler.capturar_excecao(e, "COTACAO_MANUAL", "Erro ao processar cotação manual")
-        return False
-
 def criar_retorno_erro_cotacao_manual(mensagem: str, tipo_erro: str, tempo_execucao: float, parametros: Dict[str, Any], exception_handler) -> Dict[str, Any]:
     """
     CRIAR RETORNO DE ERRO ESPECÍFICO PARA COTAÇÃO MANUAL
@@ -4674,6 +4495,56 @@ def criar_retorno_erro_cotacao_manual(mensagem: str, tipo_erro: str, tempo_execu
             parametros,
             exception_handler
         )
+
+def criar_retorno_erro_tela_final_nao_detectada(mensagem: str, tipo_erro: str, tempo_execucao: float, parametros: Dict[str, Any], exception_handler) -> Dict[str, Any]:
+    """
+    CRIAR RETORNO DE ERRO ESPECÍFICO PARA TELA FINAL NÃO DETECTADA
+    
+    VERSÃO: v3.5.0
+    IMPLEMENTAÇÃO: Retorno específico quando tela final não é detectada
+    """
+    try:
+        retorno = {
+            "status": "erro",
+            "timestamp": datetime.now().isoformat(),
+            "versao": "3.5.0",
+            "sistema": "RPA Tô Segurado - Playwright",
+            "codigo": 9004,
+            "mensagem": mensagem,
+            "tipo_erro": tipo_erro,
+            "tempo_execucao": f"{tempo_execucao:.1f}s",
+            "dados": {
+                "tela_final_nao_detectada": True,
+                "texto_esperado": "Parabéns, chegamos ao resultado final da cotação!",
+                "dados_coletados": {
+                    "dados_pessoais": {
+                        "nome": parametros.get('nome', ''),
+                        "cpf": parametros.get('cpf', ''),
+                        "email": parametros.get('email', ''),
+                        "celular": parametros.get('celular', '')
+                    },
+                    "dados_veiculo": {
+                        "placa": parametros.get('placa', ''),
+                        "marca": parametros.get('marca', ''),
+                        "modelo": parametros.get('modelo', ''),
+                        "ano": parametros.get('ano', '')
+                    }
+                }
+            },
+            "progress_tracker": {
+                "etapa_atual": 15,
+                "total_etapas": 15,
+                "percentual": 100.0,
+                "status": "erro",
+                "mensagem": "Tela final não detectada - cálculo manual necessário"
+            }
+        }
+        
+        return retorno
+        
+    except Exception as e:
+        exception_handler.capturar_excecao(e, "TELA_FINAL_NAO_DETECTADA", "Erro ao criar retorno específico")
+        return criar_retorno_erro("Erro interno", "ERRO_INTERNO", tempo_execucao, parametros, exception_handler)
 
 def capturar_dados_planos_seguro(page: Page, parametros_tempo) -> Dict[str, Any]:
     """
@@ -5803,7 +5674,7 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
             # TELA 15
             if progress_tracker: progress_tracker.update_progress(15, "Aguardando cálculo completo")
             exibir_mensagem("\n" + "="*50)
-            if executar_com_timeout(smart_timeout, 15, navegar_tela_15_playwright, page, parametros['autenticacao']['email_login'], parametros['autenticacao']['senha_login'], parametros_tempo, parametros):
+            if executar_com_timeout(smart_timeout, 15, navegar_tela_15_playwright, page, parametros['autenticacao']['email_login'], parametros['autenticacao']['senha_login'], parametros_tempo, parametros, progress_tracker):
                 telas_executadas += 1
                 resultado_telas["tela_15"] = True
                 if progress_tracker: progress_tracker.update_progress(15, "Tela 15 concluída")
@@ -5813,34 +5684,41 @@ def executar_rpa_playwright(parametros: Dict[str, Any]) -> Dict[str, Any]:
                 if progress_tracker: progress_tracker.update_progress(15, "Tela 15 falhou")
                 exibir_mensagem("[ERRO] TELA 15 FALHOU!")
                 
+                # NOVA LÓGICA: Verificar se foi erro específico de tela final não detectada
+                try:
+                    # Verificar se o retorno contém erro específico
+                    if hasattr(navegar_tela_15_playwright, '_ultimo_retorno'):
+                        ultimo_retorno = navegar_tela_15_playwright._ultimo_retorno
+                        if ultimo_retorno and ultimo_retorno.get('codigo') == 9004:
+                            # Atualizar progress tracker com erro específico
+                            if progress_tracker: 
+                                progress_tracker.update_progress(15, "ERRO: Tela final não detectada")
+                                progress_tracker.set_error_status("Tela final não detectada - cálculo manual necessário")
+                            
+                            # Retornar erro específico
+                            return ultimo_retorno
+                except:
+                    pass
+                
                 # Verificar se foi por cotação manual
                 try:
                     # Verificar se apareceu tela de cotação manual
                     page.wait_for_selector('p.text-center.text-base', timeout=2000)
                     exibir_mensagem("[INFO] COTAÇÃO MANUAL DETECTADA NO FLUXO PRINCIPAL!")
                     
-                    # Processar cotação manual
-                    if processar_cotacao_manual(page, parametros):
-                        resultado_telas["tela_cotacao_manual"] = True
-                        exibir_mensagem("[OK] COTAÇÃO MANUAL PROCESSADA!")
-                        
-                        # Retornar erro específico para cotação manual
-                        return criar_retorno_erro_cotacao_manual(
-                            "Não foi possível efetuar o cálculo nesse momento. O corretor de seguros já foi notificado e logo entrará em contato para te auxiliar a encontrar as melhores opções.",
-                            "COTACAO_MANUAL_NECESSARIA",
-                            time.time() - inicio_execucao,
-                            parametros,
-                            exception_handler
-                        )
-                    else:
-                        exibir_mensagem("[ERRO] ERRO AO PROCESSAR COTAÇÃO MANUAL!")
-                        return criar_retorno_erro(
-                            "Erro ao processar cotação manual",
-                            "COTACAO_MANUAL_ERROR",
-                            time.time() - inicio_execucao,
-                            parametros,
-                            exception_handler
-                        )
+                    # Atualizar progress tracker com erro de cotação manual
+                    if progress_tracker:
+                        progress_tracker.update_progress(15, "Erro: Cotação manual necessária")
+                        progress_tracker.finalizar('error', None, "Cotação manual necessária")
+                    
+                    # Retornar erro específico para cotação manual
+                    return criar_retorno_erro_cotacao_manual(
+                        "Não foi possível efetuar o cálculo nesse momento. O corretor de seguros já foi notificado e logo entrará em contato para te auxiliar a encontrar as melhores opções.",
+                        "COTACAO_MANUAL_NECESSARIA",
+                        time.time() - inicio_execucao,
+                        parametros,
+                        exception_handler
+                    )
                         
                 except:
                     # Não é cotação manual, retornar erro padrão

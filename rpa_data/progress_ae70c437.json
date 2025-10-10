@@ -1,0 +1,172 @@
+{
+  "etapa_atual": 15,
+  "total_etapas": 15,
+  "percentual": 100.0,
+  "status": "concluido",
+  "mensagem": "Tela 15 falhou",
+  "timestamp_inicio": "2025-10-09T19:08:50.316551",
+  "timestamp_atualizacao": "2025-10-09T19:28:19.710097",
+  "dados_extra": {
+    "estimativas_tela_5": {
+      "timestamp": "2025-10-09T19:09:00.623624",
+      "coberturas_detalhadas": [
+        {
+          "indice": 1,
+          "nome_cobertura": "CompreensivaDe",
+          "valores": {
+            "de": "R$ 2.400,00",
+            "ate": "R$ 2.900,00"
+          },
+          "beneficios": [
+            {
+              "nome": "Colisão e Acidentes",
+              "status": "incluido"
+            },
+            {
+              "nome": "Roubo e Furto",
+              "status": "incluido"
+            },
+            {
+              "nome": "Incêndio",
+              "status": "incluido"
+            },
+            {
+              "nome": "Danos a terceiros",
+              "status": "incluido"
+            },
+            {
+              "nome": "Assistência 24h",
+              "status": "incluido"
+            },
+            {
+              "nome": "Carro Reserva",
+              "status": "incluido"
+            },
+            {
+              "nome": "Vidros",
+              "status": "incluido"
+            },
+            {
+              "nome": "Roubo",
+              "status": "incluido"
+            },
+            {
+              "nome": "Furto",
+              "status": "incluido"
+            },
+            {
+              "nome": "Danos parciais em tentativas de roubo",
+              "status": "incluido"
+            },
+            {
+              "nome": "Danos materiais a terceiros",
+              "status": "incluido"
+            },
+            {
+              "nome": "Danos corporais a terceiro",
+              "status": "incluido"
+            },
+            {
+              "nome": "Assistência",
+              "status": "incluido"
+            },
+            {
+              "nome": "Carro reserva",
+              "status": "incluido"
+            },
+            {
+              "nome": "Vidros",
+              "status": "incluido"
+            },
+            {
+              "nome": "Acidentes",
+              "status": "incluido"
+            },
+            {
+              "nome": "Colisão",
+              "status": "incluido"
+            },
+            {
+              "nome": "Terceiros",
+              "status": "incluido"
+            },
+            {
+              "nome": "Materiais",
+              "status": "incluido"
+            },
+            {
+              "nome": "Corporais",
+              "status": "incluido"
+            }
+          ],
+          "texto_completo": "Confira abaixo a estimativa inicial para o seu seguro carro!Essa é somente uma estimativa baseada nos dados fornecidos. O valor estimado é baseado em mais de 30 milhões de cotações de seguros das principais seguradoras do país.Cobertura CompreensivaDeR$ 2.400,00atéR$ 2.900,00com possibilidade de parcelamento sem jurosPrincipais BenefíciosColisão e AcidentesRoubo e FurtoIncêndioDanos a terceirosAssistência 24hCarro ReservaVidrosCobertura Roubo e FurtoDeR$ 1.300,00atéR$ 1.700,00com possibilidade de parcelamento sem jurosPrincipais BenefíciosRouboFurtoDanos parciais em tentativas de roubo.Cobertura RCFDeR$ 1.300,00atéR$ 1.700,00com possibilidade de parcelamento sem jurosPrincipais BenefíciosDanos materiais a terceirosDanos corporais a terceirosPrevious slideNext slideVoltarContinuar"
+        },
+        {
+          "indice": 13,
+          "nome_cobertura": "Roubo",
+          "valores": {
+            "de": "R$ 1.300,00",
+            "ate": "R$ 1.700,00"
+          },
+          "beneficios": [
+            {
+              "nome": "Roubo e Furto",
+              "status": "incluido"
+            },
+            {
+              "nome": "Roubo",
+              "status": "incluido"
+            },
+            {
+              "nome": "Furto",
+              "status": "incluido"
+            },
+            {
+              "nome": "Danos parciais em tentativas de roubo",
+              "status": "incluido"
+            }
+          ],
+          "texto_completo": "Cobertura Roubo e FurtoDeR$ 1.300,00atéR$ 1.700,00com possibilidade de parcelamento sem jurosPrincipais BenefíciosRouboFurtoDanos parciais em tentativas de roubo."
+        },
+        {
+          "indice": 15,
+          "nome_cobertura": "RCFDe",
+          "valores": {
+            "de": "R$ 1.300,00",
+            "ate": "R$ 1.700,00"
+          },
+          "beneficios": [
+            {
+              "nome": "Danos materiais a terceiros",
+              "status": "incluido"
+            },
+            {
+              "nome": "Danos corporais a terceiro",
+              "status": "incluido"
+            },
+            {
+              "nome": "Terceiros",
+              "status": "incluido"
+            },
+            {
+              "nome": "Materiais",
+              "status": "incluido"
+            },
+            {
+              "nome": "Corporais",
+              "status": "incluido"
+            }
+          ],
+          "texto_completo": "Cobertura RCFDeR$ 1.300,00atéR$ 1.700,00com possibilidade de parcelamento sem jurosPrincipais BenefíciosDanos materiais a terceirosDanos corporais a terceiros"
+        }
+      ],
+      "resumo": {
+        "total_coberturas": 3,
+        "total_beneficios": 12,
+        "valores_encontrados": 6
+      }
+    }
+  },
+  "erros": [],
+  "session_id": "ae70c437"
+}

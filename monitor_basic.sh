@@ -55,3 +55,9 @@ echo "- Uso do disco: $DISK_USAGE%"
 
 
 
+
+
+
+
+
+

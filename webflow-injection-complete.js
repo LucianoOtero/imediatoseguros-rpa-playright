@@ -926,16 +926,16 @@
             
             console.log('🔄 Iniciando polling do progresso...');
             this.pollCount = 0;
-            this.maxPolls = 90; // 90 tentativas = 180 segundos (3 minutos, 2s cada)
+            this.maxPolls = 300; // 300 tentativas = 600 segundos (10 minutos, 2s cada)
             
             this.progressInterval = setInterval(() => {
                 this.pollCount++;
                 console.log(`🔄 Polling ${this.pollCount}/${this.maxPolls}`);
                 
                 if (this.pollCount > this.maxPolls) {
-                    console.error('❌ Timeout: Processamento demorou mais de 3 minutos');
+                    console.error('❌ Timeout: Processamento demorou mais de 10 minutos');
                     this.stopProgressPolling();
-                    this.showErrorAlert('O processamento está demorando mais que o esperado (3 minutos). Tente novamente ou entre em contato conosco.');
+                    this.showErrorAlert('O processamento está demorando mais que o esperado (10 minutos). Tente novamente ou entre em contato conosco.');
                     return;
                 }
                 
@@ -971,6 +971,9 @@
                     const progressData = data.progress;
                     const currentStatus = progressData.status || 'processing';
                     const mensagem = progressData.mensagem || '';
+                    
+                    // Salvar dados de progresso para uso em handleRPAError
+                    this.lastProgressData = progressData;
                     
                     console.log('🔍 DEBUG - Dados completos do progresso:', {
                         fase_atual: progressData.fase_atual,
@@ -1246,6 +1249,20 @@
                     "description": "Arquivo não encontrado",
                     "message": "Um arquivo necessário para execução não foi encontrado",
                     "action": "Verificar se o arquivo está no local correto e se há permissões de acesso"
+                },
+                
+                // ERROS DE TELA FINAL E RESULTADOS (9000-9999)
+                9003: {
+                    "category": "MANUAL_QUOTATION_ERROR",
+                    "description": "Cotação manual necessária",
+                    "message": "Não foi possível efetuar o cálculo nesse momento. O corretor de seguros já foi notificado e logo entrará em contato para te auxiliar a encontrar as melhores opções.",
+                    "action": "O corretor de seguros entrará em contato em breve para auxiliar com a cotação manual."
+                },
+                9004: {
+                    "category": "FINAL_SCREEN_ERROR",
+                    "description": "Tela final não detectada",
+                    "message": "Infelizmente não foi possível, devido a problemas técnicos, efetuar o cálculo agora. Mas a Imediato Seguros fará o cálculo manualmente em instantes e entrará em contato",
+                    "action": "A Imediato Seguros fará o cálculo manualmente e entrará em contato em breve"
                 }
             };
         }
@@ -1269,10 +1286,12 @@
                 'timeout', 'denied', 'invalid', 'blocked', 'cancelled'
             ];
             
-            // Códigos de erro HTTP comuns
+            // Códigos de erro HTTP comuns + RPA específicos
             const errorCodes = [
                 '400', '401', '403', '404', '405', '408', '409', '410', 
-                '422', '429', '500', '501', '502', '503', '504'
+                '422', '429', '500', '501', '502', '503', '504',
+                '9003',  // Cotação Manual Necessária
+                '9004'   // Tela Final Não Detectada
             ];
             
             // Verificar código de erro específico da tabela RPA
@@ -1336,6 +1355,24 @@
                 modal.remove();
             }
             
+            // Verificar se há erro na timeline (buscar nos dados de progresso mais recentes)
+            const timeline = this.lastProgressData?.timeline;
+            const timelineWithError = timeline?.find(entry => entry.erro !== null);
+            
+            if (timelineWithError) {
+                // Mostrar SweetAlert específico para cotação manual para QUALQUER erro
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: '📞 Cotação Manual Necessária',
+                        text: 'Não foi possível efetuar o cálculo nesse momento. Um especialista da Imediato Seguros fará o cálculo manualmente e entrará em contato para envia-lo à você em seguida.',
+                        icon: 'info',
+                        confirmButtonText: 'Entendi',
+                        confirmButtonColor: '#3085d6'
+                    });
+                }
+                return;
+            }
+            
             // Obter informações detalhadas do erro
             let errorInfo = {
                 message: mensagem,
@@ -1368,6 +1405,38 @@
             if (typeof Swal !== 'undefined') {
                 let title = '❌ Erro no Cálculo';
                 let text = `Ocorreu um erro durante o cálculo: ${mensagem}`;
+                
+                // Tratamento especial para erro 9003 (Cotação Manual Necessária)
+                if (errorCode === 9003) {
+                    title = '📞 Cotação Manual Necessária';
+                    text = mensagem; // Usar mensagem específica do RPA
+                    
+                    Swal.fire({
+                        title: title,
+                        text: text,
+                        icon: 'info',
+                        confirmButtonText: 'Entendi',
+                        confirmButtonColor: '#3085d6'
+                    });
+                    return;
+                }
+                
+                // Tratamento especial para erro 9004 (Tela Final Não Detectada)
+                if (errorCode === 9004) {
+                    title = '⚠️ Problema Técnico Temporário';
+                    text = mensagem; // Usar mensagem específica do RPA
+                    
+                    Swal.fire({
+                        title: title,
+                        text: text,
+                        icon: 'warning',
+                        confirmButtonText: 'Entendi',
+                        confirmButtonColor: '#0099CC',
+                        allowOutsideClick: false,
+                        showCloseButton: false
+                    });
+                    return;
+                }
                 
                 // Se temos código de erro, mostrar informações adicionais
                 if (errorCode) {

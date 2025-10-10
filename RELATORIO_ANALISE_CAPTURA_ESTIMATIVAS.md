@@ -297,3 +297,9 @@ A solução é simples: remover `--modo-silencioso` do wrapper script para resta
 
 
 
+
+
+
+
+
+

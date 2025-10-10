@@ -1,0 +1,494 @@
+{
+  "session_id": "2d4c17d1",
+  "timestamp_inicio": "2025-10-09T19:19:30.082054",
+  "timestamp_fim": "2025-10-09T19:25:55.364710",
+  "status_final": "success",
+  "total_etapas": 15,
+  "historico": [
+    {
+      "etapa": "inicio",
+      "timestamp": "2025-10-09T19:19:30.084487",
+      "status": "iniciando",
+      "mensagem": "ProgressTracker inicializado",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 0,
+      "timestamp": "2025-10-09T19:19:30.086014",
+      "status": "iniciando",
+      "mensagem": "Iniciando RPA",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 1,
+      "timestamp": "2025-10-09T19:19:31.074036",
+      "status": "executando",
+      "mensagem": "Selecionando Tipo de Veiculo",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 1,
+      "timestamp": "2025-10-09T19:19:31.625596",
+      "status": "executando",
+      "mensagem": "Tela 1 concluída",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 2,
+      "timestamp": "2025-10-09T19:19:31.626132",
+      "status": "executando",
+      "mensagem": "Selecionando veículo com a placa informada",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 2,
+      "timestamp": "2025-10-09T19:19:32.606575",
+      "status": "executando",
+      "mensagem": "Tela 2 concluída",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 3,
+      "timestamp": "2025-10-09T19:19:32.607215",
+      "status": "executando",
+      "mensagem": "Confirmando seleção do veículo",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 3,
+      "timestamp": "2025-10-09T19:19:32.678007",
+      "status": "executando",
+      "mensagem": "Tela 3 concluída",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 4,
+      "timestamp": "2025-10-09T19:19:32.678379",
+      "status": "executando",
+      "mensagem": "Calculando como novo Seguro",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 4,
+      "timestamp": "2025-10-09T19:19:32.730790",
+      "status": "executando",
+      "mensagem": "Tela 4 concluída",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 5,
+      "timestamp": "2025-10-09T19:19:32.731242",
+      "status": "executando",
+      "mensagem": "Elaborando estimativas",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 5,
+      "timestamp": "2025-10-09T19:19:39.933827",
+      "status": "executando",
+      "mensagem": "Tela 5 concluída",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": "estimativas",
+      "timestamp": "2025-10-09T19:19:39.934348",
+      "status": "completed",
+      "mensagem": "Estimativas capturadas",
+      "dados_extra": {
+        "timestamp": "2025-10-09T19:19:39.933464",
+        "coberturas_detalhadas": [
+          {
+            "indice": 1,
+            "nome_cobertura": "CompreensivaDe",
+            "valores": {
+              "de": "R$ 2.400,00",
+              "ate": "R$ 2.900,00"
+            },
+            "beneficios": [
+              {
+                "nome": "Colisão e Acidentes",
+                "status": "incluido"
+              },
+              {
+                "nome": "Roubo e Furto",
+                "status": "incluido"
+              },
+              {
+                "nome": "Incêndio",
+                "status": "incluido"
+              },
+              {
+                "nome": "Danos a terceiros",
+                "status": "incluido"
+              },
+              {
+                "nome": "Assistência 24h",
+                "status": "incluido"
+              },
+              {
+                "nome": "Carro Reserva",
+                "status": "incluido"
+              },
+              {
+                "nome": "Vidros",
+                "status": "incluido"
+              },
+              {
+                "nome": "Roubo",
+                "status": "incluido"
+              },
+              {
+                "nome": "Furto",
+                "status": "incluido"
+              },
+              {
+                "nome": "Danos parciais em tentativas de roubo",
+                "status": "incluido"
+              },
+              {
+                "nome": "Danos materiais a terceiros",
+                "status": "incluido"
+              },
+              {
+                "nome": "Danos corporais a terceiro",
+                "status": "incluido"
+              },
+              {
+                "nome": "Assistência",
+                "status": "incluido"
+              },
+              {
+                "nome": "Carro reserva",
+                "status": "incluido"
+              },
+              {
+                "nome": "Vidros",
+                "status": "incluido"
+              },
+              {
+                "nome": "Acidentes",
+                "status": "incluido"
+              },
+              {
+                "nome": "Colisão",
+                "status": "incluido"
+              },
+              {
+                "nome": "Terceiros",
+                "status": "incluido"
+              },
+              {
+                "nome": "Materiais",
+                "status": "incluido"
+              },
+              {
+                "nome": "Corporais",
+                "status": "incluido"
+              }
+            ],
+            "texto_completo": "Confira abaixo a estimativa inicial para o seu seguro carro!Essa é somente uma estimativa baseada nos dados fornecidos. O valor estimado é baseado em mais de 30 milhões de cotações de seguros das principais seguradoras do país.Cobertura CompreensivaDeR$ 2.400,00atéR$ 2.900,00com possibilidade de parcelamento sem jurosPrincipais BenefíciosColisão e AcidentesRoubo e FurtoIncêndioDanos a terceirosAssistência 24hCarro ReservaVidrosCobertura Roubo e FurtoDeR$ 1.300,00atéR$ 1.700,00com possibilidade de parcelamento sem jurosPrincipais BenefíciosRouboFurtoDanos parciais em tentativas de roubo.Cobertura RCFDeR$ 1.300,00atéR$ 1.700,00com possibilidade de parcelamento sem jurosPrincipais BenefíciosDanos materiais a terceirosDanos corporais a terceirosPrevious slideNext slideVoltarContinuar"
+          },
+          {
+            "indice": 13,
+            "nome_cobertura": "Roubo",
+            "valores": {
+              "de": "R$ 1.300,00",
+              "ate": "R$ 1.700,00"
+            },
+            "beneficios": [
+              {
+                "nome": "Roubo e Furto",
+                "status": "incluido"
+              },
+              {
+                "nome": "Roubo",
+                "status": "incluido"
+              },
+              {
+                "nome": "Furto",
+                "status": "incluido"
+              },
+              {
+                "nome": "Danos parciais em tentativas de roubo",
+                "status": "incluido"
+              }
+            ],
+            "texto_completo": "Cobertura Roubo e FurtoDeR$ 1.300,00atéR$ 1.700,00com possibilidade de parcelamento sem jurosPrincipais BenefíciosRouboFurtoDanos parciais em tentativas de roubo."
+          },
+          {
+            "indice": 15,
+            "nome_cobertura": "RCFDe",
+            "valores": {
+              "de": "R$ 1.300,00",
+              "ate": "R$ 1.700,00"
+            },
+            "beneficios": [
+              {
+                "nome": "Danos materiais a terceiros",
+                "status": "incluido"
+              },
+              {
+                "nome": "Danos corporais a terceiro",
+                "status": "incluido"
+              },
+              {
+                "nome": "Terceiros",
+                "status": "incluido"
+              },
+              {
+                "nome": "Materiais",
+                "status": "incluido"
+              },
+              {
+                "nome": "Corporais",
+                "status": "incluido"
+              }
+            ],
+            "texto_completo": "Cobertura RCFDeR$ 1.300,00atéR$ 1.700,00com possibilidade de parcelamento sem jurosPrincipais BenefíciosDanos materiais a terceirosDanos corporais a terceiros"
+          }
+        ],
+        "resumo": {
+          "total_coberturas": 3,
+          "total_beneficios": 12,
+          "valores_encontrados": 6
+        }
+      },
+      "erro": null
+    },
+    {
+      "etapa": 5.5,
+      "timestamp": "2025-10-09T19:19:40.006868",
+      "status": "executando",
+      "mensagem": "Processando Zero KM",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 5.5,
+      "timestamp": "2025-10-09T19:19:41.109383",
+      "status": "executando",
+      "mensagem": "Tela Zero KM concluída",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 6,
+      "timestamp": "2025-10-09T19:19:41.109791",
+      "status": "executando",
+      "mensagem": "Seleção de detalhes do veículo",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 6,
+      "timestamp": "2025-10-09T19:19:41.222458",
+      "status": "executando",
+      "mensagem": "Tela 6 concluída",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 7,
+      "timestamp": "2025-10-09T19:19:41.223040",
+      "status": "executando",
+      "mensagem": "Definição de local de pernoite com o CEP informado",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 7,
+      "timestamp": "2025-10-09T19:19:46.952466",
+      "status": "executando",
+      "mensagem": "Tela 7 concluída",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 8,
+      "timestamp": "2025-10-09T19:19:46.953062",
+      "status": "executando",
+      "mensagem": "Definição do uso do veículo",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 8,
+      "timestamp": "2025-10-09T19:20:07.102688",
+      "status": "executando",
+      "mensagem": "Tela 8 concluída",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 9,
+      "timestamp": "2025-10-09T19:20:07.103593",
+      "status": "executando",
+      "mensagem": "Preenchimento dos dados pessoais",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 9,
+      "timestamp": "2025-10-09T19:20:10.588437",
+      "status": "executando",
+      "mensagem": "Tela 9 concluída",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 10,
+      "timestamp": "2025-10-09T19:20:10.588967",
+      "status": "executando",
+      "mensagem": "Definição do Condutor Principal",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 10,
+      "timestamp": "2025-10-09T19:20:10.702157",
+      "status": "executando",
+      "mensagem": "Tela 10 concluída",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 11,
+      "timestamp": "2025-10-09T19:20:10.702786",
+      "status": "executando",
+      "mensagem": "Definição do uso do veículo",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 11,
+      "timestamp": "2025-10-09T19:20:10.782394",
+      "status": "executando",
+      "mensagem": "Tela 11 concluída",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 12,
+      "timestamp": "2025-10-09T19:20:10.783249",
+      "status": "executando",
+      "mensagem": "Definição do tipo de garagem",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 12,
+      "timestamp": "2025-10-09T19:20:10.948905",
+      "status": "executando",
+      "mensagem": "Tela 12 concluída",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 13,
+      "timestamp": "2025-10-09T19:20:10.949415",
+      "status": "executando",
+      "mensagem": "Definição de residentes",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 13,
+      "timestamp": "2025-10-09T19:20:19.249813",
+      "status": "executando",
+      "mensagem": "Tela 13 concluída",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 14,
+      "timestamp": "2025-10-09T19:20:19.250472",
+      "status": "executando",
+      "mensagem": "Definição do Corretor",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 14,
+      "timestamp": "2025-10-09T19:20:19.251399",
+      "status": "executando",
+      "mensagem": "Tela 14 pulada",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 15,
+      "timestamp": "2025-10-09T19:20:19.251815",
+      "status": "concluido",
+      "mensagem": "Aguardando cálculo completo",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 15,
+      "timestamp": "2025-10-09T19:25:54.848333",
+      "status": "concluido",
+      "mensagem": "Tela 15 concluída",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 15,
+      "timestamp": "2025-10-09T19:25:54.848841",
+      "status": "concluido",
+      "mensagem": "RPA concluído com sucesso",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": "final",
+      "timestamp": "2025-10-09T19:25:55.365877",
+      "status": "success",
+      "mensagem": "RPA success",
+      "dados_extra": {
+        "plano_recomendado": {
+          "plano": "Plano recomendado",
+          "valor": "N/A",
+          "forma_pagamento": "N/A",
+          "parcelamento": "N/A",
+          "valor_franquia": "N/A",
+          "valor_mercado": "N/A",
+          "assistencia": false,
+          "vidros": false,
+          "carro_reserva": false,
+          "danos_materiais": "N/A",
+          "danos_corporais": "N/A",
+          "danos_morais": "N/A",
+          "morte_invalidez": "N/A"
+        },
+        "plano_alternativo": {
+          "plano": "Plano alternativo",
+          "valor": "N/A",
+          "forma_pagamento": "N/A",
+          "parcelamento": "N/A",
+          "valor_franquia": "N/A",
+          "valor_mercado": "N/A",
+          "assistencia": false,
+          "vidros": false,
+          "carro_reserva": false,
+          "danos_materiais": "N/A",
+          "danos_corporais": "N/A",
+          "danos_morais": "N/A",
+          "morte_invalidez": "N/A"
+        }
+      },
+      "erro": null
+    }
+  ]
+}
