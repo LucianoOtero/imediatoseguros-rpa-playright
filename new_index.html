@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Seguro - Imediato Seguros V6.12.0 (TESTE)</title>
+    
+    <!-- Titillium Web Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    
+    <!-- SweetAlert2 para alertas -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- CSS Principal -->
+    <style>
+        /* IDENTIDADE VISUAL IMEDIATO SEGUROS V6.4.2 */
+        
+        /* Importar fonte Titillium Web */
+        @import url('https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;600;700&display=swap');
+        
+        /* Variáveis CSS com cores da Imediato */
+        :root {
+            --imediato-dark-blue: #003366;
+            --imediato-light-blue: #0099CC;
+            --imediato-white: #FFFFFF;
+            --imediato-gray: #F8F9FA;
+            --imediato-text: #333333;
+            --imediato-text-light: #666666;
+            --imediato-border: #E0E0E0;
+            --imediato-shadow: rgba(0, 51, 102, 0.1);
+            --imediato-shadow-hover: rgba(0, 51, 102, 0.2);
+            
+            /* Font sizes */
+            --font-size-xs: 0.75rem;
+            --font-size-sm: 0.875rem;
+            --font-size-base: 1rem;
+            --font-size-lg: 1.125rem;
+            --font-size-xl: 1.25rem;
+            --font-size-2xl: 1.5rem;
+            --font-size-3xl: 1.875rem;
+            --font-size-4xl: 2.25rem;
+        }
+        
+        /* Reset básico */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Titillium Web', sans-serif;
+            background: linear-gradient(135deg, var(--imediato-gray) 0%, var(--imediato-white) 100%);
+            color: var(--imediato-text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        /* Página Principal */
+        .main-page {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Header da Página */
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: var(--imediato-white);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px var(--imediato-shadow);
+        }
+        
+        .logo-container {
+            margin-bottom: 1.5rem;
+        }
+        
+        .company-logo {
+            height: 60px;
+            width: auto;
+            filter: none;
+        }
+        
+        .page-header h1 {
+            font-size: var(--font-size-3xl);
+            font-weight: 700;
+            color: var(--imediato-dark-blue);
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-header h1 i {
+            color: var(--imediato-light-blue);
+            margin-right: 0.5rem;
+        }
+        
+        .page-header p {
+            font-size: var(--font-size-lg);
+            color: var(--imediato-text-light);
+        }
+        
+        /* Container do Formulário */
+        .form-container {
+            background: var(--imediato-white);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px var(--imediato-shadow);
+            margin-bottom: 2rem;
+        }
+        
+        /* Seções do Formulário */
+        .form-section {
+            margin-bottom: 2rem;
+        }
+        
+        .form-section h3 {
+            font-size: var(--font-size-xl);
+            font-weight: 600;
+            color: var(--imediato-dark-blue);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--imediato-light-blue);
+        }
+        
+        .form-section h3 i {
+            color: var(--imediato-light-blue);
+            margin-right: 0.5rem;
+        }
+        
+        /* Linhas do Formulário */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+        }
+        
+        /* Grupos de Formulário */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-weight: 600;
+            color: var(--imediato-dark-blue);
+            margin-bottom: 0.5rem;
+            font-size: var(--font-size-sm);
+        }
+        
+        .form-group input,
+        .form-group select {
+            padding: 0.75rem;
+            border: 2px solid var(--imediato-border);
+            border-radius: 8px;
+            font-size: var(--font-size-base);
+            font-family: 'Titillium Web', sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--imediato-light-blue);
+            box-shadow: 0 0 0 3px rgba(0, 153, 204, 0.1);
+        }
+        
+        .field-hint {
+            font-size: var(--font-size-xs);
+            color: var(--imediato-text-light);
+            margin-top: 0.25rem;
+        }
+        
+        /* Botão de Ação */
+        .form-actions {
+            text-align: center;
+            margin-top: 2rem;
+        }
+        
+        .btn-calculate {
+            background: linear-gradient(135deg, var(--imediato-dark-blue) 0%, var(--imediato-light-blue) 100%);
+            color: var(--imediato-white);
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            font-family: 'Titillium Web', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px var(--imediato-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-calculate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--imediato-shadow-hover);
+        }
+        
+        .btn-calculate:active {
+            transform: translateY(0);
+        }
+        
+        .btn-calculate i {
+            margin-right: 0.5rem;
+        }
+        
+        .btn-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        /* Painel de Informações */
+        .info-panel {
+            background: var(--imediato-white);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px var(--imediato-shadow);
+        }
+        
+        .info-panel h3 {
+            font-size: var(--font-size-xl);
+            font-weight: 600;
+            color: var(--imediato-dark-blue);
+            margin-bottom: 1.5rem;
+        }
+        
+        .info-panel h3 i {
+            color: var(--imediato-light-blue);
+            margin-right: 0.5rem;
+        }
+        
+        .info-panel ul {
+            list-style: none;
+        }
+        
+        .info-panel li {
+            padding: 0.5rem 0;
+            font-size: var(--font-size-base);
+            color: var(--imediato-text);
+        }
+        
+        .info-panel li i {
+            color: var(--imediato-light-blue);
+            margin-right: 0.5rem;
+        }
+        
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .main-page {
+                padding: 1rem;
+            }
+            
+            .page-header,
+            .form-container,
+            .info-panel {
+                padding: 1.5rem;
+            }
+            
+            .page-header h1 {
+                font-size: var(--font-size-2xl);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .main-page {
+                padding: 0.5rem;
+            }
+            
+            .page-header,
+            .form-container,
+            .info-panel {
+                padding: 1rem;
+            }
+            
+            .page-header h1 {
+                font-size: var(--font-size-xl);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Página Principal -->
+    <div class="main-page">
+        <!-- Header com Logotipo -->
+        <div class="page-header">
+            <div class="logo-container">
+                <img src="https://cdn.prod.website-files.com/59eb807f9d16950001e202af/5f845624fe08f9f0d0573fee_logotipo-imediato-seguros.svg" alt="Imediato Seguros" class="company-logo">
+            </div>
+            <h1><i class="fas fa-car"></i> Calculadora de Seguro V6.12.0 (TESTE)</h1>
+            <p>Preencha os dados essenciais para calcular seu seguro - Versão com SpinnerTimer Integrado</p>
+        </div>
+        
+        <!-- Container do Formulário -->
+        <div class="form-container">
+            <form id="rpa-form" class="rpa-form">
+                <!-- Dados Pessoais -->
+                <div class="form-section">
+                    <h3><i class="fas fa-user"></i> Dados Pessoais</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="CPF">CPF *</label>
+                            <input type="text" id="CPF" name="CPF" required maxlength="11" placeholder="00000000000" value="28431381833">
+                            <small class="field-hint">Digite apenas números</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="nome">Nome Completo *</label>
+                            <input type="text" id="nome" name="nome" required placeholder="Seu nome completo" value="Rui Magalhães">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="DATA-DE-NASCIMENTO">Data de Nascimento *</label>
+                            <input type="text" id="DATA-DE-NASCIMENTO" name="DATA-DE-NASCIMENTO" required placeholder="DD/MM/AAAA" value="20/05/1985">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="SEXO">Sexo *</label>
+                            <select id="SEXO" name="SEXO" required>
+                                <option value="">Selecione</option>
+                                <option value="M" selected>Masculino</option>
+                                <option value="F">Feminino</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="ESTADO-CIVIL">Estado Civil *</label>
+                            <select id="ESTADO-CIVIL" name="ESTADO-CIVIL" required>
+                                <option value="">Selecione</option>
+                                <option value="casado_uniao_estavel" selected>Casado ou União Estável</option>
+                                <option value="solteiro">Solteiro</option>
+                                <option value="divorciado">Divorciado</option>
+                                <option value="separado">Separado</option>
+                                <option value="viuvo">Viúvo</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email *</label>
+                            <input type="email" id="email" name="email" required placeholder="seu@email.com" value="ruiacmg@gmail.com">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="DDD-CELULAR">DDD *</label>
+                            <input type="text" id="DDD-CELULAR" name="DDD-CELULAR" required maxlength="2" placeholder="11" value="11">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="CELULAR">Celular *</label>
+                            <input type="text" id="CELULAR" name="CELULAR" required maxlength="9" placeholder="999999999" value="982171913">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Dados do Veículo -->
+                <div class="form-section">
+                    <h3><i class="fas fa-car"></i> Dados do Veículo</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="PLACA">Placa do Veículo *</label>
+                            <input type="text" id="PLACA" name="PLACA" required maxlength="7" placeholder="ABC1234" style="text-transform: uppercase" value="FJM7C36">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="MARCA">Marca *</label>
+                            <input type="text" id="MARCA" name="MARCA" required placeholder="Ex: TOYOTA" value="HYUNDAI / HB20 1.6M 1.6M">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="ANO">Ano do Veículo *</label>
+                            <input type="text" id="ANO" name="ANO" required maxlength="4" placeholder="2020" value="2013">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="TIPO-DE-VEICULO">Tipo de Veículo *</label>
+                            <select id="TIPO-DE-VEICULO" name="TIPO-DE-VEICULO" required>
+                                <option value="">Selecione</option>
+                                <option value="moto">Moto</option>
+                                <option value="sedan" selected>Sedan</option>
+                                <option value="hatchback">Hatchback</option>
+                                <option value="suv">SUV</option>
+                                <option value="pickup">Pickup</option>
+                                <option value="wagon">Wagon</option>
+                                <option value="coupe">Coupé</option>
+                                <option value="convertible">Conversível</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Dados de Endereço -->
+                <div class="form-section">
+                    <h3><i class="fas fa-map-marker-alt"></i> Endereço</h3>
+                    
+                    <div class="form-group">
+                        <label for="CEP">CEP *</label>
+                        <input type="text" id="CEP" name="CEP" required maxlength="9" placeholder="00000-000" value="09990-030">
+                    </div>
+                </div>
+                
+                <!-- Campos Ocultos para Tracking -->
+                <div style="display: none;">
+                    <input type="hidden" id="GCLID_FLD" name="GCLID_FLD" value="TesteRPA123">
+                    <input type="hidden" id="utm_source" name="utm_source" value="">
+                    <input type="hidden" id="utm_medium" name="utm_medium" value="">
+                    <input type="hidden" id="utm_campaign" name="utm_campaign" value="">
+                    <input type="hidden" id="utm_term" name="utm_term" value="">
+                    <input type="hidden" id="utm_content" name="utm_content" value="">
+                    <input type="hidden" id="landing_url" name="landing_url" value="">
+                </div>
+                
+                <!-- Botão de Ação -->
+                <div class="form-actions">
+                    <button type="submit" class="btn-calculate" id="submit_button_auto">
+                        <i class="fas fa-calculator"></i>
+                        <span>CALCULE AGORA! (V6.12.0)</span>
+                        <div class="btn-loading" style="display: none;">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>Aguarde...</span>
+                        </div>
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Informações Adicionais -->
+        <div class="info-panel">
+            <h3><i class="fas fa-info-circle"></i> Informações do Sistema V6.12.0</h3>
+            <ul>
+                <li><i class="fas fa-check-circle"></i> Formulário compatível com Webflow (12 campos)</li>
+                <li><i class="fas fa-check-circle"></i> Modal de progresso em tempo real</li>
+                <li><i class="fas fa-check-circle"></i> Execução completa do Multi-Cálculo</li>
+                <li><i class="fas fa-check-circle"></i> Conversões automáticas de campos</li>
+                <li><i class="fas fa-check-circle"></i> Cálculos finais recomendado e alternativo</li>
+                <li><i class="fas fa-star"></i> <strong>NOVO:</strong> SpinnerTimer integrado com ciclo de vida do RPA</li>
+                <li><i class="fas fa-star"></i> <strong>NOVO:</strong> Timer para automaticamente em sucesso/erro</li>
+                <li><i class="fas fa-star"></i> <strong>NOVO:</strong> Melhorias de robustez (try-catch, debounce)</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- JavaScript Unificado V6.12.0 - SpinnerTimer Integrado -->
+    <script src="new_webflow-injection-complete.js"></script>
+</body>
+</html>
+
