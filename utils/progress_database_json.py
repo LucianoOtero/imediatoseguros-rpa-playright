@@ -72,9 +72,14 @@ class DatabaseProgressTracker:
             mensagem: Mensagem descritiva da etapa
             dados_extra: Dados adicionais para a etapa
         """
+        # ✅ V6.13.0: Substituições terminológicas
+        mensagem_formatada = mensagem or ""
+        mensagem_formatada = mensagem_formatada.replace("Tela ", "Processo ")
+        mensagem_formatada = mensagem_formatada.replace("concluída", "finalizou")
+        
         self.etapa_atual = min(etapa, self.total_etapas)
         self.percentual = (self.etapa_atual / self.total_etapas) * 100
-        self.mensagem = mensagem or f"Etapa {etapa}"
+        self.mensagem = mensagem_formatada or f"Etapa {etapa}"
         self.timestamp_atualizacao = datetime.now().isoformat()
         
         if dados_extra:
