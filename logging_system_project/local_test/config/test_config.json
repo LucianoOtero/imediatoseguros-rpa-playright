@@ -1,0 +1,39 @@
+{
+  "server": {
+    "host": "mdmidia.com.br",
+    "port": 443,
+    "protocol": "https",
+    "timeout": 30
+  },
+  "database": {
+    "host": "localhost",
+    "port": 3306,
+    "database": "rpa_logs",
+    "username": "rpa_logger",
+    "password": "senha_super_segura_123!"
+  },
+  "security": {
+    "rate_limit": 100,
+    "max_request_size": 10240,
+    "allowed_origins": [
+      "https://www.segurosimediato.com.br",
+      "https://segurosimediato.com.br"
+    ]
+  },
+  "test_data": {
+    "sample_sessions": 5,
+    "logs_per_session": 10,
+    "concurrent_users": 3
+  },
+  "performance": {
+    "max_response_time": 2.0,
+    "min_throughput": 50,
+    "max_memory_usage": 100
+  },
+  "logging": {
+    "level": "INFO",
+    "file": "test_runner.log",
+    "max_size": "10MB",
+    "backup_count": 5
+  }
+}
