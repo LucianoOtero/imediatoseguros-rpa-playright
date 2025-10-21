@@ -130,12 +130,12 @@ def check_connectivity():
     try:
         import requests
         
-        # Testar conectividade com mdmidia.com.br
-        response = requests.get('https://mdmidia.com.br', timeout=10)
+        # Testar conectividade com bpsegurosimediato.com.br
+        response = requests.get('http://bpsegurosimediato.com.br:8080', timeout=10)
         if response.status_code == 200:
-            print("✅ Conectividade com mdmidia.com.br OK")
+            print("✅ Conectividade com bpsegurosimediato.com.br OK")
         else:
-            print(f"⚠️ mdmidia.com.br retornou status {response.status_code}")
+            print(f"⚠️ bpsegurosimediato.com.br retornou status {response.status_code}")
             
     except ImportError:
         print("⚠️ requests não instalado - conectividade não verificada")
@@ -144,3 +144,5 @@ def check_connectivity():
 
 if __name__ == "__main__":
     main()
+
+

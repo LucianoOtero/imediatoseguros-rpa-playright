@@ -467,3 +467,5 @@ class IntegrityValidator:
             'failed': sum(1 for s in check_statuses if s == 'FAILED'),
             'warning': sum(1 for s in check_statuses if s == 'WARNING')
         }
+
+

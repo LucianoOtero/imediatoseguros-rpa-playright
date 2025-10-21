@@ -400,3 +400,5 @@ class ReportGenerator:
                 ])
         
         return filepath
+
+

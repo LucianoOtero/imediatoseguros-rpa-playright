@@ -379,3 +379,5 @@ python test_runner.py --report-only
 **Status:** ✅ **PRONTO PARA USO**
 **Versão:** 1.0.0
 **Compatibilidade:** Windows 10/11, Python 3.8+
+
+

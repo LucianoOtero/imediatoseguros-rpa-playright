@@ -1,0 +1,18 @@
+[
+  {
+    "log_id": "log_68f6c22c38d4f6.16534679",
+    "timestamp": "2025-10-20 20:13:48.000",
+    "level": "INFO",
+    "message": "Usuario iniciou cotacao - Sessao session_003",
+    "data": "{\"timestamp\": \"2025-10-20T20:13:23.086355\", \"user_session\": \"session_003\"}",
+    "url": "https://www.segurosimediato.com.br"
+  },
+  {
+    "log_id": "log_68f6c2b8429c40.68399069",
+    "timestamp": "2025-10-20 20:16:08.000",
+    "level": "INFO",
+    "message": "Usuario iniciou cotacao - Sessao session_003",
+    "data": "{\"timestamp\": \"2025-10-20T20:15:43.099276\", \"user_session\": \"session_003\"}",
+    "url": "https://www.segurosimediato.com.br"
+  }
+]

@@ -82,7 +82,7 @@ def simulate_footer_code_logs():
         }
     ]
     
-    api_url = 'https://mdmidia.com.br/debug_logger.php'
+    api_url = 'http://bpsegurosimediato.com.br:8080/debug_logger_db.php'
     
     for log in logs:
         log['timestamp'] = datetime.now().isoformat()
@@ -161,7 +161,7 @@ def simulate_injection_logs():
         }
     ]
     
-    api_url = 'https://mdmidia.com.br/debug_logger.php'
+    api_url = 'http://bpsegurosimediato.com.br:8080/debug_logger_db.php'
     
     for log in logs:
         log['timestamp'] = datetime.now().isoformat()
@@ -177,7 +177,7 @@ def simulate_multiple_sessions():
     print("\n=== SIMULANDO MÚLTIPLAS SESSÕES ===")
     
     sessions = ['session_001', 'session_002', 'session_003']
-    api_url = 'https://mdmidia.com.br/debug_logger.php'
+    api_url = 'http://bpsegurosimediato.com.br:8080/debug_logger_db.php'
     
     for session in sessions:
         log = {
@@ -280,3 +280,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+

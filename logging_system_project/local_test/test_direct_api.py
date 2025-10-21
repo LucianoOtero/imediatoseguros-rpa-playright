@@ -61,7 +61,7 @@ def test_file_api():
     
     try:
         response = requests.post(
-            'https://mdmidia.com.br/debug_logger.php',
+            'https://bpsegurosimediato.com.br/debug_logger_db.php',
             json=test_data,
             timeout=10,
             headers={'Content-Type': 'application/json'}
@@ -99,3 +99,5 @@ if __name__ == "__main__":
     print(f"API Banco de Dados: {'OK' if db_success else 'ERRO'}")
     print(f"API Arquivos: {'OK' if file_success else 'ERRO'}")
     print("=" * 60)
+
+

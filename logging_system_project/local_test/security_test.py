@@ -560,3 +560,5 @@ class SecurityTest:
             'failed': sum(1 for s in test_statuses if s == 'FAILED'),
             'warning': sum(1 for s in test_statuses if s == 'WARNING')
         }
+
+

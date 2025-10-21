@@ -161,7 +161,7 @@ class ConnectivityTest:
         """Testa conectividade com API de logging"""
         start_time = time.time()
         try:
-            url = f"https://{self.config['server']['host']}/debug_logger_db.php"
+            url = f"http://{self.config['server']['host']}:{self.config['server']['port']}/debug_logger_db.php"
             test_data = {
                 'message': 'Teste de conectividade',
                 'level': 'INFO',
@@ -253,3 +253,5 @@ if __name__ == "__main__":
     test = ConnectivityTest(config)
     results = test.run_all_tests()
     print(f"\nResultado final: {results['status']}")
+
+

@@ -48,17 +48,17 @@ class TestRunner:
         """Configuração padrão para testes"""
         return {
             "server": {
-                "host": "mdmidia.com.br",
-                "port": 443,
-                "protocol": "https",
+                "host": "bpsegurosimediato.com.br",
+                "port": 8080,
+                "protocol": "http",
                 "timeout": 30
             },
             "database": {
                 "host": "localhost",
                 "port": 3306,
                 "database": "rpa_logs",
-                "username": "rpa_logger",
-                "password": "senha_super_segura_123!"
+                "username": "rpa_user",
+                "password": "RpaLogs2025!"
             },
             "test_data": {
                 "sample_sessions": 5,
@@ -287,3 +287,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+

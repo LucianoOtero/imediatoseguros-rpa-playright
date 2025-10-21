@@ -90,7 +90,7 @@ def test_server_connectivity():
         }
         
         response = requests.post(
-            "https://mdmidia.com.br/debug_logger_db.php",
+            "http://bpsegurosimediato.com.br:8080/debug_logger_db.php",
             json=test_data,
             timeout=10,
             headers={'Content-Type': 'application/json'}
@@ -155,3 +155,5 @@ if __name__ == "__main__":
     print("\n" + "=" * 60)
     print("TESTE CONCLUIDO")
     print("=" * 60)
+
+

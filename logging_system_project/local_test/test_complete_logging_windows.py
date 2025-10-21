@@ -82,7 +82,7 @@ def simulate_footer_code_logs():
         }
     ]
     
-    api_url = 'https://mdmidia.com.br/debug_logger.php'
+    api_url = 'https://bpsegurosimediato.com.br/logging_system/debug_logger_db.php'
     
     for log in logs:
         log['timestamp'] = datetime.now().isoformat()
@@ -161,7 +161,7 @@ def simulate_injection_logs():
         }
     ]
     
-    api_url = 'https://mdmidia.com.br/debug_logger.php'
+    api_url = 'https://bpsegurosimediato.com.br/logging_system/debug_logger_db.php'
     
     for log in logs:
         log['timestamp'] = datetime.now().isoformat()
@@ -177,7 +177,7 @@ def simulate_multiple_sessions():
     print("\n=== SIMULANDO MULTIPLAS SESSOES ===")
     
     sessions = ['session_001', 'session_002', 'session_003']
-    api_url = 'https://mdmidia.com.br/debug_logger.php'
+    api_url = 'https://bpsegurosimediato.com.br/logging_system/debug_logger_db.php'
     
     for session in sessions:
         log = {
@@ -204,10 +204,10 @@ def check_logs_on_server():
         # Usar SSH para verificar logs
         import subprocess
         
-        # Verificar arquivos de log
+        # Verificar logs no banco de dados do Hetzner
         result = subprocess.run([
-            'ssh', 'mdmidiac@mdmidia.com.br', 
-            'cd public_html && ls -la debug_rpa* && echo "--- Ultimas 10 linhas do log legivel ---" && tail -10 debug_rpa_readable.log'
+            'ssh', 'root@bpsegurosimediato.com.br', 
+            'mysql -u rpa_user -pRpaLogs2025! -e "USE rpa_logs; SELECT COUNT(*) as total_logs FROM debug_logs; SELECT log_id, timestamp, level, message FROM debug_logs ORDER BY timestamp DESC LIMIT 5;"'
         ], capture_output=True, text=True, timeout=30)
         
         if result.returncode == 0:
@@ -280,3 +280,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+

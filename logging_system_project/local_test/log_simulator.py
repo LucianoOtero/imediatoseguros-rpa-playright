@@ -454,3 +454,5 @@ class LogSimulator:
             'failed': sum(1 for s in simulation_statuses if s == 'FAILED'),
             'warning': sum(1 for s in simulation_statuses if s == 'WARNING')
         }
+
+

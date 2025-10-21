@@ -1,0 +1,15 @@
+{
+  "success": true,
+  "session_id": "sess_1761003579543_cdy86jual",
+  "logs": [
+    {
+      "log_id": "log_68f6c8550289b0.04959472",
+      "timestamp": "2025-10-20 20:40:05.000",
+      "level": "INFO",
+      "message": "🎯 [CONFIG] RPA habilitado via PHP Log",
+      "data": "{\"rpaEnabled\": false}",
+      "url": "https://www.segurosimediato.com.br/"
+    }
+  ],
+  "count": 1
+}

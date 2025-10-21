@@ -1,0 +1,18 @@
+[
+  {
+    "log_id": "log_68f6c7d88dde20.24449636",
+    "timestamp": "2025-10-20 20:38:00.000",
+    "level": "INFO",
+    "message": "Teste simples",
+    "data": "null",
+    "url": "https://test.com"
+  },
+  {
+    "log_id": "test_1761003405",
+    "timestamp": "2025-10-20 23:36:45.000",
+    "level": "INFO",
+    "message": "Teste de conexão",
+    "data": "{\"test\": true}",
+    "url": "https://test.com"
+  }
+]

@@ -1,0 +1,103 @@
+{
+  "success": true,
+  "session_id": "footer_session_001",
+  "logs": [
+    {
+      "log_id": "log_68f6c21a1bc3a1.97411088",
+      "timestamp": "2025-10-20 20:13:30.000",
+      "level": "INFO",
+      "message": "Footer Code carregado - Iniciando monitoramento do formulario",
+      "data": "{\"version\": \"1.0.0\", \"component\": \"footer_code\"}",
+      "url": "https://www.segurosimediato.com.br"
+    },
+    {
+      "log_id": "log_68f6c21b580ec8.90719056",
+      "timestamp": "2025-10-20 20:13:31.000",
+      "level": "DEBUG",
+      "message": "Formulario detectado - ID: #form-cotacao",
+      "data": "{\"form_id\": \"form-cotacao\", \"form_elements\": 15}",
+      "url": "https://www.segurosimediato.com.br"
+    },
+    {
+      "log_id": "log_68f6c21c90d337.15795525",
+      "timestamp": "2025-10-20 20:13:32.000",
+      "level": "INFO",
+      "message": "Event listener adicionado ao submit",
+      "data": "{\"event\": \"submit\", \"preventDefault\": true}",
+      "url": "https://www.segurosimediato.com.br"
+    },
+    {
+      "log_id": "log_68f6c21dcc7b56.66643212",
+      "timestamp": "2025-10-20 20:13:33.000",
+      "level": "DEBUG",
+      "message": "Validacao de campos iniciada",
+      "data": "{\"fields_validated\": [\"nome\", \"email\", \"telefone\", \"ddd\"]}",
+      "url": "https://www.segurosimediato.com.br"
+    },
+    {
+      "log_id": "log_68f6c21f1298e5.43744759",
+      "timestamp": "2025-10-20 20:13:35.000",
+      "level": "INFO",
+      "message": "Campos validados com sucesso",
+      "data": "{\"errors\": [], \"validation_result\": \"success\"}",
+      "url": "https://www.segurosimediato.com.br"
+    },
+    {
+      "log_id": "log_68f6c2204e4e40.25910574",
+      "timestamp": "2025-10-20 20:13:36.000",
+      "level": "INFO",
+      "message": "Iniciando carregamento do Injection Script",
+      "data": "{\"injection_url\": \"https://mdmidia.com.br/webflow_injection_limpo.js\"}",
+      "url": "https://www.segurosimediato.com.br"
+    },
+    {
+      "log_id": "log_68f6c2a5eaef88.56143626",
+      "timestamp": "2025-10-20 20:15:49.000",
+      "level": "INFO",
+      "message": "Footer Code carregado - Iniciando monitoramento do formulario",
+      "data": "{\"version\": \"1.0.0\", \"component\": \"footer_code\"}",
+      "url": "https://www.segurosimediato.com.br"
+    },
+    {
+      "log_id": "log_68f6c2a73b5730.76471221",
+      "timestamp": "2025-10-20 20:15:51.000",
+      "level": "DEBUG",
+      "message": "Formulario detectado - ID: #form-cotacao",
+      "data": "{\"form_id\": \"form-cotacao\", \"form_elements\": 15}",
+      "url": "https://www.segurosimediato.com.br"
+    },
+    {
+      "log_id": "log_68f6c2a8802c73.74432146",
+      "timestamp": "2025-10-20 20:15:52.000",
+      "level": "INFO",
+      "message": "Event listener adicionado ao submit",
+      "data": "{\"event\": \"submit\", \"preventDefault\": true}",
+      "url": "https://www.segurosimediato.com.br"
+    },
+    {
+      "log_id": "log_68f6c2a9c00636.28352516",
+      "timestamp": "2025-10-20 20:15:53.000",
+      "level": "DEBUG",
+      "message": "Validacao de campos iniciada",
+      "data": "{\"fields_validated\": [\"nome\", \"email\", \"telefone\", \"ddd\"]}",
+      "url": "https://www.segurosimediato.com.br"
+    },
+    {
+      "log_id": "log_68f6c2ab042142.36747741",
+      "timestamp": "2025-10-20 20:15:55.000",
+      "level": "INFO",
+      "message": "Campos validados com sucesso",
+      "data": "{\"errors\": [], \"validation_result\": \"success\"}",
+      "url": "https://www.segurosimediato.com.br"
+    },
+    {
+      "log_id": "log_68f6c2ac440de4.65046441",
+      "timestamp": "2025-10-20 20:15:56.000",
+      "level": "INFO",
+      "message": "Iniciando carregamento do Injection Script",
+      "data": "{\"injection_url\": \"https://mdmidia.com.br/webflow_injection_limpo.js\"}",
+      "url": "https://www.segurosimediato.com.br"
+    }
+  ],
+  "count": 12
+}
