@@ -34,6 +34,70 @@
 <!-- ====================== -->
 
 <!-- ====================== -->
+<!-- 🛠️ Footer Code Utils - Carregar funções utilitárias -->
+<script>
+(function() {
+  // Carregar Utils.js dinamicamente antes de tudo
+  const utilsScript = document.createElement('script');
+  utilsScript.src = 'https://dev.bpsegurosimediato.com.br/webhooks/FooterCodeSiteDefinitivoUtils.js?v=2&nocache=' + Date.now();
+  utilsScript.async = false; // Carregar de forma síncrona para garantir ordem
+  
+  console.log('🔄 [FOOTER] Tentando carregar Utils.js da URL:', utilsScript.src);
+  
+  // Função para verificar se todas as funções foram carregadas
+  function verificarFuncoesUtils() {
+    const requiredFunctions = [
+      'onlyDigits', 'toUpperNospace', 'setFieldValue', 'readCookie',
+      'generateSessionId', 'nativeSubmit', 'validarEmailLocal',
+      'validarCPFFormato', 'validarCPFAlgoritmo', 'validarPlacaFormato',
+      'validarCelularLocal', 'aplicarMascaraPlaca', 'sha1', 'hmacSHA256',
+      'extractDataFromPH3A', 'extractVehicleFromPlacaFipe',
+      'preencherEnderecoViaCEP'
+    ];
+    
+    const missing = requiredFunctions.filter(fn => typeof window[fn] !== 'function');
+    if (missing.length > 0) {
+      console.error('❌ [FOOTER] Funções faltando:', missing);
+      return false;
+    } else {
+      console.log('✅ [FOOTER] Todas as funções utilitárias disponíveis');
+      return true;
+    }
+  }
+  
+  utilsScript.onload = function() {
+    console.log('✅ [FOOTER] Utils.js carregado com sucesso');
+    verificarFuncoesUtils();
+    
+    // Disparar evento customizado para indicar que Utils está pronto
+    window.dispatchEvent(new CustomEvent('footerUtilsLoaded'));
+  };
+  
+  utilsScript.onerror = function(error) {
+    console.error('❌ [FOOTER] Erro ao carregar Utils.js');
+    console.error('❌ [FOOTER] Detalhes do erro:', error);
+    console.error('❌ [FOOTER] URL tentada:', utilsScript.src);
+    console.error('❌ [FOOTER] Script element:', utilsScript);
+    
+    // Tentar diagnosticar o problema
+    fetch(utilsScript.src, { method: 'HEAD' })
+      .then(response => {
+        console.log('✅ [FOOTER] HEAD request OK - Status:', response.status);
+        console.log('✅ [FOOTER] Content-Type:', response.headers.get('content-type'));
+      })
+      .catch(err => {
+        console.error('❌ [FOOTER] HEAD request falhou:', err);
+      });
+    
+    console.warn('⚠️ [FOOTER] Algumas funcionalidades podem não funcionar corretamente');
+  };
+  
+  document.head.appendChild(utilsScript);
+})();
+</script>
+<!-- ====================== -->
+
+<!-- ====================== -->
 <!-- 🎯 CONFIGURAÇÃO RPA GLOBAL -->
 <script>
   // Flag global para controle do RPA
@@ -104,17 +168,10 @@
     console.log(`[${level}] ${message}`, data);
   }
   
-  // Gerar ID único de sessão
-  function generateSessionId() {
-    if (!window.sessionId) {
-      window.sessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-    }
-    return window.sessionId;
-  }
-  
   // Expor funções globalmente
   window.logDebug = logDebug;
-  window.generateSessionId = generateSessionId;
+  
+  // generateSessionId agora está no Utils.js
   
   // FASE 0: Teste da funcionalidade de logging
   logDebug('INFO', '[CONFIG] RPA habilitado via PHP Log', {rpaEnabled: window.rpaEnabled});
@@ -158,15 +215,27 @@ window.loadRPAScript = loadRPAScript;
 <!-- ====================== -->
 <!-- WhatsApp links com GCLID -->
 <script>
-  function readCookie(name) {
-    var n = name + "=", cookie = document.cookie.split(';');
-    for (var i = 0; i < cookie.length; i++) {
-      var c = cookie[i].trim();
-      if (c.indexOf(n) === 0) return c.substring(n.length);
+  // readCookie agora está no Utils.js
+  // Aguardar Utils.js carregar antes de usar
+  var gclid = null;
+  
+  function initGCLID() {
+    if (typeof window.readCookie === 'function') {
+      gclid = window.readCookie('gclid');
+    } else {
+      // Fallback se Utils.js não carregou
+      console.warn('⚠️ [FOOTER] readCookie não disponível, tentando novamente...');
+      setTimeout(initGCLID, 100);
     }
-    return null;
   }
-  var gclid = readCookie('gclid');
+  
+  // Tentar inicializar imediatamente ou aguardar carregamento do Utils
+  if (typeof window.readCookie === 'function') {
+    gclid = window.readCookie('gclid');
+  } else {
+    window.addEventListener('footerUtilsLoaded', initGCLID);
+    setTimeout(initGCLID, 500); // Fallback após 500ms
+  }
 
   // Função para carregar modal dinamicamente
   function loadWhatsAppModal() {
@@ -177,7 +246,7 @@ window.loadRPAScript = loadRPAScript;
     
     console.log('🔄 [MODAL] Carregando modal de dev.bpsegurosimediato.com.br...');
     const script = document.createElement('script');
-    script.src = 'https://dev.bpsegurosimediato.com.br/webhooks/MODAL_WHATSAPP_DEFINITIVO.js?v=15';
+    script.src = 'https://dev.bpsegurosimediato.com.br/webhooks/MODAL_WHATSAPP_DEFINITIVO.js?v=23&force=' + Math.random();
     script.onload = function() {
       window.whatsappModalLoaded = true;
       console.log('✅ [MODAL] Modal carregado com sucesso');
@@ -314,34 +383,17 @@ const SAFETY_API_KEY = '20a7a1c297e39180bd80428ac13c363e882a531f';
 const VALIDAR_PH3A = false; // true = consulta API PH3A, false = apenas validação local
 
 /* ========= SAFETYMAILS CRYPTO ========= */
-async function sha1(text) {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(text);
-  const hashBuffer = await crypto.subtle.digest("SHA-1", data);
-  return [...new Uint8Array(hashBuffer)]
-    .map(byte => byte.toString(16).padStart(2, "0"))
-    .join("");
-}
-
-async function hmacSHA256(value, key) {
-  const encoder = new TextEncoder();
-  const keyData = encoder.encode(key);
-  const valueData = encoder.encode(value);
-
-  const cryptoKey = await crypto.subtle.importKey(
-    "raw", keyData, { name: "HMAC", hash: { name: "SHA-256" } }, false, ["sign"]
-  );
-  const signature = await crypto.subtle.sign("HMAC", cryptoKey, valueData);
-  return [...new Uint8Array(signature)]
-    .map(byte => byte.toString(16).padStart(2, "0"))
-    .join("");
-}
+// sha1 e hmacSHA256 agora estão no Utils.js
 
 async function validarEmailSafetyMails(email) {
   try {
-    const code = await sha1(SAFETY_TICKET);
+    if (typeof window.sha1 !== 'function' || typeof window.hmacSHA256 !== 'function') {
+      console.error('❌ [FOOTER] sha1 ou hmacSHA256 não disponíveis');
+      return null;
+    }
+    const code = await window.sha1(SAFETY_TICKET);
     const url = `https://${SAFETY_TICKET}.safetymails.com/api/${code}`;
-    const hmac = await hmacSHA256(email, SAFETY_API_KEY);
+    const hmac = await window.hmacSHA256(email, SAFETY_API_KEY);
 
     let form = new FormData();
     form.append('email', email);
@@ -387,98 +439,21 @@ function showLoading(txt){const o=document.getElementById('si-loading-overlay');
 function hideLoading(){const o=document.getElementById('si-loading-overlay');if(!o)return;__siLoadingCount=Math.max(0,__siLoadingCount-1);if(__siLoadingCount===0)o.style.display='none';}
 
 /* ========= HELPERS ========= */
-function onlyDigits(s){return (s||'').replace(/\D+/g,'');}
-function toUpperNospace(s){return (s||'').toUpperCase().trim();}
-function nativeSubmit($form){var f=$form.get(0);if(!f)return;(typeof f.requestSubmit==='function')?f.requestSubmit():f.submit();}
-function setFieldValue(id,val){var $f=$('#'+id+', [name="'+id+'"]');if($f.length){$f.val(val).trigger('input').trigger('change');}}
+// onlyDigits, toUpperNospace, nativeSubmit e setFieldValue agora estão no Utils.js
 
 /* ========= CPF + API PH3A ========= */
-function validarCPFFormato(cpf) {
-  const cpfLimpo = onlyDigits(cpf);
-  return cpfLimpo.length === 11 && !/^(\d)\1{10}$/.test(cpfLimpo);
-}
-
-function validarCPFAlgoritmo(cpf) {
-  cpf = onlyDigits(cpf);
-  if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
-  
-  let soma = 0, resto = 0;
-  for (let i = 1; i <= 9; i++) {
-    soma += parseInt(cpf[i-1], 10) * (11 - i);
-  }
-  resto = (soma * 10) % 11;
-  if (resto === 10 || resto === 11) resto = 0;
-  if (resto !== parseInt(cpf[9], 10)) return false;
-  
-  soma = 0;
-  for (let i = 1; i <= 10; i++) {
-    soma += parseInt(cpf[i-1], 10) * (12 - i);
-  }
-  resto = (soma * 10) % 11;
-  if (resto === 10 || resto === 11) resto = 0;
-  return resto === parseInt(cpf[10], 10);
-}
-
-function extractDataFromPH3A(apiJson) {
-  const data = apiJson && apiJson.data;
-  if (!data || typeof data !== 'object') {
-    return {
-      sexo: '',
-      dataNascimento: '',
-      estadoCivil: ''
-    };
-  }
-  
-  // Mapear sexo
-  let sexo = '';
-  if (data.sexo !== undefined) {
-    switch (data.sexo) {
-      case 1: sexo = 'Masculino'; break;
-      case 2: sexo = 'Feminino'; break;
-      default: sexo = ''; break;
-    }
-  }
-  
-  // Mapear estado civil
-  let estadoCivil = '';
-  if (data.estado_civil !== undefined) {
-    switch (data.estado_civil) {
-      case 0: estadoCivil = 'Solteiro'; break;
-      case 1: estadoCivil = 'Casado'; break;
-      case 2: estadoCivil = 'Divorciado'; break;
-      case 3: estadoCivil = 'Viúvo'; break;
-      default: estadoCivil = ''; break;
-    }
-  }
-  
-  // Formatar data de nascimento (de ISO para DD/MM/YYYY)
-  let dataNascimento = '';
-  if (data.data_nascimento) {
-    try {
-      const date = new Date(data.data_nascimento);
-      if (!isNaN(date.getTime())) {
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const year = date.getFullYear();
-        dataNascimento = `${day}/${month}/${year}`;
-      }
-    } catch (e) {
-      dataNascimento = data.data_nascimento;
-    }
-  }
-  
-  return {
-    sexo: sexo,
-    dataNascimento: dataNascimento,
-    estadoCivil: estadoCivil
-  };
-}
+// validarCPFFormato, validarCPFAlgoritmo e extractDataFromPH3A agora estão no Utils.js
 
 function validarCPFApi(cpf) {
-  const cpfLimpo = onlyDigits(cpf);
+  if (typeof window.onlyDigits !== 'function' || typeof window.validarCPFFormato !== 'function' || typeof window.validarCPFAlgoritmo !== 'function') {
+    console.error('❌ [FOOTER] Funções de CPF não disponíveis');
+    return Promise.resolve({ok: false, reason: 'erro_utils'});
+  }
+  
+  const cpfLimpo = window.onlyDigits(cpf);
   
   // Primeiro validar formato e algoritmo
-  if (!validarCPFFormato(cpfLimpo) || !validarCPFAlgoritmo(cpfLimpo)) {
+  if (!window.validarCPFFormato(cpfLimpo) || !window.validarCPFAlgoritmo(cpfLimpo)) {
     return Promise.resolve({
       ok: false, 
       reason: 'formato'
@@ -501,7 +476,7 @@ function validarCPFApi(cpf) {
     return {
       ok, 
       reason: ok ? 'ok' : 'nao_encontrado', 
-      parsed: ok ? extractDataFromPH3A(j) : {
+      parsed: ok && typeof window.extractDataFromPH3A === 'function' ? window.extractDataFromPH3A(j) : {
         sexo: '',
         dataNascimento: '',
         estadoCivil: ''
@@ -516,13 +491,17 @@ function validarCPFApi(cpf) {
 
 // Função de compatibilidade para código existente
 function validarCPF(cpf){
-  return validarCPFAlgoritmo(cpf);
+  return typeof window.validarCPFAlgoritmo === 'function' ? window.validarCPFAlgoritmo(cpf) : false;
 }
 
 /* ========= CEP (ViaCEP) ========= */
-function preencherEnderecoViaCEP(data){ setFieldValue('CIDADE', data.localidade||''); setFieldValue('ESTADO', data.uf||''); }
+// preencherEnderecoViaCEP agora está no Utils.js
 function validarCepViaCep(cep){
-  cep=onlyDigits(cep);
+  if (typeof window.onlyDigits !== 'function') {
+    console.error('❌ [FOOTER] onlyDigits não disponível');
+    return Promise.resolve({ok: false, reason: 'erro_utils'});
+  }
+  cep = window.onlyDigits(cep);
   if(cep.length!==8) return Promise.resolve({ok:false, reason:'formato'});
   return fetch('https://viacep.com.br/ws/'+cep+'/json/')
     .then(r=>r.json())
@@ -531,79 +510,15 @@ function validarCepViaCep(cep){
 }
 
 /* ========= PLACA ========= */
-
-// Função para converter para maiúsculas e remover espaços
-function toUpperNospace(str) {
-  return str.toUpperCase().replace(/\s/g, '');
-}
-
-// Função para extrair apenas dígitos
-function onlyDigits(str) {
-  return str.replace(/[^0-9]/g, '');
-}
-
-function validarPlacaFormato(p){
-  const placaLimpa = p.toUpperCase().replace(/[^A-Z0-9]/g,'');
-  const antigo=/^[A-Z]{3}[0-9]{4}$/;
-  const mercosul=/^[A-Z]{3}[0-9][A-Z][0-9]{2}$/;
-  return antigo.test(placaLimpa)||mercosul.test(placaLimpa);
-}
-function extractVehicleFromPlacaFipe(apiJson){
-  const r = apiJson && (apiJson.informacoes_veiculo || apiJson);
-  if(!r || typeof r !== 'object') return {marcaTxt:'', anoModelo:'', tipoVeiculo:''};
-  
-  // Extrair dados da API Placa Fipe
-  const fabricante = r.marca || '';
-  const modelo = r.modelo || '';
-  const anoMod = r.ano || r.ano_modelo || '';
-  
-  // Determinar tipo de veículo baseado no segmento
-  let tipoVeiculo = '';
-  if(r.segmento) {
-    const segmento = r.segmento.toLowerCase();
-    if(segmento.includes('moto')) {
-      tipoVeiculo = 'moto';
-    } else if(segmento.includes('auto')) {
-      tipoVeiculo = 'carro';
-    } else {
-      // Fallback baseado em marcas conhecidas
-      const modeloLower = modelo.toLowerCase();
-      const marcaLower = fabricante.toLowerCase();
-      
-      if(marcaLower.includes('honda') || marcaLower.includes('yamaha') || 
-         marcaLower.includes('suzuki') || marcaLower.includes('kawasaki') ||
-         modeloLower.includes('cg') || modeloLower.includes('cb') || 
-         modeloLower.includes('fazer') || modeloLower.includes('ninja')) {
-        tipoVeiculo = 'moto';
-      } else {
-        tipoVeiculo = 'carro';
-      }
-    }
-  } else {
-    // Fallback baseado em marcas conhecidas
-    const modeloLower = modelo.toLowerCase();
-    const marcaLower = fabricante.toLowerCase();
-    
-    if(marcaLower.includes('honda') || marcaLower.includes('yamaha') || 
-       marcaLower.includes('suzuki') || marcaLower.includes('kawasaki') ||
-       modeloLower.includes('cg') || modeloLower.includes('cb') || 
-       modeloLower.includes('fazer') || modeloLower.includes('ninja')) {
-      tipoVeiculo = 'moto';
-    } else {
-      tipoVeiculo = 'carro';
-    }
-  }
-  
-  return { 
-    marcaTxt: [fabricante, modelo].filter(Boolean).join(' / '), 
-    anoModelo: onlyDigits(String(anoMod)).slice(0,4),
-    tipoVeiculo: tipoVeiculo
-  };
-}
+// toUpperNospace, onlyDigits (duplicação removida), validarPlacaFormato e extractVehicleFromPlacaFipe agora estão no Utils.js
 
 function validarPlacaApi(placa){
+  if (typeof window.validarPlacaFormato !== 'function') {
+    console.error('❌ [FOOTER] validarPlacaFormato não disponível');
+    return Promise.resolve({ok: false, reason: 'erro_utils'});
+  }
   const raw = placa.toUpperCase().replace(/[^A-Z0-9]/g,'');
-  if(!validarPlacaFormato(raw)) return Promise.resolve({ok:false, reason:'formato'});
+  if(!window.validarPlacaFormato(raw)) return Promise.resolve({ok:false, reason:'formato'});
   
   // ✅ URL CORRETA: direto no mdmidia.com.br
   return fetch('https://mdmidia.com.br/placa-validate.php', {
@@ -619,9 +534,9 @@ function validarPlacaApi(placa){
     .then(j => {
       const ok = !!j && (j.codigo === 1 || j.success === true);
       return {
-        ok, 
-        reason: ok ? 'ok' : 'nao_encontrada', 
-        parsed: ok ? extractVehicleFromPlacaFipe(j) : {marcaTxt:'', anoModelo:'', tipoVeiculo:''}
+      ok, 
+      reason: ok ? 'ok' : 'nao_encontrada', 
+      parsed: ok && typeof window.extractVehicleFromPlacaFipe === 'function' ? window.extractVehicleFromPlacaFipe(j) : {marcaTxt:'', anoModelo:'', tipoVeiculo:''}
       };
     })
     .catch(_ => ({ok:false, reason:'erro_api'}));
@@ -635,13 +550,7 @@ function validarPlaca(placa) {
 
 /* ========= CELULAR ========= */
 /* Máscara jQuery Mask (sem limpar incompletos). Valida apenas no blur do CELULAR. */
-function validarCelularLocal(ddd,numero){
-  const d=onlyDigits(ddd), n=onlyDigits(numero);
-  if(d.length!==2) return {ok:false, reason:'ddd'};
-  if(n.length!==9) return {ok:false, reason:'len'};
-  if(n[0]!=='9')   return {ok:false, reason:'pattern'};
-  return {ok:true, national:d+n};
-}
+// validarCelularLocal agora está no Utils.js
 function validarCelularApi(nat){
   return fetch('https://apilayer.net/api/validate?access_key='+APILAYER_KEY+'&country_code=BR&number='+nat)
     .then(r=>r.json())
@@ -649,7 +558,11 @@ function validarCelularApi(nat){
     .catch(_=>({ok:true})); // falha externa não bloqueia
 }
 function validarTelefoneAsync($DDD,$CEL){
-  const local=validarCelularLocal($DDD.val(),$CEL.val());
+  if (typeof window.validarCelularLocal !== 'function') {
+    console.error('❌ [FOOTER] validarCelularLocal não disponível');
+    return Promise.resolve({ok: false, reason: 'erro_utils'});
+  }
+  const local = window.validarCelularLocal($DDD.val(),$CEL.val());
   if(!local.ok) return Promise.resolve({ok:false, reason:local.reason});
   if(!USE_PHONE_API) return Promise.resolve({ok:true});
   return validarCelularApi(local.national).then(api=>({ok:api.ok}));
@@ -657,14 +570,10 @@ function validarTelefoneAsync($DDD,$CEL){
 
 /* ========= E-MAIL ========= */
 /* Bloqueio: apenas regex. SafetyMails: aviso não bloqueante. */
-function validarEmailLocal(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i.test((v||'').trim()); }
+// validarEmailLocal agora está no Utils.js
 
 /* ========= MÁSCARAS ========= */
-function aplicarMascaraPlaca($i){
-  const t={'S':{pattern:/[A-Za-z]/},'0':{pattern:/\d/},'A':{pattern:/[A-Za-z0-9]/}};
-  $i.on('input',function(){this.value=this.value.toUpperCase();});
-  $i.mask('SSS-0A00',{translation:t, clearIfNotMatch:false});
-}
+// aplicarMascaraPlaca agora está no Utils.js
 
 /* ========= BOOT ========= */
 $(function () {
@@ -681,7 +590,9 @@ $(function () {
   // Máscaras
   if ($CPF.length)   $CPF.mask('000.000.000-00');
   if ($CEP.length)   $CEP.mask('00000-000');
-  if ($PLACA.length) aplicarMascaraPlaca($PLACA);
+  if ($PLACA.length && typeof window.aplicarMascaraPlaca === 'function') {
+    window.aplicarMascaraPlaca($PLACA);
+  }
   if ($DDD.length)   $DDD.off('.siPhone').mask('00', { clearIfNotMatch:false });
   if ($CEL.length)   $CEL.off('.siPhone').mask('00000-0000', { clearIfNotMatch:false });
 
@@ -714,7 +625,11 @@ $(function () {
     const cpfValue = $(this).val();
     
     // Validação local primeiro
-    if (!validarCPFAlgoritmo(cpfValue)) {
+    if (typeof window.validarCPFAlgoritmo !== 'function') {
+      console.error('❌ [FOOTER] validarCPFAlgoritmo não disponível');
+      return;
+    }
+    if (!window.validarCPFAlgoritmo(cpfValue)) {
       saWarnConfirmCancel({
         title: 'CPF inválido',
         html: 'Deseja corrigir?'
@@ -727,9 +642,11 @@ $(function () {
     // Se flag VALIDAR_PH3A estiver desabilitada, apenas validar formato
     if (!VALIDAR_PH3A) {
       // CPF válido, mas sem consulta à API - limpar campos para preenchimento manual
-      setFieldValue('SEXO', '');
-      setFieldValue('DATA-DE-NASCIMENTO', '');
-      setFieldValue('ESTADO-CIVIL', '');
+      if (typeof window.setFieldValue === 'function') {
+        window.setFieldValue('SEXO', '');
+        window.setFieldValue('DATA-DE-NASCIMENTO', '');
+        window.setFieldValue('ESTADO-CIVIL', '');
+      }
       return;
     }
     
@@ -738,11 +655,11 @@ $(function () {
     validarCPFApi(cpfValue).then(res => {
       hideLoading();
       
-      if (res.ok && res.parsed) {
+      if (res.ok && res.parsed && typeof window.setFieldValue === 'function') {
         // Preencher campos automaticamente
-        if (res.parsed.sexo) setFieldValue('SEXO', res.parsed.sexo);
-        if (res.parsed.dataNascimento) setFieldValue('DATA-DE-NASCIMENTO', res.parsed.dataNascimento);
-        if (res.parsed.estadoCivil) setFieldValue('ESTADO-CIVIL', res.parsed.estadoCivil);
+        if (res.parsed.sexo) window.setFieldValue('SEXO', res.parsed.sexo);
+        if (res.parsed.dataNascimento) window.setFieldValue('DATA-DE-NASCIMENTO', res.parsed.dataNascimento);
+        if (res.parsed.estadoCivil) window.setFieldValue('ESTADO-CIVIL', res.parsed.estadoCivil);
       } else if (res.reason === 'nao_encontrado') {
         // CPF válido mas não encontrado na base
         saInfoConfirmCancel({
@@ -751,9 +668,11 @@ $(function () {
         }).then(r => {
           if (r.isConfirmed) {
             // Limpar campos e permitir preenchimento manual
-            setFieldValue('SEXO', '');
-            setFieldValue('DATA-DE-NASCIMENTO', '');
-            setFieldValue('ESTADO-CIVIL', '');
+            if (typeof window.setFieldValue === 'function') {
+              window.setFieldValue('SEXO', '');
+              window.setFieldValue('DATA-DE-NASCIMENTO', '');
+              window.setFieldValue('ESTADO-CIVIL', '');
+            }
           }
         });
       }
@@ -775,8 +694,8 @@ $(function () {
           title: 'CEP inválido',
           html: 'Deseja corrigir?'
         }).then(r=>{ if (r.isConfirmed) $CEP.focus(); });
-      } else if (res.viacep){
-        preencherEnderecoViaCEP(res.viacep);
+      } else if (res.viacep && typeof window.preencherEnderecoViaCEP === 'function'){
+        window.preencherEnderecoViaCEP(res.viacep);
       }
     }).catch(_=>hideLoading());
   });
@@ -791,11 +710,17 @@ $(function () {
           title: 'Placa inválida',
           html: 'Deseja corrigir?'
         }).then(r=>{ if (r.isConfirmed) $PLACA.focus(); });
-        setFieldValue('MARCA',''); setFieldValue('ANO',''); setFieldValue('TIPO-DE-VEICULO','');
+        if (typeof window.setFieldValue === 'function') {
+          window.setFieldValue('MARCA',''); 
+          window.setFieldValue('ANO',''); 
+          window.setFieldValue('TIPO-DE-VEICULO','');
+        }
       } else {
-        if (res.parsed?.marcaTxt) setFieldValue('MARCA', res.parsed.marcaTxt);
-        if (res.parsed?.anoModelo) setFieldValue('ANO',   res.parsed.anoModelo);
-        if (res.parsed?.tipoVeiculo) setFieldValue('TIPO-DE-VEICULO', res.parsed.tipoVeiculo);
+        if (typeof window.setFieldValue === 'function' && res.parsed) {
+          if (res.parsed.marcaTxt) window.setFieldValue('MARCA', res.parsed.marcaTxt);
+          if (res.parsed.anoModelo) window.setFieldValue('ANO', res.parsed.anoModelo);
+          if (res.parsed.tipoVeiculo) window.setFieldValue('TIPO-DE-VEICULO', res.parsed.tipoVeiculo);
+        }
       }
     }).catch(_=>hideLoading());
   });
@@ -805,7 +730,11 @@ $(function () {
   
   // DDD → valida no BLUR do DDD
   $DDD.on('blur.siPhone', function(){
-    const dddDigits = onlyDigits($DDD.val()).length;
+    if (typeof window.onlyDigits !== 'function') {
+      console.error('❌ [FOOTER] onlyDigits não disponível');
+      return;
+    }
+    const dddDigits = window.onlyDigits($DDD.val()).length;
     
     // Se DDD incompleto (não tem 2 dígitos)
     if (dddDigits > 0 && dddDigits < 2) {
@@ -827,8 +756,12 @@ $(function () {
   });
   
   $CEL.on('blur.siPhone', function(){
-    const dddDigits = onlyDigits($DDD.val()).length;
-    const celDigits = onlyDigits($CEL.val()).length;
+    if (typeof window.onlyDigits !== 'function') {
+      console.error('❌ [FOOTER] onlyDigits não disponível');
+      return;
+    }
+    const dddDigits = window.onlyDigits($DDD.val()).length;
+    const celDigits = window.onlyDigits($CEL.val()).length;
 
     // Validação DDD: deve ter exatamente 2 dígitos
     if (dddDigits !== 2) {
@@ -869,7 +802,11 @@ $(function () {
   $EMAIL.on('change.siMail', function(){
     const v = ($(this).val()||'').trim();
     if (!v) return;
-    if (!validarEmailLocal(v)){
+    if (typeof window.validarEmailLocal !== 'function') {
+      console.error('❌ [FOOTER] validarEmailLocal não disponível');
+      return;
+    }
+    if (!window.validarEmailLocal(v)){
       saWarnConfirmCancel({
         title: 'E-mail inválido',
         html: `O e-mail informado:<br><br><b>${v}</b><br><br>não parece válido.<br><br>Deseja corrigir?`,
@@ -879,16 +816,18 @@ $(function () {
       return;
     }
     // Aviso opcional via SafetyMails (não bloqueia)
-    validarEmailSafetyMails(v).then(resp=>{
-      if (resp && resp.StatusEmail && resp.StatusEmail !== 'VALIDO'){
-        saWarnConfirmCancel({
-          title: 'Atenção',
-          html: `O e-mail informado:<br><br><b>${v}</b><br><br>pode não ser válido segundo verificador externo.<br><br>Deseja corrigir?`,
-          cancelButtonText: 'Manter',
-          confirmButtonText: 'Corrigir'
-        }).then(r=>{ if (r.isConfirmed) $EMAIL.focus(); });
-      }
-    }).catch(()=>{ /* silêncio em erro externo */ });
+    if (typeof validarEmailSafetyMails === 'function') {
+      validarEmailSafetyMails(v).then(resp=>{
+        if (resp && resp.StatusEmail && resp.StatusEmail !== 'VALIDO'){
+          saWarnConfirmCancel({
+            title: 'Atenção',
+            html: `O e-mail informado:<br><br><b>${v}</b><br><br>pode não ser válido segundo verificador externo.<br><br>Deseja corrigir?`,
+            cancelButtonText: 'Manter',
+            confirmButtonText: 'Corrigir'
+          }).then(r=>{ if (r.isConfirmed) $EMAIL.focus(); });
+        }
+      }).catch(()=>{ /* silêncio em erro externo */ });
+    }
   });
 
 
@@ -920,37 +859,37 @@ $(function () {
       showLoading('Validando seus dados…');
 
       Promise.all([
-        $CPF.length ? (VALIDAR_PH3A ? validarCPFApi($CPF.val()) : Promise.resolve({ok: validarCPFAlgoritmo($CPF.val())})) : Promise.resolve({ok: true}),
+        $CPF.length ? (VALIDAR_PH3A ? validarCPFApi($CPF.val()) : Promise.resolve({ok: typeof window.validarCPFAlgoritmo === 'function' ? window.validarCPFAlgoritmo($CPF.val()) : false})) : Promise.resolve({ok: true}),
         $CEP.length   ? validarCepViaCep($CEP.val())  : Promise.resolve({ok:true}),
         $PLACA.length ? validarPlacaApi($PLACA.val()) : Promise.resolve({ok:true}),
         // TELEFONE no submit — considera incompleto como inválido
-        ($DDD.length && $CEL.length)
+        ($DDD.length && $CEL.length && typeof window.onlyDigits === 'function')
           ? (function(){
-              const d = onlyDigits($DDD.val()).length;
-              const n = onlyDigits($CEL.val()).length;
+              const d = window.onlyDigits($DDD.val()).length;
+              const n = window.onlyDigits($CEL.val()).length;
               if (d === 2 && n === 9) return validarTelefoneAsync($DDD,$CEL);    // completo → valida API
               if (d === 2 && n > 0 && n < 9) return Promise.resolve({ok:false});  // incompleto → inválido
               return Promise.resolve({ok:false}); // ddd incompleto ou vazio → inválido
             })()
-          : Promise.resolve({ok:true}),
+          : Promise.resolve({ok:false}),
         // E-mail: regex (bloqueante)
-        $EMAIL.length ? Promise.resolve({ok: validarEmailLocal(($EMAIL.val()||'').trim())}) : Promise.resolve({ok:true})
+        $EMAIL.length ? Promise.resolve({ok: typeof window.validarEmailLocal === 'function' ? window.validarEmailLocal(($EMAIL.val()||'').trim()) : false}) : Promise.resolve({ok:true})
       ])
       .then(([cpfRes, cepRes, placaRes, telRes, mailRes])=>{
         hideLoading();
 
         // autopreenche MARCA/ANO/TIPO de novo se validou placa
-        if (placaRes.ok && placaRes.parsed){
-          if (placaRes.parsed.marcaTxt) setFieldValue('MARCA', placaRes.parsed.marcaTxt);
-          if (placaRes.parsed.anoModelo) setFieldValue('ANO',   placaRes.parsed.anoModelo);
-          if (placaRes.parsed.tipoVeiculo) setFieldValue('TIPO-DE-VEICULO', placaRes.parsed.tipoVeiculo);
+        if (placaRes.ok && placaRes.parsed && typeof window.setFieldValue === 'function'){
+          if (placaRes.parsed.marcaTxt) window.setFieldValue('MARCA', placaRes.parsed.marcaTxt);
+          if (placaRes.parsed.anoModelo) window.setFieldValue('ANO', placaRes.parsed.anoModelo);
+          if (placaRes.parsed.tipoVeiculo) window.setFieldValue('TIPO-DE-VEICULO', placaRes.parsed.tipoVeiculo);
         }
 
         // autopreenche SEXO/DATA/ESTADO-CIVIL se validou CPF com API
-        if (cpfRes.ok && cpfRes.parsed && VALIDAR_PH3A) {
-          if (cpfRes.parsed.sexo) setFieldValue('SEXO', cpfRes.parsed.sexo);
-          if (cpfRes.parsed.dataNascimento) setFieldValue('DATA-DE-NASCIMENTO', cpfRes.parsed.dataNascimento);
-          if (cpfRes.parsed.estadoCivil) setFieldValue('ESTADO-CIVIL', cpfRes.parsed.estadoCivil);
+        if (cpfRes.ok && cpfRes.parsed && VALIDAR_PH3A && typeof window.setFieldValue === 'function') {
+          if (cpfRes.parsed.sexo) window.setFieldValue('SEXO', cpfRes.parsed.sexo);
+          if (cpfRes.parsed.dataNascimento) window.setFieldValue('DATA-DE-NASCIMENTO', cpfRes.parsed.dataNascimento);
+          if (cpfRes.parsed.estadoCivil) window.setFieldValue('ESTADO-CIVIL', cpfRes.parsed.estadoCivil);
         }
 
         const invalido = (!cpfRes.ok) || (!cepRes.ok) || (!placaRes.ok) || (!telRes.ok) || (!mailRes.ok);
@@ -980,7 +919,11 @@ $(function () {
                 } else {
                   console.warn('🎯 [RPA] Função handleFormSubmit não encontrada - usando fallback');
                   $form.data('validated-ok', true);
-                  nativeSubmit($form);
+                  if (typeof window.nativeSubmit === 'function') {
+                    window.nativeSubmit($form);
+                  } else {
+                    $form[0].submit();
+                  }
                 }
               })
               .catch((error) => {
@@ -992,7 +935,11 @@ $(function () {
           } else {
             console.log('🎯 [RPA] RPA desabilitado - processando apenas com Webflow');
             $form.data('validated-ok', true);
-            nativeSubmit($form);
+            if (typeof window.nativeSubmit === 'function') {
+              window.nativeSubmit($form);
+            } else {
+              $form[0].submit();
+            }
           }
         } else {
           console.log('❌ [DEBUG] Dados inválidos - mostrando SweetAlert');
@@ -1041,7 +988,11 @@ $(function () {
                     } else {
                       console.warn('🎯 [RPA] Função handleFormSubmit não encontrada - usando fallback');
                       $form.data('skip-validate', true);
-                      nativeSubmit($form);
+                      if (typeof window.nativeSubmit === 'function') {
+                        window.nativeSubmit($form);
+                      } else {
+                        $form[0].submit();
+                      }
                     }
                   })
                   .catch((error) => {
@@ -1053,7 +1004,11 @@ $(function () {
               } else {
                 console.log('🎯 [RPA] RPA desabilitado - processando apenas com Webflow');
                 $form.data('skip-validate', true);
-                nativeSubmit($form);
+                if (typeof window.nativeSubmit === 'function') {
+                  window.nativeSubmit($form);
+                } else {
+                  $form[0].submit();
+                }
               }
             } else {
               if (!cpfRes.ok && $CPF.length)        { $CPF.focus(); return; }
