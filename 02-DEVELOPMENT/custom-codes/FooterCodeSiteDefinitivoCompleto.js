@@ -1,9 +1,9 @@
 /**
  * PROJETO: UNIFICAÇÃO DE ARQUIVOS FOOTER CODE
  * INÍCIO: 30/10/2025 19:55
- * ÚLTIMA ALTERAÇÃO: 31/10/2025 13:23
+ * ÚLTIMA ALTERAÇÃO: 01/11/2025 10:12
  * 
- * VERSÃO: 1.2 - Unificação do Inside Head Tag Pagina.js
+ * VERSÃO: 1.3 - Correção da captura de GCLID
  * 
  * Arquivo unificado contendo:
  * - FooterCodeSiteDefinitivoUtils.js (Parte 1)
@@ -11,6 +11,15 @@
  * - Inside Head Tag Pagina.js (Parte 3 - GCLID integrado)
  * 
  * ALTERAÇÕES NESTA VERSÃO:
+ * - Adicionados logs de debug detalhados na captura imediata de GCLID
+ * - Implementado fallback no DOMContentLoaded para re-tentar captura se cookie não existir
+ * - Adicionado tratamento de erros com try-catch na captura imediata
+ * - Adicionado log de verificação do cookie após salvamento
+ * - Melhorados logs no preenchimento de campos GCLID_FLD (mostra quantidade encontrada e índice)
+ * - Logs adicionais para diagnóstico: URL, window.location.search, valores capturados, gclsrc
+ * - Garantido que código execute corretamente mesmo se captura imediata falhar
+ * 
+ * ALTERAÇÕES VERSÃO 1.2:
  * - Integração completa do código GCLID do Inside Head Tag Pagina.js
  * - Captura imediata de GCLID/GBRAID da URL e salvamento em cookie
  * - Preenchimento automático de campos GCLID_FLD
@@ -724,16 +733,35 @@
     }
     
     // Captura imediata de GCLID/GBRAID da URL (executa ANTES do DOM)
+    console.log('🔍 [GCLID] Iniciando captura - URL:', window.location.href);
+    console.log('🔍 [GCLID] window.location.search:', window.location.search);
+    
     var gclid = getParam("gclid") || getParam("GCLID") || getParam("gclId");
     var gbraid = getParam("gbraid") || getParam("GBRAID") || getParam("gBraid");
     var trackingId = gclid || gbraid;
     
+    console.log('🔍 [GCLID] Valores capturados:', { gclid: gclid, gbraid: gbraid, trackingId: trackingId });
+    
     if (trackingId) {
       var gclsrc = getParam("gclsrc");
+      console.log('🔍 [GCLID] gclsrc:', gclsrc);
+      
       if (!gclsrc || gclsrc.indexOf("aw") !== -1) {
-        setCookie("gclid", trackingId, 90);
-        console.log('✅ [GCLID] Capturado da URL e salvo em cookie:', trackingId);
+        try {
+          setCookie("gclid", trackingId, 90);
+          console.log('✅ [GCLID] Capturado da URL e salvo em cookie:', trackingId);
+          
+          // Verificar se cookie foi salvo corretamente
+          var cookieVerificado = readCookie("gclid");
+          console.log('🔍 [GCLID] Cookie verificado após salvamento:', cookieVerificado);
+        } catch (error) {
+          console.error('❌ [GCLID] Erro ao salvar cookie:', error);
+        }
+      } else {
+        console.warn('⚠️ [GCLID] gclsrc bloqueou salvamento:', gclsrc);
       }
+    } else {
+      console.warn('⚠️ [GCLID] Nenhum trackingId encontrado na URL');
     }
     
     // Função de verificação defensiva de dependências (Recomendação do Engenheiro)
@@ -781,13 +809,45 @@
       
       // 2.1. Gerenciamento GCLID (DOMContentLoaded)
       document.addEventListener("DOMContentLoaded", function () {
+        // Tentar capturar novamente se não foi capturado antes (FALLBACK)
+        var cookieExistente = window.readCookie ? window.readCookie("gclid") : null;
+        
+        if (!cookieExistente) {
+          console.log('🔍 [GCLID] Cookie não encontrado, tentando captura novamente no DOMContentLoaded...');
+          var gclid = getParam("gclid") || getParam("GCLID") || getParam("gclId");
+          var gbraid = getParam("gbraid") || getParam("GBRAID") || getParam("gBraid");
+          var trackingId = gclid || gbraid;
+          
+          if (trackingId) {
+            var gclsrc = getParam("gclsrc");
+            if (!gclsrc || gclsrc.indexOf("aw") !== -1) {
+              try {
+                setCookie("gclid", trackingId, 90);
+                console.log('✅ [GCLID] Capturado no DOMContentLoaded e salvo em cookie:', trackingId);
+                cookieExistente = trackingId;
+              } catch (error) {
+                console.error('❌ [GCLID] Erro ao salvar cookie no DOMContentLoaded:', error);
+              }
+            }
+          } else {
+            console.warn('⚠️ [GCLID] Nenhum trackingId encontrado na URL no DOMContentLoaded');
+          }
+        } else {
+          console.log('✅ [GCLID] Cookie já existe:', cookieExistente);
+        }
+        
         // Preencher campos com nome GCLID_FLD
         const gclidFields = document.getElementsByName("GCLID_FLD");
+        console.log('🔍 [GCLID] Campos GCLID_FLD encontrados:', gclidFields.length);
+        
         for (var i = 0; i < gclidFields.length; i++) {
-          var cookieValue = window.readCookie ? window.readCookie("gclid") : null;
+          var cookieValue = window.readCookie ? window.readCookie("gclid") : cookieExistente;
+          
           if (cookieValue) {
             gclidFields[i].value = cookieValue;
-            console.log('✅ [GCLID] Campo GCLID_FLD preenchido:', cookieValue);
+            console.log('✅ [GCLID] Campo GCLID_FLD[' + i + '] preenchido:', cookieValue);
+          } else {
+            console.warn('⚠️ [GCLID] Campo GCLID_FLD[' + i + '] não preenchido - cookie não encontrado');
           }
         }
         

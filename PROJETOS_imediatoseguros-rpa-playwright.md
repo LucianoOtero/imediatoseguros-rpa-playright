@@ -1,11 +1,54 @@
 # 📊 CONTROLE DE PROJETOS - imediatoseguros-rpa-playwright
 
 **Criado em:** 30/10/2025 12:05  
-**Última atualização:** 31/10/2025 13:23
+**Última atualização:** 01/11/2025 09:30
 
 ---
 
 ## 📋 PROJETOS ATIVOS/ARQUIVADOS
+
+### 8. **PROJETO: CORREÇÃO DA CAPTURA DE GCLID NO ARQUIVO UNIFICADO**
+
+**Status:** 🟡 **PLANEJADO - AGUARDANDO REVISÃO TÉCNICA**  
+**Data de Criação:** 01/11/2025 09:30  
+**Data de Conclusão:** [AGUARDANDO REVISÃO E APROVAÇÃO]  
+**Arquivo:** `02-DEVELOPMENT/PROJETO_CORRECAO_CAPTURA_GCLID.md`
+
+**Descrição:** Corrigir o problema de captura de GCLID identificado no arquivo unificado `FooterCodeSiteDefinitivoCompleto.js`, garantindo que o código de captura imediata de GCLID/GBRAID da URL funcione corretamente e preencha os campos `GCLID_FLD` do formulário.
+
+**Objetivos:**
+- Adicionar logs de debug detalhados para diagnóstico
+- Implementar fallback no DOMContentLoaded para garantir captura
+- Garantir que código execute no momento correto
+- Manter 100% de compatibilidade com código original (Head Tag)
+- Corrigir problema de campos `GCLID_FLD` chegando vazios no webhook
+
+**Problema Identificado:**
+- GCLID não está sendo capturado da URL quando o script carrega
+- Campos `GCLID_FLD` chegam vazios (`""`) no webhook
+- Logs de captura não aparecem no console
+- Comportamento diferente do código original que funciona em produção
+
+**Arquivos a Modificar:**
+- `02-DEVELOPMENT/custom-codes/FooterCodeSiteDefinitivoCompleto.js` (local e servidor DEV)
+
+**Arquivos de Referência:**
+- `02-DEVELOPMENT/custom-codes/Inside Head Tag Pagina.js` (código original funcionando)
+
+**Tempo Estimado:** ~2 horas  
+**Complexidade:** Média  
+**Impacto:** Alto (GCLID é crítico para rastreamento de conversões Google Ads)
+
+**Revisão Técnica:**
+- [ ] **Aguardando revisão do engenheiro**
+- **Status:** Aguardando aprovação
+- **Engenheiro:** [A DEFINIR]
+
+**⚠️ PRÉ-REQUISITO:**
+- Problema identificado após implementação do Projeto 7
+- Necessário corrigir antes de prosseguir com testes extensivos
+
+---
 
 ### 7. **PROJETO: UNIFICAÇÃO DO INSIDE HEAD TAG PAGINA COM FOOTER CODE**
 
@@ -286,10 +329,10 @@
 
 ## 📈 ESTATÍSTICAS
 
-- **Total de Projetos:** 6
+- **Total de Projetos:** 8
 - **Concluídos:** 3
 - **Em Andamento:** 1
-- **Planejados:** 2
+- **Planejados:** 4
 - **Taxa de Sucesso:** 100%
 
 ---
@@ -318,5 +361,5 @@
 
 ---
 
-**Última atualização:** 30/10/2025 23:35  
+**Última atualização:** 01/11/2025 09:30  
 **Próxima revisão:** Conforme novos projetos
