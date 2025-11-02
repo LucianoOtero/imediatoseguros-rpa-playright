@@ -1,11 +1,99 @@
 # 📊 CONTROLE DE PROJETOS - imediatoseguros-rpa-playwright
 
 **Criado em:** 30/10/2025 12:05  
-**Última atualização:** 01/11/2025 09:30
+**Última atualização:** 02/11/2025 17:15
 
 ---
 
 ## 📋 PROJETOS ATIVOS/ARQUIVADOS
+
+### 10. **PROJETO: VALIDAÇÃO CONDICIONAL DE ASSINATURA WEBFLOW (ENDPOINTS V2)**
+
+**Status:** ✅ **IMPLEMENTADO**  
+**Data de Criação:** 02/11/2025 17:15  
+**Data de Implementação:** 02/11/2025 14:25  
+**Data de Conclusão:** 02/11/2025 14:25  
+**Arquivo:** `02-DEVELOPMENT/PROJETO_VALIDACAO_CONDICIONAL_ASSINATURA_V2.md`
+
+**Descrição:** Modificar os endpoints `add_flyingdonkeys_v2.php` e `add_webflow_octa_v2.php` para validar assinatura do Webflow apenas quando ela estiver presente, permitindo que requisições do modal WhatsApp (navegador) sejam aceitas sem validação, enquanto requisições do Webflow continuam sendo validadas rigorosamente.
+
+**Objetivos:**
+- Implementar validação condicional de assinatura
+- Aceitar requisições do navegador (modal) sem assinatura
+- Manter validação rigorosa para requisições do Webflow
+- Adicionar logging detalhado de origem da requisição
+- Resolver erro de "Assinatura inválida" no modal
+
+**Problema Atual:**
+- Endpoints `_v2` sempre exigem assinatura válida
+- Requisições do modal WhatsApp são rejeitadas
+- Erro: "Assinatura inválida" bloqueia funcionalidade do modal
+- CORS já corrigido, mas validação ainda bloqueia
+
+**Arquivos a Modificar:**
+- `02-DEVELOPMENT/custom-codes/add_flyingdonkeys_v2.php` (local e servidor produção)
+- `02-DEVELOPMENT/custom-codes/add_webflow_octa_v2.php` (local e servidor produção)
+
+**Tempo Estimado:** ~45 minutos  
+**Complexidade:** Baixa  
+**Impacto:** Médio (resolve bloqueio do modal, mantém segurança do Webflow)
+
+**Revisão Técnica:**
+- [ ] **Aguardando revisão do engenheiro**
+- **Status:** Aguardando aprovação
+- **Engenheiro:** [A DEFINIR]
+
+**⚠️ CONSIDERAÇÕES:**
+- Solução simples e adequada ao contexto da empresa pequena
+- Mantém segurança para requisições do Webflow
+- CORS já configurado corretamente
+- Logging completo para auditoria
+
+---
+
+### 9. **PROJETO: SELEÇÃO DINÂMICA DE TEMPLATE OCTADESK**
+
+**Status:** 🟡 **PLANEJADO - AGUARDANDO REVISÃO TÉCNICA**  
+**Data de Criação:** 02/11/2025 14:45  
+**Data de Conclusão:** [AGUARDANDO REVISÃO E APROVAÇÃO]  
+**Arquivo:** `02-DEVELOPMENT/PROJETO_SELECAO_DINAMICA_TEMPLATE_OCTADESK.md`
+
+**Descrição:** Implementar seleção dinâmica do template de mensagem WhatsApp que será enviado ao cliente através da API do OctaDesk, permitindo escolher diferentes templates baseado em regras de negócio, dados do formulário ou campanhas de marketing.
+
+**Objetivos:**
+- Substituir template hardcoded (`site_cotacao`) por seleção dinâmica
+- Implementar regras de negócio para escolha de template (produto, campanha, etc.)
+- Adicionar validação de segurança (lista de templates permitidos)
+- Criar mapeamento de componentes por template
+- Adicionar logging de qual template foi usado
+
+**Problema Atual:**
+- Template fixo no código (`site_cotacao` hardcoded)
+- Todos os clientes recebem a mesma mensagem
+- Impossível personalizar por produto/campanha
+- Não permite A/B testing de mensagens
+
+**Arquivos a Modificar:**
+- `02-DEVELOPMENT/custom-codes/add_webflow_octa_v2.php` (local e servidor produção)
+
+**Arquivos de Referência:**
+- `02-DEVELOPMENT/ANALISE_OCTADESK_TEMPLATE_SELECAO.md` (análise técnica realizada)
+
+**Tempo Estimado:** ~2h15min  
+**Complexidade:** Média  
+**Impacto:** Médio (permite personalização e marketing segmentado)
+
+**Revisão Técnica:**
+- [ ] **Aguardando revisão do engenheiro**
+- **Status:** Aguardando aprovação
+- **Engenheiro:** [A DEFINIR]
+
+**⚠️ PRÉ-REQUISITOS:**
+- Templates devem estar criados e aprovados no WhatsApp Business antes de usar
+- Mapear estrutura de componentes de cada template
+- Testar cada template antes de produção
+
+---
 
 ### 8. **PROJETO: CORREÇÃO DA CAPTURA DE GCLID NO ARQUIVO UNIFICADO**
 
@@ -329,10 +417,10 @@
 
 ## 📈 ESTATÍSTICAS
 
-- **Total de Projetos:** 8
+- **Total de Projetos:** 9
 - **Concluídos:** 3
 - **Em Andamento:** 1
-- **Planejados:** 4
+- **Planejados:** 5
 - **Taxa de Sucesso:** 100%
 
 ---

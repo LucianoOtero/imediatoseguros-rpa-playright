@@ -20,6 +20,7 @@ $(function() {
       ddd: '#DDD-CELULAR-MODAL',
       celular: '#CELULAR-MODAL',
       cpf: '#CPF-MODAL',
+      email: '#EMAIL-MODAL',
       nome: '#NOME-MODAL',
       cep: '#CEP-MODAL',
       placa: '#PLACA-MODAL',
@@ -32,6 +33,24 @@ $(function() {
   };
   
   const timers = {};
+  
+  // Flag para controlar registro inicial (evitar múltiplos registros)
+  let initialRegistrationAttempted = false;
+  
+  // ==================== VARIÁVEIS GOOGLE TAG MANAGER (Configuráveis) ====================
+  
+  // CONFIGURAÇÃO GTM - VARIÁVEIS (preencher depois no GTM ou no código)
+  window.GTM_EVENT_NAME_INITIAL = window.GTM_EVENT_NAME_INITIAL || 'whatsapp_modal_initial_contact'; // Nome do evento GTM
+  window.GTM_FORM_TYPE = window.GTM_FORM_TYPE || 'whatsapp_modal';                                   // Tipo de formulário
+  window.GTM_CONTACT_STAGE = window.GTM_CONTACT_STAGE || 'initial';                                  // Estágio do contato
+  window.GTM_UTM_SOURCE = window.GTM_UTM_SOURCE || null;                                            // UTM Source (auto-preenchido se null)
+  window.GTM_UTM_CAMPAIGN = window.GTM_UTM_CAMPAIGN || null;                                         // UTM Campaign (auto-preenchido se null)
+  window.GTM_UTM_MEDIUM = window.GTM_UTM_MEDIUM || null;                                            // UTM Medium (auto-preenchido se null)
+  window.GTM_UTM_TERM = window.GTM_UTM_TERM || null;                                                // UTM Term (auto-preenchido se null)
+  window.GTM_UTM_CONTENT = window.GTM_UTM_CONTENT || null;                                          // UTM Content (auto-preenchido se null)
+  window.GTM_PAGE_URL = window.GTM_PAGE_URL || null;                                                // URL da página (auto-preenchido se null)
+  window.GTM_PAGE_TITLE = window.GTM_PAGE_TITLE || null;                                            // Título da página (auto-preenchido se null)
+  window.GTM_USER_AGENT = window.GTM_USER_AGENT || null;                                            // User Agent (auto-preenchido se null)
   
   // ==================== UTILITÁRIOS ====================
   
@@ -58,6 +77,419 @@ $(function() {
     return '';
   }
   
+  // ==================== DETECÇÃO DE AMBIENTE ====================
+  
+  /**
+   * Detectar se estamos em ambiente de desenvolvimento
+   * @returns {boolean}
+   */
+  function isDevelopmentEnvironment() {
+    const hostname = window.location.hostname;
+    const href = window.location.href;
+    
+    // SOLUÇÃO DEFINITIVA: HARDCODE para webflow.io (SEMPRE desenvolvimento)
+    if (hostname.indexOf('webflow.io') !== -1) {
+      console.log('✅ [ENV] Hardcode DEV: webflow.io detectado');
+      return true;
+    }
+    
+    // Verificações padrão para outros ambientes
+    if (hostname.includes('dev.') || 
+        hostname.includes('localhost') ||
+        hostname.includes('127.0.0.1')) {
+      console.log('✅ [ENV] DEV via hostname padrão');
+      return true;
+    }
+    
+    if (href.includes('/dev/')) {
+      console.log('✅ [ENV] DEV via URL path');
+      return true;
+    }
+    
+    // Parâmetro GET para forçar dev
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('env') === 'dev' || urlParams.get('dev') === '1') {
+      console.log('✅ [ENV] DEV via parâmetro GET');
+      return true;
+    }
+    
+    // Variável global
+    if (typeof window.ENVIRONMENT !== 'undefined' && window.ENVIRONMENT === 'development') {
+      console.log('✅ [ENV] DEV via variável global');
+      return true;
+    }
+    
+    console.log('❌ [ENV] PRODUÇÃO detectado');
+    return false;
+  }
+  
+  /**
+   * Obter URL do endpoint baseado no ambiente
+   * @param {string} endpoint - 'travelangels' ou 'octadesk'
+   * @returns {string} URL do endpoint
+   */
+  function getEndpointUrl(endpoint) {
+    const hostname = window.location.hostname;
+    
+    // SOLUÇÃO DEFINITIVA: FORÇAR _dev para webflow.io SEMPRE
+    if (hostname.indexOf('webflow.io') !== -1) {
+      console.log('✅ [ENDPOINT] FORÇANDO DEV para webflow.io');
+      const devEndpoints = {
+        travelangels: 'https://bpsegurosimediato.com.br/dev/webhooks/add_travelangels_dev.php',
+        octadesk: 'https://bpsegurosimediato.com.br/dev/webhooks/add_webflow_octa_dev.php'
+      };
+      const url = devEndpoints[endpoint];
+      console.log('🌍 [ENDPOINT] URL FORÇADA (webflow.io):', url);
+      return url;
+    }
+    
+    // Para outros ambientes, usar detecção normal
+    const isDev = isDevelopmentEnvironment();
+    
+    const endpoints = {
+      travelangels: {
+        dev: 'https://bpsegurosimediato.com.br/dev/webhooks/add_travelangels_dev.php',
+        prod: 'https://bpsegurosimediato.com.br/webhooks/add_flyingdonkeys_v2.php' // ✅ V2: Endpoint paralelo
+      },
+      octadesk: {
+        dev: 'https://bpsegurosimediato.com.br/dev/webhooks/add_webflow_octa_dev.php',
+        prod: 'https://bpsegurosimediato.com.br/webhooks/add_webflow_octa_v2.php' // ✅ V2: Endpoint paralelo
+      }
+    };
+    
+    const env = isDev ? 'dev' : 'prod';
+    let url = endpoints[endpoint][env];
+    
+    // LOGS DETALHADOS
+    console.log('🌍 [ENDPOINT] hostname:', hostname);
+    console.log('🌍 [ENDPOINT] isDev:', isDev);
+    console.log('🌍 [ENDPOINT] env:', env);
+    console.log('🌍 [ENDPOINT] URL escolhida:', url);
+    console.log('🌍 [ENDPOINT] tem _dev?', url.includes('_dev') ? 'SIM ✅' : 'NÃO ❌');
+    
+    return url;
+  }
+  
+  // ==================== FUNÇÕES AUXILIARES ====================
+  
+  /**
+   * Obter parâmetro UTM da URL
+   * @param {string} param - Nome do parâmetro UTM
+   * @returns {string}
+   */
+  function getUtmParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param) || '';
+  }
+  
+  /**
+   * Sanitizar dados para prevenir XSS
+   * @param {Object} data - Dados a sanitizar
+   * @returns {Object}
+   */
+  function sanitizeData(data) {
+    const sanitized = {};
+    
+    for (const [key, value] of Object.entries(data)) {
+      if (typeof value === 'string') {
+        // Remover tags HTML e caracteres perigosos
+        sanitized[key] = value
+          .replace(/[<>]/g, '') // Remove < >
+          .trim()
+          .slice(0, 500); // Limitar tamanho
+      } else if (value != null) {
+        sanitized[key] = value;
+      }
+    }
+    
+    return sanitized;
+  }
+  
+  /**
+   * Gerar ID de sessão único
+   * @returns {string}
+   */
+  function generateSessionId() {
+    if (!window.modalSessionId) {
+      window.modalSessionId = 'modal_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    }
+    return window.modalSessionId;
+  }
+  
+  /**
+   * Log de eventos estruturado
+   * @param {string} eventType - Tipo do evento
+   * @param {Object} data - Dados do evento
+   * @param {string} severity - Nível de severidade (info, warning, error)
+   */
+  function logEvent(eventType, data, severity = 'info') {
+    const logData = {
+      event: eventType,
+      timestamp: new Date().toISOString(),
+      severity: severity,
+      data: sanitizeData(data), // Sanitizar dados antes de logar
+      session_id: generateSessionId(),
+      page_url: window.location.href,
+      environment: isDevelopmentEnvironment() ? 'dev' : 'prod'
+    };
+    
+    // Log no console (sem dados sensíveis completos)
+    console.log(`[${severity.toUpperCase()}] ${eventType}`, {
+      has_ddd: !!data.ddd,
+      has_celular: !!data.celular,
+      has_cpf: !!data.cpf,
+      has_nome: !!data.nome,
+      environment: logData.environment
+    });
+    
+    // Enviar para sistema de logging se disponível
+    try {
+      if (typeof window.logDebug === 'function') {
+        window.logDebug(severity.toUpperCase(), `[MODAL] ${eventType}`, logData);
+      }
+    } catch (e) {
+      // Falha silenciosa em logging
+    }
+  }
+  
+  /**
+   * Sistema de logging detalhado para debug (V3)
+   * @param {string} category - Categoria do log ('ESPOCRM', 'OCTADESK', 'GTM', 'STATE', 'ERROR', 'PARALLEL', 'VALIDATION')
+   * @param {string} action - Ação sendo executada
+   * @param {Object} data - Dados detalhados
+   * @param {string} level - Nível do log ('info', 'warn', 'error', 'debug')
+   */
+  function debugLog(category, action, data = {}, level = 'info') {
+    // Verificar se categoria está habilitada (se configurado)
+    if (window.DEBUG_LOG_CONFIG && !window.DEBUG_LOG_CONFIG[category]) {
+      return; // Não logar esta categoria
+    }
+    
+    const timestamp = new Date().toISOString();
+    const environment = isDevelopmentEnvironment() ? '🔧 DEV' : '🚀 PROD';
+    
+    // Emoji por categoria
+    const categoryEmojis = {
+      'ESPOCRM': '📊',
+      'OCTADESK': '📱',
+      'GTM': '📈',
+      'STATE': '💾',
+      'ERROR': '❌',
+      'PARALLEL': '⚡',
+      'VALIDATION': '✅'
+    };
+    
+    const emoji = categoryEmojis[category] || '📝';
+    
+    // Formatar dados para exibição
+    const formattedData = {
+      timestamp,
+      environment,
+      category,
+      action,
+      ...data
+    };
+  
+    // Adicionar JSON stringificado se houver objetos complexos
+    if (data.payload) {
+      formattedData.payload_json = JSON.stringify(data.payload, null, 2);
+    }
+    if (data.event_data) {
+      formattedData.event_data_json = JSON.stringify(data.event_data, null, 2);
+    }
+    if (data.response_data) {
+      formattedData.response_data_json = JSON.stringify(data.response_data, null, 2);
+    }
+    if (data.dados_complete || data.dados) {
+      formattedData.dados_json = JSON.stringify(data.dados_complete || data.dados, null, 2);
+    }
+    
+    // Log formatado no console
+    const logMessage = `${emoji} [${category}] ${action}`;
+    
+    // Escolher método de log baseado no nível
+    switch(level) {
+      case 'error':
+        console.error(logMessage, formattedData);
+        break;
+      case 'warn':
+        console.warn(logMessage, formattedData);
+        break;
+      case 'debug':
+        console.debug(logMessage, formattedData);
+        break;
+      default:
+        console.log(logMessage, formattedData);
+    }
+    
+    // Se disponível, enviar para sistema de logging
+    try {
+      if (typeof window.logDebug === 'function') {
+        window.logDebug(level.toUpperCase(), `[MODAL V3] ${category} - ${action}`, formattedData);
+      }
+    } catch (e) {
+      // Falha silenciosa
+    }
+  }
+  
+  // Configuração opcional de logging por categoria (padrão: todas habilitadas)
+  if (typeof window.DEBUG_LOG_CONFIG === 'undefined') {
+    window.DEBUG_LOG_CONFIG = {
+      ESPOCRM: true,
+      OCTADESK: true,
+      GTM: true,
+      STATE: true,
+      PARALLEL: true,
+      VALIDATION: true,
+      ERROR: true
+    };
+  }
+  
+  /**
+   * Gerenciamento de estado do lead (localStorage)
+   */
+  function saveLeadState(leadData) {
+    const state = {
+      lead_id: leadData.id || leadData.lead_id || null,
+      opportunity_id: leadData.opportunity_id || leadData.opportunityId || null,
+      ddd: leadData.ddd,
+      celular: onlyDigits(leadData.celular),
+      gclid: leadData.gclid || '',
+      timestamp: Date.now(),
+      expires: Date.now() + (30 * 60 * 1000) // 30 minutos
+    };
+    
+    try {
+      localStorage.setItem('whatsapp_modal_lead_state', JSON.stringify(state));
+      console.log('💾 [MODAL] Estado do lead salvo:', { 
+        lead_id: state.lead_id, 
+        opportunity_id: state.opportunity_id,
+        ddd: state.ddd 
+      });
+    } catch (e) {
+      console.warn('⚠️ [MODAL] Não foi possível salvar estado (localStorage indisponível)');
+    }
+  }
+  
+  function getLeadState() {
+    try {
+      const stored = localStorage.getItem('whatsapp_modal_lead_state');
+      if (!stored) return null;
+      
+      const state = JSON.parse(stored);
+      
+      // Verificar expiração
+      if (Date.now() > state.expires) {
+        localStorage.removeItem('whatsapp_modal_lead_state');
+        return null;
+      }
+      
+      return state;
+    } catch (e) {
+      return null;
+    }
+  }
+  
+  /**
+   * Rate Limiter para prevenir spam
+   */
+  class RateLimiter {
+    constructor(maxCalls = 3, windowMs = 60000) {
+      this.maxCalls = maxCalls;
+      this.windowMs = windowMs;
+      this.calls = new Map(); // key -> [timestamps]
+    }
+    
+    canMakeCall(key) {
+      const now = Date.now();
+      const userCalls = this.calls.get(key) || [];
+      
+      // Remover chamadas antigas (fora da janela)
+      const recentCalls = userCalls.filter(timestamp => now - timestamp < this.windowMs);
+      
+      if (recentCalls.length >= this.maxCalls) {
+        return false;
+      }
+      
+      recentCalls.push(now);
+      this.calls.set(key, recentCalls);
+      return true;
+    }
+  }
+  
+  const rateLimiter = new RateLimiter(3, 60000); // 3 chamadas por minuto
+  
+  /**
+   * Fetch com retry para chamadas críticas
+   * @param {string} url - URL do endpoint
+   * @param {Object} options - Opções do fetch
+   * @param {number} maxRetries - Número máximo de tentativas
+   * @param {number} retryDelay - Delay entre tentativas (ms)
+   * @returns {Promise}
+   */
+  async function fetchWithRetry(url, options, maxRetries = 2, retryDelay = 1000) {
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        // Criar AbortController para timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
+        
+        const response = await fetch(url, {
+          ...options,
+          signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (response.ok || response.status < 500) {
+          return { success: true, response, attempt };
+        }
+        
+        // Retry apenas para erros 5xx (servidor) ou timeout
+        if (attempt < maxRetries && (response.status >= 500 || response.status === 408)) {
+          console.warn(`⚠️ [MODAL] Tentativa ${attempt + 1}/${maxRetries + 1} falhou, tentando novamente...`);
+          await new Promise(resolve => setTimeout(resolve, retryDelay * (attempt + 1)));
+          continue;
+        }
+        
+        return { success: false, response, attempt };
+        
+      } catch (error) {
+        // Erro de rede ou timeout - tentar retry
+        if (attempt < maxRetries && (error.name === 'TypeError' || error.name === 'AbortError')) {
+          console.warn(`⚠️ [MODAL] Erro de rede na tentativa ${attempt + 1}/${maxRetries + 1}, retry...`);
+          await new Promise(resolve => setTimeout(resolve, retryDelay * (attempt + 1)));
+          continue;
+        }
+        
+        return { success: false, error, attempt };
+      }
+    }
+  }
+  
+  /**
+   * Funções de Loading (compatibilidade com Footer Code)
+   */
+  function showLoading(message) {
+    if (typeof window.showLoading === 'function') {
+      window.showLoading(message);
+    } else {
+      const overlay = document.getElementById('si-loading-overlay');
+      const text = document.getElementById('si-loading-text');
+      if (overlay) overlay.style.display = 'flex';
+      if (text && message) text.textContent = message;
+    }
+  }
+  
+  function hideLoading() {
+    if (typeof window.hideLoading === 'function') {
+      window.hideLoading();
+    } else {
+      const overlay = document.getElementById('si-loading-overlay');
+      if (overlay) overlay.style.display = 'none';
+    }
+  }
+  
   function buildWhatsAppMessage(dados) {
     // Mensagem simples como especificado
     return 'Ola.%20Quero%20fazer%20uma%20cotacao%20de%20seguro.';
@@ -71,14 +503,707 @@ $(function() {
   }
   
   function coletarTodosDados() {
+    const ddd = $(MODAL_CONFIG.fieldIds.ddd).val();
+    const celular = $(MODAL_CONFIG.fieldIds.celular).val();
+    const emailField = $(MODAL_CONFIG.fieldIds.email).val();
+    
+    // Gerar email automaticamente se campo estiver vazio
+    let email = emailField;
+    if (!email && ddd && celular) {
+      email = ddd + onlyDigits(celular) + '@imediatoseguros.com.br';
+    }
+    
+    // ✅ LOG PARA DEBUG - verificar se email está sendo gerado
+    console.log('🔍 [DEBUG] Email generation:', {
+      ddd: ddd,
+      celular: celular,
+      emailField: emailField,
+      emailGenerated: email,
+      hasEmail: !!email
+    });
+    
+    // ✅ LOG ADICIONAL - verificar se função está sendo chamada
+    console.log('🔍 [DEBUG] coletarTodosDados() executada - dados coletados:', {
+      TELEFONE: ddd + celular,
+      DDD: ddd,
+      CELULAR: celular,
+      EMAIL: email,
+      CPF: $(MODAL_CONFIG.fieldIds.cpf).val() || '',
+      NOME: $(MODAL_CONFIG.fieldIds.nome).val() || ''
+    });
+    
+    // ✅ LOG CRÍTICO - verificar se email está sendo enviado
+    console.log('🔍 [DEBUG] Email sendo enviado para EspoCRM:', email);
+    
     return {
-      TELEFONE: $(MODAL_CONFIG.fieldIds.ddd).val() + $(MODAL_CONFIG.fieldIds.celular).val(),
+      TELEFONE: ddd + celular,
+      DDD: ddd,
+      CELULAR: celular,
       CPF: $(MODAL_CONFIG.fieldIds.cpf).val() || '',
       NOME: $(MODAL_CONFIG.fieldIds.nome).val() || '',
+      EMAIL: email || '',
       CEP: $(MODAL_CONFIG.fieldIds.cep).val() || '',
       PLACA: $(MODAL_CONFIG.fieldIds.placa).val() || '',
-      ENDERECO: $(MODAL_CONFIG.fieldIds.endereco).val() || ''
+      ENDERECO: $(MODAL_CONFIG.fieldIds.endereco).val() || '',
+      MARCA: '', // Não existe no modal atual
+      ANO: '', // Não existe no modal atual
+      SEXO: '', // Não existe no modal atual
+      DATA_NASCIMENTO: '', // Não existe no modal atual
+      ESTADO_CIVIL: '', // Não existe no modal atual
+      GCLID: getGCLID()
     };
+  }
+  
+  // ==================== FUNÇÕES DE INTEGRAÇÃO ====================
+  
+  /**
+   * Registrar primeiro contato no EspoCRM (após validação do celular)
+   * @param {string} ddd - DDD do telefone
+   * @param {string} celular - Número do celular
+   * @param {string} gclid - GCLID dos cookies
+   * @returns {Promise<Object>}
+   */
+  async function registrarPrimeiroContatoEspoCRM(ddd, celular, gclid) {
+    const phoneKey = `${ddd}${onlyDigits(celular)}`;
+    
+    // ✅ V3: Log de rate limiting
+    debugLog('ESPOCRM', 'RATE_LIMIT_CHECK', {
+      phone_key: phoneKey,
+      can_make_call: rateLimiter.canMakeCall(phoneKey)
+    }, 'debug');
+    
+    if (!rateLimiter.canMakeCall(phoneKey)) {
+      debugLog('ESPOCRM', 'RATE_LIMIT_EXCEEDED', {
+        phone_key: phoneKey,
+        message: 'Muitas tentativas recentes, aguarde...'
+      }, 'warn');
+      return { success: false, error: 'rate_limit' };
+    }
+    
+    // ✅ FORMATO COMPATÍVEL COM RPA/PRODUÇÃO: estrutura com 'data' como objeto
+    // Mantém compatibilidade com add_travelangels.php que processa $data['data']
+    // IMPORTANTE: garantir que landing_url seja string simples, não objeto
+    const landingUrl = String(window.location.href || '');
+    const webhook_data = {
+      data: {
+        'DDD-CELULAR': String(ddd || ''),
+        'CELULAR': String(onlyDigits(celular) || ''),
+        'GCLID_FLD': String(gclid || ''),
+        'NOME': String(`${ddd}-${onlyDigits(celular)}-NOVO CLIENTE WHATSAPP`),
+        'CPF': '',
+        'CEP': '',
+        'PLACA': '',
+        'Email': ddd && celular ? `${ddd}${onlyDigits(celular)}@imediatoseguros.com.br` : '',
+        'produto': 'seguro-auto',
+        'landing_url': landingUrl,
+        'utm_source': String(getUtmParam('utm_source') || ''),
+        'utm_campaign': String(getUtmParam('utm_campaign') || '')
+      },
+      d: new Date().toISOString(),
+      name: 'Modal WhatsApp - Primeiro Contato (V2)'
+    };
+    
+    // ✅ GARANTIR que 'data' seja um objeto, não string
+    if (typeof webhook_data.data === 'string') {
+      console.error('❌ [CRÍTICO] webhook_data.data é STRING! Corrigindo...');
+      try {
+        webhook_data.data = JSON.parse(webhook_data.data);
+      } catch (e) {
+        console.error('❌ [CRÍTICO] Erro ao parsear data:', e);
+      }
+    }
+    
+    const endpointUrl = getEndpointUrl('travelangels');
+    
+    // ✅ V3: LOG COMPLETO ANTES DA CHAMADA
+    const jsonBodyForLog = JSON.stringify(webhook_data);
+    debugLog('ESPOCRM', 'INITIAL_REQUEST_PREPARATION', {
+      endpoint_url: endpointUrl,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'User-Agent': 'Modal-WhatsApp-v2.0'
+      },
+      payload: webhook_data,
+      payload_json_stringified: jsonBodyForLog,
+      input_data: {
+        ddd: ddd,
+        celular: '***' + onlyDigits(celular).slice(-4),
+        gclid: gclid || '(vazio)',
+        gclid_length: (gclid || '').length
+      },
+      rate_limiting: {
+        phone_key: phoneKey,
+        can_make_call: true
+      }
+    }, 'info');
+    
+    logEvent('whatsapp_modal_espocrm_initial_attempt', { ddd, celular: '***' }, 'info');
+    
+    debugLog('ESPOCRM', 'INITIAL_REQUEST_STARTING', {
+      endpoint_url: endpointUrl,
+      attempt: 1,
+      max_retries: 2
+    }, 'info');
+    
+    // ✅ DEBUG: Serializar JSON e verificar formato ANTES do envio
+    const jsonBody = JSON.stringify(webhook_data);
+    console.log('🔍 [DEBUG JSON] Objeto webhook_data original:', webhook_data);
+    console.log('🔍 [DEBUG JSON] JSON serializado (JSON.stringify):', jsonBody);
+    console.log('🔍 [DEBUG JSON] Tipo do campo data:', typeof webhook_data.data);
+    console.log('🔍 [DEBUG JSON] Data é objeto?', webhook_data.data instanceof Object && !Array.isArray(webhook_data.data));
+    console.log('🔍 [DEBUG JSON] Tamanho do JSON:', jsonBody.length, 'caracteres');
+    
+    // ✅ DEBUG: Validar JSON manualmente
+    try {
+      const testParse = JSON.parse(jsonBody);
+      console.log('✅ [DEBUG JSON] JSON válido - pode fazer parse:', testParse.data ? 'Data presente' : 'Data ausente');
+    } catch (e) {
+      console.error('❌ [DEBUG JSON] JSON INVÁLIDO:', e.message);
+    }
+    
+    try {
+      const result = await fetchWithRetry(endpointUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'Modal-WhatsApp-v2.0'
+        },
+        body: jsonBody
+      }, 2, 1000);
+      
+      // ✅ V3: LOG DA RESPOSTA
+      debugLog('ESPOCRM', 'INITIAL_RESPONSE_RECEIVED', {
+        success: result.success,
+        attempt: result.attempt + 1,
+        http_status: result.response?.status || 'N/A',
+        has_response_data: !!result.response,
+        error: result.error || null
+      }, result.success ? 'info' : 'warn');
+      
+      if (result.success && result.response) {
+        try {
+          const responseData = await result.response.json();
+          
+          // ✅ V3: LOG DA RESPOSTA PARSEADA
+          debugLog('ESPOCRM', 'INITIAL_RESPONSE_PARSED', {
+            response_data: responseData,
+            lead_id: responseData.contact_id || responseData.lead_id || responseData.data?.leadIdFlyingDonkeys || null,
+            success: responseData.success || result.response.ok
+          }, 'info');
+          
+          if (responseData.success || result.response.ok) {
+            const leadId = responseData.contact_id || responseData.lead_id || responseData.data?.leadIdFlyingDonkeys || null;
+            const opportunityId = responseData.opportunity_id || responseData.data?.opportunityIdFlyingDonkeys || null;
+            
+            if (leadId) {
+              saveLeadState({ 
+                id: leadId, 
+                lead_id: leadId,
+                opportunity_id: opportunityId,
+                opportunityId: opportunityId,
+                ddd, 
+                celular, 
+                gclid 
+              });
+              
+              // ✅ V3: LOG DO ESTADO SALVO
+              debugLog('STATE', 'LEAD_STATE_SAVED', {
+                lead_id: leadId,
+                opportunity_id: opportunityId || '(não fornecido)',
+                ddd: ddd,
+                celular: '***' + onlyDigits(celular).slice(-4),
+                gclid: gclid || '(vazio)',
+                localStorage_key: 'whatsapp_modal_lead_state'
+              }, 'info');
+            }
+            
+            logEvent('whatsapp_modal_espocrm_initial_success', { 
+              lead_id: leadId, 
+              opportunity_id: opportunityId 
+            }, 'info');
+            return { success: true, id: leadId, opportunity_id: opportunityId, attempt: result.attempt + 1 };
+          } else {
+            console.warn('⚠️ [MODAL] Erro ao criar lead no EspoCRM:', responseData);
+            logEvent('whatsapp_modal_espocrm_initial_failed', { error: responseData }, 'warning');
+            return { success: false, error: responseData, attempt: result.attempt + 1 };
+          }
+        } catch (parseError) {
+          debugLog('ESPOCRM', 'INITIAL_RESPONSE_PARSE_ERROR', {
+            error: parseError.message,
+            response_ok: result.response.ok,
+            response_status: result.response.status
+          }, 'warn');
+          return { success: result.response.ok, attempt: result.attempt + 1 };
+        }
+      } else {
+        const errorMsg = result.error?.message || 'Erro desconhecido';
+        debugLog('ESPOCRM', 'INITIAL_REQUEST_ERROR', {
+          error: errorMsg,
+          attempt: result.attempt + 1
+        }, 'error');
+        return { success: false, error: errorMsg, attempt: result.attempt + 1 };
+      }
+    } catch (error) {
+      debugLog('ERROR', 'ESPOCRM_INITIAL_EXCEPTION', {
+        error_message: error.message,
+        error_stack: error.stack,
+        error_name: error.name
+      }, 'error');
+      return { success: false, error: error.message };
+    }
+  }
+  
+  /**
+   * Atualizar lead no EspoCRM com dados completos
+   * @param {Object} dados - Dados completos do formulário
+   * @param {string|null} espocrmId - ID do lead criado anteriormente (se houver)
+   * @returns {Promise<Object>}
+   */
+  async function atualizarLeadEspoCRM(dados, espocrmId = null) {
+    // Tentar recuperar estado anterior se não tiver ID
+    if (!espocrmId) {
+      const previousState = getLeadState();
+      if (previousState && previousState.lead_id) {
+        espocrmId = previousState.lead_id;
+        
+        // ✅ V3: LOG DA RECUPERAÇÃO DO ESTADO
+        debugLog('STATE', 'LEAD_ID_RECOVERED', {
+          lead_id: espocrmId,
+          source: 'localStorage',
+          previous_state: previousState
+        }, 'info');
+      }
+    }
+    
+    const webhook_data = {
+      data: {
+        'NOME': sanitizeData({ NOME: dados.NOME }).NOME || '',
+        'DDD-CELULAR': dados.DDD || '',
+        'CELULAR': onlyDigits(dados.CELULAR) || '',
+        'Email': sanitizeData({ Email: dados.EMAIL }).Email || '',
+        'CEP': dados.CEP || '',
+        'CPF': dados.CPF || '',
+        'PLACA': dados.PLACA || '',
+        'MARCA': dados.MARCA || '',
+        'VEICULO': dados.MARCA || '',
+        'ANO': dados.ANO || '',
+        'GCLID_FLD': dados.GCLID || '',
+        'SEXO': dados.SEXO || '',
+        'DATA-DE-NASCIMENTO': dados.DATA_NASCIMENTO || '',
+        'ESTADO-CIVIL': dados.ESTADO_CIVIL || '',
+        'ENDERECO': sanitizeData({ ENDERECO: dados.ENDERECO }).ENDERECO || '',
+        'produto': 'seguro-auto',
+        'landing_url': window.location.href,
+        'utm_source': getUtmParam('utm_source'),
+        'utm_campaign': getUtmParam('utm_campaign')
+      },
+      d: new Date().toISOString(),
+      name: 'Modal WhatsApp - Dados Completos'
+    };
+    
+    // Se tiver ID do lead criado anteriormente, incluir no payload
+    if (espocrmId) {
+      webhook_data.data.lead_id = espocrmId;
+      webhook_data.data.contact_id = espocrmId;
+      
+      // ✅ V4: Incluir opportunity_id se disponível no estado
+      const previousState = getLeadState();
+      if (previousState && previousState.opportunity_id) {
+        webhook_data.data.opportunity_id = previousState.opportunity_id;
+        
+        debugLog('ESPOCRM', 'OPPORTUNITY_ID_INCLUDED', {
+          opportunity_id: previousState.opportunity_id,
+          lead_id: espocrmId
+        }, 'info');
+      }
+    }
+    
+    const endpointUrl = getEndpointUrl('travelangels');
+    
+    // ✅ V3: LOG COMPLETO ANTES DA ATUALIZAÇÃO
+    debugLog('ESPOCRM', 'UPDATE_REQUEST_PREPARATION', {
+      endpoint_url: endpointUrl,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'User-Agent': 'Modal-WhatsApp-v2.0'
+      },
+      payload: webhook_data,
+      lead_id: espocrmId || '(não fornecido)',
+      has_lead_id: !!espocrmId,
+      input_data_summary: {
+        has_nome: !!dados.NOME,
+        has_cpf: !!dados.CPF,
+        has_cep: !!dados.CEP,
+        has_placa: !!dados.PLACA,
+        has_email: !!dados.EMAIL,
+        ddd: dados.DDD || '',
+        celular: dados.CELULAR ? '***' + onlyDigits(dados.CELULAR).slice(-4) : ''
+      }
+    }, 'info');
+    
+    logEvent('whatsapp_modal_espocrm_update_attempt', { 
+      has_lead_id: !!espocrmId,
+      has_cpf: !!dados.CPF,
+      has_nome: !!dados.NOME 
+    }, 'info');
+    
+    try {
+      const result = await fetchWithRetry(endpointUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'Modal-WhatsApp-v2.0'
+        },
+        body: JSON.stringify(webhook_data)
+      }, 2, 1000);
+      
+      // ✅ V3: LOG DA RESPOSTA DE ATUALIZAÇÃO
+      debugLog('ESPOCRM', 'UPDATE_RESPONSE_RECEIVED', {
+        success: result.success,
+        attempt: result.attempt + 1,
+        http_status: result.response?.status || 'N/A',
+        has_response_data: !!result.response,
+        error: result.error || null
+      }, result.success ? 'info' : 'warn');
+      
+      if (result.success && result.response) {
+        try {
+          const responseData = await result.response.json();
+          
+          // ✅ V3: LOG DA RESPOSTA PARSEADA DE ATUALIZAÇÃO
+          debugLog('ESPOCRM', 'UPDATE_RESPONSE_PARSED', {
+            response_data: responseData,
+            success: result.response.ok
+          }, 'info');
+          
+          logEvent('whatsapp_modal_espocrm_update_success', { attempt: result.attempt + 1 }, 'info');
+          return { success: true, result: responseData, attempt: result.attempt + 1 };
+        } catch (parseError) {
+          debugLog('ESPOCRM', 'UPDATE_RESPONSE_PARSE_ERROR', {
+            error: parseError.message
+          }, 'warn');
+          logEvent('whatsapp_modal_espocrm_update_parse_error', { error: parseError.message }, 'warning');
+          return { success: result.response.ok, attempt: result.attempt + 1 };
+        }
+      } else {
+        const errorMsg = result.error?.message || 'Erro desconhecido';
+        debugLog('ESPOCRM', 'UPDATE_REQUEST_ERROR', {
+          error: errorMsg,
+          attempt: result.attempt + 1
+        }, 'error');
+        logEvent('whatsapp_modal_espocrm_update_error', { error: errorMsg, attempt: result.attempt + 1 }, 'error');
+        return { success: false, error: errorMsg, attempt: result.attempt + 1 };
+      }
+    } catch (error) {
+      debugLog('ERROR', 'ESPOCRM_UPDATE_EXCEPTION', {
+        error_message: error.message,
+        error_stack: error.stack
+      }, 'error');
+      logEvent('whatsapp_modal_espocrm_update_exception', { error: error.message }, 'error');
+      return { success: false, error: error.message };
+    }
+  }
+  
+  /**
+   * Enviar mensagem inicial via Octadesk (após validação do celular)
+   * @param {string} ddd - DDD do telefone
+   * @param {string} celular - Número do celular
+   * @param {string} gclid - GCLID dos cookies
+   * @returns {Promise<Object>}
+   */
+  async function enviarMensagemInicialOctadesk(ddd, celular, gclid) {
+    const webhook_data = {
+      data: {
+        'DDD-CELULAR': ddd,
+        'CELULAR': onlyDigits(celular),
+        'GCLID_FLD': gclid || '',
+        'NOME': '',
+        'CPF': '',
+        'Email': '',
+        'produto': 'seguro-auto',
+        'landing_url': window.location.href,
+        'utm_source': getUtmParam('utm_source'),
+        'utm_campaign': getUtmParam('utm_campaign')
+      },
+      d: new Date().toISOString(),
+      name: 'Modal WhatsApp - Mensagem Inicial (V2)'
+    };
+    
+    const endpointUrl = getEndpointUrl('octadesk');
+    
+    // ✅ V3: LOG COMPLETO ANTES DA CHAMADA OCTADESK
+    debugLog('OCTADESK', 'INITIAL_REQUEST_PREPARATION', {
+      endpoint_url: endpointUrl,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'User-Agent': 'Modal-WhatsApp-v2.0'
+      },
+      payload: webhook_data,
+      input_data: {
+        ddd: ddd,
+        celular: '***' + onlyDigits(celular).slice(-4),
+        gclid: gclid || '(vazio)'
+      }
+    }, 'info');
+    
+    logEvent('whatsapp_modal_octadesk_initial_attempt', { has_celular: !!celular }, 'info');
+    
+    debugLog('OCTADESK', 'INITIAL_REQUEST_STARTING', {
+      endpoint_url: endpointUrl,
+      attempt: 1,
+      max_retries: 2
+    }, 'info');
+    
+    try {
+      const result = await fetchWithRetry(endpointUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'Modal-WhatsApp-v2.0'
+        },
+        body: JSON.stringify(webhook_data)
+      }, 2, 1000);
+      
+      // ✅ V3: LOG DA RESPOSTA OCTADESK
+      debugLog('OCTADESK', 'INITIAL_RESPONSE_RECEIVED', {
+        success: result.success,
+        attempt: result.attempt + 1,
+        http_status: result.response?.status || 'N/A',
+        has_response_data: !!result.response,
+        error: result.error || null
+      }, result.success ? 'info' : 'warn');
+      
+      if (result.success && result.response) {
+        try {
+          const responseData = await result.response.json();
+          
+          // ✅ V3: LOG DA RESPOSTA PARSEADA OCTADESK
+          debugLog('OCTADESK', 'INITIAL_RESPONSE_PARSED', {
+            response_data: responseData,
+            success: result.response.ok
+          }, 'info');
+          
+          logEvent('whatsapp_modal_octadesk_initial_success', { attempt: result.attempt + 1 }, 'info');
+          return { success: true, result: responseData, attempt: result.attempt + 1 };
+        } catch (parseError) {
+          debugLog('OCTADESK', 'INITIAL_RESPONSE_PARSE_ERROR', {
+            error: parseError.message,
+            response_ok: result.response.ok
+          }, 'warn');
+          logEvent('whatsapp_modal_octadesk_initial_parse_error', { error: parseError.message }, 'warning');
+          return { success: result.response.ok, attempt: result.attempt + 1 };
+        }
+      } else {
+        const errorMsg = result.error?.message || 'Erro desconhecido';
+        debugLog('OCTADESK', 'INITIAL_REQUEST_ERROR', {
+          error: errorMsg,
+          attempt: result.attempt + 1
+        }, 'error');
+        logEvent('whatsapp_modal_octadesk_initial_error', { error: errorMsg, attempt: result.attempt + 1 }, 'error');
+        return { success: false, error: errorMsg, attempt: result.attempt + 1 };
+      }
+    } catch (error) {
+      debugLog('ERROR', 'OCTADESK_INITIAL_EXCEPTION', {
+        error_message: error.message,
+        error_stack: error.stack,
+        error_name: error.name
+      }, 'error');
+      logEvent('whatsapp_modal_octadesk_initial_exception', { error: error.message }, 'error');
+      return { success: false, error: error.message };
+    }
+  }
+  
+  /**
+   * Enviar mensagem via Octadesk (versão completa - usado no submit se necessário)
+   * @param {Object} dados - Dados completos do formulário
+   * @returns {Promise<Object>}
+   */
+  async function enviarMensagemOctadesk(dados) {
+    const webhook_data = {
+      data: {
+        'NOME': sanitizeData({ NOME: dados.NOME }).NOME || '',
+        'DDD-CELULAR': dados.DDD || '',
+        'CELULAR': onlyDigits(dados.CELULAR) || '',
+        'Email': sanitizeData({ Email: dados.EMAIL }).Email || '',
+        'CEP': dados.CEP || '',
+        'CPF': dados.CPF || '',
+        'PLACA': dados.PLACA || '',
+        'MARCA': dados.MARCA || '',
+        'VEICULO': dados.MARCA || '',
+        'ANO': dados.ANO || '',
+        'GCLID_FLD': dados.GCLID || '',
+        'SEXO': dados.SEXO || '',
+        'DATA-DE-NASCIMENTO': dados.DATA_NASCIMENTO || '',
+        'ESTADO-CIVIL': dados.ESTADO_CIVIL || '',
+        'ENDERECO': sanitizeData({ ENDERECO: dados.ENDERECO }).ENDERECO || '',
+        'produto': 'seguro-auto',
+        'landing_url': window.location.href,
+        'utm_source': getUtmParam('utm_source'),
+        'utm_campaign': getUtmParam('utm_campaign')
+      },
+      d: new Date().toISOString(),
+      name: 'Modal WhatsApp - Mensagem Octadesk'
+    };
+    
+    logEvent('whatsapp_modal_octadesk_attempt', { has_celular: !!dados.CELULAR }, 'info');
+    
+    try {
+      const endpointUrl = getEndpointUrl('octadesk');
+      
+      const result = await fetchWithRetry(endpointUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'Modal-WhatsApp-v1.0'
+        },
+        body: JSON.stringify(webhook_data)
+      }, 2, 1000);
+      
+      if (result.success && result.response) {
+        try {
+          const responseData = await result.response.json();
+          logEvent('whatsapp_modal_octadesk_success', { attempt: result.attempt + 1 }, 'info');
+          return { success: true, result: responseData, attempt: result.attempt + 1 };
+        } catch (parseError) {
+          logEvent('whatsapp_modal_octadesk_parse_error', { error: parseError.message }, 'warning');
+          return { success: result.response.ok, attempt: result.attempt + 1 };
+        }
+      } else {
+        const errorMsg = result.error?.message || 'Erro desconhecido';
+        logEvent('whatsapp_modal_octadesk_error', { error: errorMsg, attempt: result.attempt + 1 }, 'error');
+        return { success: false, error: errorMsg, attempt: result.attempt + 1 };
+      }
+    } catch (error) {
+      console.error('❌ [MODAL] Erro ao enviar mensagem via Octadesk:', error);
+      logEvent('whatsapp_modal_octadesk_exception', { error: error.message }, 'error');
+      return { success: false, error: error.message };
+    }
+  }
+  
+  /**
+   * Registrar conversão inicial no Google Tag Manager
+   * @param {string} ddd - DDD do telefone
+   * @param {string} celular - Número do celular
+   * @param {string} gclid - GCLID dos cookies
+   * @returns {Object} Resultado do registro
+   */
+  function registrarConversaoInicialGTM(ddd, celular, gclid) {
+    // ✅ V3: LOG ANTES DE CONSTRUIR DADOS GTM
+    debugLog('GTM', 'DATA_PREPARATION_START', {
+      ddd: ddd,
+      celular: '***' + onlyDigits(celular).slice(-4),
+      gclid: gclid || '(vazio)',
+      dataLayer_available: typeof window.dataLayer !== 'undefined',
+      gtm_variables: {
+        GTM_EVENT_NAME_INITIAL: window.GTM_EVENT_NAME_INITIAL || '(não definido)',
+        GTM_FORM_TYPE: window.GTM_FORM_TYPE || '(não definido)',
+        GTM_CONTACT_STAGE: window.GTM_CONTACT_STAGE || '(não definido)',
+        GTM_UTM_SOURCE: window.GTM_UTM_SOURCE || '(null - será preenchido)',
+        GTM_UTM_CAMPAIGN: window.GTM_UTM_CAMPAIGN || '(null - será preenchido)',
+        GTM_PAGE_URL: window.GTM_PAGE_URL || '(null - será preenchido)',
+        GTM_PAGE_TITLE: window.GTM_PAGE_TITLE || '(null - será preenchido)'
+      },
+      utm_params_from_url: {
+        utm_source: getUtmParam('utm_source') || '(vazio)',
+        utm_campaign: getUtmParam('utm_campaign') || '(vazio)',
+        utm_medium: getUtmParam('utm_medium') || '(vazio)',
+        utm_term: getUtmParam('utm_term') || '(vazio)',
+        utm_content: getUtmParam('utm_content') || '(vazio)'
+      }
+    }, 'info');
+    
+    if (typeof window.dataLayer === 'undefined') {
+      debugLog('GTM', 'DATALAYER_UNAVAILABLE', {
+        message: 'dataLayer não disponível para registro de conversão inicial',
+        window_dataLayer: typeof window.dataLayer
+      }, 'warn');
+      logEvent('whatsapp_modal_gtm_initial_datalayer_unavailable', {}, 'warning');
+      return { success: false, error: 'dataLayer_unavailable' };
+    }
+    
+    // Construir dados do evento GTM usando variáveis configuráveis
+    const gtmEventData = {
+      'event': window.GTM_EVENT_NAME_INITIAL || 'whatsapp_modal_initial_contact',
+      'form_type': window.GTM_FORM_TYPE || 'whatsapp_modal',
+      'contact_stage': window.GTM_CONTACT_STAGE || 'initial',
+      'phone_ddd': ddd || '',
+      'phone_number': '***',
+      'has_phone': !!celular,
+      'gclid': gclid || '',
+      'utm_source': window.GTM_UTM_SOURCE || getUtmParam('utm_source') || '',
+      'utm_campaign': window.GTM_UTM_CAMPAIGN || getUtmParam('utm_campaign') || '',
+      'utm_medium': window.GTM_UTM_MEDIUM || getUtmParam('utm_medium') || '',
+      'utm_term': window.GTM_UTM_TERM || getUtmParam('utm_term') || '',
+      'utm_content': window.GTM_UTM_CONTENT || getUtmParam('utm_content') || '',
+      'page_url': window.GTM_PAGE_URL || window.location.href || '',
+      'page_title': window.GTM_PAGE_TITLE || document.title || '',
+      'user_agent': window.GTM_USER_AGENT || navigator.userAgent || '',
+      'timestamp': new Date().toISOString(),
+      'environment': isDevelopmentEnvironment() ? 'dev' : 'prod'
+    };
+    
+    // ✅ V3: LOG DO OBJETO COMPLETO QUE SERÁ ENVIADO AO GTM
+    debugLog('GTM', 'EVENT_DATA_READY', {
+      event_data: gtmEventData,
+      event_name: gtmEventData.event,
+      dataLayer_length_before: window.dataLayer.length
+    }, 'info');
+    
+    // ✅ V3: LOG ANTES DO PUSH
+    debugLog('GTM', 'PUSHING_TO_DATALAYER', {
+      event_name: gtmEventData.event,
+      dataLayer_length_before: window.dataLayer.length
+    }, 'info');
+    
+    window.dataLayer.push(gtmEventData);
+    
+    // ✅ V3: LOG APÓS O PUSH
+    debugLog('GTM', 'PUSHED_TO_DATALAYER', {
+      event_name: gtmEventData.event,
+      dataLayer_length_after: window.dataLayer.length,
+      dataLayer_item: window.dataLayer[window.dataLayer.length - 1]
+    }, 'info');
+    
+    logEvent('whatsapp_modal_gtm_initial_conversion', { 
+      event_name: gtmEventData.event,
+      has_gclid: !!gtmEventData.gclid
+    }, 'info');
+    
+    return { success: true, eventData: gtmEventData };
+  }
+  
+  /**
+   * Registrar conversão no Google Ads (mantida para compatibilidade)
+   * @param {Object} dados - Dados do formulário
+   */
+  function registrarConversaoGoogleAds(dados) {
+    if (typeof window.dataLayer === 'undefined') {
+      console.warn('⚠️ [MODAL] dataLayer não disponível para registro de conversão');
+      logEvent('whatsapp_modal_googleads_datalayer_unavailable', {}, 'warning');
+      return;
+    }
+    
+    window.dataLayer.push({
+      'event': 'whatsapp_modal_submit',
+      'form_type': 'whatsapp_modal',
+      'validation_status': 'valid',
+      'phone': dados.CELULAR ? '***' : '', // Não logar telefone completo
+      'has_cpf': !!dados.CPF,
+      'has_placa': !!dados.PLACA,
+      'has_cep': !!dados.CEP,
+      'has_nome': !!dados.NOME,
+      'gclid': dados.GCLID || ''
+    });
+    
+    logEvent('whatsapp_modal_googleads_conversion', { 
+      has_cpf: !!dados.CPF,
+      has_placa: !!dados.PLACA 
+    }, 'info');
+    
+    console.log('✅ [MODAL] Conversão registrada no Google Ads');
   }
   
   // ==================== 1. CRIAR HTML DO MODAL ====================
@@ -158,8 +1283,10 @@ $(function() {
               </p>
             </div>
             
+            <!-- CPF e Email na mesma linha -->
+            <div style="display: flex; gap: 1.5%; margin-bottom: 20px; align-items: flex-start;">
             <!-- CPF -->
-            <div class="field-group" style="margin-bottom: 20px;">
+              <div class="field-group" style="flex: 1; min-width: 0;">
               <label for="CPF-MODAL" style="display: block; color: #003366; font-weight: 600; margin-bottom: 8px; font-size: 14px; font-family: 'Titillium Web', sans-serif;">CPF</label>
               <input 
                 type="text" 
@@ -169,6 +1296,20 @@ $(function() {
                 style="width: 100%; padding: 14px 16px; border: 2px solid #E0E0E0; border-radius: 10px; font-size: 16px; transition: all 0.3s ease; box-sizing: border-box; font-family: 'Titillium Web', sans-serif; color: #333333;" 
               />
               <small class="help-message" style="display: none; font-size: 12px; margin-top: 4px;"></small>
+              </div>
+              
+              <!-- Email -->
+              <div class="field-group" style="flex: 1; min-width: 0;">
+                <label for="EMAIL-MODAL" style="display: block; color: #003366; font-weight: 600; margin-bottom: 8px; font-size: 14px; font-family: 'Titillium Web', sans-serif;">Email</label>
+                <input 
+                  type="email" 
+                  id="EMAIL-MODAL" 
+                  name="EMAIL" 
+                  placeholder="seu@email.com"
+                  style="width: 100%; padding: 14px 16px; border: 2px solid #E0E0E0; border-radius: 10px; font-size: 16px; transition: all 0.3s ease; box-sizing: border-box; font-family: 'Titillium Web', sans-serif; color: #333333;" 
+                />
+                <small class="help-message" style="display: none; font-size: 12px; margin-top: 4px;"></small>
+              </div>
             </div>
             
             <!-- Nome -->
@@ -251,13 +1392,15 @@ $(function() {
   
   $('<style>').html(`
     #whatsapp-modal input[type="text"].field-error,
-    #whatsapp-modal input[type="tel"].field-error {
+    #whatsapp-modal input[type="tel"].field-error,
+    #whatsapp-modal input[type="email"].field-error {
       border-color: #e74c3c !important;
       background-color: #fff5f5 !important;
     }
     
     #whatsapp-modal input[type="text"].field-warning,
-    #whatsapp-modal input[type="tel"].field-warning {
+    #whatsapp-modal input[type="tel"].field-warning,
+    #whatsapp-modal input[type="email"].field-warning {
       border-color: #FFB300 !important;
       background-color: #fffbf0 !important;
     }
@@ -267,13 +1410,15 @@ $(function() {
     }
     
     #whatsapp-modal input[type="text"].field-success,
-    #whatsapp-modal input[type="tel"].field-success {
+    #whatsapp-modal input[type="tel"].field-success,
+    #whatsapp-modal input[type="email"].field-success {
       border-color: #27ae60 !important;
       background-color: #f0fff4 !important;
     }
     
     #whatsapp-modal input[type="text"]:focus,
-    #whatsapp-modal input[type="tel"]:focus {
+    #whatsapp-modal input[type="tel"]:focus,
+    #whatsapp-modal input[type="email"]:focus {
       outline: none !important;
       border-color: #0099CC !important;
       box-shadow: 0 0 0 3px rgba(0, 153, 204, 0.1) !important;
@@ -351,6 +1496,11 @@ $(function() {
   $(MODAL_CONFIG.fieldIds.celular).mask('00000-0000', { clearIfNotMatch: false });
   $(MODAL_CONFIG.fieldIds.cpf).mask('000.000.000-00');
   $(MODAL_CONFIG.fieldIds.cep).mask('00000-000');
+  // PLACA: Usa função utilitária padronizada
+  if (typeof window.aplicarMascaraPlaca === 'function') {
+    window.aplicarMascaraPlaca($(MODAL_CONFIG.fieldIds.placa));
+  } else {
+    // Fallback caso a função não esteja disponível (não deveria acontecer)
   $(MODAL_CONFIG.fieldIds.placa).mask('SSS-0A00', {
     translation: {
       'S': { pattern: /[A-Za-z]/, recursive: true },
@@ -362,6 +1512,7 @@ $(function() {
       field.val(value.toUpperCase());
     }
   });
+  }
   
   // ==================== 5. EXPANSÃO AUTOMÁTICA ====================
   
@@ -436,11 +1587,212 @@ $(function() {
           showFieldWarning($(this), 'Celular inválido');
         } else {
           showFieldSuccess($(this));
+          
+          // ✅ V2: Registrar primeiro contato (EspoCRM + Octadesk + GTM) em PARALELO
+          if (!initialRegistrationAttempted) {
+            initialRegistrationAttempted = true;
+            const ddd = $(MODAL_CONFIG.fieldIds.ddd).val();
+            const celular = $(this).val();
+            const gclid = getGCLID();
+            
+            // ✅ V3: LOG DO INÍCIO DO PROCESSAMENTO PARALELO
+            debugLog('PARALLEL', 'INITIAL_PROCESSING_START', {
+              ddd: ddd,
+              celular: '***' + onlyDigits(celular).slice(-4),
+              gclid: gclid || '(vazio)',
+              initialRegistrationAttempted: true,
+              processes: ['EspoCRM', 'Octadesk', 'GTM'],
+              strategy: 'Promise.all (paralelo)'
+            }, 'info');
+            
+            // ✅ V3: LOG DO ESTADO ANTES DO PROCESSAMENTO
+            const previousState = getLeadState();
+            debugLog('STATE', 'STATE_BEFORE_PROCESSING', {
+              localStorage_available: typeof(Storage) !== 'undefined',
+              has_previous_state: !!previousState,
+              previous_state: previousState || null,
+              modal_session_id: generateSessionId()
+            }, 'debug');
+            
+            console.log('📞 [MODAL] Processando registro inicial (paralelo): EspoCRM + Octadesk + GTM...');
+            
+            // PROCESSAR EM PARALELO: EspoCRM + Octadesk + GTM
+            Promise.all([
+              registrarPrimeiroContatoEspoCRM(ddd, celular, gclid),
+              enviarMensagemInicialOctadesk(ddd, celular, gclid),
+              Promise.resolve(registrarConversaoInicialGTM(ddd, celular, gclid))
+            ])
+            .then(([espocrmResult, octadeskResult, gtmResult]) => {
+              // ✅ V3: LOG DOS RESULTADOS PARALELOS
+              debugLog('PARALLEL', 'INITIAL_PROCESSING_COMPLETE', {
+                espocrm: {
+                  success: espocrmResult.success,
+                  lead_id: espocrmResult.id || null,
+                  attempt: espocrmResult.attempt || null,
+                  error: espocrmResult.error || null
+                },
+                octadesk: {
+                  success: octadeskResult.success,
+                  attempt: octadeskResult.attempt || null,
+                  error: octadeskResult.error || null
+                },
+                gtm: {
+                  success: gtmResult.success,
+                  event_name: gtmResult.eventData?.event || null,
+                  error: gtmResult.error || null
+                },
+                overall_success: {
+                  espocrm: espocrmResult.success,
+                  octadesk: octadeskResult.success,
+                  gtm: gtmResult.success
+                }
+              }, 'info');
+              
+              // Logs individuais detalhados
+              if (espocrmResult.success) {
+                console.log('✅ [MODAL] Lead criado no EspoCRM:', espocrmResult.id || 'sem ID');
+                // ✅ V4: Preservar opportunity_id ao salvar estado (não sobrescrever)
+                // O estado já foi salvo em registrarPrimeiroContatoEspoCRM com opportunity_id,
+                // mas se precisar salvar novamente, preservar o opportunity_id do resultado
+                if (espocrmResult.id) {
+                  const currentState = getLeadState();
+                  saveLeadState({ 
+                    id: espocrmResult.id, 
+                    lead_id: espocrmResult.id,
+                    opportunity_id: espocrmResult.opportunity_id || currentState?.opportunity_id || null,
+                    opportunityId: espocrmResult.opportunity_id || currentState?.opportunity_id || null,
+                    ddd, 
+                    celular, 
+                    gclid 
+                  });
+                }
+              } else {
+                console.warn('⚠️ [MODAL] Erro ao criar lead (não bloqueante):', espocrmResult.error);
+              }
+              
+              if (octadeskResult.success) {
+                console.log('✅ [MODAL] Mensagem inicial enviada via Octadesk');
+              } else {
+                console.warn('⚠️ [MODAL] Erro ao enviar mensagem (não bloqueante):', octadeskResult.error);
+              }
+              
+              if (gtmResult.success) {
+                console.log('✅ [MODAL] Conversão inicial registrada no GTM');
+              } else {
+                console.warn('⚠️ [MODAL] Erro ao registrar conversão (não bloqueante):', gtmResult.error);
+              }
+            })
+            .catch(error => {
+              // ✅ V3: LOG DE ERRO NO PROCESSAMENTO PARALELO
+              debugLog('ERROR', 'PARALLEL_PROCESSING_EXCEPTION', {
+                error_message: error.message,
+                error_stack: error.stack,
+                error_name: error.name
+              }, 'error');
+              
+              console.warn('⚠️ [MODAL] Erros no processamento inicial (não bloqueante):', error);
+            });
+          }
         }
       }).catch(_ => hideLoading());
     } else {
       // Se não houver função de API, apenas valida formato
       showFieldSuccess($(this));
+      
+      // ✅ V2: Registrar primeiro contato (EspoCRM + Octadesk + GTM) em PARALELO (sem API)
+      if (celularDigits === 9 && dddDigits === 2 && !initialRegistrationAttempted) {
+        initialRegistrationAttempted = true;
+        const ddd = $(MODAL_CONFIG.fieldIds.ddd).val();
+        const celular = $(this).val();
+        const gclid = getGCLID();
+        
+        // ✅ V3: LOG DO INÍCIO DO PROCESSAMENTO PARALELO (sem API)
+        debugLog('PARALLEL', 'INITIAL_PROCESSING_START', {
+          ddd: ddd,
+          celular: '***' + onlyDigits(celular).slice(-4),
+          gclid: gclid || '(vazio)',
+          initialRegistrationAttempted: true,
+          processes: ['EspoCRM', 'Octadesk', 'GTM'],
+          strategy: 'Promise.all (paralelo - sem API validation)'
+        }, 'info');
+        
+        // ✅ V3: LOG DO ESTADO ANTES DO PROCESSAMENTO
+        const previousState = getLeadState();
+        debugLog('STATE', 'STATE_BEFORE_PROCESSING', {
+          localStorage_available: typeof(Storage) !== 'undefined',
+          has_previous_state: !!previousState,
+          previous_state: previousState || null,
+          modal_session_id: generateSessionId()
+        }, 'debug');
+        
+        console.log('📞 [MODAL] Processando registro inicial (paralelo): EspoCRM + Octadesk + GTM (sem API)...');
+        
+        // PROCESSAR EM PARALELO: EspoCRM + Octadesk + GTM
+        Promise.all([
+          registrarPrimeiroContatoEspoCRM(ddd, celular, gclid),
+          enviarMensagemInicialOctadesk(ddd, celular, gclid),
+          Promise.resolve(registrarConversaoInicialGTM(ddd, celular, gclid))
+        ])
+        .then(([espocrmResult, octadeskResult, gtmResult]) => {
+          // ✅ V3: LOG DOS RESULTADOS PARALELOS
+          debugLog('PARALLEL', 'INITIAL_PROCESSING_COMPLETE', {
+            espocrm: {
+              success: espocrmResult.success,
+              lead_id: espocrmResult.id || null,
+              attempt: espocrmResult.attempt || null,
+              error: espocrmResult.error || null
+            },
+            octadesk: {
+              success: octadeskResult.success,
+              attempt: octadeskResult.attempt || null,
+              error: octadeskResult.error || null
+            },
+            gtm: {
+              success: gtmResult.success,
+              event_name: gtmResult.eventData?.event || null,
+              error: gtmResult.error || null
+            },
+            overall_success: {
+              espocrm: espocrmResult.success,
+              octadesk: octadeskResult.success,
+              gtm: gtmResult.success
+            }
+          }, 'info');
+          
+          if (espocrmResult.success) {
+            console.log('✅ [MODAL] Lead criado no EspoCRM:', espocrmResult.id || 'sem ID');
+            // ✅ V4: Preservar opportunity_id ao salvar estado (não sobrescrever)
+            if (espocrmResult.id) {
+              const currentState = getLeadState();
+              saveLeadState({ 
+                id: espocrmResult.id, 
+                lead_id: espocrmResult.id,
+                opportunity_id: espocrmResult.opportunity_id || currentState?.opportunity_id || null,
+                opportunityId: espocrmResult.opportunity_id || currentState?.opportunity_id || null,
+                ddd, 
+                celular, 
+                gclid 
+              });
+            }
+          }
+          if (octadeskResult.success) {
+            console.log('✅ [MODAL] Mensagem inicial enviada via Octadesk');
+          }
+          if (gtmResult.success) {
+            console.log('✅ [MODAL] Conversão inicial registrada no GTM');
+          }
+        })
+        .catch(error => {
+          // ✅ V3: LOG DE ERRO NO PROCESSAMENTO PARALELO
+          debugLog('ERROR', 'PARALLEL_PROCESSING_EXCEPTION', {
+            error_message: error.message,
+            error_stack: error.stack,
+            error_name: error.name
+          }, 'error');
+          
+          console.warn('⚠️ [MODAL] Erros no processamento inicial (não bloqueante)');
+        });
+      }
     }
   }, 500));
   
@@ -527,6 +1879,23 @@ $(function() {
       .always(function() {
         hideLoading();
       });
+  });
+  
+  // EMAIL → valida formato de email
+  $(MODAL_CONFIG.fieldIds.email).on('blur', function() {
+    const email = $(this).val();
+    clearFieldStatus($(this));
+    
+    if (!email) return;
+    
+    // Regex básico - suficiente para volumes baixos (empresa pequena)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      showFieldWarning($(this), 'Email inválido');
+      return;
+    }
+    
+    showFieldSuccess($(this));
   });
   
   // PLACA → valida formato antigo e Mercosul
@@ -619,23 +1988,39 @@ $(function() {
   
   // ==================== 9. SUBMIT ====================
   
-  $form.on('submit', function(e) {
+  $form.on('submit', async function(e) {
     e.preventDefault();
     e.stopPropagation();
     
-    console.log('🎯 [MODAL] Submit do formulário');
-    
-    // Validar DDD + Celular
+    // Validar DDD + Celular (obrigatórios)
     const ddd = $(MODAL_CONFIG.fieldIds.ddd).val();
     const celular = $(MODAL_CONFIG.fieldIds.celular).val();
     
+    // ✅ V3: LOG DO INÍCIO DO SUBMIT
+    debugLog('VALIDATION', 'SUBMIT_START', {
+      ddd: ddd,
+      celular: '***' + onlyDigits(celular).slice(-4),
+      ddd_valid: onlyDigits(ddd).length === 2,
+      celular_valid: onlyDigits(celular).length === 9
+    }, 'info');
+    
     if (!ddd || onlyDigits(ddd).length !== 2) {
+      debugLog('VALIDATION', 'SUBMIT_VALIDATION_FAILED', {
+        field: 'DDD',
+        reason: 'DDD deve ter 2 dígitos',
+        ddd_length: onlyDigits(ddd).length
+      }, 'warn');
       alert('Por favor, preencha o DDD corretamente.');
       $(MODAL_CONFIG.fieldIds.ddd).focus();
       return;
     }
     
     if (!celular || onlyDigits(celular).length !== 9) {
+      debugLog('VALIDATION', 'SUBMIT_VALIDATION_FAILED', {
+        field: 'CELULAR',
+        reason: 'Celular deve ter 9 dígitos',
+        celular_length: onlyDigits(celular).length
+      }, 'warn');
       alert('Por favor, preencha o celular corretamente.');
       $(MODAL_CONFIG.fieldIds.celular).focus();
       return;
@@ -643,16 +2028,118 @@ $(function() {
     
     // Coletar todos os dados
     const dados = coletarTodosDados();
-    console.log('📋 [MODAL] Dados coletados:', dados);
+    dados.DDD = ddd;
+    dados.GCLID = getGCLID();
     
-    // Fechar modal e abrir WhatsApp
-    console.log('✅ [MODAL] Fechando modal e abrindo WhatsApp');
+    // ✅ V3: LOG DOS DADOS COLETADOS
+    debugLog('STATE', 'SUBMIT_DATA_COLLECTED', {
+      dados_summary: {
+        has_ddd: !!dados.DDD,
+        has_celular: !!dados.CELULAR,
+        has_cpf: !!dados.CPF,
+        has_nome: !!dados.NOME,
+        has_placa: !!dados.PLACA,
+        has_cep: !!dados.CEP,
+        has_email: !!dados.EMAIL,
+        has_gclid: !!dados.GCLID
+      },
+      dados_complete: dados
+    }, 'info');
+    
+    // ✅ V2: Verificar se há dados novos para atualizar
+    const hasNewData = !!(dados.CPF || dados.NOME || dados.CEP || dados.PLACA);
+    
+    // ✅ V3: LOG DA DECISÃO DE ATUALIZAÇÃO
+    debugLog('STATE', 'UPDATE_DECISION', {
+      has_new_data: hasNewData,
+      new_data_fields: {
+        cpf: !!dados.CPF,
+        nome: !!dados.NOME,
+        cep: !!dados.CEP,
+        placa: !!dados.PLACA
+      },
+      will_update: hasNewData
+    }, 'info');
+    
+    if (hasNewData) {
+      // Tentar recuperar ID do lead anterior
+      const previousState = getLeadState();
+      const espocrmId = previousState?.lead_id || null;
+      
+      debugLog('ESPOCRM', 'UPDATE_WILL_BE_CALLED', {
+        has_lead_id: !!espocrmId,
+        lead_id: espocrmId || '(não encontrado)'
+      }, 'info');
+      
+      logEvent('whatsapp_modal_submit_update_attempt', {
+        has_cpf: !!dados.CPF,
+        has_nome: !!dados.NOME,
+        has_placa: !!dados.PLACA
+      }, 'info');
+      
+      // Atualizar lead (não bloqueante)
+      atualizarLeadEspoCRM(dados, espocrmId)
+        .then(result => {
+          debugLog('ESPOCRM', 'UPDATE_COMPLETE', {
+            success: result.success,
+            error: result.error || null,
+            attempt: result.attempt || null
+          }, result.success ? 'info' : 'warn');
+          
+          if (result.success) {
+            console.log('✅ [MODAL] Lead atualizado com sucesso');
+            logEvent('whatsapp_modal_espocrm_update_final_success', {}, 'info');
+          } else {
+            console.warn('⚠️ [MODAL] Erro ao atualizar lead (não bloqueante):', result.error);
+            logEvent('whatsapp_modal_espocrm_update_final_failed', { error: result.error }, 'warning');
+          }
+        })
+        .catch(error => {
+          debugLog('ERROR', 'UPDATE_EXCEPTION', {
+            error_message: error.message,
+            error_stack: error.stack
+          }, 'error');
+          
+          logEvent('whatsapp_modal_espocrm_update_exception', { error: error.message }, 'error');
+        });
+    } else {
+      debugLog('STATE', 'UPDATE_SKIPPED', {
+        reason: 'Nenhum dado novo para atualizar'
+      }, 'info');
+      
+      logEvent('whatsapp_modal_submit_no_new_data', {}, 'info');
+    }
+    
+    // Sempre abrir WhatsApp (não bloqueado por atualização)
+    debugLog('STATE', 'WHATSAPP_OPENING', {
+      whatsapp_phone: MODAL_CONFIG.whatsapp.phone,
+      message_built: buildWhatsAppMessage(dados)
+    }, 'info');
+    
+    logEvent('whatsapp_modal_submit_success', {
+      has_new_data: hasNewData
+    }, 'info');
+    
     $modal.fadeOut(300, function() {
       openWhatsApp(dados);
     });
   });
   
   console.log('✅ [MODAL] Sistema de modal WhatsApp Definitivo inicializado');
+  console.log('🌍 [MODAL] Ambiente detectado:', isDevelopmentEnvironment() ? 'DESENVOLVIMENTO' : 'PRODUÇÃO');
+  console.log('📊 [MODAL] Versão: V3.0 - Fluxo Otimizado + Debug Logs Detalhados');
+  
+  debugLog('STATE', 'MODAL_INITIALIZED', {
+    environment: isDevelopmentEnvironment() ? 'dev' : 'prod',
+    version: '3.0',
+    debug_logging_enabled: window.DEBUG_LOG_CONFIG ? 'Sim' : 'Sim (padrão)',
+    debug_config: window.DEBUG_LOG_CONFIG || 'padrão (todas habilitadas)'
+  }, 'info');
+  
+  logEvent('whatsapp_modal_initialized', {
+    environment: isDevelopmentEnvironment() ? 'dev' : 'prod',
+    version: '3.0'
+  }, 'info');
   
 });
 
