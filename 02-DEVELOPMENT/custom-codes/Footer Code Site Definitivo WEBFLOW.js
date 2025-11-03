@@ -34,9 +34,24 @@
 <!-- ====================== -->
 
 <!-- ====================== -->
+<!-- Configuração de Debug (ANTES do script principal) -->
+<script>
+  // Definir DEBUG_CONFIG ANTES do script principal para garantir que exista quando logUnified executar
+  window.DEBUG_CONFIG = window.DEBUG_CONFIG || {
+    level: 'info',
+    enabled: false,  // false = logs desabilitados | true = logs habilitados
+    exclude: [],
+    environment: 'auto'
+  };
+</script>
+<!-- ====================== -->
+
+<!-- ====================== -->
 <!-- Script Unificado - Footer Code Completo -->
 <script src="https://dev.bpsegurosimediato.com.br/webhooks/FooterCodeSiteDefinitivoCompleto.js?v=1.2" defer></script>
 <!-- ====================== -->
+
+
 
 
 

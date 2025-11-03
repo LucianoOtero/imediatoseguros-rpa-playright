@@ -1,16 +1,38 @@
 /**
  * PROJETO: UNIFICAÇÃO DE ARQUIVOS FOOTER CODE
  * INÍCIO: 30/10/2025 19:55
- * ÚLTIMA ALTERAÇÃO: 01/11/2025 10:12
+ * ÚLTIMA ALTERAÇÃO: 03/11/2025 13:20
  * 
- * VERSÃO: 1.3 - Correção da captura de GCLID
+ * VERSÃO: 1.5.0 - Correção Sistema de Controle de Logs
  * 
  * Arquivo unificado contendo:
  * - FooterCodeSiteDefinitivoUtils.js (Parte 1)
  * - Footer Code Site Definitivo.js (Parte 2 - modificado)
  * - Inside Head Tag Pagina.js (Parte 3 - GCLID integrado)
  * 
- * ALTERAÇÕES NESTA VERSÃO:
+ * ALTERAÇÕES VERSÃO 1.5.0:
+ * - ✅ Correção crítica: window.DEBUG_CONFIG não sobrescreve mais valores do Webflow Footer Code
+ * - ✅ Verificação prioritária movida para primeira linha de logUnified()
+ * - ✅ Bloqueio completo de logs quando enabled === false
+ * - ✅ Verificações adicionais em todas as callbacks da função logDebug()
+ * - ✅ Preservação de valores definidos no Webflow Footer Code usando || operator
+ * - ✅ Sistema de logs agora respeita completamente window.DEBUG_CONFIG.enabled
+ * 
+ * ALTERAÇÕES VERSÃO 1.4.0:
+ * - ✅ Sistema unificado de controle de logs implementado
+ * - ✅ ~102 ocorrências de console.log/error/warn substituídas por funções unificadas
+ * - ✅ Função logDebug() mantida intacta (13 logs internos preservados)
+ * - ✅ Configuração global via window.DEBUG_CONFIG (nível, categorias, ambiente)
+ * - ✅ Auto-detecção de ambiente (dev/prod) com cache para performance
+ * - ✅ Funções de alias: logInfo(), logError(), logWarn(), logDebug()
+ * - ✅ Logs categorizados: UTILS, GCLID, MODAL, FOOTER, RPA, GTM, DEBUG, etc.
+ * 
+ * ALTERAÇÕES VERSÃO 1.3.1:
+ * - Constantes globais movidas para ANTES da verificação do Footer Code Utils
+ * - Eliminado aviso "Constantes faltando" no console
+ * - Sincronização com versão de produção
+ * 
+ * ALTERAÇÕES VERSÃO 1.3:
  * - Adicionados logs de debug detalhados na captura imediata de GCLID
  * - Implementado fallback no DOMContentLoaded para re-tentar captura se cookie não existir
  * - Adicionado tratamento de erros com try-catch na captura imediata
@@ -53,7 +75,195 @@
 (function() {
   'use strict';
   
-  console.log('🔄 [UTILS] Carregando Footer Code Utils...');
+  // ======================
+  // CONSTANTES GLOBAIS (definir ANTES de qualquer uso)
+  // ======================
+  // ⚠️ AMBIENTE: DEV
+  window.USE_PHONE_API = true;
+  window.APILAYER_KEY = 'dce92fa84152098a3b5b7b8db24debbc';
+  window.SAFETY_TICKET = 'fc5e18c10c4aa883b2c31a305f1c09fea3834138'; // DEV: segurosimediato dev
+  window.SAFETY_API_KEY = '20a7a1c297e39180bd80428ac13c363e882a531f'; // Mesmo para DEV e PROD
+  window.VALIDAR_PH3A = false;
+  // ======================
+  
+  // ======================
+  // SISTEMA DE CONTROLE DE LOGS
+  // ======================
+  // Controle global de logs - alterar conforme necessário
+  // ⚠️ IMPORTANTE: Usar || para NÃO sobrescrever se já existir (definido no Webflow Footer Code)
+  window.DEBUG_CONFIG = window.DEBUG_CONFIG || {
+    // Nível global: 'none' | 'error' | 'warn' | 'info' | 'debug' | 'all'
+    level: 'info',
+    
+    // Habilitar/desabilitar logs completamente
+    enabled: false,
+    
+    // Categorias a ignorar (array vazio = nenhuma ignorada)
+    exclude: [], // Exemplo: ['DEBUG'] = ignora esta categoria
+    
+    // Ambiente (auto-detectado uma vez, depois cached)
+    environment: 'auto' // 'auto' | 'dev' | 'prod'
+  };
+
+  // ======================
+  // NÍVEIS DE AJUSTE DISPONÍVEIS
+  // ======================
+  // 
+  // Hierarquia de níveis (ordem crescente de verbosidade):
+  // 
+  // 1. 'none' (Prioridade: 0)
+  //    - Nenhum log é exibido
+  //    - Uso: Desativar completamente todos os logs
+  //    - Exemplo: window.DEBUG_CONFIG.level = 'none';
+  // 
+  // 2. 'error' (Prioridade: 1)
+  //    - Apenas logs de erro (logError)
+  //    - Uso: Produção com foco em erros críticos
+  //    - Exemplo: window.DEBUG_CONFIG.level = 'error';
+  // 
+  // 3. 'warn' (Prioridade: 2)
+  //    - Erros + Avisos (logError + logWarn)
+  //    - Uso: Produção com alertas importantes
+  //    - Exemplo: window.DEBUG_CONFIG.level = 'warn';
+  // 
+  // 4. 'info' (Prioridade: 3) ⭐ PADRÃO
+  //    - Erros + Avisos + Informações (logError + logWarn + logInfo)
+  //    - Uso: Desenvolvimento e produção balanceada (RECOMENDADO)
+  //    - Exemplo: window.DEBUG_CONFIG.level = 'info';
+  // 
+  // 5. 'debug' (Prioridade: 4)
+  //    - Todos os logs, incluindo debug (exceto logs internos preservados)
+  //    - Uso: Depuração detalhada em desenvolvimento
+  //    - Exemplo: window.DEBUG_CONFIG.level = 'debug';
+  // 
+  // 6. 'all' (Prioridade: 5)
+  //    - Todos os logs disponíveis (máximo detalhamento)
+  //    - Uso: Análise profunda e troubleshooting
+  //    - Exemplo: window.DEBUG_CONFIG.level = 'all';
+  // 
+  // REGRA DE HIERARQUIA:
+  // - Ao escolher um nível, todos os níveis abaixo dele também são exibidos
+  // - Exemplo: 'info' exibe error + warn + info
+  // 
+  // OUTRAS CONFIGURAÇÕES:
+  // 
+  // enabled: true/false
+  //    - Controla se o sistema de logs está ativo
+  //    - Se false, nenhum log é exibido, independente do nível
+  //    - Exemplo: window.DEBUG_CONFIG.enabled = false;
+  // 
+  // exclude: ['CATEGORIA1', 'CATEGORIA2']
+  //    - Ignora logs de categorias específicas
+  //    - Categorias disponíveis: 'UTILS', 'GCLID', 'MODAL', 'FOOTER', 
+  //      'RPA', 'GTM', 'DEBUG', 'UNIFIED', etc.
+  //    - Exemplo: window.DEBUG_CONFIG.exclude = ['DEBUG', 'RPA'];
+  // 
+  // environment: 'auto' | 'dev' | 'prod'
+  //    - 'auto': Detecta automaticamente pelo hostname (recomendado)
+  //    - 'dev': Força ambiente de desenvolvimento
+  //    - 'prod': Força ambiente de produção
+  //    - Em 'prod' sem nível definido, usa 'error' automaticamente
+  //    - Exemplo: window.DEBUG_CONFIG.environment = 'prod';
+  // 
+  // EXEMPLOS PRÁTICOS:
+  // 
+  // Produção (apenas erros):
+  //   window.DEBUG_CONFIG.level = 'error';
+  //   window.DEBUG_CONFIG.environment = 'prod';
+  // 
+  // Desenvolvimento (todos os logs):
+  //   window.DEBUG_CONFIG.level = 'all';
+  //   window.DEBUG_CONFIG.environment = 'dev';
+  // 
+  // Desabilitar completamente:
+  //   window.DEBUG_CONFIG.enabled = false;
+  //   // OU
+  //   window.DEBUG_CONFIG.level = 'none';
+  // 
+  // Ignorar categorias específicas:
+  //   window.DEBUG_CONFIG.exclude = ['DEBUG', 'RPA'];
+  // 
+  // ======================
+
+  // Cache para ambiente detectado (otimização de performance)
+  let _envCache = null;
+
+  // Função unificada de log
+  window.logUnified = function(level, category, message, data) {
+    // VERIFICAÇÃO PRIORITÁRIA: Bloquear ANTES de qualquer execução
+    // Verifica se enabled existe E é explicitamente false (boolean ou string)
+    if (window.DEBUG_CONFIG && 
+        (window.DEBUG_CONFIG.enabled === false || window.DEBUG_CONFIG.enabled === 'false')) {
+      return; // Bloquear TODOS os logs se disabled (incluindo debug temporário)
+    }
+    
+    // DEBUG TEMPORÁRIO - Apenas se enabled não for false
+    if (!window._debugLogChecked) {
+      window._debugLogChecked = true;
+      console.log('[DEBUG-TEMP] window.DEBUG_CONFIG existe?', !!window.DEBUG_CONFIG);
+      console.log('[DEBUG-TEMP] window.DEBUG_CONFIG:', window.DEBUG_CONFIG);
+      console.log('[DEBUG-TEMP] enabled value:', window.DEBUG_CONFIG?.enabled);
+      console.log('[DEBUG-TEMP] enabled === false?', window.DEBUG_CONFIG?.enabled === false);
+      console.log('[DEBUG-TEMP] enabled type:', typeof window.DEBUG_CONFIG?.enabled);
+    }
+    
+    // Fallback para objeto vazio se DEBUG_CONFIG não existir
+    const config = window.DEBUG_CONFIG || {};
+    
+    // Auto-detectar ambiente UMA VEZ (cache para performance)
+    if (config.environment === 'auto' && _envCache === null) {
+      _envCache = (window.location.hostname.includes('webflow.io') || 
+                   window.location.hostname.includes('localhost') ||
+                   window.location.hostname.includes('dev.')) ? 'dev' : 'prod';
+    }
+    
+    const env = (config.environment === 'auto') ? _envCache : config.environment;
+    
+    // Em produção, usar nível mais restritivo se não especificado
+    if (env === 'prod' && !config.level) {
+      config.level = 'error';
+    }
+    
+    // Mapeamento de níveis (ordem de prioridade)
+    const levels = { 'none': 0, 'error': 1, 'warn': 2, 'info': 3, 'debug': 4, 'all': 5 };
+    const currentLevel = levels[config.level] || levels['info'];
+    const messageLevel = levels[level] || levels['info'];
+    
+    // Verificar se deve exibir o log baseado no nível
+    if (messageLevel > currentLevel) return;
+    
+    // Verificar exclusão de categoria (apenas um tipo de filtro para simplicidade)
+    if (config.exclude && config.exclude.length > 0) {
+      if (category && config.exclude.includes(category)) return;
+    }
+    
+    // Formatar mensagem com categoria
+    const formattedMessage = category ? `[${category}] ${message}` : message;
+    
+    // Escolher método de console apropriado
+    switch(level) {
+      case 'error':
+        console.error(formattedMessage, data || '');
+        break;
+      case 'warn':
+        console.warn(formattedMessage, data || '');
+        break;
+      case 'info':
+      case 'debug':
+      default:
+        console.log(formattedMessage, data || '');
+        break;
+    }
+  };
+
+  // Aliases para facilitar uso
+  window.logInfo = (cat, msg, data) => window.logUnified('info', cat, msg, data);
+  window.logError = (cat, msg, data) => window.logUnified('error', cat, msg, data);
+  window.logWarn = (cat, msg, data) => window.logUnified('warn', cat, msg, data);
+  window.logDebug = (cat, msg, data) => window.logUnified('debug', cat, msg, data);
+  // ======================
+  
+  window.logInfo('UTILS', '🔄 Carregando Footer Code Utils...');
   
   // ========= MANIPULAÇÃO DE DADOS =========
   
@@ -381,7 +591,7 @@
    */
   function validarCPFApi(cpf) {
     if (typeof window.onlyDigits !== 'function' || typeof window.validarCPFFormato !== 'function' || typeof window.validarCPFAlgoritmo !== 'function') {
-      console.error('❌ [UTILS] Funções de CPF não disponíveis');
+      window.logError('UTILS', '❌ Funções de CPF não disponíveis');
       return Promise.resolve({ok: false, reason: 'erro_utils'});
     }
     
@@ -397,7 +607,7 @@
     
     // Verificar se VALIDAR_PH3A está habilitado
     if (typeof window.VALIDAR_PH3A === 'undefined') {
-      console.warn('⚠️ [UTILS] VALIDAR_PH3A não disponível, assumindo false');
+      window.logWarn('UTILS', '⚠️ VALIDAR_PH3A não disponível, assumindo false');
     }
     
     // Se não deve validar via API, retornar apenas validação local
@@ -444,7 +654,7 @@
    */
   function validarCepViaCep(cep) {
     if (typeof window.onlyDigits !== 'function') {
-      console.error('❌ [UTILS] onlyDigits não disponível');
+      window.logError('UTILS', '❌ onlyDigits não disponível');
       return Promise.resolve({ok: false, reason: 'erro_utils'});
     }
     cep = window.onlyDigits(cep);
@@ -462,7 +672,7 @@
    */
   function validarPlacaApi(placa) {
     if (typeof window.validarPlacaFormato !== 'function') {
-      console.error('❌ [UTILS] validarPlacaFormato não disponível');
+      window.logError('UTILS', '❌ validarPlacaFormato não disponível');
       return Promise.resolve({ok: false, reason: 'erro_utils'});
     }
     const raw = placa.toUpperCase().replace(/[^A-Z0-9]/g, '');
@@ -496,7 +706,7 @@
    */
   function validarCelularApi(nat) {
     if (typeof window.APILAYER_KEY === 'undefined') {
-      console.warn('⚠️ [UTILS] APILAYER_KEY não disponível, usando fallback');
+      window.logWarn('UTILS', '⚠️ APILAYER_KEY não disponível, usando fallback');
       return Promise.resolve({ok: true}); // fallback - falha externa não bloqueia
     }
     return fetch('https://apilayer.net/api/validate?access_key=' + window.APILAYER_KEY + '&country_code=BR&number=' + nat)
@@ -513,14 +723,14 @@
    */
   function validarTelefoneAsync($DDD, $CEL) {
     if (typeof window.validarCelularLocal !== 'function') {
-      console.error('❌ [UTILS] validarCelularLocal não disponível');
+      window.logError('UTILS', '❌ validarCelularLocal não disponível');
       return Promise.resolve({ok: false, reason: 'erro_utils'});
     }
     const local = window.validarCelularLocal($DDD.val(), $CEL.val());
     if (!local.ok) return Promise.resolve({ok: false, reason: local.reason});
     
     if (typeof window.USE_PHONE_API === 'undefined') {
-      console.warn('⚠️ [UTILS] USE_PHONE_API não disponível, assumindo false');
+      window.logWarn('UTILS', '⚠️ USE_PHONE_API não disponível, assumindo false');
       return Promise.resolve({ok: true});
     }
     
@@ -536,12 +746,12 @@
   async function validarEmailSafetyMails(email) {
     try {
       if (typeof window.sha1 !== 'function' || typeof window.hmacSHA256 !== 'function') {
-        console.error('❌ [UTILS] sha1 ou hmacSHA256 não disponíveis');
+        window.logError('UTILS', '❌ sha1 ou hmacSHA256 não disponíveis');
         return null;
       }
       
       if (typeof window.SAFETY_TICKET === 'undefined' || typeof window.SAFETY_API_KEY === 'undefined') {
-        console.warn('⚠️ [UTILS] SAFETY_TICKET ou SAFETY_API_KEY não disponíveis');
+        window.logWarn('UTILS', '⚠️ SAFETY_TICKET ou SAFETY_API_KEY não disponíveis');
         return null;
       }
       
@@ -559,14 +769,14 @@
       });
       
       if (!response.ok) {
-        console.error(`SafetyMails HTTP Error: ${response.status}`);
+        window.logError('UTILS', `SafetyMails HTTP Error: ${response.status}`);
         return null;
       }
       
       const data = await response.json();
       return data.Success ? data : null;
     } catch (error) {
-      console.error('SafetyMails request failed:', error);
+      window.logError('UTILS', 'SafetyMails request failed:', error);
       return null;
     }
   }
@@ -672,18 +882,18 @@
   
   const missing = requiredFunctions.filter(fn => typeof window[fn] !== 'function');
   if (missing.length > 0) {
-    console.error('❌ [UTILS] Funções faltando:', missing);
+    window.logError('UTILS', '❌ Funções faltando:', missing);
   } else {
-    console.log('✅ [UTILS] Footer Code Utils carregado - 26 funções disponíveis');
+    window.logInfo('UTILS', '✅ Footer Code Utils carregado - 26 funções disponíveis');
   }
   
   // ✅ Verificar se constantes estão disponíveis (recomendação do engenheiro)
   const requiredConstants = ['USE_PHONE_API', 'APILAYER_KEY', 'SAFETY_TICKET', 'SAFETY_API_KEY', 'VALIDAR_PH3A'];
   const missingConstants = requiredConstants.filter(c => typeof window[c] === 'undefined');
   if (missingConstants.length > 0) {
-    console.warn('⚠️ [UTILS] Constantes faltando:', missingConstants);
+    window.logWarn('UTILS', '⚠️ Constantes faltando:', missingConstants);
   } else {
-    console.log('✅ [UTILS] Todas as constantes disponíveis');
+    window.logInfo('UTILS', '✅ Todas as constantes disponíveis');
   }
 })();
 // ======================
@@ -696,14 +906,7 @@
     // ======================
     // PARTE 2: FOOTER CODE PRINCIPAL (modificado)
     // ======================
-    
-    // Constantes globais (expor ANTES de qualquer uso - Recomendação do Engenheiro)
-    // ⚠️ AMBIENTE: DEV (segurosimediato dev)
-    window.USE_PHONE_API = true;
-    window.APILAYER_KEY = 'dce92fa84152098a3b5b7b8db24debbc';
-    window.SAFETY_TICKET = 'fc5e18c10c4aa883b2c31a305f1c09fea3834138'; // DEV: segurosimediato dev
-    window.SAFETY_API_KEY = '20a7a1c297e39180bd80428ac13c363e882a531f'; // Mesmo para DEV e PROD
-    window.VALIDAR_PH3A = false;
+    // Nota: Constantes globais já foram definidas no início do Footer Code Utils (PARTE 1)
     
     // ======================
     // CAPTURA E GERENCIAMENTO DE GCLID (Integrado do Inside Head Tag Pagina.js)
@@ -733,35 +936,35 @@
     }
     
     // Captura imediata de GCLID/GBRAID da URL (executa ANTES do DOM)
-    console.log('🔍 [GCLID] Iniciando captura - URL:', window.location.href);
-    console.log('🔍 [GCLID] window.location.search:', window.location.search);
+    window.logDebug('GCLID', '🔍 Iniciando captura - URL:', window.location.href);
+    window.logDebug('GCLID', '🔍 window.location.search:', window.location.search);
     
     var gclid = getParam("gclid") || getParam("GCLID") || getParam("gclId");
     var gbraid = getParam("gbraid") || getParam("GBRAID") || getParam("gBraid");
     var trackingId = gclid || gbraid;
     
-    console.log('🔍 [GCLID] Valores capturados:', { gclid: gclid, gbraid: gbraid, trackingId: trackingId });
+    window.logDebug('GCLID', '🔍 Valores capturados:', { gclid: gclid, gbraid: gbraid, trackingId: trackingId });
     
     if (trackingId) {
       var gclsrc = getParam("gclsrc");
-      console.log('🔍 [GCLID] gclsrc:', gclsrc);
+      window.logDebug('GCLID', '🔍 gclsrc:', gclsrc);
       
       if (!gclsrc || gclsrc.indexOf("aw") !== -1) {
         try {
           setCookie("gclid", trackingId, 90);
-          console.log('✅ [GCLID] Capturado da URL e salvo em cookie:', trackingId);
+          window.logInfo('GCLID', '✅ Capturado da URL e salvo em cookie:', trackingId);
           
           // Verificar se cookie foi salvo corretamente
           var cookieVerificado = readCookie("gclid");
-          console.log('🔍 [GCLID] Cookie verificado após salvamento:', cookieVerificado);
+          window.logDebug('GCLID', '🔍 Cookie verificado após salvamento:', cookieVerificado);
         } catch (error) {
-          console.error('❌ [GCLID] Erro ao salvar cookie:', error);
+          window.logError('GCLID', '❌ Erro ao salvar cookie:', error);
         }
       } else {
-        console.warn('⚠️ [GCLID] gclsrc bloqueou salvamento:', gclsrc);
+        window.logWarn('GCLID', '⚠️ gclsrc bloqueou salvamento:', gclsrc);
       }
     } else {
-      console.warn('⚠️ [GCLID] Nenhum trackingId encontrado na URL');
+      window.logWarn('GCLID', '⚠️ Nenhum trackingId encontrado na URL');
     }
     
     // Função de verificação defensiva de dependências (Recomendação do Engenheiro)
@@ -777,7 +980,7 @@
         } else if (Date.now() - startTime < maxWait) {
           setTimeout(check, 50);
         } else {
-          console.error('[FOOTER COMPLETO] Timeout aguardando dependências:', {
+          window.logError('FOOTER', '[FOOTER COMPLETO] Timeout aguardando dependências:', {
             jQuery: hasJQuery,
             Utils: hasUtils
           });
@@ -805,7 +1008,7 @@
       
       // 2. Configuração RPA Global
       window.rpaEnabled = false;
-      console.log('🎯 [CONFIG] RPA habilitado:', window.rpaEnabled);
+      window.logInfo('CONFIG', '🎯 RPA habilitado:', window.rpaEnabled);
       
       // 2.1. Gerenciamento GCLID (DOMContentLoaded)
       document.addEventListener("DOMContentLoaded", function () {
@@ -813,7 +1016,7 @@
         var cookieExistente = window.readCookie ? window.readCookie("gclid") : null;
         
         if (!cookieExistente) {
-          console.log('🔍 [GCLID] Cookie não encontrado, tentando captura novamente no DOMContentLoaded...');
+          window.logDebug('GCLID', '🔍 Cookie não encontrado, tentando captura novamente no DOMContentLoaded...');
           var gclid = getParam("gclid") || getParam("GCLID") || getParam("gclId");
           var gbraid = getParam("gbraid") || getParam("GBRAID") || getParam("gBraid");
           var trackingId = gclid || gbraid;
@@ -823,31 +1026,31 @@
             if (!gclsrc || gclsrc.indexOf("aw") !== -1) {
               try {
                 setCookie("gclid", trackingId, 90);
-                console.log('✅ [GCLID] Capturado no DOMContentLoaded e salvo em cookie:', trackingId);
+                window.logInfo('GCLID', '✅ Capturado no DOMContentLoaded e salvo em cookie:', trackingId);
                 cookieExistente = trackingId;
               } catch (error) {
-                console.error('❌ [GCLID] Erro ao salvar cookie no DOMContentLoaded:', error);
+                window.logError('GCLID', '❌ Erro ao salvar cookie no DOMContentLoaded:', error);
               }
             }
           } else {
-            console.warn('⚠️ [GCLID] Nenhum trackingId encontrado na URL no DOMContentLoaded');
+            window.logWarn('GCLID', '⚠️ Nenhum trackingId encontrado na URL no DOMContentLoaded');
           }
         } else {
-          console.log('✅ [GCLID] Cookie já existe:', cookieExistente);
+          window.logInfo('GCLID', '✅ Cookie já existe:', cookieExistente);
         }
         
         // Preencher campos com nome GCLID_FLD
         const gclidFields = document.getElementsByName("GCLID_FLD");
-        console.log('🔍 [GCLID] Campos GCLID_FLD encontrados:', gclidFields.length);
+        window.logDebug('GCLID', '🔍 Campos GCLID_FLD encontrados:', gclidFields.length);
         
         for (var i = 0; i < gclidFields.length; i++) {
           var cookieValue = window.readCookie ? window.readCookie("gclid") : cookieExistente;
           
           if (cookieValue) {
             gclidFields[i].value = cookieValue;
-            console.log('✅ [GCLID] Campo GCLID_FLD[' + i + '] preenchido:', cookieValue);
+            window.logInfo('GCLID', '✅ Campo GCLID_FLD[' + i + '] preenchido:', cookieValue);
           } else {
-            console.warn('⚠️ [GCLID] Campo GCLID_FLD[' + i + '] não preenchido - cookie não encontrado');
+            window.logWarn('GCLID', '⚠️ Campo GCLID_FLD[' + i + '] não preenchido - cookie não encontrado');
           }
         }
         
@@ -883,12 +1086,18 @@
           window.CollectChatAttributes = {
             gclid: decodeURIComponent(gclidCookie)
           };
-          console.log("✅ [GCLID] CollectChatAttributes configurado:", decodeURIComponent(gclidCookie));
+          window.logInfo("GCLID", "✅ CollectChatAttributes configurado:", decodeURIComponent(gclidCookie));
         }
       });
       
       // Função básica de logging para teste
       function logDebug(level, message, data = null) {
+        // Verificar se logs estão desabilitados
+        if (window.DEBUG_CONFIG && 
+            (window.DEBUG_CONFIG.enabled === false || window.DEBUG_CONFIG.enabled === 'false')) {
+          return; // Bloquear se disabled
+        }
+        
         const logData = {
           level: level,
           message: message,
@@ -910,6 +1119,11 @@
           credentials: 'omit'
         })
         .then(response => {
+          // Verificar enabled novamente antes de cada log
+          if (window.DEBUG_CONFIG && 
+              (window.DEBUG_CONFIG.enabled === false || window.DEBUG_CONFIG.enabled === 'false')) {
+            return;
+          }
           console.log(`[LOG DEBUG] Status: ${response.status} ${response.statusText}`);
           console.log(`[LOG DEBUG] Headers:`, Object.fromEntries(response.headers.entries()));
           
@@ -920,23 +1134,48 @@
           return response.text();
         })
         .then(text => {
+          // Verificar enabled novamente antes de cada log
+          if (window.DEBUG_CONFIG && 
+              (window.DEBUG_CONFIG.enabled === false || window.DEBUG_CONFIG.enabled === 'false')) {
+            return;
+          }
           console.log(`[LOG DEBUG] Resposta bruta:`, text);
           
           try {
             const result = JSON.parse(text);
+            if (window.DEBUG_CONFIG && 
+                (window.DEBUG_CONFIG.enabled === false || window.DEBUG_CONFIG.enabled === 'false')) {
+              return;
+            }
             console.log(`[LOG DEBUG] Sucesso:`, result);
             
             if (result.success) {
+              if (window.DEBUG_CONFIG && 
+                  (window.DEBUG_CONFIG.enabled === false || window.DEBUG_CONFIG.enabled === 'false')) {
+                return;
+              }
               console.log(`[LOG DEBUG] Log enviado com sucesso! ID: ${result.logged?.log_id || 'N/A'}`);
             } else {
+              if (window.DEBUG_CONFIG && 
+                  (window.DEBUG_CONFIG.enabled === false || window.DEBUG_CONFIG.enabled === 'false')) {
+                return;
+              }
               console.error(`[LOG DEBUG] Erro no servidor:`, result.error);
             }
           } catch (parseError) {
+            if (window.DEBUG_CONFIG && 
+                (window.DEBUG_CONFIG.enabled === false || window.DEBUG_CONFIG.enabled === 'false')) {
+              return;
+            }
             console.error(`[LOG DEBUG] Erro ao fazer parse da resposta:`, parseError);
             console.error(`[LOG DEBUG] Resposta que causou erro:`, text);
           }
         })
         .catch(error => {
+          if (window.DEBUG_CONFIG && 
+              (window.DEBUG_CONFIG.enabled === false || window.DEBUG_CONFIG.enabled === 'false')) {
+            return;
+          }
           console.error(`[LOG DEBUG] Erro na requisição:`, error);
           console.error(`[LOG DEBUG] Tipo do erro:`, error.constructor.name);
           console.error(`[LOG DEBUG] Mensagem:`, error.message);
@@ -947,8 +1186,11 @@
           }
         });
         
-        // Manter console.log para desenvolvimento local
-        console.log(`[${level}] ${message}`, data);
+        // Manter console.log para desenvolvimento local (apenas se enabled)
+        if (!window.DEBUG_CONFIG || 
+            (window.DEBUG_CONFIG.enabled !== false && window.DEBUG_CONFIG.enabled !== 'false')) {
+          console.log(`[${level}] ${message}`, data);
+        }
       }
       
       // Expor funções globalmente
@@ -962,21 +1204,21 @@
         return new Promise((resolve, reject) => {
           // Verificar se já foi carregado
           if (window.MainPage && window.ProgressModalRPA) {
-            console.log('🎯 Script RPA já carregado');
+            window.logInfo('RPA', '🎯 Script RPA já carregado');
             resolve();
             return;
           }
 
-          console.log('🎯 Carregando script RPA...');
+          window.logInfo('RPA', '🎯 Carregando script RPA...');
           
           const script = document.createElement('script');
           script.src = 'https://mdmidia.com.br/webflow_injection_limpo.js';
           script.onload = () => {
-            console.log('✅ Script RPA carregado com sucesso');
+            window.logInfo('RPA', '✅ Script RPA carregado com sucesso');
             resolve();
           };
           script.onerror = () => {
-            console.error('❌ Erro ao carregar script RPA');
+            window.logError('RPA', '❌ Erro ao carregar script RPA');
             reject(new Error('Falha ao carregar script RPA'));
           };
           document.head.appendChild(script);
@@ -994,7 +1236,7 @@
           gclid = window.readCookie('gclid');
         } else {
           // Fallback se Utils.js não carregou
-          console.warn('⚠️ [FOOTER] readCookie não disponível, tentando novamente...');
+          window.logWarn('FOOTER', '⚠️ readCookie não disponível, tentando novamente...');
           setTimeout(initGCLID, 100);
         }
       }
@@ -1010,19 +1252,19 @@
       // Função para carregar modal dinamicamente
       function loadWhatsAppModal() {
         if (window.whatsappModalLoaded) {
-          console.log('✅ [MODAL] Modal já carregado');
+          window.logInfo('MODAL', '✅ Modal já carregado');
           return;
         }
         
-        console.log('🔄 [MODAL] Carregando modal de dev.bpsegurosimediato.com.br...');
+        window.logInfo('MODAL', '🔄 Carregando modal de dev.bpsegurosimediato.com.br...');
         const script = document.createElement('script');
         script.src = 'https://dev.bpsegurosimediato.com.br/webhooks/MODAL_WHATSAPP_DEFINITIVO.js?v=23&force=' + Math.random();
         script.onload = function() {
           window.whatsappModalLoaded = true;
-          console.log('✅ [MODAL] Modal carregado com sucesso');
+          window.logInfo('MODAL', '✅ Modal carregado com sucesso');
         };
         script.onerror = function() {
-          console.error('❌ [MODAL] Erro ao carregar modal');
+          window.logError('MODAL', '❌ Erro ao carregar modal');
         };
         document.head.appendChild(script);
       }
@@ -1113,7 +1355,7 @@
           
           // Validação local primeiro
           if (typeof window.validarCPFAlgoritmo !== 'function') {
-            console.error('❌ [FOOTER] validarCPFAlgoritmo não disponível');
+            window.logError('FOOTER', '❌ validarCPFAlgoritmo não disponível');
             return;
           }
           if (!window.validarCPFAlgoritmo(cpfValue)) {
@@ -1167,7 +1409,7 @@
             }).catch(_ => {
               if (typeof window.hideLoading === 'function') window.hideLoading();
               // Em caso de erro na API, não bloquear o usuário
-              console.log('Erro na consulta da API PH3A');
+              window.logError('FOOTER', 'Erro na consulta da API PH3A');
             });
           }
         });
@@ -1228,7 +1470,7 @@
         // DDD → valida no BLUR do DDD
         $DDD.on('blur.siPhone', function(){
           if (typeof window.onlyDigits !== 'function') {
-            console.error('❌ [FOOTER] onlyDigits não disponível');
+            window.logError('FOOTER', '❌ onlyDigits não disponível');
             return;
           }
           const dddDigits = window.onlyDigits($DDD.val()).length;
@@ -1254,7 +1496,7 @@
         
         $CEL.on('blur.siPhone', function(){
           if (typeof window.onlyDigits !== 'function') {
-            console.error('❌ [FOOTER] onlyDigits não disponível');
+            window.logError('FOOTER', '❌ onlyDigits não disponível');
             return;
           }
           const dddDigits = window.onlyDigits($DDD.val()).length;
@@ -1304,7 +1546,7 @@
           const v = ($(this).val()||'').trim();
           if (!v) return;
           if (typeof window.validarEmailLocal !== 'function') {
-            console.error('❌ [FOOTER] validarEmailLocal não disponível');
+            window.logError('FOOTER', '❌ validarEmailLocal não disponível');
             return;
           }
           if (!window.validarEmailLocal(v)){
@@ -1334,14 +1576,14 @@
 
         // CONTROLE MANUAL DO BOTÃO SUBMIT
         $('#submit_button_auto').on('click', function(e) {
-          console.log('🎯 [DEBUG] Botão CALCULE AGORA! clicado');
+          window.logDebug('DEBUG', '🎯 Botão CALCULE AGORA! clicado');
           e.preventDefault(); // Bloquear submit natural para validação
           e.stopPropagation();
           
           // Encontrar o formulário e disparar validação
           const $form = $(this).closest('form');
           if ($form.length) {
-            console.log('🔍 [DEBUG] Disparando validação manual do formulário');
+            window.logDebug('DEBUG', '🔍 Disparando validação manual do formulário');
             $form.trigger('submit');
           }
         });
@@ -1354,7 +1596,7 @@
             if ($form.data('validated-ok') === true) { $form.removeData('validated-ok'); return true; }
             if ($form.data('skip-validate') === true){ $form.removeData('skip-validate');  return true; }
 
-            console.log('🔍 [DEBUG] Submit do formulário interceptado');
+            window.logDebug('DEBUG', '🔍 Submit do formulário interceptado');
             ev.preventDefault();
             ev.stopPropagation();
             if (typeof window.showLoading === 'function') window.showLoading('Validando seus dados…');
@@ -1394,13 +1636,13 @@
               }
 
               const invalido = (!cpfRes.ok) || (!cepRes.ok) || (!placaRes.ok) || (!telRes.ok) || (!mailRes.ok);
-              console.log('🔍 [DEBUG] Dados inválidos?', invalido);
+              window.logDebug('DEBUG', '🔍 Dados inválidos?', invalido);
 
               if (!invalido){
-                console.log('✅ [DEBUG] Dados válidos - verificando RPA');
+                window.logDebug('DEBUG', '✅ Dados válidos - verificando RPA');
                 
                 // 🎯 CAPTURAR CONVERSÃO GTM - DADOS VÁLIDOS
-                console.log('🎯 [GTM] Registrando conversão - dados válidos');
+                window.logInfo('GTM', '🎯 Registrando conversão - dados válidos');
                 if (typeof window.dataLayer !== 'undefined') {
                   window.dataLayer.push({
                     'event': 'form_submit_valid',
@@ -1410,15 +1652,15 @@
                 }
                 
                 if (window.rpaEnabled === true) {
-                  console.log('🎯 [RPA] RPA habilitado - iniciando processo RPA');
+                  window.logInfo('RPA', '🎯 RPA habilitado - iniciando processo RPA');
                   window.loadRPAScript()
                     .then(() => {
-                      console.log('🎯 [RPA] Script RPA carregado - executando processo');
+                      window.logInfo('RPA', '🎯 Script RPA carregado - executando processo');
                       if (window.MainPage && typeof window.MainPage.prototype.handleFormSubmit === 'function') {
                         const mainPageInstance = new window.MainPage();
                         mainPageInstance.handleFormSubmit($form[0]);
                       } else {
-                        console.warn('🎯 [RPA] Função handleFormSubmit não encontrada - usando fallback');
+                        window.logWarn('RPA', '🎯 Função handleFormSubmit não encontrada - usando fallback');
                         $form.data('validated-ok', true);
                         if (typeof window.nativeSubmit === 'function') {
                           window.nativeSubmit($form);
@@ -1428,8 +1670,8 @@
                       }
                     })
                     .catch((error) => {
-                      console.error('🎯 [RPA] Erro ao carregar script RPA:', error);
-                      console.log('🎯 [RPA] Fallback para processamento Webflow');
+                      window.logError('RPA', '🎯 Erro ao carregar script RPA:', error);
+                      window.logInfo('RPA', '🎯 Fallback para processamento Webflow');
                       $form.data('validated-ok', true);
                       if (typeof window.nativeSubmit === 'function') {
                         window.nativeSubmit($form);
@@ -1438,7 +1680,7 @@
                       }
                     });
                 } else {
-                  console.log('🎯 [RPA] RPA desabilitado - processando apenas com Webflow');
+                  window.logInfo('RPA', '🎯 RPA desabilitado - processando apenas com Webflow');
                   $form.data('validated-ok', true);
                   if (typeof window.nativeSubmit === 'function') {
                     window.nativeSubmit($form);
@@ -1447,7 +1689,7 @@
                   }
                 }
               } else {
-                console.log('❌ [DEBUG] Dados inválidos - mostrando SweetAlert');
+                window.logDebug('DEBUG', '❌ Dados inválidos - mostrando SweetAlert');
                 let linhas = "";
                 if (!cpfRes.ok)       linhas += "• CPF inválido\n";
                 if (!cepRes.ok)   linhas += "• CEP inválido\n";
@@ -1470,10 +1712,10 @@
                   allowEscapeKey: true
                 }).then(r=>{
                   if (r.isConfirmed){
-                    console.log('🎯 [RPA] Usuário escolheu prosseguir com dados inválidos');
+                    window.logInfo('RPA', '🎯 Usuário escolheu prosseguir com dados inválidos');
                     
                     // 🎯 CAPTURAR CONVERSÃO GTM - USUÁRIO PROSSEGUIU COM DADOS INVÁLIDOS
-                    console.log('🎯 [GTM] Registrando conversão - usuário prosseguiu com dados inválidos');
+                    window.logInfo('GTM', '🎯 Registrando conversão - usuário prosseguiu com dados inválidos');
                     if (typeof window.dataLayer !== 'undefined') {
                       window.dataLayer.push({
                         'event': 'form_submit_invalid_proceed',
@@ -1483,15 +1725,15 @@
                     }
                     
                     if (window.rpaEnabled === true) {
-                      console.log('🎯 [RPA] RPA habilitado - iniciando processo RPA com dados inválidos');
+                      window.logInfo('RPA', '🎯 RPA habilitado - iniciando processo RPA com dados inválidos');
                       window.loadRPAScript()
                         .then(() => {
-                          console.log('🎯 [RPA] Script RPA carregado - executando processo com dados inválidos');
+                          window.logInfo('RPA', '🎯 Script RPA carregado - executando processo com dados inválidos');
                           if (window.MainPage && typeof window.MainPage.prototype.handleFormSubmit === 'function') {
                             const mainPageInstance = new window.MainPage();
                             mainPageInstance.handleFormSubmit($form[0]);
                           } else {
-                            console.warn('🎯 [RPA] Função handleFormSubmit não encontrada - usando fallback');
+                            window.logWarn('RPA', '🎯 Função handleFormSubmit não encontrada - usando fallback');
                             $form.data('skip-validate', true);
                             if (typeof window.nativeSubmit === 'function') {
                               window.nativeSubmit($form);
@@ -1501,8 +1743,8 @@
                           }
                         })
                         .catch((error) => {
-                          console.error('🎯 [RPA] Erro ao carregar script RPA:', error);
-                          console.log('🎯 [RPA] Fallback para processamento Webflow');
+                          window.logError('RPA', '🎯 Erro ao carregar script RPA:', error);
+                          window.logInfo('RPA', '🎯 Fallback para processamento Webflow');
                           $form.data('skip-validate', true);
                           if (typeof window.nativeSubmit === 'function') {
                             window.nativeSubmit($form);
@@ -1511,7 +1753,7 @@
                           }
                         });
                     } else {
-                      console.log('🎯 [RPA] RPA desabilitado - processando apenas com Webflow');
+                      window.logInfo('RPA', '🎯 RPA desabilitado - processando apenas com Webflow');
                       $form.data('skip-validate', true);
                       if (typeof window.nativeSubmit === 'function') {
                         window.nativeSubmit($form);
@@ -1543,10 +1785,10 @@
                 allowEscapeKey: true
               }).then(r=>{
                 if (r.isConfirmed) { 
-                  console.log('🎯 [RPA] Usuário escolheu prosseguir após erro de rede');
+                  window.logInfo('RPA', '🎯 Usuário escolheu prosseguir após erro de rede');
                   
                   // 🎯 CAPTURAR CONVERSÃO GTM - USUÁRIO PROSSEGUIU APÓS ERRO DE REDE
-                  console.log('🎯 [GTM] Registrando conversão - usuário prosseguiu após erro de rede');
+                  window.logInfo('GTM', '🎯 Registrando conversão - usuário prosseguiu após erro de rede');
                   if (typeof window.dataLayer !== 'undefined') {
                     window.dataLayer.push({
                       'event': 'form_submit_network_error_proceed',
@@ -1556,15 +1798,15 @@
                   }
                   
                   if (window.rpaEnabled === true) {
-                    console.log('🎯 [RPA] RPA habilitado - iniciando processo RPA após erro de rede');
+                    window.logInfo('RPA', '🎯 RPA habilitado - iniciando processo RPA após erro de rede');
                     window.loadRPAScript()
                       .then(() => {
-                        console.log('🎯 [RPA] Script RPA carregado - executando processo após erro de rede');
+                        window.logInfo('RPA', '🎯 Script RPA carregado - executando processo após erro de rede');
                         if (window.MainPage && typeof window.MainPage.prototype.handleFormSubmit === 'function') {
                           const mainPageInstance = new window.MainPage();
                           mainPageInstance.handleFormSubmit($form[0]);
                         } else {
-                          console.warn('🎯 [RPA] Função handleFormSubmit não encontrada - usando fallback');
+                          window.logWarn('RPA', '🎯 Função handleFormSubmit não encontrada - usando fallback');
                           $form.data('skip-validate', true);
                           if (typeof window.nativeSubmit === 'function') {
                             window.nativeSubmit($form);
@@ -1574,8 +1816,8 @@
                         }
                       })
                       .catch((error) => {
-                        console.error('🎯 [RPA] Erro ao carregar script RPA:', error);
-                        console.log('🎯 [RPA] Fallback para processamento Webflow');
+                        window.logError('RPA', '🎯 Erro ao carregar script RPA:', error);
+                        window.logInfo('RPA', '🎯 Fallback para processamento Webflow');
                         $form.data('skip-validate', true);
                         if (typeof window.nativeSubmit === 'function') {
                           window.nativeSubmit($form);
@@ -1584,7 +1826,7 @@
                         }
                       });
                   } else {
-                    console.log('🎯 [RPA] RPA desabilitado - processando apenas com Webflow');
+                    window.logInfo('RPA', '🎯 RPA desabilitado - processando apenas com Webflow');
                     $form.data('skip-validate', true);
                     if (typeof window.nativeSubmit === 'function') {
                       window.nativeSubmit($form);
@@ -1626,98 +1868,98 @@
         });
         
         // 7. Debug RPA
-        console.log('🔍 [DEBUG] Iniciando verificação de injeção RPA...');
+        window.logDebug('DEBUG', '🔍 Iniciando verificação de injeção RPA...');
 
         // Função para verificar se a injeção foi bem-sucedida
         function debugRPAModule() {
-          console.log('🔍 [DEBUG] === VERIFICAÇÃO DE INJEÇÃO RPA ===');
+          window.logDebug('DEBUG', '🔍 === VERIFICAÇÃO DE INJEÇÃO RPA ===');
           
           // 1. Verificar se window.rpaEnabled existe
           if (typeof window.rpaEnabled !== 'undefined') {
-            console.log('✅ [DEBUG] window.rpaEnabled encontrado:', window.rpaEnabled);
+            window.logDebug('DEBUG', '✅ window.rpaEnabled encontrado:', window.rpaEnabled);
           } else {
-            console.error('❌ [DEBUG] window.rpaEnabled NÃO encontrado!');
+            window.logError('DEBUG', '❌ window.rpaEnabled NÃO encontrado!');
           }
           
           // 2. Verificar se loadRPAScript existe
           if (typeof window.loadRPAScript === 'function') {
-            console.log('✅ [DEBUG] window.loadRPAScript encontrado');
+            window.logDebug('DEBUG', '✅ window.loadRPAScript encontrado');
           } else {
-            console.error('❌ [DEBUG] window.loadRPAScript NÃO encontrado!');
+            window.logError('DEBUG', '❌ window.loadRPAScript NÃO encontrado!');
           }
           
           // 3. Verificar se jQuery está disponível
           if (typeof $ !== 'undefined') {
-            console.log('✅ [DEBUG] jQuery disponível:', $.fn.jquery);
+            window.logDebug('DEBUG', '✅ jQuery disponível:', $.fn.jquery);
           } else {
-            console.error('❌ [DEBUG] jQuery NÃO disponível!');
+            window.logError('DEBUG', '❌ jQuery NÃO disponível!');
           }
           
           // 4. Verificar se SweetAlert2 está disponível
           if (typeof Swal !== 'undefined') {
-            console.log('✅ [DEBUG] SweetAlert2 disponível');
+            window.logDebug('DEBUG', '✅ SweetAlert2 disponível');
           } else {
-            console.warn('⚠️ [DEBUG] SweetAlert2 NÃO disponível (pode ser carregado dinamicamente)');
+            window.logWarn('DEBUG', '⚠️ SweetAlert2 NÃO disponível (pode ser carregado dinamicamente)');
           }
           
           // 5. Verificar conflitos de nomes de função
           const globalFunctions = Object.keys(window).filter(key => typeof window[key] === 'function');
           const rpaFunctions = globalFunctions.filter(func => func.toLowerCase().includes('rpa') || func.toLowerCase().includes('load'));
-          console.log('🔍 [DEBUG] Funções globais relacionadas ao RPA:', rpaFunctions);
+          window.logDebug('DEBUG', '🔍 Funções globais relacionadas ao RPA:', rpaFunctions);
           
           // 6. Verificar se há elementos de formulário
           const forms = document.querySelectorAll('form');
-          console.log('🔍 [DEBUG] Formulários encontrados:', forms.length);
+          window.logDebug('DEBUG', '🔍 Formulários encontrados:', forms.length);
           
           // 7. Verificar se há botões de submit
           const submitButtons = document.querySelectorAll('button[type="submit"], input[type="submit"]');
-          console.log('🔍 [DEBUG] Botões de submit encontrados:', submitButtons.length);
+          window.logDebug('DEBUG', '🔍 Botões de submit encontrados:', submitButtons.length);
           
-          console.log('🔍 [DEBUG] === FIM DA VERIFICAÇÃO ===');
+          window.logDebug('DEBUG', '🔍 === FIM DA VERIFICAÇÃO ===');
         }
 
         // Função para testar carregamento dinâmico
         function testDynamicLoading() {
-          console.log('🔍 [DEBUG] Testando carregamento dinâmico...');
+          window.logDebug('DEBUG', '🔍 Testando carregamento dinâmico...');
           
           if (typeof window.loadRPAScript === 'function') {
-            console.log('🔍 [DEBUG] Tentando carregar script RPA...');
+            window.logDebug('DEBUG', '🔍 Tentando carregar script RPA...');
             
             window.loadRPAScript()
               .then(() => {
-                console.log('✅ [DEBUG] Script RPA carregado com sucesso!');
+                window.logDebug('DEBUG', '✅ Script RPA carregado com sucesso!');
                 
                 // Verificar se as classes RPA foram carregadas
                 if (typeof window.MainPage !== 'undefined') {
-                  console.log('✅ [DEBUG] window.MainPage disponível');
+                  window.logDebug('DEBUG', '✅ window.MainPage disponível');
                 } else {
-                  console.error('❌ [DEBUG] window.MainPage NÃO disponível após carregamento');
+                  window.logError('DEBUG', '❌ window.MainPage NÃO disponível após carregamento');
                 }
                 
                 if (typeof window.ProgressModalRPA !== 'undefined') {
-                  console.log('✅ [DEBUG] window.ProgressModalRPA disponível');
+                  window.logDebug('DEBUG', '✅ window.ProgressModalRPA disponível');
                 } else {
-                  console.error('❌ [DEBUG] window.ProgressModalRPA NÃO disponível após carregamento');
+                  window.logError('DEBUG', '❌ window.ProgressModalRPA NÃO disponível após carregamento');
                 }
                 
                 if (typeof window.SpinnerTimer !== 'undefined') {
-                  console.log('✅ [DEBUG] window.SpinnerTimer disponível');
+                  window.logDebug('DEBUG', '✅ window.SpinnerTimer disponível');
                 } else {
-                  console.error('❌ [DEBUG] window.SpinnerTimer NÃO disponível após carregamento');
+                  window.logError('DEBUG', '❌ window.SpinnerTimer NÃO disponível após carregamento');
                 }
                 
               })
               .catch(error => {
-                console.error('❌ [DEBUG] Erro ao carregar script RPA:', error);
+                window.logError('DEBUG', '❌ Erro ao carregar script RPA:', error);
               });
           } else {
-            console.error('❌ [DEBUG] window.loadRPAScript não está disponível para teste');
+            window.logError('DEBUG', '❌ window.loadRPAScript não está disponível para teste');
           }
         }
 
         // Função para detectar conflitos
         function detectConflicts() {
-          console.log('🔍 [DEBUG] === DETECÇÃO DE CONFLITOS ===');
+          window.logDebug('DEBUG', '🔍 === DETECÇÃO DE CONFLITOS ===');
           
           // Verificar se há múltiplas definições de funções
           const functionNames = [];
@@ -1745,9 +1987,9 @@
           });
           
           if (functionNames.length > 1) {
-            console.warn('⚠️ [DEBUG] Possível conflito detectado - múltiplas definições:', functionNames);
+            window.logWarn('DEBUG', '⚠️ Possível conflito detectado - múltiplas definições:', functionNames);
           } else {
-            console.log('✅ [DEBUG] Nenhum conflito de múltiplas definições detectado');
+            window.logDebug('DEBUG', '✅ Nenhum conflito de múltiplas definições detectado');
           }
           
           // Verificar se há erros no console
@@ -1761,13 +2003,13 @@
           setTimeout(() => {
             console.error = originalError;
             if (errors.length > 0) {
-              console.warn('⚠️ [DEBUG] Erros detectados durante inicialização:', errors);
+              window.logWarn('DEBUG', '⚠️ Erros detectados durante inicialização:', errors);
             } else {
-              console.log('✅ [DEBUG] Nenhum erro detectado durante inicialização');
+              window.logDebug('DEBUG', '✅ Nenhum erro detectado durante inicialização');
             }
           }, 2000);
           
-          console.log('🔍 [DEBUG] === FIM DA DETECÇÃO DE CONFLITOS ===');
+          window.logDebug('DEBUG', '🔍 === FIM DA DETECÇÃO DE CONFLITOS ===');
         }
 
         // Executar verificações após DOM estar pronto
@@ -1786,10 +2028,10 @@
         window.testDynamicLoading = testDynamicLoading;
         window.detectConflicts = detectConflicts;
 
-        console.log('🔍 [DEBUG] Funções de debug disponíveis:');
-        console.log('  - window.debugRPAModule()');
-        console.log('  - window.testDynamicLoading()');
-        console.log('  - window.detectConflicts()');
+        window.logDebug('DEBUG', '🔍 Funções de debug disponíveis:');
+        window.logDebug('DEBUG', '  - window.debugRPAModule()');
+        window.logDebug('DEBUG', '  - window.testDynamicLoading()');
+        window.logDebug('DEBUG', '  - window.detectConflicts()');
       });
     }
     
@@ -1804,8 +2046,8 @@
     }
     
   } catch (error) {
-    console.error('[UNIFIED] Erro crítico no Footer Code Unificado:', error);
-    console.error('[UNIFIED] Stack trace:', error.stack);
+    window.logError('UNIFIED', 'Erro crítico no Footer Code Unificado:', error);
+    window.logError('UNIFIED', 'Stack trace:', error.stack);
     // Não bloquear a página, mas registrar o erro
   }
 })();
