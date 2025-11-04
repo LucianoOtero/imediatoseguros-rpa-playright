@@ -554,6 +554,218 @@ $(function() {
     };
   }
   
+  // ==================== FUNÇÕES DE NOTIFICAÇÃO EMAIL ====================
+  
+  /**
+   * Identifica em qual momento o modal está sendo processado
+   * Baseado no payload enviado pelo modal ao add_flyingdonkeys_v2.php
+   * 
+   * @param {Object} payload - Payload enviado pelo modal ao add_flyingdonkeys_v2.php
+   * @param {boolean} isError - Se true, indica que houve erro na chamada
+   * @returns {Object} Objeto com informações do momento
+   */
+  function identifyModalMoment(payload, isError = false) {
+    try {
+      const name = payload.name || '';
+      const nome = (payload.data && payload.data.NOME) || '';
+      const cpf = (payload.data && payload.data.CPF) || '';
+      const cep = (payload.data && payload.data.CEP) || '';
+      const placa = (payload.data && payload.data.PLACA) || '';
+      
+      // Verificar pelo campo 'name'
+      const isInitialByName = name.includes('Primeiro Contato') || name.includes('Mensagem Inicial');
+      
+      // Verificar pelo padrão do nome (INITIAL tem padrão especial)
+      const isInitialPattern = /^\d{2}-\d{9}-NOVO CLIENTE WHATSAPP$/.test(nome);
+      
+      // Verificar se campos obrigatórios estão vazios (INITIAL tem apenas telefone)
+      const camposVazios = !cpf && !cep && !placa;
+      
+      // Determinar tipo base (INITIAL ou UPDATE)
+      const isInitial = isInitialByName || isInitialPattern || camposVazios;
+      
+      // Se houver erro, usar identificadores de erro (sem prefixo "ERRO -" na descrição)
+      if (isError) {
+        return {
+          moment: isInitial ? 'initial_error' : 'update_error',
+          emoji: isInitial ? '📞' : '❌', // Primeira mensagem: telefone azul, segunda: erro vermelho
+          color: '🔴',
+          color_name: 'VERMELHO',
+          description: isInitial 
+            ? 'Primeiro Contato - Apenas Telefone' 
+            : 'Submissão Completa - Todos os Dados',
+          banner_color: '#F44336'
+        };
+      }
+      
+      // Lógica de identificação (SUCESSO)
+      if (isInitial) {
+        // MOMENTO 1: INITIAL (SUCESSO)
+        return {
+          moment: 'initial',
+          emoji: '📞',
+          color: '🔵',
+          color_name: 'AZUL',
+          description: 'Primeiro Contato - Apenas Telefone',
+          banner_color: '#2196F3'
+        };
+      } else {
+        // MOMENTO 2: UPDATE (SUCESSO)
+        return {
+          moment: 'update',
+          emoji: '✅',
+          color: '🟢',
+          color_name: 'VERDE',
+          description: 'Submissão Completa - Todos os Dados',
+          banner_color: '#4CAF50'
+        };
+      }
+    } catch (error) {
+      console.error('❌ [EMAIL] Erro ao identificar momento:', error);
+      // Default: assumir UPDATE com erro (mais seguro)
+      return {
+        moment: 'update_error',
+        emoji: '❌',
+        color: '🔴',
+        color_name: 'VERMELHO',
+        description: 'Submissão Completa - Todos os Dados',
+        banner_color: '#F44336'
+      };
+    }
+  }
+  
+  /**
+   * Envia notificação por email aos administradores
+   * Chamada após sucesso OU erro nas respostas do add_flyingdonkeys_v2.php
+   * 
+   * @param {Object} modalPayload - Payload original enviado pelo modal
+   * @param {Object} responseData - Resposta do add_flyingdonkeys_v2.php (pode ser sucesso ou erro)
+   * @param {Object} errorInfo - Informações do erro (se houver): { message, status, code }
+   * @returns {Promise<Object>} Resultado do envio de email
+   */
+  async function sendAdminEmailNotification(modalPayload, responseData, errorInfo = null) {
+    try {
+      // Identificar se houve erro
+      // Regras claras:
+      // 1. Se errorInfo foi passado explicitamente, é ERRO
+      // 2. Se responseData existe e responseData.success === true, é SUCESSO (não erro)
+      // 3. Se responseData existe e responseData.success === false, é ERRO
+      // 4. Se responseData.success não está definido mas há contact_id/lead_id, é SUCESSO
+      // 5. Se responseData é null/undefined e não há errorInfo explícito, assumir SUCESSO (caso padrão)
+      const isError = errorInfo !== null || 
+        (responseData && (
+          responseData.success === false || 
+          (responseData.success !== true && !responseData.contact_id && !responseData.lead_id && !responseData.id)
+        ));
+      
+      // Identificar momento (com flag de erro)
+      const modalMoment = identifyModalMoment(modalPayload, isError);
+      
+      // Extrair dados do payload do modal
+      const data = modalPayload.data || {};
+      const ddd = data['DDD-CELULAR'] || '';
+      const celular = data['CELULAR'] || '';
+      const nome = data['NOME'] || 'Não informado';
+      const cpf = data['CPF'] || 'Não informado';
+      const cep = data['CEP'] || 'Não informado';
+      const placa = data['PLACA'] || 'Não informado';
+      const email = data['Email'] || 'Não informado';
+      const gclid = data['GCLID_FLD'] || 'Não informado';
+      
+      // Validar dados mínimos
+      if (!ddd || !celular) {
+        console.warn('📧 [EMAIL] Dados insuficientes para enviar email - DDD ou celular ausente');
+        return {
+          success: false,
+          error: 'DDD e celular são obrigatórios'
+        };
+      }
+      
+      // Preparar dados para endpoint de email
+      const emailPayload = {
+        ddd: ddd,
+        celular: celular,
+        cpf: cpf,
+        nome: nome,
+        email: email,
+        cep: cep,
+        placa: placa,
+        gclid: gclid,
+        momento: modalMoment.moment,
+        momento_descricao: modalMoment.description,
+        momento_emoji: modalMoment.emoji,
+        // Informações de erro (se houver)
+        erro: errorInfo ? {
+          message: errorInfo.message || 'Erro desconhecido',
+          status: errorInfo.status || null,
+          code: errorInfo.code || null,
+          response_data: errorInfo.responseData || null
+        } : null
+      };
+      
+      // Determinar URL do endpoint (dev ou prod)
+      const isDev = isDevelopmentEnvironment();
+      const emailEndpoint = isDev 
+        ? 'https://dev.bpsegurosimediato.com.br/webhooks/send_email_notification_endpoint.php'
+        : 'https://bpsegurosimediato.com.br/webhooks/send_email_notification_endpoint.php';
+      
+      // Log antes do envio
+      console.log(`${modalMoment.emoji} [EMAIL-${modalMoment.color_name}] Enviando notificação ${modalMoment.description}`);
+      
+      // Fazer chamada para endpoint de email
+      const response = await fetch(emailEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'Modal-WhatsApp-EmailNotification-v1.0'
+        },
+        body: JSON.stringify(emailPayload)
+      });
+      
+      // Verificar se a resposta é JSON válido antes de fazer parse
+      let result;
+      const contentType = response.headers.get('content-type');
+      const responseText = await response.text();
+      
+      if (contentType && contentType.includes('application/json')) {
+        try {
+          result = responseText ? JSON.parse(responseText) : { success: false, error: 'Resposta vazia' };
+        } catch (parseError) {
+          console.error('❌ [EMAIL-ERRO] Erro ao parsear resposta JSON:', parseError);
+          console.error('❌ [EMAIL-ERRO] Resposta recebida:', responseText.substring(0, 500));
+          return {
+            success: false,
+            error: 'Erro ao processar resposta do servidor: ' + parseError.message
+          };
+        }
+      } else {
+        console.error(`❌ [EMAIL-ERRO] Resposta não é JSON. Status: ${response.status}, Tipo: ${contentType}, Texto: ${responseText.substring(0, 200)}`);
+        return {
+          success: false,
+          error: `Resposta inválida do servidor (Status: ${response.status})`
+        };
+      }
+      
+      // Log do resultado
+      if (result.success) {
+        // Se o email foi enviado com sucesso, mas o conteúdo é sobre erro, deixar claro
+        const statusTipo = isError ? 'ERRO' : 'SUCESSO';
+        console.log(`📧 [EMAIL-ENVIADO] Notificação de ${statusTipo} enviada com SUCESSO: ${modalMoment.description}`);
+      } else {
+        console.error(`❌ [EMAIL-FALHA] Falha ao enviar notificação ${modalMoment.description}:`, result.error || 'Erro desconhecido');
+      }
+      
+      return result;
+      
+    } catch (error) {
+      console.error('❌ [EMAIL-EXCEPTION] Erro ao enviar notificação:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+  
   // ==================== FUNÇÕES DE INTEGRAÇÃO ====================
   
   /**
@@ -722,10 +934,31 @@ $(function() {
               lead_id: leadId, 
               opportunity_id: opportunityId 
             }, 'info');
+            
+            // 📧 ENVIAR EMAIL PARA ADMINISTRADORES APÓS SUCESSO (INITIAL)
+            // Enviar email de forma assíncrona (não bloquear o retorno)
+            sendAdminEmailNotification(webhook_data, responseData)
+              .catch(error => {
+                console.error('❌ [EMAIL] Erro ao enviar email (não bloqueante):', error);
+              });
+            
             return { success: true, id: leadId, opportunity_id: opportunityId, attempt: result.attempt + 1 };
           } else {
             console.warn('⚠️ [MODAL] Erro ao criar lead no EspoCRM:', responseData);
             logEvent('whatsapp_modal_espocrm_initial_failed', { error: responseData }, 'warning');
+            
+            // 📧 ENVIAR EMAIL PARA ADMINISTRADORES APÓS ERRO (INITIAL)
+            // Enviar email de forma assíncrona (não bloquear o retorno)
+            sendAdminEmailNotification(webhook_data, responseData, {
+              message: responseData.error || responseData.message || 'Erro ao criar lead no EspoCRM',
+              status: null,
+              code: null,
+              responseData: responseData
+            })
+              .catch(error => {
+                console.error('❌ [EMAIL] Erro ao enviar email de notificação (não bloqueante):', error);
+              });
+            
             return { success: false, error: responseData, attempt: result.attempt + 1 };
           }
         } catch (parseError) {
@@ -734,6 +967,18 @@ $(function() {
             response_ok: result.response.ok,
             response_status: result.response.status
           }, 'warn');
+          
+          // 📧 ENVIAR EMAIL PARA ADMINISTRADORES APÓS ERRO DE PARSE (INITIAL)
+          sendAdminEmailNotification(webhook_data, null, {
+            message: parseError.message || 'Erro ao parsear resposta do EspoCRM',
+            status: result.response?.status || null,
+            code: null,
+            responseData: null
+          })
+            .catch(error => {
+              console.error('❌ [EMAIL] Erro ao enviar email de notificação (não bloqueante):', error);
+            });
+          
           return { success: result.response.ok, attempt: result.attempt + 1 };
         }
       } else {
@@ -742,6 +987,18 @@ $(function() {
           error: errorMsg,
           attempt: result.attempt + 1
         }, 'error');
+        
+        // 📧 ENVIAR EMAIL PARA ADMINISTRADORES APÓS ERRO DE REQUEST (INITIAL)
+        sendAdminEmailNotification(webhook_data, null, {
+          message: errorMsg || 'Erro desconhecido na requisição',
+          status: null,
+          code: null,
+          responseData: null
+        })
+          .catch(error => {
+            console.error('❌ [EMAIL] Erro ao enviar email de notificação (não bloqueante):', error);
+          });
+        
         return { success: false, error: errorMsg, attempt: result.attempt + 1 };
       }
     } catch (error) {
@@ -879,12 +1136,32 @@ $(function() {
           }, 'info');
           
           logEvent('whatsapp_modal_espocrm_update_success', { attempt: result.attempt + 1 }, 'info');
+          
+          // 📧 ENVIAR EMAIL PARA ADMINISTRADORES APÓS SUCESSO (UPDATE)
+          // Enviar email de forma assíncrona (não bloquear o retorno)
+          sendAdminEmailNotification(webhook_data, responseData)
+            .catch(error => {
+              console.error('❌ [EMAIL] Erro ao enviar email (não bloqueante):', error);
+            });
+          
           return { success: true, result: responseData, attempt: result.attempt + 1 };
         } catch (parseError) {
           debugLog('ESPOCRM', 'UPDATE_RESPONSE_PARSE_ERROR', {
             error: parseError.message
           }, 'warn');
           logEvent('whatsapp_modal_espocrm_update_parse_error', { error: parseError.message }, 'warning');
+          
+          // 📧 ENVIAR EMAIL PARA ADMINISTRADORES APÓS ERRO DE PARSE (UPDATE)
+          sendAdminEmailNotification(webhook_data, null, {
+            message: parseError.message || 'Erro ao parsear resposta do EspoCRM',
+            status: result.response?.status || null,
+            code: null,
+            responseData: null
+          })
+            .catch(error => {
+              console.error('❌ [EMAIL] Erro ao enviar email de notificação (não bloqueante):', error);
+            });
+          
           return { success: result.response.ok, attempt: result.attempt + 1 };
         }
       } else {
@@ -894,6 +1171,18 @@ $(function() {
           attempt: result.attempt + 1
         }, 'error');
         logEvent('whatsapp_modal_espocrm_update_error', { error: errorMsg, attempt: result.attempt + 1 }, 'error');
+        
+        // 📧 ENVIAR EMAIL PARA ADMINISTRADORES APÓS ERRO DE REQUEST (UPDATE)
+        sendAdminEmailNotification(webhook_data, null, {
+          message: errorMsg || 'Erro desconhecido na requisição',
+          status: null,
+          code: null,
+          responseData: null
+        })
+          .catch(error => {
+            console.error('❌ [EMAIL] Erro ao enviar email de notificação (não bloqueante):', error);
+          });
+        
         return { success: false, error: errorMsg, attempt: result.attempt + 1 };
       }
     } catch (error) {
@@ -902,6 +1191,18 @@ $(function() {
         error_stack: error.stack
       }, 'error');
       logEvent('whatsapp_modal_espocrm_update_exception', { error: error.message }, 'error');
+      
+      // 📧 ENVIAR EMAIL PARA ADMINISTRADORES APÓS EXCEÇÃO (UPDATE)
+      sendAdminEmailNotification(webhook_data, null, {
+        message: error.message || 'Exceção ao atualizar lead',
+        status: null,
+        code: null,
+        responseData: null
+      })
+        .catch(emailError => {
+          console.error('❌ [EMAIL] Erro ao enviar email de notificação (não bloqueante):', emailError);
+        });
+      
       return { success: false, error: error.message };
     }
   }

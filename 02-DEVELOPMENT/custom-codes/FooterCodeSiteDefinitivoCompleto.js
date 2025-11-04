@@ -1258,7 +1258,7 @@
         
         window.logInfo('MODAL', '🔄 Carregando modal de dev.bpsegurosimediato.com.br...');
         const script = document.createElement('script');
-        script.src = 'https://dev.bpsegurosimediato.com.br/webhooks/MODAL_WHATSAPP_DEFINITIVO.js?v=23&force=' + Math.random();
+        script.src = 'https://dev.bpsegurosimediato.com.br/webhooks/MODAL_WHATSAPP_DEFINITIVO.js?v=24&force=' + Math.random();
         script.onload = function() {
           window.whatsappModalLoaded = true;
           window.logInfo('MODAL', '✅ Modal carregado com sucesso');
