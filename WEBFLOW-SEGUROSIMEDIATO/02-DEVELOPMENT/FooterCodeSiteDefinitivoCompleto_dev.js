@@ -1,31 +1,21 @@
 /**
- * PROJETO: UNIFICAÇÃO DE ARQUIVOS FOOTER CODE
+ * PROJETO: UNIFICAÇÃO DE ARQUIVOS FOOTER CODE + CORREÇÕES iOS MODAL
  * INÍCIO: 30/10/2025 19:55
- * ÚLTIMA ALTERAÇÃO: 06/11/2025 10:09
+ * ÚLTIMA ALTERAÇÃO: 06/11/2025 22:30
  * 
- * VERSÃO: 1.6.0 - Correção Modal iOS + Detecção Dispositivo + Flag Controle
+ * VERSÃO: 1.6.0 - Correções iOS Modal + Sistema de Controle de Logs
+ * 
+ * ALTERAÇÕES VERSÃO 1.6.0:
+ * - ✅ Correção modal abrindo como nova aba em iOS (V25)
+ * - ✅ Implementada detecção iOS melhorada (inclui iPad iOS 13+)
+ * - ✅ Adicionada flag de controle para prevenir dupla execução
+ * - ✅ Implementado handler touchstart para iOS
+ * - ✅ Melhorado handler click com prevenção de dupla execução
  * 
  * Arquivo unificado contendo:
  * - FooterCodeSiteDefinitivoUtils.js (Parte 1)
  * - Footer Code Site Definitivo.js (Parte 2 - modificado)
  * - Inside Head Tag Pagina.js (Parte 3 - GCLID integrado)
- * 
- * ALTERAÇÕES VERSÃO 1.6.0:
- * - ✅ Implementada detecção iOS melhorada (inclui iPad iOS 13+)
- * - ✅ Adicionada flag de controle para prevenir dupla execução
- * - ✅ Implementado handler touchstart para iOS (intercepta antes do Safari seguir link)
- * - ✅ Melhorado handler click com prevenção de dupla execução
- * - ✅ Implementado uso de passive: false apenas em iOS (otimizado para outros dispositivos)
- * - ✅ Correção do problema do modal abrindo como nova aba em dispositivos iOS
- * 
- * BASEADO EM:
- * - PESQUISA_SOLUCOES_VALIDADAS_FONTES_REFERENCIA.md
- * - MDN Web Docs, Stack Overflow, web.dev, WCAG Guidelines
- * 
- * ARQUIVOS RELACIONADOS:
- * - MODAL_WHATSAPP_DEFINITIVO_dev.js
- * - WEBFLOW-SEGUROSIMEDIATO/05-DOCUMENTATION/PESQUISA_SOLUCOES_VALIDADAS_FONTES_REFERENCIA.md
- * - WEBFLOW-SEGUROSIMEDIATO/05-DOCUMENTATION/PROJETO_CORRECAO_MODAL_IOS_NOVA_ABA.md
  * 
  * ALTERAÇÕES VERSÃO 1.5.0:
  * - ✅ Correção crítica: window.DEBUG_CONFIG não sobrescreve mais valores do Webflow Footer Code
@@ -69,7 +59,7 @@
  * Localização: https://dev.bpsegurosimediato.com.br/webhooks/FooterCodeSiteDefinitivoCompleto_dev.js
  * 
  * ⚠️ AMBIENTE: DESENVOLVIMENTO
- * - SafetyMails Ticket: fc5e18c10c4aa883b2c31a305f1c09fea3834138
+ * - SafetyMails Ticket: b537141762218eefb8fc7bc8bd81dc16eac8467d
  * - SafetyMails API Key: 20a7a1c297e39180bd80428ac13c363e882a531f
  * - Ver documentação: DOCUMENTACAO_MIGRACAO_PRODUCAO_SAFETYMAILS.md
  */
@@ -95,10 +85,10 @@
   // ======================
   // CONSTANTES GLOBAIS (definir ANTES de qualquer uso)
   // ======================
-  // ⚠️ AMBIENTE: DESENVOLVIMENTO
+  // ⚠️ AMBIENTE: PRODUÇÃO
   window.USE_PHONE_API = true;
   window.APILAYER_KEY = 'dce92fa84152098a3b5b7b8db24debbc';
-  window.SAFETY_TICKET = 'fc5e18c10c4aa883b2c31a305f1c09fea3834138'; // DEV: Ticket origem correto (segurosimediato-8119bf26e77bf4ff336a58e.webflow.io)
+  window.SAFETY_TICKET = '9bab7f0c2711c5accfb83588c859dc1103844a94'; // PROD: Ticket origem correto (www.segurosimediato.com.br)
   window.SAFETY_API_KEY = '20a7a1c297e39180bd80428ac13c363e882a531f'; // Mesmo para DEV e PROD
   window.VALIDAR_PH3A = false;
   // ======================
@@ -1266,23 +1256,6 @@
         setTimeout(initGCLID, 500); // Fallback após 500ms
       }
 
-      /**
-       * Detecção iOS melhorada (inclui iPad iOS 13+)
-       * Baseado em: MDN, Stack Overflow, GeeksforGeeks
-       * Validação: PESQUISA_SOLUCOES_VALIDADAS_FONTES_REFERENCIA.md
-       */
-      function isIOS() {
-        // Detecção padrão
-        const isStandardIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-        
-        // Detecção para iPad iOS 13+ (retorna MacIntel)
-        const isIPadOS13 = navigator.platform === 'MacIntel' && 
-                           navigator.maxTouchPoints > 1 &&
-                           'ontouchend' in document;
-        
-        return isStandardIOS || isIPadOS13;
-      }
-
       // Função para carregar modal dinamicamente
       function loadWhatsAppModal() {
         if (window.whatsappModalLoaded) {
@@ -1292,7 +1265,7 @@
         
         window.logInfo('MODAL', '🔄 Carregando modal de dev.bpsegurosimediato.com.br...');
         const script = document.createElement('script');
-        script.src = 'https://dev.bpsegurosimediato.com.br/webhooks/MODAL_WHATSAPP_DEFINITIVO_dev.js?v=24&force=' + Math.random();
+        script.src = 'https://dev.bpsegurosimediato.com.br/webhooks/MODAL_WHATSAPP_DEFINITIVO_dev.js?v=26&force=' + Math.random();
         script.onload = function() {
           window.whatsappModalLoaded = true;
           window.logInfo('MODAL', '✅ Modal carregado com sucesso');
@@ -1303,140 +1276,40 @@
         document.head.appendChild(script);
       }
       
-      /**
-       * Flag de controle para prevenir dupla execução
-       * Baseado em: Stack Overflow, CSS-Tricks (padrão da indústria)
-       */
-      let modalOpening = false;
-
-      /**
-       * Função unificada para abrir modal
-       * Previne dupla execução com flag de controle
-       */
-      function openWhatsAppModal() {
-        if (modalOpening) {
-          window.logDebug('MODAL', '⚠️ Modal já está sendo aberto, ignorando chamada duplicada');
-          return;
-        }
-        
-        modalOpening = true;
-        window.logDebug('MODAL', '🔄 Abrindo modal WhatsApp');
-        
-        // Se modal já existe, apenas abrir
-        if ($('#whatsapp-modal').length) {
-          $('#whatsapp-modal').fadeIn(300);
-          // Resetar flag após animação completar
-          setTimeout(() => {
-            modalOpening = false;
-          }, 500);
-        } else {
-          // Modal não existe, carregar
-          loadWhatsAppModal();
-          
-          // Aguardar modal ser criado pelo script
-          const checkModal = setInterval(function() {
-            if ($('#whatsapp-modal').length) {
-              clearInterval(checkModal);
-              $('#whatsapp-modal').fadeIn(300);
-              setTimeout(() => {
-                modalOpening = false;
-              }, 500);
-            }
-          }, 100);
-          
-          // Timeout de 3 segundos
-          setTimeout(function() {
-            clearInterval(checkModal);
-            if ($('#whatsapp-modal').length) {
-              $('#whatsapp-modal').fadeIn(300);
-            }
-            modalOpening = false;
-          }, 3000);
-        }
-      }
-
-      /**
-       * Verificar suporte a passive listeners
-       * Baseado em: MDN, web.dev
-       */
-      let passiveSupported = false;
-      try {
-        const opts = Object.defineProperty({}, 'passive', {
-          get() { passiveSupported = true; }
-        });
-        window.addEventListener('test', null, opts);
-        window.removeEventListener('test', null, opts);
-      } catch (e) {
-        // Navegador não suporta passive option
-        passiveSupported = false;
-      }
-
       // Aguardar jQuery para inicializar validações
       $(function () {
-        /**
-         * Configurar handlers com detecção de dispositivo iOS
-         * Baseado em: PESQUISA_SOLUCOES_VALIDADAS_FONTES_REFERENCIA.md
-         * 
-         * Soluções implementadas:
-         * 1. Detecção iOS melhorada (inclui iPad iOS 13+)
-         * 2. Flag de controle para prevenir dupla execução
-         * 3. Handler touchstart para iOS (intercepta antes do Safari seguir link)
-         * 4. Handler click melhorado com prevenção de dupla execução
-         * 5. Uso de passive: false apenas em iOS
-         */
+        // Interceptar clicks (MANTÉM ESTRUTURA ORIGINAL)
         ['whatsapplink', 'whatsapplinksucesso', 'whatsappfone1', 'whatsappfone2'].forEach(function (id) {
           var $el = $('#' + id);
-          if (!$el.length) return;
-          
-          // Handler touchstart (apenas iOS)
-          // iOS Safari processa touchstart ANTES de click
-          // Precisamos interceptar touchstart para prevenir navegação
-          if (isIOS()) {
-            const touchOptions = passiveSupported ? { passive: false } : false;
-            
-            $el.on('touchstart', function (e) {
-              // Se modal já está sendo aberto, prevenir evento
-              if (modalOpening) {
-                e.preventDefault();
-                e.stopPropagation();
-                return false;
+          if ($el.length) {
+            $el.on('click', function (e) {
+              e.preventDefault(); // ✅ NOVO: Bloqueia window.open direto
+              
+              // Se modal já existe, apenas abrir
+              if ($('#whatsapp-modal').length) {
+                $('#whatsapp-modal').fadeIn(300);
+              } else {
+                // Modal não existe, carregar
+                loadWhatsAppModal();
+                
+                // Aguardar modal ser criado pelo script
+                const checkModal = setInterval(function() {
+                  if ($('#whatsapp-modal').length) {
+                    clearInterval(checkModal);
+                    $('#whatsapp-modal').fadeIn(300);
+                  }
+                }, 100);
+                
+                // Timeout de 3 segundos
+                setTimeout(function() {
+                  clearInterval(checkModal);
+                  if ($('#whatsapp-modal').length) {
+                    $('#whatsapp-modal').fadeIn(300);
+                  }
+                }, 3000);
               }
-              
-              // Prevenir comportamento padrão (navegação)
-              e.preventDefault();
-              e.stopPropagation();
-              
-              // Abrir modal
-              openWhatsAppModal();
-              
-              // Retornar false para garantir que não segue link
-              return false;
             });
-            
-            window.logDebug('MODAL', '✅ Handler touchstart configurado para iOS:', id);
           }
-          
-          // Handler click (todos os dispositivos)
-          $el.on('click', function (e) {
-            // Em iOS, se touchstart já executou, prevenir click
-            if (isIOS() && modalOpening) {
-              e.preventDefault();
-              e.stopPropagation();
-              return false;
-            }
-            
-            // Prevenir comportamento padrão
-            e.preventDefault();
-            e.stopPropagation();
-            
-            // Abrir modal
-            openWhatsAppModal();
-            
-            // Retornar false para garantir que não segue link
-            return false;
-          });
-          
-          window.logDebug('MODAL', '✅ Handler click configurado:', id);
         });
         
         // 5. Validações unificadas: CPF, CEP, PLACA, CELULAR, E-MAIL

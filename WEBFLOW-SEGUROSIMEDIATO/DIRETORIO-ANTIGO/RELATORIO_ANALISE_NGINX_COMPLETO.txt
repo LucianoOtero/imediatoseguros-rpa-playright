@@ -1,0 +1,283 @@
+[0;32m[INFO][0m Sistema Operacional: Ubuntu 24.04.3 LTS
+[0;32m[INFO][0m Kernel: 6.8.0-71-generic
+[0;32m[INFO][0m Arquitetura: x86_64
+[0;32m[INFO][0m Usuário atual: root
+[0;32m[INFO][0m UID: 0
+[0;32m[INFO][0m Grupos: root
+
+[0;32m[INFO][0m Nginx instalado: nginx version: nginx/1.24.0 (Ubuntu)
+[0;32m[INFO][0m Status: Nginx está RODANDO
+● nginx.service - A high performance web server and a reverse proxy server
+     Loaded: loaded (/usr/lib/systemd/system/nginx.service; enabled; preset: enabled)
+     Active: active (running) since Thu 2025-10-23 10:17:18 -03; 1 week 3 days ago
+       Docs: man:nginx(8)
+    Process: 1762151 ExecReload=/usr/sbin/nginx -g daemon on; master_process on; -s reload (code=exited, status=0/SUCCESS)
+[0;32m[INFO][0m PID do processo principal: 1441856
+[0;32m[INFO][0m Processos Nginx ativos: 6
+
+[0;32m[INFO][0m Diretório de configuração: /etc/nginx
+[0;32m[INFO][0m Configurações disponíveis: /etc/nginx/sites-available
+[0;32m[INFO][0m Configurações habilitadas: /etc/nginx/sites-enabled
+[0;32m[INFO][0m Procurando configuração em: /etc/nginx/sites-available/bpsegurosimediato.com.br
+[0;32m[INFO][0m ✅ Arquivo de configuração encontrado: /etc/nginx/sites-available/bpsegurosimediato.com.br
+[1;33m[WARN][0m ⚠️  Configuração NÃO está habilitada (sem symlink em sites-enabled)
+[0;32m[INFO][0m Análise da configuração do servidor:
+---
+[0;32m[INFO][0m Server blocks encontrados:
+6:server {
+74:server {
+[0;32m[INFO][0m Server names configurados:
+7:    server_name bpsegurosimediato.com.br www.bpsegurosimediato.com.br;
+85:    server_name bpsegurosimediato.com.br www.bpsegurosimediato.com.br;
+[0;32m[INFO][0m Location blocks para /webhooks/:
+    location ~ ^/webhooks/.*\.(js|css)$ {
+        root /var/www/html;
+        try_files $uri =404;
+        expires 1h;
+        add_header Cache-Control "public, max-age=3600";
+        add_header Content-Type application/javascript;
+    }
+    
+    
+    # Proxy para Botpress para todas as outras requisições
+    # Servir arquivos do dev/webhooks (modal WhatsApp)
+    location /dev/webhooks/ {
+        alias /var/www/html/dev/webhooks/;
+        try_files \ =404;
+        add_header Content-Type application/javascript;
+    }
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+        proxy_set_header Host $host;
+[0;32m[INFO][0m Location blocks para arquivos estáticos (.js, .css):
+    location ~ ^/webhooks/.*\.(js|css)$ {
+        root /var/www/html;
+        try_files $uri =404;
+        expires 1h;
+        add_header Cache-Control "public, max-age=3600";
+        add_header Content-Type application/javascript;
+    }
+    
+    
+    # Proxy para Botpress para todas as outras requisições
+    # Servir arquivos do dev/webhooks (modal WhatsApp)
+[0;32m[INFO][0m Root directives:
+11:        root /var/www/html;
+17:        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+22:        root /var/www/html;
+28:        root /var/www/html;
+34:        root /var/www/html;
+45:        alias /var/www/html/dev/webhooks/;
+[0;32m[INFO][0m Try files directives:
+12:        try_files $uri =404;
+23:        try_files $uri =404;
+29:        try_files $uri =404;
+35:        try_files $uri =404;
+46:        try_files \ =404;
+[0;32m[INFO][0m Proxy pass directives:
+50:        proxy_pass http://127.0.0.1:3000;
+
+[0;32m[INFO][0m Testando sintaxe da configuração do Nginx:
+2025/11/02 17:29:02 [warn] 1768838#1768838: protocol options redefined for [::]:443 in /etc/nginx/sites-enabled/dev.bpsegurosimediato.com.br:18
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+[0;32m[INFO][0m ✅ Sintaxe do Nginx está CORRETA
+
+[0;32m[INFO][0m Verificando diretório de produção: /var/www/html/webhooks
+[0;32m[INFO][0m ✅ Diretório existe
+[0;32m[INFO][0m Permissões: 755 root:root
+[0;32m[INFO][0m Proprietário: root:root
+[0;32m[INFO][0m Conteúdo do diretório:
+total 232K
+drwxr-xr-x 2 root     root     4.0K Nov  2 14:10 .
+drwxr-xr-x 6 www-data www-data 4.0K Nov  2 10:00 ..
+-rw-r--r-- 1 root     root      43K Nov  2 14:21 add_flyingdonkeys_v2.php
+-rw-r--r-- 1 root     root      18K Nov  2 14:22 add_webflow_octa_v2.php
+-rw-r--r-- 1 root     root      75K Nov  2 10:09 FooterCodeSiteDefinitivoCompleto_prod.js
+-rw-r--r-- 1 root     root      82K Nov  2 14:10 MODAL_WHATSAPP_DEFINITIVO.js
+[0;32m[INFO][0m Verificando arquivo específico: /var/www/html/webhooks/FooterCodeSiteDefinitivoCompleto_prod.js
+[0;32m[INFO][0m ✅ Arquivo EXISTE
+[0;32m[INFO][0m Tamanho: 75864 bytes
+[0;32m[INFO][0m Permissões: 644 root:root
+[0;32m[INFO][0m Proprietário: root:root
+[0;32m[INFO][0m Tipo MIME: 
+[0;32m[INFO][0m ✅ Arquivo é LEGÍVEL
+
+[0;32m[INFO][0m Verificando diretório DEV (funcional): /var/www/html/dev/webhooks
+[0;32m[INFO][0m ✅ Diretório DEV existe
+[0;32m[INFO][0m Permissões: 755 www-data:www-data
+[0;32m[INFO][0m ✅ Arquivo existe em DEV: /var/www/html/dev/webhooks/FooterCodeSiteDefinitivoCompleto_prod.js
+[0;32m[INFO][0m Permissões: 644 root:root
+
+[0;32m[INFO][0m Webroot configurado no Nginx: /var/www/html
+[0;32m[INFO][0m ✅ Diretório raiz existe
+[0;32m[INFO][0m Permissões: 755 www-data:www-data
+[0;32m[INFO][0m Estrutura de diretórios:
+/var/www/html
+/var/www/html/webhooks
+/var/www/html/logs
+/var/www/html/dev
+/var/www/html/dev/webhooks
+/var/www/html/dev/logs
+/var/www/html/dev/config
+/var/www/html/dev/octadesk-simulator
+/var/www/html/dev/octadesk-simulator/data
+/var/www/html/logging_system
+/var/www/html/logging_system/src
+/var/www/html/logging_system/docs
+/var/www/html/logging_system/logs
+/var/www/html/logging_system/tests
+/var/www/html/logging_system/utils
+/var/www/html/logging_system/config
+/var/www/html/logging_system/viewer
+/var/www/html/logging_system/viewer/api
+/var/www/html/logging_system/install
+
+[0;32m[INFO][0m Usuário do Nginx (worker): www-data
+[0;32m[INFO][0m Grupo do Nginx: www-data
+[0;32m[INFO][0m Testando acesso do Nginx ao diretório:
+[0;32m[INFO][0m Diretório: perms=755, owner=root, group=root
+[1;33m[WARN][0m ⚠️  Proprietário/grupo pode estar incompatível com Nginx
+[0;32m[INFO][0m ✅ Nginx pode LER o diretório
+[0;32m[INFO][0m ✅ Nginx pode ENTRAR no diretório (executar)
+[0;32m[INFO][0m Arquivo: perms=644, owner=root
+[0;32m[INFO][0m ✅ Nginx pode LER o arquivo
+
+[0;32m[INFO][0m Testando acesso HTTP a: https://bpsegurosimediato.com.br/webhooks/FooterCodeSiteDefinitivoCompleto_prod.js
+[0;32m[INFO][0m Fazendo requisição HTTP com curl:
+[0;31m[ERROR][0m ❌ Arquivo retorna 404 (NOT FOUND)
+HTTP/2 404 
+date: Sun, 02 Nov 2025 20:29:02 GMT
+content-type: text/html; charset=utf-8
+server: cloudflare
+x-powered-by: Botpress
+access-control-allow-origin: *
+content-security-policy: default-src 'none'
+x-content-type-options: nosniff
+x-response-time: 1ms
+vary: Accept-Encoding
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=Ljd5E1VR4bCeKYvDRvCH64ZpJkCqh8AnwExTF5%2B%2FkrwIMyELl9NOJELE0Wzu7aIhjQBiZvzQS3nOyK4hRG%2FR3f9nmnp124m%2BcO2Gs9wYoel7NEPxkBYZ7RRqCuls1PsN%2BBs%3D"}]}
+cache-control: max-age=14400
+cf-cache-status: MISS
+nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+cf-ray: 998661bd3a1c8d7d-HEL
+alt-svc: h3=":443"; ma=86400
+
+
+HTTP_CODE:404
+TIME_TOTAL:0.097079
+
+[0;32m[INFO][0m Comparando com DEV (que funciona): https://dev.bpsegurosimediato.com.br/webhooks/FooterCodeSiteDefinitivoCompleto_prod.js
+[0;32m[INFO][0m DEV HTTP Code: 200
+[0;32m[INFO][0m ✅ DEV está funcionando (200 OK)
+
+[0;32m[INFO][0m Verificando logs do Nginx:
+[0;32m[INFO][0m ✅ Log de erros encontrado: /var/log/nginx/error.log
+[0;32m[INFO][0m Últimas 20 linhas do log de erros relacionadas a webhooks:
+2025/11/02 10:50:38 [error] 1613471#1613471: *25745 FastCGI sent in stderr: "PHP message: PHP Warning:  fopen(logs.txt): Failed to open stream: Permission denied in /var/www/html/class.php on line 143; PHP message: PHP Fatal error:  Uncaught TypeError: fwrite(): Argument #1 ($stream) must be of type resource, false given in /var/www/html/class.php:144
+#1 /var/www/html/webhooks/add_flyingdonkeys_v2.php(799): EspoApiClient->request()
+  thrown in /var/www/html/class.php on line 144" while reading response header from upstream, client: 104.23.211.171, server: bpsegurosimediato.com.br, request: "POST /webhooks/add_flyingdonkeys_v2.php HTTP/2.0", upstream: "fastcgi://unix:/var/run/php/php8.3-fpm.sock:", host: "bpsegurosimediato.com.br"
+[0;32m[INFO][0m ✅ Log de acesso encontrado: /var/log/nginx/access.log
+[0;32m[INFO][0m Últimas 10 requisições para /webhooks/:
+172.69.114.64 - - [02/Nov/2025:16:14:25 -0300] "GET /webhooks/MODAL_WHATSAPP_DEFINITIVO.js?v=23&force=0.4066798566147054 HTTP/2.0" 200 83021 "https://www.segurosimediato.com.br/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+172.69.114.105 - - [02/Nov/2025:16:14:50 -0300] "POST /webhooks/add_flyingdonkeys_v2.php HTTP/2.0" 200 544 "https://www.segurosimediato.com.br/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+172.69.114.106 - - [02/Nov/2025:16:14:52 -0300] "POST /webhooks/add_webflow_octa_v2.php HTTP/2.0" 200 106 "https://www.segurosimediato.com.br/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+172.69.138.3 - - [02/Nov/2025:16:30:35 -0300] "GET /webhooks/FooterCodeSiteDefinitivoCompleto_prod.js?v=1.3 HTTP/2.0" 200 76066 "https://www.segurosimediato.com.br/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+172.69.39.149 - - [02/Nov/2025:16:30:45 -0300] "GET /webhooks/MODAL_WHATSAPP_DEFINITIVO.js?v=23&force=0.9812630250483609 HTTP/2.0" 200 83021 "https://www.segurosimediato.com.br/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+104.23.254.113 - - [02/Nov/2025:16:30:54 -0300] "POST /webhooks/add_flyingdonkeys_v2.php HTTP/2.0" 200 544 "https://www.segurosimediato.com.br/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+104.23.254.113 - - [02/Nov/2025:16:30:55 -0300] "POST /webhooks/add_webflow_octa_v2.php HTTP/2.0" 200 106 "https://www.segurosimediato.com.br/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+172.70.35.69 - - [02/Nov/2025:17:02:32 -0300] "GET /webhooks/FooterCodeSiteDefinitivoCompleto_prod.js?v=1.3 HTTP/2.0" 200 76066 "https://www.segurosimediato.com.br/" "Mozilla/5.0 (compatible; AhrefsBot/7.0; +http://ahrefs.com/robot/)"
+162.158.239.107 - - [02/Nov/2025:17:29:02 -0300] "GET /webhooks/FooterCodeSiteDefinitivoCompleto_prod.js HTTP/2.0" 404 165 "-" "curl/8.5.0"
+172.64.223.25 - - [02/Nov/2025:17:29:03 -0300] "HEAD /webhooks/FooterCodeSiteDefinitivoCompleto_prod.js HTTP/2.0" 200 0 "-" "curl/8.5.0"
+[0;32m[INFO][0m Requisições 404 para webhooks:
+[0;32m[INFO][0m Nenhum 404 encontrado
+
+[0;32m[INFO][0m SELinux não está instalado/configurado
+[0;32m[INFO][0m AppArmor está instalado
+[0;32m[INFO][0m Status AppArmor: apparmor module is loaded.
+
+[0;32m[INFO][0m Status UFW: Status: active
+[0;32m[INFO][0m Regras UFW:
+Status: active
+
+     To                         Action      From
+     --                         ------      ----
+[ 1] 3000/tcp                   ALLOW IN    Anywhere                  
+[ 2] 80/tcp                     ALLOW IN    Anywhere                  
+[ 3] 443/tcp                    ALLOW IN    Anywhere                  
+[ 4] 22/tcp                     ALLOW IN    Anywhere                  
+[ 5] 8080/tcp                   ALLOW IN    Anywhere                  
+[ 6] 8081/tcp                   ALLOW IN    Anywhere                  
+[ 7] 3306                       ALLOW IN    Anywhere                  
+[ 8] 3000/tcp (v6)              ALLOW IN    Anywhere (v6)             
+[ 9] 80/tcp (v6)                ALLOW IN    Anywhere (v6)             
+[10] 443/tcp (v6)               ALLOW IN    Anywhere (v6)             
+[11] 22/tcp (v6)                ALLOW IN    Anywhere (v6)             
+[12] 8080/tcp (v6)              ALLOW IN    Anywhere (v6)             
+[13] 8081/tcp (v6)              ALLOW IN    Anywhere (v6)             
+[14] 3306 (v6)                  ALLOW IN    Anywhere (v6)             
+
+[0;32m[INFO][0m Verificando regras iptables relevantes (porta 80/443):
+Chain INPUT (policy DROP 0 packets, 0 bytes)
+Chain FORWARD (policy DROP 0 packets, 0 bytes)
+ 956K  352M ACCEPT     0    --  *      docker0  0.0.0.0/0            0.0.0.0/0            ctstate RELATED,ESTABLISHED
+1004K  189M ACCEPT     0    --  docker0 !docker0  0.0.0.0/0            0.0.0.0/0           
+    0     0 ACCEPT     0    --  docker0 docker0  0.0.0.0/0            0.0.0.0/0           
+    0     0 ACCEPT     0    --  *      br-9a381c2ac425  0.0.0.0/0            0.0.0.0/0            ctstate RELATED,ESTABLISHED
+    0     0 ACCEPT     0    --  br-9a381c2ac425 !br-9a381c2ac425  0.0.0.0/0            0.0.0.0/0           
+    0     0 ACCEPT     0    --  br-9a381c2ac425 br-9a381c2ac425  0.0.0.0/0            0.0.0.0/0           
+    0     0 ACCEPT     0    --  *      br-0827b3057ea0  0.0.0.0/0            0.0.0.0/0            ctstate RELATED,ESTABLISHED
+    0     0 ACCEPT     0    --  br-0827b3057ea0 !br-0827b3057ea0  0.0.0.0/0            0.0.0.0/0           
+[0;32m[INFO][0m Nenhuma regra relevante encontrada
+[0;32m[INFO][0m Portas em escuta relacionadas ao Nginx:
+tcp        0      0 0.0.0.0:443             0.0.0.0:*               LISTEN      1441856/nginx: mast 
+tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      1441856/nginx: mast 
+tcp6       0      0 :::443                  :::*                    LISTEN      1441856/nginx: mast 
+tcp6       0      0 :::80                   :::*                    LISTEN      1441856/nginx: mast 
+
+[0;32m[INFO][0m ✅ Configuração DEV encontrada: /etc/nginx/sites-available/dev.bpsegurosimediato.com.br
+[0;32m[INFO][0m Location blocks para /dev/webhooks/ na configuração DEV:
+[1;33m[WARN][0m Nenhum location block encontrado
+[0;32m[INFO][0m Diferenças relevantes entre PROD e DEV:
+--- PRODUÇÃO ---
+    location ~ ^/webhooks/.*\.(js|css)$ {
+        root /var/www/html;
+        try_files $uri =404;
+        expires 1h;
+        add_header Cache-Control "public, max-age=3600";
+        add_header Content-Type application/javascript;
+    }
+    
+    
+    # Proxy para Botpress para todas as outras requisições
+    # Servir arquivos do dev/webhooks (modal WhatsApp)
+    location /dev/webhooks/ {
+        alias /var/www/html/dev/webhooks/;
+        try_files \ =404;
+        add_header Content-Type application/javascript;
+    }
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+        proxy_set_header Host $host;
+--- DEV ---
+Nenhum location block para dev/webhooks
+
+[0;32m[INFO][0m Analisando como o Nginx resolve o caminho /webhooks/FooterCodeSiteDefinitivoCompleto_prod.js:
+[0;32m[INFO][0m Server block que corresponde a bpsegurosimediato.com.br:
+[0;32m[INFO][0m Root do server block: /var/www/html
+[0;32m[INFO][0m Caminho esperado (sem location blocks): /var/www/html/webhooks/FooterCodeSiteDefinitivoCompleto_prod.js
+[0;32m[INFO][0m ✅ Arquivo EXISTE no caminho esperado
+[0;32m[INFO][0m Alias encontrado no location block: /var/www/html/dev/webhooks/
+[0;32m[INFO][0m Caminho com alias: /var/www/html/dev/webhooks//FooterCodeSiteDefinitivoCompleto_prod.js
+[0;32m[INFO][0m ✅ Arquivo EXISTE no caminho do alias
+
+Análise concluída em: Sun Nov  2 05:29:03 PM -03 2025
+Relatório completo salvo em: /tmp/nginx_analysis_report_20251102_172901.txt
+[0;32m[INFO][0m PRINCIPAIS PONTOS VERIFICADOS:
+[0;32m[INFO][0m Relatório completo: /tmp/nginx_analysis_report_20251102_172901.txt
