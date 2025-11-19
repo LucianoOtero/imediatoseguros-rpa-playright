@@ -1,0 +1,555 @@
+# Diretivas do Projeto - Imediato Seguros RPA
+
+## 🚨 REGRAS CRÍTICAS - SEMPRE RESPEITAR
+
+### 🚨 REGRA CRÍTICA #0: Investigação vs Implementação (VIOLAÇÃO MAIS COMUM)
+- ⚠️ **VIOLAÇÃO MAIS COMUM:** Modificar código após comandos de investigação
+- ✅ **COMANDOS DE INVESTIGAÇÃO** ("verifique", "analise", "investigue", "explique", "como funciona") → **APENAS investigar e documentar**
+- ❌ **NUNCA modificar código** após comandos de investigação sem autorização explícita
+- ✅ **COMANDOS DE IMPLEMENTAÇÃO** ("corrija", "implemente", "faça", "adicione") → Investigar + implementar
+- ⚠️ **ANTES DE MODIFICAR QUALQUER ARQUIVO:** Verificar se comando é de investigação ou implementação
+- 🚨 **CHECKLIST OBRIGATÓRIO ANTES DE QUALQUER MODIFICAÇÃO:**
+  1. [ ] O comando contém palavra de investigação ("verifique", "analise", "investigue")?
+  2. [ ] Se SIM → **PARAR** - apenas investigar e documentar, NÃO modificar código
+  3. [ ] O comando contém palavra de implementação ("corrija", "implemente", "adicione")?
+  4. [ ] Se SIM → Continuar com implementação
+  5. [ ] Se houver dúvida → **PERGUNTAR** antes de modificar
+- 🚨 **SE HOUVER DÚVIDA:** Sempre perguntar antes de modificar
+
+### 1. Autorização Prévia para Modificações
+- ❌ **NUNCA modificar** código fora da implementação autorizada de um projeto
+- ✅ **SEMPRE perguntar** antes de iniciar um projeto: "Posso iniciar o projeto X agora?"
+- ✅ Aguardar autorização explícita antes de iniciar o projeto
+- ✅ **Dentro de um projeto autorizado:** Não é necessário pedir autorização para cada arquivo individual
+- ⚠️ **Projetos isolados:** Sempre perguntar antes de modificar arquivos fora de projetos autorizados
+- 🚨 **CRÍTICO - INTERPRETAÇÃO DE COMANDOS:**
+  - ⚠️ **"Faça um projeto"** ou **"Crie um projeto"** = Criar documento do projeto, apresentar ao usuário, e AGUARDAR autorização para executar
+  - ❌ **NÃO significa:** Criar E executar imediatamente
+  - ✅ **Significa:** Criar documento → Apresentar → Perguntar "Posso iniciar o projeto X agora?" → Aguardar autorização → Executar
+  - 🚨 **PROCESSO OBRIGATÓRIO para "faça um projeto":**
+    1. Criar documento do projeto em `05-DOCUMENTATION/`
+    2. Apresentar projeto ao usuário (resumo das fases, objetivos, arquivos envolvidos)
+    3. Perguntar explicitamente: "Posso iniciar o projeto X agora?"
+    4. Aguardar autorização explícita do usuário
+    5. Somente então executar o projeto
+  - ⚠️ **EXCEÇÃO:** Se o comando for explicitamente "execute o projeto X" ou "implemente o projeto X", pode executar imediatamente (mas ainda deve apresentar o projeto primeiro se não foi apresentado antes)
+
+### 2. Modificação de Arquivos JavaScript
+- ❌ **NUNCA modificar** arquivos `.js` diretamente no servidor
+- ✅ **SEMPRE modificar** arquivos `.js` localmente em `WEBFLOW-SEGUROSIMEDIATO/02-DEVELOPMENT/`
+- ✅ Fazer deploy via scripts ou comandos autorizados após modificação local
+- ✅ **OBRIGATÓRIO:** Após copiar arquivo para servidor, sempre verificar integridade comparando hash (MD5/SHA256)
+- ✅ **OBRIGATÓRIO:** Comparar hashes ignorando diferenças de maiúsculas/minúsculas (case-insensitive)
+- ✅ **OBRIGATÓRIO:** Sempre usar caminho completo do workspace ao copiar arquivos (não usar caminhos relativos que podem falhar)
+- 🚨 **OBRIGATÓRIO - CACHE CLOUDFLARE:** Após atualizar arquivo `.js` no servidor, **SEMPRE avisar** ao usuário sobre a necessidade de limpar o cache do Cloudflare para que as alterações sejam refletidas imediatamente
+
+### 3. Modificação de Arquivos PHP
+- ❌ **NUNCA modificar** arquivos `.php` diretamente no servidor
+- ✅ **SEMPRE modificar** arquivos `.php` localmente em `WEBFLOW-SEGUROSIMEDIATO/02-DEVELOPMENT/` primeiro
+- ✅ **SEMPRE criar backup** do arquivo original antes de modificar
+- ✅ Fazer deploy via scripts ou comandos autorizados após modificação local e backup
+- ✅ **OBRIGATÓRIO:** Após copiar arquivo para servidor, sempre verificar integridade comparando hash (MD5/SHA256)
+- ✅ **OBRIGATÓRIO:** Comparar hashes ignorando diferenças de maiúsculas/minúsculas (case-insensitive)
+- ✅ **OBRIGATÓRIO:** Sempre usar caminho completo do workspace ao copiar arquivos (não usar caminhos relativos que podem falhar)
+- 🚨 **OBRIGATÓRIO - CACHE CLOUDFLARE:** Após atualizar arquivo `.php` no servidor, **SEMPRE avisar** ao usuário sobre a necessidade de limpar o cache do Cloudflare para que as alterações sejam refletidas imediatamente
+- ❌ **NUNCA modificar** configurações do Nginx e PHP quando estão funcionando
+- ⚠️ Sempre confirmar antes de modificar configurações de infraestrutura
+
+### 4. Servidores com Acesso SSH
+- ❌ **NUNCA modificar ou criar** arquivos diretamente em servidores com acesso SSH
+- ✅ **SEMPRE criar** arquivos localmente no Windows primeiro
+- ✅ **SEMPRE criar backup** antes de qualquer modificação
+- ✅ **SEMPRE copiar** arquivos do Windows para o servidor (via scp, scripts de deploy, etc.)
+- ❌ **SEM EXCEÇÕES** - Nunca modificar diretamente no servidor, mesmo quando autorizado
+
+### 5. Arquivos de Configuração de Servidor
+- ❌ **NUNCA criar** arquivos de configuração (Nginx, PHP-FPM, systemd, etc.) diretamente no servidor
+- ✅ **SEMPRE criar** arquivos de configuração localmente primeiro
+- ✅ **SEMPRE criar** em diretório específico: `WEBFLOW-SEGUROSIMEDIATO/06-SERVER-CONFIG/`
+- ✅ **SEMPRE copiar** para o servidor via SCP após criação local
+- 📁 **Diretório de configuração:** `WEBFLOW-SEGUROSIMEDIATO/06-SERVER-CONFIG/`
+  - Arquivos Nginx: `nginx_*.conf`
+  - Arquivos PHP-FPM: `php-fpm_*.conf`
+  - Arquivos systemd: `*.service`
+  - Scripts de configuração: `*.sh`
+- ❌ **NUNCA usar** heredoc ou comandos inline complexos para criar arquivos no servidor
+- ✅ **SEMPRE usar** arquivo local + SCP para transferir configurações
+- 🚨 **OBRIGATÓRIO - VERIFICAÇÃO ANTES DE MODIFICAR:**
+  - ✅ **ANTES de modificar** qualquer arquivo de configuração local que será copiado para o servidor
+  - ✅ **SEMPRE verificar** se o arquivo local é idêntico ao arquivo no servidor
+  - ✅ **SEMPRE comparar hash** (SHA256, case-insensitive) antes de modificar arquivo local
+  - ✅ **Se arquivos forem diferentes:** Baixar arquivo do servidor primeiro, depois modificar
+  - ✅ **Se arquivos forem idênticos:** Pode modificar arquivo local com segurança
+  - ✅ **Processo obrigatório:**
+    1. Baixar arquivo do servidor para local (se não existir localmente)
+    2. Comparar hash do arquivo local com hash do arquivo no servidor
+    3. Se diferentes → Atualizar arquivo local com versão do servidor primeiro
+    4. Se idênticos → Modificar arquivo local
+    5. Copiar arquivo modificado para servidor
+    6. Verificar hash após cópia
+
+### 6. Organização de Arquivos no Diretório DEV
+- ❌ **NUNCA criar** arquivos novos diretamente no raiz de `WEBFLOW-SEGUROSIMEDIATO/02-DEVELOPMENT/`
+- ✅ **SEMPRE criar** novos arquivos nos diretórios apropriados:
+  - 📁 **Documentação:** `WEBFLOW-SEGUROSIMEDIATO/05-DOCUMENTATION/`
+  - 📁 **Backups:** `WEBFLOW-SEGUROSIMEDIATO/02-DEVELOPMENT/backups/` ou `WEBFLOW-SEGUROSIMEDIATO/04-BACKUPS/`
+  - 📁 **Testes:** `WEBFLOW-SEGUROSIMEDIATO/02-DEVELOPMENT/TMP/` (arquivos temporários de teste)
+  - 📁 **Configuração de Servidor:** `WEBFLOW-SEGUROSIMEDIATO/06-SERVER-CONFIG/`
+  - 📁 **Scripts de Deploy:** `WEBFLOW-SEGUROSIMEDIATO/02-DEVELOPMENT/` (apenas scripts essenciais de deploy)
+- ✅ **Arquivos do projeto** (JavaScript, PHP principais) devem permanecer no raiz de `02-DEVELOPMENT/`
+- ✅ **Arquivos auxiliares** (testes, documentação, backups) devem estar em subdiretórios apropriados
+
+### 7. Comandos de Parada
+- 🛑 Quando o usuário disser "Pare", "Não pode fazer isso" ou similar, **PARAR IMEDIATAMENTE**
+- 🛑 Não continuar com a ação que foi rejeitada
+- 🛑 Aguardar novas instruções antes de prosseguir
+
+### 8. Consulta de Documentação para Erros de Ambiente (OBRIGATÓRIA)
+- 🚨 **REGRA CRÍTICA:** Antes de tentar corrigir QUALQUER erro relacionado a ambiente, servidor, Linux, Nginx, PHP, MySQL/MariaDB, SQL, ou infraestrutura, **SEMPRE consultar a documentação primeiro**
+- ✅ **PROCESSO OBRIGATÓRIO ao detectar erro de ambiente:**
+  1. **PARAR** imediatamente qualquer tentativa de correção
+  2. **CONSULTAR documentação oficial:**
+     - Documentação do projeto em `WEBFLOW-SEGUROSIMEDIATO/05-DOCUMENTATION/`
+     - Documentação oficial do componente (Nginx, PHP, MySQL/MariaDB, Linux)
+     - Blogs e tutoriais relevantes sobre o erro específico
+     - Histórico de problemas similares no projeto
+  3. **IDENTIFICAR causa raiz** baseado na documentação consultada
+  4. **PROPOR solução** fundamentada na documentação antes de implementar
+  5. **SOMENTE APÓS** consultar documentação, prosseguir com correção
+- ✅ **Componentes que exigem consulta de documentação:**
+  - Linux (sistema operacional, permissões, serviços, systemd)
+  - Nginx (configuração, location blocks, fastcgi, SSL)
+  - PHP/PHP-FPM (configuração, variáveis de ambiente, extensões)
+  - MySQL/MariaDB (autenticação, usuários, permissões, conexões)
+  - SQL (sintaxe, comandos, usuários, senhas)
+  - Servidores (SSH, SCP, permissões, diretórios)
+  - Infraestrutura (rede, firewall, DNS, certificados SSL)
+- ❌ **NUNCA** tentar corrigir erros de ambiente sem consultar documentação primeiro
+- ❌ **NUNCA** usar tentativa-e-erro para problemas de ambiente
+- ⚠️ **Se documentação não for encontrada:** Informar ao usuário e perguntar antes de prosseguir
+- ✅ **Documentar consulta:** Registrar quais documentações foram consultadas e quais soluções foram identificadas
+- 📁 **Documentação do projeto:** `WEBFLOW-SEGUROSIMEDIATO/05-DOCUMENTATION/`
+  - Arquivos de arquitetura: `ARQUITETURA_*.md`
+  - Documentação de servidores: `ARQUITETURA_SERVIDORES.md`
+  - Guias de configuração: `GUIA_*.md`
+  - Relatórios de problemas: `STATUS_*.md`, `ANALISE_*.md`
+- 🔍 **Fontes de documentação externa:**
+  - Documentação oficial do Nginx: https://nginx.org/en/docs/
+  - Documentação oficial do PHP: https://www.php.net/docs.php
+  - Documentação oficial do MariaDB: https://mariadb.com/kb/en/documentation/
+  - Documentação oficial do MySQL: https://dev.mysql.com/doc/
+  - Tutoriais e blogs relevantes sobre o erro específico
+
+### 9. Ambiente Padrão de Trabalho
+- ✅ **PADRÃO:** Sempre trabalhar apenas no ambiente de **DESENVOLVIMENTO** (DEV)
+- ✅ **Diretório padrão:** `WEBFLOW-SEGUROSIMEDIATO/02-DEVELOPMENT/`
+- ✅ **Servidor padrão:** `dev.bssegurosimediato.com.br` (IP: 65.108.156.14)
+- ✅ **Deploy padrão:** Apenas para `/var/www/html/dev/root/` no servidor DEV
+- 🚨 **PRODUÇÃO - PROCEDIMENTO NÃO DEFINIDO:**
+  - ⚠️ **STATUS:** O procedimento para atualizar o ambiente de produção **será definido posteriormente**
+  - 🚨 **VALIDAÇÃO AUTOMÁTICA OBRIGATÓRIA:**
+    - ✅ **ANTES de executar QUALQUER comando:** Verificar arquivo `.env.production_access`
+    - ✅ **Se `PRODUCTION_ACCESS=DISABLED`:** BLOQUEAR automaticamente e emitir alerta
+    - ✅ **Se `PRODUCTION_ACCESS=ENABLED`:** Permitir após validação adicional (verificar autorização, backup, etc.)
+    - ✅ **Se `PRODUCTION_ACCESS=READ_ONLY`:** Permitir apenas comandos de leitura/investigação
+  - 🚨 **DETECÇÃO AUTOMÁTICA OBRIGATÓRIA:**
+    - ✅ **Padrões a detectar:** IP `157.180.36.223`, domínio `prod.bssegurosimediato.com.br`, caminho `/var/www/html/prod/root`
+    - ✅ **Comandos a bloquear:** `ssh root@157.180.36.223`, `scp ... root@157.180.36.223:...`, qualquer comando com `/var/www/html/prod/root/`
+    - ✅ **Ação quando detectado:** BLOQUEAR automaticamente se `PRODUCTION_ACCESS=DISABLED`, emitir alerta obrigatório
+  - 🚨 **ALERTA OBRIGATÓRIO:** Sempre emitir alerta quando detectar tentativa de acesso ao servidor de produção
+  - 🚨 **ALERTA OBRIGATÓRIO:** Sempre emitir alerta quando detectar referências a IP `157.180.36.223` ou domínio `prod.bssegurosimediato.com.br`
+  - 🚨 **ALERTA OBRIGATÓRIO:** Sempre emitir alerta quando detectar comandos SSH para servidor de produção
+  - 🚨 **ALERTA OBRIGATÓRIO:** Sempre emitir alerta quando detectar modificações em `/var/www/html/prod/root/`
+  - ❌ **BLOQUEIO:** Não executar comandos ou modificações em produção até que procedimento seja oficialmente definido E arquivo `.env.production_access` tenha `PRODUCTION_ACCESS=ENABLED`
+  - ⚠️ **EXCEÇÃO FUTURA:** Após definição oficial do procedimento, modificar produção apenas quando houver instrução **EXPLÍCITA** do usuário E `PRODUCTION_ACCESS=ENABLED`
+- ✅ **Documentação:** Projetos devem especificar claramente se são DEV ou PROD
+- ✅ **Backups:** Backups devem ser criados localmente em `WEBFLOW-SEGUROSIMEDIATO/02-DEVELOPMENT/backups/` ou `WEBFLOW-SEGUROSIMEDIATO/04-BACKUPS/`
+
+---
+
+## 📋 DIRETIVAS DE IMPLEMENTAÇÃO
+
+### Variáveis de Ambiente
+- ✅ **SEMPRE usar** variáveis de ambiente do Docker (`APP_BASE_DIR`, `APP_BASE_URL`, etc.)
+- ✅ **SEMPRE usar** variáveis de sistema diretamente via `$_ENV` no PHP
+- ❌ **NÃO criar** sistemas de configuração complexos (`window.APP_CONFIG`, objetos de configuração)
+- ✅ Usar variáveis globais simples quando necessário (`window.APP_BASE_URL`, `window.APP_ENVIRONMENT`)
+
+### Estrutura de Arquivos
+- ✅ Arquivos `.js` e `.php` devem estar no mesmo diretório raiz
+- ✅ Acessíveis via `https://dev.bssegurosimediato.com.br/` (dev) ou `https://bssegurosimediato.com.br/` (prod)
+- ✅ Modificações sempre começam localmente em `WEBFLOW-SEGUROSIMEDIATO/02-DEVELOPMENT/`
+- ✅ Arquivos de configuração de servidor em `WEBFLOW-SEGUROSIMEDIATO/06-SERVER-CONFIG/`
+
+### Fluxo de Trabalho
+1. **Criar backup** do arquivo original (se existir)
+2. **Modificar localmente** → `WEBFLOW-SEGUROSIMEDIATO/02-DEVELOPMENT/`
+3. **Testar localmente** (quando possível)
+4. **Deploy para servidor DEV** via scripts ou comandos autorizados (`dev.bssegurosimediato.com.br`)
+   - ✅ **OBRIGATÓRIO:** Usar caminho completo do workspace ao copiar arquivos
+   - ✅ **OBRIGATÓRIO:** Após copiar, sempre comparar hash (MD5/SHA256) do arquivo origem e destino
+   - ✅ **OBRIGATÓRIO:** Comparar hashes ignorando diferenças de maiúsculas/minúsculas (case-insensitive)
+   - ✅ **OBRIGATÓRIO:** Confirmar que hash coincide antes de considerar deploy concluído
+5. **Verificar funcionamento** no servidor DEV
+6. 🚨 **OBRIGATÓRIO - CACHE CLOUDFLARE:** Após atualizar arquivos `.js` ou `.php` no servidor, **SEMPRE avisar** ao usuário sobre a necessidade de limpar o cache do Cloudflare para que as alterações sejam refletidas imediatamente
+7. **OBRIGATÓRIO: Realizar auditoria pós-implementação** (ver seção "Auditoria Pós-Implementação")
+- 🚨 **PRODUÇÃO:** 
+  - ⚠️ **ALERTA:** Procedimento para produção será definido posteriormente
+  - 🚨 **BLOQUEAR** qualquer deploy ou modificação em produção até procedimento oficial
+  - ⚠️ **EMITIR ALERTA** se detectar tentativa de acesso ou modificação em produção
+
+### Fluxo de Trabalho para Correção de Erros em Arquivos .js e .php (OBRIGATÓRIO)
+- 🚨 **REGRA CRÍTICA:** Quando erros são detectados em arquivos `.js` ou `.php`, **SEMPRE seguir este processo sequencial obrigatório**
+- ✅ **PROCESSO OBRIGATÓRIO para correção de erros:**
+  1. **FASE 1: Atualizar em Desenvolvimento (Local)**
+     - ✅ Modificar arquivo em `WEBFLOW-SEGUROSIMEDIATO/02-DEVELOPMENT/`
+     - ✅ Criar backup do arquivo original antes de modificar
+     - ✅ Aplicar correção no arquivo de desenvolvimento
+  2. **FASE 2: Copiar de Desenvolvimento para Servidor de Desenvolvimento**
+     - ✅ Copiar arquivo de `WEBFLOW-SEGUROSIMEDIATO/02-DEVELOPMENT/` para servidor DEV
+     - ✅ Servidor DEV: `dev.bssegurosimediato.com.br` (IP: 65.108.156.14)
+     - ✅ Caminho no servidor: `/var/www/html/dev/root/`
+     - ✅ **OBRIGATÓRIO:** Verificar hash (SHA256) após cópia
+     - ✅ **OBRIGATÓRIO:** Usar caminho completo do workspace ao copiar
+  3. **FASE 3: Testar em Desenvolvimento**
+     - ✅ Testar funcionalidade corrigida no ambiente DEV
+     - ✅ Verificar logs do servidor DEV
+     - ✅ Confirmar que correção resolve o problema
+     - ✅ **NÃO prosseguir para produção se teste em DEV falhar**
+     - ⚠️ **Testes que requerem intervenção manual:**
+       - ✅ Se teste requer envio real de email, submissão de formulário, ou outra ação manual
+       - ✅ Marcar fase como "PENDENTE TESTE MANUAL" no TODO
+       - ✅ Documentar claramente no relatório que teste requer intervenção manual
+       - ✅ **Pode prosseguir para FASE 4** se integridade do arquivo foi verificada (hash, sintaxe)
+       - ✅ **MAS** deve documentar que teste funcional completo será realizado posteriormente
+       - ⚠️ **Se teste pode ser automatizado:** Deve ser realizado antes de prosseguir
+  4. **FASE 4: Atualizar de Desenvolvimento para Produção (Local)**
+     - ✅ **SOMENTE APÓS** confirmação de sucesso em DEV
+     - ✅ Copiar arquivo corrigido de `WEBFLOW-SEGUROSIMEDIATO/02-DEVELOPMENT/` para `WEBFLOW-SEGUROSIMEDIATO/03-PRODUCTION/`
+     - ✅ Verificar que arquivo foi copiado corretamente
+     - ✅ Comparar hash dos arquivos DEV e PROD (devem ser idênticos após cópia)
+  5. **FASE 5: Copiar de Produção para Servidor de Produção**
+     - ✅ **SOMENTE APÓS** arquivo estar em `WEBFLOW-SEGUROSIMEDIATO/03-PRODUCTION/`
+     - ✅ Copiar arquivo de `WEBFLOW-SEGUROSIMEDIATO/03-PRODUCTION/` para servidor PROD
+     - ✅ Servidor PROD: `prod.bssegurosimediato.com.br` (IP: 157.180.36.223)
+     - ✅ Caminho no servidor: `/var/www/html/prod/root/`
+     - ✅ **OBRIGATÓRIO:** Verificar hash (SHA256) após cópia
+     - ✅ **OBRIGATÓRIO:** Usar caminho completo do workspace ao copiar
+  6. **FASE 6: Verificação Final**
+     - ✅ Testar funcionalidade corrigida no ambiente PROD
+     - ✅ Verificar logs do servidor PROD
+     - ✅ Confirmar que correção está funcionando em produção
+     - 🚨 **OBRIGATÓRIO - CACHE CLOUDFLARE:** Avisar ao usuário sobre necessidade de limpar cache do Cloudflare
+- ❌ **NUNCA pular etapas** do processo sequencial
+- ❌ **NUNCA copiar diretamente** de DEV para servidor PROD sem passar por PROD local
+- ❌ **NUNCA atualizar produção** sem testar em desenvolvimento primeiro
+- ✅ **SEMPRE documentar** cada fase do processo de correção
+- ✅ **SEMPRE criar backup** antes de qualquer modificação
+- ⚠️ **Se teste em DEV falhar:** Parar processo, corrigir em DEV, e repetir a partir da FASE 1
+
+### Fluxo de Trabalho para Arquivos de Configuração de Servidor
+1. **Criar arquivo localmente** → `WEBFLOW-SEGUROSIMEDIATO/06-SERVER-CONFIG/`
+2. **Verificar sintaxe** (quando possível: `nginx -t`, `php-fpm -t`, etc.)
+3. **Copiar para servidor** via SCP: `scp arquivo.conf root@servidor:/caminho/destino/`
+4. **Aplicar configuração** no servidor (reload/restart do serviço)
+5. **Verificar funcionamento** no servidor
+
+### Auditoria Pós-Implementação (OBRIGATÓRIA)
+- ✅ **SEMPRE realizar auditoria** ao final da implementação de qualquer projeto
+- ✅ **Framework de Auditoria:** Seguir metodologia definida em `WEBFLOW-SEGUROSIMEDIATO/05-DOCUMENTATION/AUDITORIA_PROJETOS_BOAS_PRATICAS.md`
+  - 📋 **Documento de Referência:** `AUDITORIA_PROJETOS_BOAS_PRATICAS.md` (versão 1.1.0)
+  - ✅ **Metodologia:** Baseada em PMI, ISO 21500, PRINCE2, Agile/Scrum, CMMI
+  - ✅ **Critérios de Avaliação:** Seguir todos os critérios definidos no documento
+  - 🚨 **CRÍTICO:** Verificar se existe seção específica para especificações do usuário no documento do projeto (Seção 2.3)
+  - ✅ **Checklist:** Seguir checklist completo definido no documento de auditoria
+- ✅ **Auditoria de Código:** Verificar todos os arquivos alterados em busca de:
+  - Falhas de sintaxe (erros de digitação, parênteses não fechados, etc.)
+  - Inconsistências lógicas (variáveis não definidas, funções não chamadas, etc.)
+  - Problemas de segurança (exposição de credenciais, validação de entrada, etc.)
+  - Violações de padrões de código (nomenclatura, estrutura, etc.)
+  - Dependências quebradas (includes, requires, imports, etc.)
+- ✅ **Auditoria de Funcionalidade:** Comparar código alterado com backup original para garantir:
+  - Nenhuma funcionalidade não prevista foi removida ou alterada
+  - Todas as funcionalidades previstas foram implementadas corretamente
+  - Nenhuma regra de negócio foi quebrada
+  - Nenhuma integração foi afetada negativamente
+- ✅ **Verificação de Especificações do Usuário (CRÍTICO):**
+  - ✅ Verificar se existe seção específica para especificações do usuário no documento do projeto
+  - ✅ Verificar se especificações estão claramente documentadas
+  - ✅ Verificar se requisitos estão explícitos e mensuráveis
+  - ✅ Verificar se expectativas do usuário estão alinhadas com escopo do projeto
+  - ✅ Verificar se critérios de aceitação do usuário estão definidos
+  - 📋 **Referência:** Ver seção 2.3 de `AUDITORIA_PROJETOS_BOAS_PRATICAS.md` para checklist completo
+- ✅ **Documentar auditoria:** Criar relatório de auditoria formal em `WEBFLOW-SEGUROSIMEDIATO/05-DOCUMENTATION/`
+  - Listar todos os arquivos auditados
+  - Documentar problemas encontrados e correções aplicadas
+  - Confirmar que nenhuma funcionalidade foi prejudicada
+  - Registrar aprovação da auditoria
+  - 🚨 **OBRIGATÓRIO:** Criar documento específico de auditoria (ex: `AUDITORIA_PROJETO_X.md`)
+  - ⚠️ **NÃO basta** apenas verificar - deve ser documentado formalmente
+  - ✅ **Seguir template:** Usar estrutura definida em `AUDITORIA_PROJETOS_BOAS_PRATICAS.md`
+- ✅ **Corrigir problemas encontrados** antes de considerar o projeto concluído
+- ⚠️ **NÃO considerar projeto concluído** sem auditoria completa e documentada
+
+---
+
+## 💬 DIRETIVAS DE COMUNICAÇÃO
+
+### Clareza e Objetividade
+- Seja direto e objetivo nas respostas
+- Evite verbosidade desnecessária
+- Vá direto ao ponto quando possível
+
+### Implementação vs Sugestão
+- ✅ **Implementar** mudanças quando solicitado explicitamente, não apenas sugerir
+- ✅ Usar as ferramentas disponíveis para fazer as alterações
+- ⚠️ **CRÍTICO - DISTINÇÃO OBRIGATÓRIA:** Distinguir entre comandos de investigação e comandos de implementação:
+  - **Comandos de investigação** ("verifique", "analise", "investigue", "explique", "como funciona"): **APENAS investigar e documentar - NUNCA modificar código**
+  - **Comandos de implementação** ("corrija", "implemente", "faça", "execute", "adicione", "modifique"): Investigar + implementar
+- ⚠️ **REGRA ABSOLUTA:** Se não tiver certeza se deve implementar ou apenas investigar, **SEMPRE perguntar antes de implementar**
+- 🚨 **CHECKLIST OBRIGATÓRIO ANTES DE MODIFICAR CÓDIGO:**
+  1. O usuário pediu explicitamente para modificar/implementar/corrigir?
+  2. Se o comando foi "verifique", "analise", "investigue" → **PARAR** - apenas investigar
+  3. Se o comando foi "corrija", "implemente", "faça" → **CONTINUAR** - implementar
+  4. Se houver dúvida → **PERGUNTAR** antes de modificar
+
+### Investigação Proativa
+- ✅ Consultar documentação e arquivos relevantes antes de responder
+- ✅ Buscar informações no código antes de perguntar ao usuário
+- ✅ Tentar resolver problemas sozinho quando possível
+- ⚠️ Se não encontrar informação, informar claramente
+- 🚨 **ESPECIALMENTE para erros de ambiente:** Sempre consultar documentação oficial e do projeto ANTES de tentar corrigir
+
+### Interpretação de Comandos: Investigar vs Implementar
+- 🚨 **CRÍTICO:** Esta é uma das diretivas mais importantes - violar resulta em modificações não autorizadas
+
+- ✅ **COMANDOS DE INVESTIGAÇÃO (NUNCA MODIFICAR CÓDIGO):**
+  - **Palavras-chave:** "verifique", "analise", "investigue", "explique", "como funciona", "por que", "identifique", "descubra"
+  - **AÇÃO PERMITIDA:** Apenas investigar, analisar e documentar o problema
+  - **AÇÃO PROIBIDA:** ❌ Corrigir código ❌ Adicionar logs ❌ Modificar arquivos ❌ Implementar soluções
+  - **PROCESSO OBRIGATÓRIO:**
+    1. Investigar o código e identificar a causa raiz
+    2. Criar documento de análise explicando o problema em `05-DOCUMENTATION/`
+    3. Apresentar análise ao usuário
+    4. **AGUARDAR autorização explícita** antes de qualquer modificação
+    5. **NUNCA modificar código** sem autorização explícita após investigação
+  - **EXEMPLOS:**
+    - ❌ "Analise porque X não funciona" → APENAS analisar, NÃO corrigir
+    - ❌ "Verifique como funciona Y" → APENAS verificar, NÃO modificar
+    - ❌ "Investigue o problema Z" → APENAS investigar, NÃO implementar
+
+- ✅ **COMANDOS DE IMPLEMENTAÇÃO (PODE MODIFICAR CÓDIGO):**
+  - **Palavras-chave:** "corrija", "implemente", "faça", "execute", "adicione", "modifique", "crie", "atualize"
+  - **AÇÃO PERMITIDA:** Investigar + implementar solução
+  - **PROCESSO OBRIGATÓRIO:**
+    1. Investigar se necessário para entender o problema
+    2. Criar backup do arquivo original
+    3. Implementar correção
+    4. Fazer deploy (se aplicável)
+    5. Realizar auditoria pós-implementação e documentar formalmente
+  - **EXEMPLOS:**
+    - ✅ "Corrija o problema X" → Investigar + corrigir
+    - ✅ "Implemente a funcionalidade Y" → Investigar + implementar
+    - ✅ "Adicione logs de diagnóstico" → Implementar logs
+  - ⚠️ **EXCEÇÃO ESPECIAL - "Faça um projeto" ou "Crie um projeto":**
+    - 🚨 **NÃO significa executar imediatamente**
+    - ✅ **Significa:** Criar documento do projeto → Apresentar → Perguntar autorização → Executar
+    - 🚨 **Ver seção "1. Autorização Prévia para Modificações" para processo completo**
+
+- ⚠️ **REGRA ABSOLUTA - SEM EXCEÇÕES:**
+  - **Quando houver dúvida entre investigar ou implementar:**
+    - **SEMPRE preferir apenas investigar primeiro**
+    - **SEMPRE aguardar autorização explícita** antes de implementar
+    - **SEMPRE perguntar:** "Deseja que eu corrija/implemente isso agora?" após apresentar análise
+  - **ANTES DE MODIFICAR QUALQUER ARQUIVO:**
+    - ✅ Verificar se comando contém palavra de implementação explícita
+    - ✅ Se comando contém apenas palavras de investigação → **PARAR** e apenas investigar
+    - ✅ Se houver dúvida → **PERGUNTAR** antes de modificar
+
+### Documentação
+- ✅ Documentar decisões importantes quando solicitado
+- ✅ Criar documentos de especificação quando necessário
+- ✅ Manter histórico das decisões técnicas
+
+### Backups Locais
+- ✅ **SEMPRE incluir** backups locais dos arquivos em diretório específico definido no projeto
+- ✅ Criar estrutura de backup antes de modificar arquivos importantes
+- ✅ Manter histórico de versões dos arquivos modificados
+- 📁 Diretório padrão: `backups/` ou conforme definido no projeto específico
+
+### Registro de Conversas
+- ✅ **SEMPRE guardar** todas as conversas em arquivos individuais
+- ✅ Criar arquivo de conversa com nome descritivo e timestamp
+- ✅ Registrar no arquivo histórico de conversas:
+  - Referência à conversa
+  - Nome do arquivo criado
+  - Timestamp da conversa
+- 📁 Formato sugerido: `CONVERSA_YYYYMMDD_HHMMSS.md` ou `CONVERSA_[TEMA]_YYYYMMDD.md`
+- 📁 Arquivo histórico: `HISTORICO_CONVERSAS.md` na raiz do projeto
+
+---
+
+## 🔧 DIRETIVAS TÉCNICAS ESPECÍFICAS
+
+### Resolução de Problemas de Ambiente (OBRIGATÓRIA)
+- 🚨 **ANTES de qualquer correção de erro de ambiente, servidor, Linux, Nginx, PHP, MySQL/MariaDB, SQL:**
+  1. ✅ **CONSULTAR documentação do projeto** em `WEBFLOW-SEGUROSIMEDIATO/05-DOCUMENTATION/`
+  2. ✅ **CONSULTAR documentação oficial** do componente (Nginx, PHP, MySQL/MariaDB)
+  3. ✅ **CONSULTAR blogs e tutoriais** relevantes sobre o erro específico
+  4. ✅ **IDENTIFICAR causa raiz** baseado na documentação
+  5. ✅ **PROPOR solução** fundamentada antes de implementar
+- ❌ **NUNCA usar tentativa-e-erro** para problemas de ambiente
+- ✅ **SEMPRE documentar** quais documentações foram consultadas
+- 📁 **Documentação do projeto:** `WEBFLOW-SEGUROSIMEDIATO/05-DOCUMENTATION/`
+- 🔍 **Fontes externas:** Documentação oficial, blogs, tutoriais relevantes
+
+### Configuração e Variáveis
+- **PHP:** Usar `$_ENV['VARIAVEL']` para acessar variáveis de ambiente do Docker
+- **JavaScript:** Usar variáveis globais simples expostas via `config_env.js.php` (se necessário)
+- **NÃO criar:** Objetos de configuração complexos, sistemas centralizados de config
+
+### Credenciais e Segurança
+- ✅ Credenciais devem estar em variáveis de ambiente do Docker
+- ✅ NÃO hardcodar credenciais em arquivos JavaScript ou PHP
+- ✅ Usar variáveis de ambiente separadas para dev e prod quando necessário
+
+### Ambientes
+- **DEV:** `https://dev.bssegurosimediato.com.br` (IP: 65.108.156.14) - **AMBIENTE PADRÃO**
+- **PROD:** `https://prod.bssegurosimediato.com.br` (IP: 157.180.36.223) - **🚨 PROCEDIMENTO NÃO DEFINIDO**
+- ✅ **PADRÃO:** Sempre trabalhar em DEV, salvo instrução específica do usuário
+- ✅ Sempre verificar qual ambiente está sendo usado antes de fazer alterações
+- 🚨 **PRODUÇÃO - ALERTAS OBRIGATÓRIOS:**
+  - ⚠️ **EMITIR ALERTA** ao detectar qualquer referência ao servidor de produção
+  - ⚠️ **EMITIR ALERTA** ao detectar IP `157.180.36.223` em comandos ou scripts
+  - ⚠️ **EMITIR ALERTA** ao detectar domínio `prod.bssegurosimediato.com.br` em comandos ou scripts
+  - ⚠️ **EMITIR ALERTA** ao detectar caminho `/var/www/html/prod/root/` em comandos ou scripts
+  - ⚠️ **EMITIR ALERTA** ao detectar tentativa de SSH para servidor de produção
+  - ❌ **BLOQUEAR** qualquer ação em produção até que procedimento seja oficialmente definido
+  - 📋 **STATUS:** Procedimento para produção será definido posteriormente
+
+---
+
+## ⚠️ AVISOS IMPORTANTES
+
+1. **NUNCA modificar nada diretamente no servidor** - Sempre modificar primeiro no Windows com backup
+2. **Backup é OBRIGATÓRIO** - Sempre criar backup antes de qualquer modificação
+3. **Nginx e PHP:** Não modificar quando estão funcionando, a menos que explicitamente autorizado
+4. **JavaScript no Servidor:** NUNCA modificar diretamente, sempre modificar localmente primeiro
+5. **PHP no Servidor:** NUNCA modificar diretamente, sempre modificar localmente primeiro com backup
+6. **Arquivos de Configuração:** NUNCA criar diretamente no servidor - SEMPRE criar localmente em `06-SERVER-CONFIG/` e copiar via SCP
+7. **Sistemas Complexos:** Evitar criar sistemas de configuração complexos, preferir soluções simples
+8. **Variáveis de Ambiente:** Sempre usar variáveis do Docker, não criar sistemas alternativos
+9. **Heredoc no SSH:** NUNCA usar heredoc complexo via SSH - SEMPRE criar arquivo local e copiar
+10. **🚨 CACHE CLOUDFLARE - OBRIGATÓRIO:** Após atualizar arquivos `.js` ou `.php` no servidor, **SEMPRE avisar** ao usuário sobre a necessidade de limpar o cache do Cloudflare. O Cloudflare pode manter versões antigas em cache, causando erros como uso de credenciais antigas, código desatualizado, etc. Avisar explicitamente: "⚠️ **IMPORTANTE:** Após atualizar arquivos no servidor, é necessário limpar o cache do Cloudflare para que as alterações sejam refletidas imediatamente."
+11. **🚨 PRODUÇÃO - PROCEDIMENTO NÃO DEFINIDO:**
+    - ⚠️ **EMITIR ALERTA** ao detectar qualquer tentativa de acesso ou modificação no servidor de produção
+    - ⚠️ **EMITIR ALERTA** ao detectar IP `157.180.36.223` ou domínio `prod.bssegurosimediato.com.br`
+    - ⚠️ **EMITIR ALERTA** ao detectar caminho `/var/www/html/prod/root/`
+    - ❌ **BLOQUEAR** qualquer ação em produção até que procedimento seja oficialmente definido
+    - 📋 Procedimento para produção será definido posteriormente
+
+---
+
+## 📝 NOTAS
+
+- Estas diretivas foram coletadas do histórico de conversas e decisões do projeto
+- Quando houver conflito entre diretivas, priorizar as regras críticas (seção 1)
+- Em caso de dúvida, perguntar ao usuário antes de prosseguir
+- As diretivas de autorização prévia e backups são **obrigatórias** e devem ser seguidas sempre
+
+---
+
+## 📋 EXEMPLO DE FLUXO CORRETO
+
+### Antes de Iniciar um Projeto:
+1. ✅ **CRIAR documento do projeto** em `05-DOCUMENTATION/` (se ainda não existir)
+2. ✅ **APRESENTAR projeto ao usuário** (resumo das fases, objetivos, arquivos envolvidos)
+3. ✅ **PERGUNTAR:** "Posso iniciar o projeto X agora?"
+4. ✅ **AGUARDAR autorização explícita** do usuário
+5. ✅ **SOMENTE então** iniciar execução do projeto
+6. ✅ Dentro do projeto autorizado: Modificar arquivos sem pedir autorização individual
+7. ✅ **OBRIGATÓRIO:** Criar backups locais dos arquivos que serão modificados ANTES de qualquer alteração
+8. ✅ Criar arquivos localmente (não no servidor)
+9. ✅ Copiar para servidor apenas após criação local e verificação
+10. ✅ Registrar conversa e atualizar histórico
+11. ✅ **OBRIGATÓRIO:** Realizar auditoria pós-implementação e documentar formalmente
+
+### Para Modificações Isoladas (fora de projeto):
+1. ✅ Perguntar: "Posso modificar o arquivo X agora?"
+2. ✅ Aguardar autorização explícita
+3. ✅ **OBRIGATÓRIO:** Criar backup local do arquivo original ANTES de modificar
+4. ✅ Modificar arquivo localmente (nunca no servidor)
+5. 🚨 **ALERTA:** Se detectar referência a produção, emitir alerta e bloquear ação
+
+### Para Comandos de Investigação ("verifique porque", "analise", "investigue", "explique", "como funciona"):
+1. ✅ **APENAS investigar** o problema (não corrigir automaticamente)
+2. ✅ Identificar causa raiz do problema
+3. ✅ Criar documento de análise em `05-DOCUMENTATION/`
+4. ✅ Apresentar análise ao usuário
+5. ✅ **AGUARDAR autorização explícita** antes de corrigir
+6. 🚨 **PROIBIÇÃO ABSOLUTA:** ❌ **NÃO corrigir** ❌ **NÃO adicionar logs** ❌ **NÃO modificar arquivos** ❌ **NÃO implementar soluções** sem autorização explícita após investigação
+7. ⚠️ **CHECKLIST ANTES DE QUALQUER MODIFICAÇÃO:**
+   - [ ] O usuário pediu explicitamente para modificar/implementar/corrigir?
+   - [ ] O comando contém palavra de implementação ("corrija", "implemente", "adicione")?
+   - [ ] Se NÃO → **PARAR** e apenas apresentar análise
+   - [ ] Se SIM → Continuar com implementação
+
+### Para Tentativas de Acesso a Produção:
+1. 🚨 **EMITIR ALERTA IMEDIATO:** "⚠️ ALERTA: Detectada tentativa de acesso ao servidor de produção"
+2. 🚨 **INFORMAR:** "O procedimento para produção será definido posteriormente"
+3. 🚨 **BLOQUEAR:** Não executar comando ou ação até procedimento oficial
+4. ✅ **SUGERIR:** Trabalhar apenas no ambiente DEV (`dev.bssegurosimediato.com.br`)
+
+### Após Modificação:
+1. ✅ Salvar conversa em arquivo individual
+2. ✅ Atualizar `HISTORICO_CONVERSAS.md` com referência e timestamp
+3. ✅ Manter backup do arquivo original
+4. ✅ **OBRIGATÓRIO:** Realizar auditoria pós-implementação (ver seção "Auditoria Pós-Implementação")
+5. ✅ **OBRIGATÓRIO:** Seguir metodologia definida em `WEBFLOW-SEGUROSIMEDIATO/05-DOCUMENTATION/AUDITORIA_PROJETOS_BOAS_PRATICAS.md`
+6. ✅ **OBRIGATÓRIO:** Criar documento formal de auditoria em `05-DOCUMENTATION/` (ex: `AUDITORIA_PROJETO_X.md`)
+7. ✅ **OBRIGATÓRIO:** Documentar todos os arquivos auditados, problemas encontrados, e confirmação de que nenhuma funcionalidade foi prejudicada
+8. ✅ **OBRIGATÓRIO:** Verificar especificações do usuário conforme seção 2.3 do documento de auditoria
+
+### Processo de Cópia para Servidor (OBRIGATÓRIO):
+1. ✅ **SEMPRE usar caminho completo do workspace** ao copiar arquivos
+   - ✅ Usar caminho absoluto completo do workspace
+   - ✅ Ou usar `cd` para o diretório do workspace antes de copiar
+   - ❌ NÃO usar caminhos relativos que podem falhar (ex: `WEBFLOW-SEGUROSIMEDIATO/02-DEVELOPMENT/arquivo.js`)
+   - ✅ Exemplo correto: `cd "C:\Users\Luciano\OneDrive - Imediato Soluções em Seguros\Imediato\imediatoseguros-rpa-playwright" && scp "WEBFLOW-SEGUROSIMEDIATO\02-DEVELOPMENT\arquivo.js" root@servidor:/destino/`
+2. ✅ **SEMPRE criar backup no servidor** antes de copiar arquivo novo
+   - ✅ Criar backup com timestamp: `arquivo.js.backup_YYYYMMDD_HHMMSS`
+3. ✅ **SEMPRE comparar hash após cópia** para garantir integridade:
+   - ✅ Calcular hash do arquivo local (SHA256 recomendado)
+   - ✅ Calcular hash do arquivo no servidor após cópia
+   - ✅ Comparar hashes **ignorando diferenças de maiúsculas/minúsculas** (case-insensitive)
+   - ✅ Se hashes não coincidirem, tentar copiar novamente
+   - ✅ Documentar hash comparado no log da operação
+   - ✅ **NUNCA considerar deploy concluído** sem verificação de hash bem-sucedida
+4. ✅ **Exemplo de verificação de hash (case-insensitive):**
+   ```powershell
+   # Local (Windows PowerShell)
+   $hashLocal = (Get-FileHash -Path "arquivo.js" -Algorithm SHA256).Hash.ToUpper()
+   
+   # Servidor (via SSH) - converter para maiúsculas para comparação
+   $hashServidor = (ssh root@servidor "sha256sum /var/www/html/dev/root/arquivo.js | cut -d' ' -f1").ToUpper()
+   
+   # Comparar ignorando maiúsculas/minúsculas (ambos convertidos para maiúsculas)
+   if ($hashLocal -eq $hashServidor) {
+       Write-Host "✅ Hash coincide - arquivo copiado corretamente"
+   } else {
+       Write-Host "❌ Hash não coincide - tentar copiar novamente"
+       Write-Host "Local:    $hashLocal"
+       Write-Host "Servidor: $hashServidor"
+   }
+   ```
+   - ⚠️ **IMPORTANTE:** Sempre converter ambos os hashes para o mesmo case (maiúsculas ou minúsculas) antes de comparar
+   - ✅ **Recomendado:** Converter ambos para maiúsculas usando `.ToUpper()` para comparação consistente
+5. ✅ **Checklist obrigatório antes de considerar deploy concluído:**
+   - [ ] Backup criado no servidor?
+   - [ ] Arquivo copiado para servidor?
+   - [ ] Hash local calculado?
+   - [ ] Hash do servidor calculado?
+   - [ ] Hashes coincidem?
+   - [ ] Se não coincidem, tentar copiar novamente
+   - [ ] Deploy só concluído após hash confirmado
+
