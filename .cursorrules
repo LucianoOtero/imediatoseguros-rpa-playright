@@ -193,6 +193,7 @@
 5. **Verificar funcionamento** no servidor DEV
 6. 🚨 **OBRIGATÓRIO - CACHE CLOUDFLARE:** Após atualizar arquivos `.js` ou `.php` no servidor, **SEMPRE avisar** ao usuário sobre a necessidade de limpar o cache do Cloudflare para que as alterações sejam refletidas imediatamente
 7. **OBRIGATÓRIO: Realizar auditoria pós-implementação** (ver seção "Auditoria Pós-Implementação")
+8. 🚨 **OBRIGATÓRIO: Atualizar documento de tracking** (`ALTERACOES_DESDE_ULTIMA_REPLICACAO_PROD_YYYYMMDD.md`) após deploy em DEV (ver seção "Tracking de Alterações para Replicação em Produção")
 - 🚨 **PRODUÇÃO:** 
   - ⚠️ **ALERTA:** Procedimento para produção será definido posteriormente
   - 🚨 **BLOQUEAR** qualquer deploy ou modificação em produção até procedimento oficial
@@ -290,6 +291,48 @@
   - ✅ **Seguir template:** Usar estrutura definida em `AUDITORIA_PROJETOS_BOAS_PRATICAS.md`
 - ✅ **Corrigir problemas encontrados** antes de considerar o projeto concluído
 - ⚠️ **NÃO considerar projeto concluído** sem auditoria completa e documentada
+
+### Tracking de Alterações para Replicação em Produção (OBRIGATÓRIO)
+- 🚨 **REGRA CRÍTICA:** Sempre que houver alterações no ambiente de desenvolvimento (DEV), **SEMPRE atualizar** o documento de tracking de alterações para facilitar a replicação em produção
+- ✅ **PROCESSO OBRIGATÓRIO ao fazer alterações em DEV:**
+  1. **Identificar tipo de alteração:**
+     - Código PHP/JavaScript modificado
+     - Configurações PHP-FPM alteradas
+     - Banco de dados modificado
+     - Variáveis de ambiente adicionadas/modificadas
+     - Projetos implementados
+  2. **Atualizar documento de tracking:**
+     - 📁 **Documento Principal:** `WEBFLOW-SEGUROSIMEDIATO/05-DOCUMENTATION/ALTERACOES_DESDE_ULTIMA_REPLICACAO_PROD_YYYYMMDD.md`
+     - ✅ **SEMPRE atualizar** após qualquer alteração em DEV que precise ser replicada em PROD
+     - ✅ Registrar data, hora, tipo de alteração, arquivos afetados
+     - ✅ Documentar configurações alteradas (variáveis de ambiente, PHP-FPM, etc.)
+     - ✅ Registrar alterações no banco de dados (se aplicável)
+     - ✅ Atualizar checklist de replicação para PROD
+  3. **Categorias de alterações a registrar:**
+     - **Código PHP:** Listar arquivos modificados e resumo das alterações
+     - **Código JavaScript:** Listar arquivos modificados e resumo das alterações
+     - **Configurações PHP-FPM:** Listar variáveis adicionadas/modificadas
+     - **Banco de Dados:** Registrar scripts SQL executados e tabelas afetadas
+     - **Projetos:** Referenciar documentos de projeto relacionados
+  4. **Quando atualizar:**
+     - ✅ **APÓS deploy** de arquivos para servidor DEV
+     - ✅ **APÓS alteração** de configurações PHP-FPM em DEV
+     - ✅ **APÓS execução** de scripts SQL no banco DEV
+     - ✅ **APÓS conclusão** de projetos implementados em DEV
+     - ✅ **ANTES de replicar** em PROD (documento deve estar atualizado)
+  5. **Estrutura do documento:**
+     - Manter seções por categoria (Código PHP, Código JavaScript, Configurações, Banco de Dados, Projetos)
+     - Incluir checklist de replicação para PROD
+     - Manter resumo executivo atualizado
+     - Registrar prioridades (Crítico, Alto, Médio)
+  6. **Documentação relacionada:**
+     - Atualizar `HISTORICO_REPLICACAO_PRODUCAO.md` quando replicação for realizada
+     - Atualizar `TRACKING_ALTERACOES_BANCO_DADOS.md` para alterações no banco
+     - Referenciar documentos de projeto quando aplicável
+- ❌ **NUNCA fazer alterações em DEV** sem atualizar o documento de tracking
+- ✅ **SEMPRE manter** o documento atualizado para facilitar replicação em PROD
+- 🚨 **OBRIGATÓRIO:** O documento deve estar sempre atualizado antes de qualquer replicação para PROD
+- 📋 **Template do documento:** Usar estrutura definida em `ALTERACOES_DESDE_ULTIMA_REPLICACAO_PROD_20251121.md`
 
 ---
 
@@ -509,6 +552,7 @@
 6. ✅ **OBRIGATÓRIO:** Criar documento formal de auditoria em `05-DOCUMENTATION/` (ex: `AUDITORIA_PROJETO_X.md`)
 7. ✅ **OBRIGATÓRIO:** Documentar todos os arquivos auditados, problemas encontrados, e confirmação de que nenhuma funcionalidade foi prejudicada
 8. ✅ **OBRIGATÓRIO:** Verificar especificações do usuário conforme seção 2.3 do documento de auditoria
+9. ✅ **OBRIGATÓRIO:** Atualizar documento de tracking de alterações (`ALTERACOES_DESDE_ULTIMA_REPLICACAO_PROD_YYYYMMDD.md`) se alterações foram feitas em DEV (ver seção "Tracking de Alterações para Replicação em Produção")
 
 ### Processo de Cópia para Servidor (OBRIGATÓRIO):
 1. ✅ **SEMPRE usar caminho completo do workspace** ao copiar arquivos
