@@ -91,3 +91,26 @@ tela_*_isolado.py
 # Arquivos de análise
 ANALISE_*.md
 INSTRUCOES_*.md
+
+# Configurações sensíveis do Sentry (não versionar)
+sentry.config.local.js
+sentry.config.local.json
+*_sentry_config.*
+
+# PROTEÇÃO DE CREDENCIAIS AWS E ARQUIVOS SENSÍVEIS
+# Arquivos CSV com credenciais AWS
+*_accessKeys.csv
+*_credentials.csv
+*_access_keys.csv
+*_secret_keys.csv
+ses-email-sender-*_accessKeys.csv
+
+# Arquivos de configuração com credenciais (versões ORIGINAL/backup)
+php-fpm_*_ORIGINAL.conf
+*_ORIGINAL.conf
+*_original.conf
+
+# Arquivos com credenciais AWS em geral
+*_aws_credentials.*
+*_aws_keys.*
+*_ses_credentials.*
