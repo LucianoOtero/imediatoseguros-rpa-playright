@@ -116,31 +116,45 @@
   3. **IDENTIFICAR causa raiz** baseado na documentação consultada
   4. **PROPOR solução** fundamentada na documentação antes de implementar
   5. **SOMENTE APÓS** consultar documentação, prosseguir com correção
-- ✅ **Componentes que exigem consulta de documentação:**
-  - Linux (sistema operacional, permissões, serviços, systemd)
-  - Nginx (configuração, location blocks, fastcgi, SSL)
-  - PHP/PHP-FPM (configuração, variáveis de ambiente, extensões)
-  - MySQL/MariaDB (autenticação, usuários, permissões, conexões)
-  - SQL (sintaxe, comandos, usuários, senhas)
-  - Servidores (SSH, SCP, permissões, diretórios)
-  - Infraestrutura (rede, firewall, DNS, certificados SSL)
-- ❌ **NUNCA** tentar corrigir erros de ambiente sem consultar documentação primeiro
-- ❌ **NUNCA** usar tentativa-e-erro para problemas de ambiente
-- ⚠️ **Se documentação não for encontrada:** Informar ao usuário e perguntar antes de prosseguir
-- ✅ **Documentar consulta:** Registrar quais documentações foram consultadas e quais soluções foram identificadas
-- 📁 **Documentação do projeto:** `WEBFLOW-SEGUROSIMEDIATO/05-DOCUMENTATION/`
-  - Arquivos de arquitetura: `ARQUITETURA_*.md`
-  - Documentação de servidores: `ARQUITETURA_SERVIDORES.md`
-  - Guias de configuração: `GUIA_*.md`
-  - Relatórios de problemas: `STATUS_*.md`, `ANALISE_*.md`
-- 🔍 **Fontes de documentação externa:**
-  - Documentação oficial do Nginx: https://nginx.org/en/docs/
-  - Documentação oficial do PHP: https://www.php.net/docs.php
-  - Documentação oficial do MariaDB: https://mariadb.com/kb/en/documentation/
-  - Documentação oficial do MySQL: https://dev.mysql.com/doc/
-  - Tutoriais e blogs relevantes sobre o erro específico
 
-### 9. Ambiente Padrão de Trabalho
+### 9. Busca de Logs em Produção (OBRIGATÓRIA)
+- 🚨 **REGRA CRÍTICA:** **SEMPRE usar o guia completo de busca de logs** antes de criar novos scripts ou comandos de busca
+- ✅ **PROCESSO OBRIGATÓRIO ao buscar logs:**
+  1. **CONSULTAR guia de referência primeiro:**
+     - 📁 **Guia Principal:** `WEBFLOW-SEGUROSIMEDIATO/05-DOCUMENTATION/GUIA_COMPLETO_BUSCA_LOGS_PRODUCAO.md`
+     - ✅ **SEMPRE usar scripts prontos** do guia (não criar novos)
+     - ✅ **SEMPRE limitar resultados** com `tail -N` (ex: `tail -20`)
+     - ✅ **SEMPRE usar padrões específicos** no `grep` (não buscar tudo)
+  2. **Se script não existir no guia:**
+     - ✅ Verificar se há script similar que pode ser adaptado
+     - ✅ Se necessário criar novo, **SEMPRE adicionar ao guia** após testar
+     - ✅ **NUNCA criar scripts temporários** sem documentar
+  3. **Verificar múltiplos locais:**
+     - ✅ Nginx error_log: `/var/log/nginx/dev_error.log`
+     - ✅ PHP-FPM log: `/var/log/php8.3-fpm.log`
+     - ✅ Banco de dados: `rpa_logs_prod.application_logs`
+     - ✅ Arquivos da aplicação: `/var/log/webflow-segurosimediato/*.txt`
+  4. **Seguir checklist do guia:**
+     - [ ] Identificar tipo de log necessário
+     - [ ] Escolher script apropriado do guia
+     - [ ] Limitar resultados com `tail -N`
+     - [ ] Usar padrões específicos no `grep`
+- ❌ **PROIBIÇÕES ABSOLUTAS:**
+  - ❌ **NUNCA buscar** em todos os arquivos sem filtro (`grep -r`)
+  - ❌ **NUNCA buscar** sem limitar resultados (`tail -N`)
+  - ❌ **NUNCA criar** scripts novos sem consultar guia primeiro
+  - ❌ **NUNCA usar** padrões muito amplos no `grep`
+- ✅ **OBRIGAÇÕES:**
+  - ✅ **SEMPRE consultar** `GUIA_COMPLETO_BUSCA_LOGS_PRODUCAO.md` antes de buscar logs
+  - ✅ **SEMPRE usar** scripts prontos do guia quando disponíveis
+  - ✅ **SEMPRE limitar** resultados para evitar retrabalho
+  - ✅ **SEMPRE documentar** novos scripts no guia após criar
+- 📋 **Documentação relacionada:**
+  - 📁 **Guia de Busca de Logs:** `WEBFLOW-SEGUROSIMEDIATO/05-DOCUMENTATION/GUIA_COMPLETO_BUSCA_LOGS_PRODUCAO.md`
+  - 📁 **Análise Logs cURL:** `WEBFLOW-SEGUROSIMEDIATO/05-DOCUMENTATION/ANALISE_LOGS_CURL_NGINX_PHP_20251125.md`
+  - 📁 **Análise Graylog:** `WEBFLOW-SEGUROSIMEDIATO/05-DOCUMENTATION/ANALISE_GRAYLOG_PARA_LOGS_20251125.md`
+
+### 10. Ambiente Padrão de Trabalho
 - ✅ **PADRÃO:** Sempre trabalhar apenas no ambiente de **DESENVOLVIMENTO** (DEV)
 - ✅ **Diretório padrão:** `WEBFLOW-SEGUROSIMEDIATO/02-DEVELOPMENT/`
 - ✅ **Servidor padrão:** `dev.bssegurosimediato.com.br` (IP: 65.108.156.14)
@@ -169,11 +183,63 @@
 
 ## 📋 DIRETIVAS DE IMPLEMENTAÇÃO
 
+### Uso de Emojis em Projetos (OBRIGATÓRIA) 🚨 **CRÍTICO**
+- 🚨 **REGRA CRÍTICA:** **NUNCA usar emojis em scripts, código ou documentação técnica**, exceto em casos específicos de UI/UX
+- ✅ **PROIBIÇÕES ABSOLUTAS:**
+  - ❌ **NUNCA usar emojis** em scripts PowerShell, Bash, ou qualquer linguagem de programação
+  - ❌ **NUNCA usar emojis** em arquivos de código (`.js`, `.php`, `.py`, etc.)
+  - ❌ **NUNCA usar emojis** em mensagens de log ou console.log
+  - ❌ **NUNCA usar emojis** em arquivos de configuração
+  - ❌ **NUNCA usar emojis** em documentação técnica (exceto títulos de seções quando apropriado)
+- ✅ **EXCEÇÕES PERMITIDAS:**
+  - ✅ **UI/UX:** Emojis podem ser usados em interfaces de usuário (HTML, componentes React/Vue, etc.)
+  - ✅ **Mensagens ao Usuário Final:** Emojis podem ser usados em mensagens exibidas ao usuário final
+  - ✅ **Documentação de Alto Nível:** Emojis podem ser usados em títulos de seções de documentação para melhorar legibilidade
+- ✅ **SUBSTITUIÇÕES RECOMENDADAS:**
+  - ✅ Use `[OK]`, `[ERRO]`, `[AVISO]`, `[INFO]`, `[SUCESSO]` em vez de emojis
+  - ✅ Use `[PROCESSANDO]`, `[PULAR]`, `[VALIDANDO]` para indicar status
+  - ✅ Use texto descritivo em vez de símbolos visuais
+- ✅ **PROCESSO OBRIGATÓRIO:**
+  1. **Ao criar script:** Não incluir emojis desde o início
+  2. **Ao revisar código:** Remover qualquer emoji encontrado
+  3. **Ao validar sintaxe:** Verificar que não há emojis causando problemas de encoding
+  4. **Ao fazer deploy:** Garantir que logs não contenham emojis
+- ✅ **Benefícios:**
+  - Evita problemas de encoding em diferentes sistemas
+  - Compatibilidade com todos os terminais e consoles
+  - Logs mais fáceis de processar e analisar
+  - Código mais profissional e legível
+  - Evita erros de parsing em scripts
+- ❌ **NUNCA usar emojis** em scripts que serão executados em servidores
+- ❌ **NUNCA usar emojis** em mensagens de log ou debug
+- ✅ **SEMPRE usar texto simples** para indicar status e mensagens
+- 📁 **Aplicável a:** Scripts PowerShell, Bash, código JavaScript/PHP, logs, mensagens de console
+
 ### Variáveis de Ambiente
 - ✅ **SEMPRE usar** variáveis de ambiente do Docker (`APP_BASE_DIR`, `APP_BASE_URL`, etc.)
 - ✅ **SEMPRE usar** variáveis de sistema diretamente via `$_ENV` no PHP
 - ❌ **NÃO criar** sistemas de configuração complexos (`window.APP_CONFIG`, objetos de configuração)
 - ✅ Usar variáveis globais simples quando necessário (`window.APP_BASE_URL`, `window.APP_ENVIRONMENT`)
+
+### Nomenclatura de Arquivos entre Ambientes (CRÍTICO) 🚨
+- 🚨 **REGRA CRÍTICA:** **Os arquivos em desenvolvimento, UAT e produção têm ABSOLUTAMENTE TODOS os mesmos nomes**
+- ✅ **NUNCA assumir** que existem versões diferentes de arquivos com sufixos `_dev.php`, `_prod.php`, `_uat.php`
+- ✅ **NUNCA criar** arquivos com sufixos de ambiente (ex: `add_webflow_octa_dev.php`, `add_flyingdonkeys_prod.php`)
+- ✅ **O que muda entre ambientes:** Apenas as **variáveis de ambiente** (domínio, URLs, credenciais, etc.)
+- ✅ **Exemplos corretos:**
+  - ✅ `add_webflow_octa.php` (mesmo nome em DEV, UAT e PROD)
+  - ✅ `add_flyingdonkeys.php` (mesmo nome em DEV, UAT e PROD)
+  - ✅ `config.php` (mesmo nome em DEV, UAT e PROD)
+- ❌ **Exemplos INCORRETOS (NUNCA criar):**
+  - ❌ `add_webflow_octa_dev.php` (NÃO existe)
+  - ❌ `add_webflow_octa_prod.php` (NÃO existe)
+  - ❌ `add_flyingdonkeys_dev.php` (NÃO existe)
+- ✅ **Como diferenciar ambientes:**
+  - ✅ Usar variáveis de ambiente: `APP_BASE_URL`, `APP_ENVIRONMENT`, etc.
+  - ✅ Usar domínios diferentes: `dev.bssegurosimediato.com.br` vs `prod.bssegurosimediato.com.br`
+  - ✅ Usar configurações diferentes via variáveis de ambiente do Docker/PHP
+- 🚨 **OBRIGATÓRIO:** Sempre verificar se está usando o nome correto do arquivo (sem sufixos de ambiente) antes de configurar endpoints, URLs ou referências
+- 🚨 **OBRIGATÓRIO:** Ao configurar Cloud Functions, APIs externas ou qualquer referência a arquivos PHP, usar apenas o nome base do arquivo (ex: `add_webflow_octa.php`, não `add_webflow_octa_dev.php`)
 
 ### Estrutura de Arquivos
 - ✅ Arquivos `.js` e `.php` devem estar no mesmo diretório raiz
@@ -194,6 +260,78 @@
 6. 🚨 **OBRIGATÓRIO - CACHE CLOUDFLARE:** Após atualizar arquivos `.js` ou `.php` no servidor, **SEMPRE avisar** ao usuário sobre a necessidade de limpar o cache do Cloudflare para que as alterações sejam refletidas imediatamente
 7. **OBRIGATÓRIO: Realizar auditoria pós-implementação** (ver seção "Auditoria Pós-Implementação")
 8. 🚨 **OBRIGATÓRIO: Atualizar documento de tracking** (`ALTERACOES_DESDE_ULTIMA_REPLICACAO_PROD_YYYYMMDD.md`) após deploy em DEV (ver seção "Tracking de Alterações para Replicação em Produção")
+
+### Validação Obrigatória de Modificações Antes de Incluir em Projetos de Deploy (OBRIGATÓRIA) 🚨 **CRÍTICO**
+- 🚨 **REGRA CRÍTICA:** **NUNCA incluir arquivos em projetos de deploy sem verificar se foram realmente modificados pelo projeto atual**
+- ✅ **PROCESSO OBRIGATÓRIO antes de incluir QUALQUER arquivo em projeto de deploy:**
+  1. **FASE 1: Identificar Arquivos Modificados pelo Projeto Atual**
+     - ✅ Listar TODOS os arquivos que foram modificados durante a implementação do projeto atual
+     - ✅ Verificar histórico de modificações (git, timestamps, ou documentação do projeto)
+     - ✅ Identificar apenas arquivos que foram REALMENTE alterados (não apenas mencionados)
+     - ❌ **NÃO incluir** arquivos que não foram modificados pelo projeto atual
+  2. **FASE 2: Comparar Hash SHA256 DEV vs PROD**
+     - ✅ Para cada arquivo candidato a deploy, calcular hash SHA256 da versão DEV
+     - ✅ Calcular hash SHA256 da versão PROD atual (se existir)
+     - ✅ Comparar hashes (case-insensitive)
+     - ✅ **Se hashes são idênticos:** ❌ **NÃO incluir** no projeto de deploy
+     - ✅ **Se hashes são diferentes:** ✅ Incluir no projeto de deploy (após validação adicional)
+     - ❌ **NUNCA incluir** arquivos idênticos (mesmo hash) em projetos de deploy
+  3. **FASE 3: Validar Necessidade de Deploy**
+     - ✅ Para cada arquivo com hash diferente, verificar:
+       - Arquivo foi modificado pelo projeto atual?
+       - Modificações são relevantes para produção?
+       - Arquivo precisa ser atualizado em produção?
+     - ✅ **Se arquivo não foi modificado pelo projeto atual:** ❌ **NÃO incluir** no deploy
+     - ✅ **Se arquivo é idêntico entre DEV e PROD:** ❌ **NÃO incluir** no deploy
+     - ✅ **Se arquivo foi modificado E é diferente:** ✅ Incluir no deploy
+  4. **FASE 4: Documentar Justificativa**
+     - ✅ Para cada arquivo incluído no projeto de deploy, documentar:
+       - Por que o arquivo foi modificado?
+       - Qual foi a alteração realizada?
+       - Hash SHA256 DEV vs PROD (se diferentes)
+       - Justificativa para incluir no deploy
+     - ✅ Para cada arquivo excluído do projeto de deploy, documentar:
+       - Por que o arquivo foi excluído?
+       - Hash SHA256 DEV vs PROD (se idênticos)
+       - Justificativa para não incluir no deploy
+  5. **FASE 5: Questionar Arquivos Não Modificados**
+     - ✅ Se arquivo foi mencionado em projetos anteriores mas não foi modificado pelo projeto atual:
+       - ❌ **NÃO incluir automaticamente**
+       - ✅ **PERGUNTAR ao usuário** se arquivo precisa ser incluído (mesmo sem modificações)
+       - ✅ **Documentar resposta** do usuário
+     - ✅ Se arquivo é idêntico entre DEV e PROD:
+       - ❌ **NÃO incluir** sem justificativa explícita do usuário
+       - ✅ **PERGUNTAR ao usuário** se há razão específica para incluir arquivo idêntico
+- ✅ **Checklist Obrigatório ANTES de Incluir Arquivo em Projeto de Deploy:**
+  - [ ] Arquivo foi modificado pelo projeto atual?
+  - [ ] Hash SHA256 DEV vs PROD foi comparado?
+  - [ ] Arquivos são diferentes (hash diferente)?
+  - [ ] Justificativa para incluir no deploy foi documentada?
+  - [ ] Se arquivo não foi modificado, usuário foi questionado?
+- ❌ **PROIBIÇÕES ABSOLUTAS:**
+  - ❌ **NUNCA incluir** arquivos em projetos de deploy sem verificar modificações reais
+  - ❌ **NUNCA incluir** arquivos idênticos (mesmo hash) sem justificativa explícita do usuário
+  - ❌ **NUNCA assumir** que arquivos mencionados em projetos anteriores precisam ser incluídos
+  - ❌ **NUNCA incluir** arquivos apenas porque são "relacionados" ao projeto (deve ser "modificados pelo projeto")
+- ✅ **OBRIGAÇÕES:**
+  - ✅ **SEMPRE verificar** quais arquivos foram realmente modificados pelo projeto atual
+  - ✅ **SEMPRE comparar** hash SHA256 DEV vs PROD antes de incluir no deploy
+  - ✅ **SEMPRE questionar** necessidade de incluir arquivos não modificados
+  - ✅ **SEMPRE documentar** justificativa para incluir ou excluir cada arquivo
+- 🚨 **SE ARQUIVO NÃO FOI MODIFICADO:**
+  - ✅ Verificar hash SHA256 DEV vs PROD
+  - ✅ Se idênticos, **NÃO incluir** no projeto de deploy
+  - ✅ Se diferentes, questionar usuário sobre necessidade de incluir
+  - ✅ Documentar decisão (incluir ou excluir) e justificativa
+- 📋 **Exemplo de Processo Correto:**
+  1. Projeto atual modificou: `ProfessionalLogger.php` (adicionou função cURL)
+  2. Verificar hash: DEV = `ABC123...`, PROD = `XYZ789...` (diferentes) ✅
+  3. Arquivo foi modificado pelo projeto atual ✅
+  4. Incluir no projeto de deploy ✅
+  5. Verificar `FooterCodeSiteDefinitivoCompleto.js`: DEV = `DEF456...`, PROD = `DEF456...` (idênticos) ❌
+  6. Arquivo NÃO foi modificado pelo projeto atual ❌
+  7. **NÃO incluir** no projeto de deploy ❌
+  8. Documentar: "Excluído - arquivo idêntico entre DEV e PROD, não foi modificado pelo projeto atual"
 - 🚨 **PRODUÇÃO:** 
   - ⚠️ **ALERTA:** Procedimento para produção será definido posteriormente
   - 🚨 **BLOQUEAR** qualquer deploy ou modificação em produção até procedimento oficial
@@ -254,6 +392,60 @@
 3. **Copiar para servidor** via SCP: `scp arquivo.conf root@servidor:/caminho/destino/`
 4. **Aplicar configuração** no servidor (reload/restart do serviço)
 5. **Verificar funcionamento** no servidor
+
+### Validação de Scripts PowerShell Antes de Execução (OBRIGATÓRIO) 🚨 **CRÍTICO**
+- 🚨 **REGRA CRÍTICA:** **NUNCA executar scripts PowerShell no servidor sem validação prévia completa**
+- ✅ **PROCESSO OBRIGATÓRIO antes de executar QUALQUER script PowerShell que acessa servidor:**
+  1. **FASE 1: Validação de Sintaxe PowerShell**
+     - ✅ Validar sintaxe PowerShell usando `[System.Management.Automation.PSParser]::Tokenize`
+     - ✅ Verificar se script carrega sem erros (sem executar)
+     - ✅ Verificar se todas as funções estão definidas corretamente
+     - ✅ Verificar se variáveis estão definidas corretamente
+     - ❌ **NÃO prosseguir** se houver erros de sintaxe
+  2. **FASE 2: Validação em Modo DryRun**
+     - ✅ Executar script com parâmetro `-DryRun` primeiro
+     - ✅ Verificar se script suporta modo DryRun
+     - ✅ Validar que script não executa ações reais em DryRun
+     - ✅ Verificar logs gerados em DryRun
+     - ✅ Validar que comandos SSH que seriam executados estão corretos
+     - ❌ **NÃO prosseguir** se DryRun falhar ou mostrar problemas
+  3. **FASE 3: Validação do Script Bash Gerado**
+     - ✅ Se script gera script bash para executar no servidor:
+       - ✅ Validar sintaxe bash do script gerado (antes de enviar)
+       - ✅ Verificar se comandos bash estão corretos
+       - ✅ Verificar se variáveis estão sendo interpoladas corretamente
+       - ✅ Verificar se caracteres especiais estão escapados corretamente
+       - ✅ Validar que script bash não contém erros de sintaxe
+     - ❌ **NÃO enviar script bash para servidor** se houver erros de sintaxe
+  4. **FASE 4: Validação de Comandos SSH**
+     - ✅ Verificar se comandos SSH estão corretos
+     - ✅ Verificar se caminhos de arquivos estão corretos
+     - ✅ Verificar se variáveis de servidor estão corretas (DEV vs PROD)
+     - ✅ Verificar se permissões necessárias estão corretas
+     - ❌ **NÃO executar** se comandos SSH estiverem incorretos
+  5. **FASE 5: Validação de Integridade**
+     - ✅ Verificar se funções críticas estão presentes (`Write-Log`, `Invoke-SafeSSHScript`, etc.)
+     - ✅ Verificar se tratamento de erros está implementado (`try/catch`)
+     - ✅ Verificar se validações de hash estão implementadas
+     - ✅ Verificar se validações de sintaxe estão implementadas
+     - ❌ **NÃO executar** se validações críticas estiverem faltando
+- ✅ **Checklist Obrigatório ANTES de Executar Script no Servidor:**
+  - [ ] Sintaxe PowerShell validada sem erros?
+  - [ ] Script executado em modo DryRun com sucesso?
+  - [ ] Script bash gerado validado (se aplicável)?
+  - [ ] Comandos SSH verificados e corretos?
+  - [ ] Funções críticas presentes e funcionando?
+  - [ ] Tratamento de erros implementado?
+  - [ ] Validações de integridade implementadas?
+  - [ ] Logs de execução serão gerados?
+- ❌ **NUNCA executar script no servidor** sem completar TODAS as fases de validação
+- ❌ **NUNCA executar script** se validação falhar em qualquer fase
+- ✅ **SEMPRE executar em DryRun primeiro** antes de execução real
+- ✅ **SEMPRE validar script bash gerado** antes de enviar para servidor
+- ✅ **SEMPRE documentar** resultados das validações antes de executar
+- 🚨 **SE VALIDAÇÃO FALHAR:** Corrigir script, repetir validação completa, e SOMENTE então executar
+- 📁 **Scripts devem estar em:** `WEBFLOW-SEGUROSIMEDIATO/02-DEVELOPMENT/scripts/`
+- 📋 **Documentação de validação:** Registrar resultados em log ou documento de validação
 
 ### Auditoria Pós-Implementação (OBRIGATÓRIA)
 - ✅ **SEMPRE realizar auditoria** ao final da implementação de qualquer projeto
@@ -333,6 +525,55 @@
 - ✅ **SEMPRE manter** o documento atualizado para facilitar replicação em PROD
 - 🚨 **OBRIGATÓRIO:** O documento deve estar sempre atualizado antes de qualquer replicação para PROD
 - 📋 **Template do documento:** Usar estrutura definida em `ALTERACOES_DESDE_ULTIMA_REPLICACAO_PROD_20251121.md`
+
+### Validação de Scripts Antes de Criação/Modificação (OBRIGATÓRIO) 🚨 **CRÍTICO**
+- 🚨 **REGRA CRÍTICA:** **SEMPRE validar scripts PowerShell ANTES de criar ou modificar**
+- ✅ **PROCESSO OBRIGATÓRIO ao criar/modificar scripts PowerShell:**
+  1. **Criar script localmente** em `WEBFLOW-SEGUROSIMEDIATO/02-DEVELOPMENT/scripts/`
+  2. **Validar sintaxe PowerShell** antes de salvar:
+     ```powershell
+     $null = [System.Management.Automation.PSParser]::Tokenize((Get-Content -Raw $ScriptPath), [ref]$null)
+     ```
+  3. **Testar carregamento** do script (sem executar):
+     ```powershell
+     $scriptContent = Get-Content -Raw $ScriptPath
+     $null = [System.Management.Automation.PowerShell]::Create().AddScript($scriptContent).Invoke()
+     ```
+  4. **Verificar funções críticas** estão presentes
+  5. **Verificar tratamento de erros** está implementado
+  6. **SOMENTE após validação completa** considerar script pronto
+- ❌ **NUNCA criar script** sem validar sintaxe primeiro
+- ❌ **NUNCA modificar script** sem validar sintaxe após modificação
+- ✅ **SEMPRE validar** antes de considerar script completo
+
+### Correção e Atualização de Scripts de Deploy (OBRIGATÓRIO) ⭐ **CRÍTICO**
+- 🚨 **REGRA CRÍTICA #1:** Se um script de deploy falhar e uma correção for aplicada diretamente no servidor, **OBRIGATÓRIO atualizar o script** com a mesma correção antes da próxima execução
+- ✅ **PROCESSO OBRIGATÓRIO quando script falha:**
+  1. **Documentar erro imediatamente:**
+     - Qual script falhou?
+     - Qual foi o erro exato?
+     - Em que etapa falhou?
+  2. **Aplicar correção no servidor** (se necessário para resolver problema imediato)
+  3. **PARAR e atualizar script OBRIGATORIAMENTE:**
+     - Abrir script que falhou
+     - Aplicar exatamente a mesma correção que funcionou no servidor
+     - Adicionar comentários explicando a correção
+     - Atualizar versão do script
+  4. **Validar script corrigido:**
+     - Testar script corrigido antes de próxima execução
+     - Verificar que funciona corretamente
+  5. **Documentar correção:**
+     - Registrar em `CORRECOES_SCRIPTS_DEPLOY.md`
+     - Incluir: Data, Script, Erro, Correção aplicada, Versão antes/depois
+     - Commitar script corrigido no Git
+- ❌ **NUNCA:** Corrigir no servidor sem atualizar script
+- ❌ **NUNCA:** Usar script novamente sem validar correção
+- ✅ **SEMPRE:** Atualizar script imediatamente após correção no servidor
+- ✅ **SEMPRE:** Testar script corrigido antes de próxima execução
+- ✅ **SEMPRE:** Registrar correção em `CORRECOES_SCRIPTS_DEPLOY.md`
+- ✅ **SEMPRE:** Commitar script corrigido no Git
+- 📁 **Documentação:** `WEBFLOW-SEGUROSIMEDIATO/05-DOCUMENTATION/PROCESSO_CORRECAO_SCRIPTS_DEPLOY.md`
+- 📁 **Registro de Correções:** `WEBFLOW-SEGUROSIMEDIATO/05-DOCUMENTATION/CORRECOES_SCRIPTS_DEPLOY.md`
 
 ---
 
@@ -434,6 +675,69 @@
 
 ## 🔧 DIRETIVAS TÉCNICAS ESPECÍFICAS
 
+### Elaboração Incremental de Scripts (OBRIGATÓRIA) 🚨 **CRÍTICO**
+- 🚨 **REGRA CRÍTICA:** **SEMPRE elaborar scripts de forma incremental**, testando sintaxe a cada etapa
+- ✅ **PROCESSO OBRIGATÓRIO ao criar/modificar scripts:**
+  1. **ETAPA 1: Estrutura Básica**
+     - ✅ Criar estrutura básica (parâmetros, variáveis, funções básicas)
+     - ✅ Validar sintaxe PowerShell antes de continuar
+     - ✅ **NÃO prosseguir** se houver erros de sintaxe
+  2. **ETAPA 2: Funções Auxiliares**
+     - ✅ Adicionar funções auxiliares uma por uma
+     - ✅ Validar sintaxe após cada função adicionada
+     - ✅ **NÃO adicionar próxima função** se houver erros de sintaxe
+  3. **ETAPA 3: Lógica Principal**
+     - ✅ Adicionar lógica principal incrementalmente
+     - ✅ Validar sintaxe após cada bloco de lógica
+     - ✅ **NÃO adicionar próximo bloco** se houver erros de sintaxe
+  4. **ETAPA 4: Tratamento de Erros**
+     - ✅ Adicionar tratamento de erros e rollback
+     - ✅ Validar sintaxe após adicionar tratamento
+     - ✅ **NÃO considerar script completo** se houver erros de sintaxe
+  5. **ETAPA 5: Validação Final**
+     - ✅ Validar sintaxe completa do script
+     - ✅ Testar em modo DryRun (se aplicável)
+     - ✅ **SOMENTE após validação completa** considerar script pronto
+- ✅ **Validação de Sintaxe Obrigatória:**
+  - ✅ Usar `[System.Management.Automation.PSParser]::Tokenize` para validar sintaxe
+  - ✅ Validar após cada função adicionada
+  - ✅ Validar após cada bloco de lógica adicionado
+  - ✅ Validar antes de considerar script completo
+- ✅ **Benefícios da Elaboração Incremental:**
+  - Detecção precoce de erros de sintaxe
+  - Facilita identificação de problemas
+  - Reduz tempo de correção
+  - Garante qualidade do código
+  - Evita retrabalho
+- ❌ **NUNCA criar script completo de uma vez** sem validar sintaxe
+- ❌ **NUNCA adicionar múltiplas funções** sem validar entre elas
+- ❌ **NUNCA considerar script pronto** sem validação final
+- ✅ **SEMPRE validar sintaxe** após cada etapa incremental
+- ✅ **SEMPRE testar em DryRun** antes de usar em produção
+- 📁 **Scripts devem estar em:** `WEBFLOW-SEGUROSIMEDIATO/02-DEVELOPMENT/scripts/`
+- 📋 **Documentação de validação:** Registrar resultados em log ou documento de validação
+
+### Validação de Scripts PowerShell (OBRIGATÓRIA) 🚨 **CRÍTICO**
+- 🚨 **REGRA CRÍTICA:** **SEMPRE usar extensão PowerShell do VS Code** para validar scripts antes de executar
+- ✅ **PROCESSO OBRIGATÓRIO ao criar/modificar scripts PowerShell:**
+  1. **Abrir script no VS Code** com extensão PowerShell instalada
+  2. **Verificar erros de sintaxe** mostrados em tempo real pela extensão
+  3. **Corrigir TODOS os erros** antes de considerar script pronto
+  4. **Validar sintaxe** usando PSScriptAnalyzer se disponível: `Invoke-ScriptAnalyzer -Path .\script.ps1`
+  5. **SOMENTE após validação completa** considerar script pronto para uso
+- ✅ **Extensão Recomendada:** "PowerShell" (Microsoft) no VS Code
+- ✅ **Benefícios:**
+  - Validação de sintaxe em tempo real
+  - Detecção de erros antes de executar
+  - IntelliSense e autocomplete
+  - Formatação automática
+  - Execução e depuração integradas
+- ❌ **NUNCA executar script PowerShell** sem validar sintaxe primeiro
+- ❌ **NUNCA modificar script PowerShell** sem verificar erros após modificação
+- ✅ **SEMPRE validar** antes de considerar script completo
+- 📁 **Scripts devem estar em:** `WEBFLOW-SEGUROSIMEDIATO/02-DEVELOPMENT/scripts/`
+- 📋 **Documentação de validação:** Registrar resultados em log ou documento de validação
+
 ### Resolução de Problemas de Ambiente (OBRIGATÓRIA)
 - 🚨 **ANTES de qualquer correção de erro de ambiente, servidor, Linux, Nginx, PHP, MySQL/MariaDB, SQL:**
   1. ✅ **CONSULTAR documentação do projeto** em `WEBFLOW-SEGUROSIMEDIATO/05-DOCUMENTATION/`
@@ -467,8 +771,10 @@
   - ⚠️ **EMITIR ALERTA** ao detectar domínio `prod.bssegurosimediato.com.br` em comandos ou scripts
   - ⚠️ **EMITIR ALERTA** ao detectar caminho `/var/www/html/prod/root/` em comandos ou scripts
   - ⚠️ **EMITIR ALERTA** ao detectar tentativa de SSH para servidor de produção
-  - ❌ **BLOQUEAR** qualquer ação em produção até que procedimento seja oficialmente definido
-  - 📋 **STATUS:** Procedimento para produção será definido posteriormente
+  - [ERRO] **BLOQUEAR** qualquer acao em producao ate que procedimento seja oficialmente definido
+  - [INFO] **STATUS:** Procedimento para producao sera definido posteriormente
+12. **[AVISO] EMOJIS EM CODIGO - PROIBIDO:** NUNCA usar emojis em scripts, codigo ou logs. Use texto simples: `[OK]`, `[ERRO]`, `[AVISO]`, `[INFO]`, `[SUCESSO]`, etc.
+13. **[AVISO] ELABORACAO INCREMENTAL - OBRIGATORIA:** SEMPRE elaborar scripts de forma incremental, validando sintaxe apos cada etapa. NUNCA criar script completo de uma vez sem validar.
 
 ---
 
@@ -483,13 +789,15 @@
 7. **Sistemas Complexos:** Evitar criar sistemas de configuração complexos, preferir soluções simples
 8. **Variáveis de Ambiente:** Sempre usar variáveis do Docker, não criar sistemas alternativos
 9. **Heredoc no SSH:** NUNCA usar heredoc complexo via SSH - SEMPRE criar arquivo local e copiar
-10. **🚨 CACHE CLOUDFLARE - OBRIGATÓRIO:** Após atualizar arquivos `.js` ou `.php` no servidor, **SEMPRE avisar** ao usuário sobre a necessidade de limpar o cache do Cloudflare. O Cloudflare pode manter versões antigas em cache, causando erros como uso de credenciais antigas, código desatualizado, etc. Avisar explicitamente: "⚠️ **IMPORTANTE:** Após atualizar arquivos no servidor, é necessário limpar o cache do Cloudflare para que as alterações sejam refletidas imediatamente."
-11. **🚨 PRODUÇÃO - PROCEDIMENTO NÃO DEFINIDO:**
-    - ⚠️ **EMITIR ALERTA** ao detectar qualquer tentativa de acesso ou modificação no servidor de produção
-    - ⚠️ **EMITIR ALERTA** ao detectar IP `157.180.36.223` ou domínio `prod.bssegurosimediato.com.br`
-    - ⚠️ **EMITIR ALERTA** ao detectar caminho `/var/www/html/prod/root/`
-    - ❌ **BLOQUEAR** qualquer ação em produção até que procedimento seja oficialmente definido
-    - 📋 Procedimento para produção será definido posteriormente
+10. **[AVISO] CACHE CLOUDFLARE - OBRIGATORIO:** Apos atualizar arquivos `.js` ou `.php` no servidor, **SEMPRE avisar** ao usuario sobre a necessidade de limpar o cache do Cloudflare. O Cloudflare pode manter versoes antigas em cache, causando erros como uso de credenciais antigas, codigo desatualizado, etc. Avisar explicitamente: "[AVISO] IMPORTANTE: Apos atualizar arquivos no servidor, e necessario limpar o cache do Cloudflare para que as alteracoes sejam refletidas imediatamente."
+11. **[AVISO] PRODUCAO - PROCEDIMENTO NAO DEFINIDO:**
+    - [AVISO] **EMITIR ALERTA** ao detectar qualquer tentativa de acesso ou modificacao no servidor de producao
+    - [AVISO] **EMITIR ALERTA** ao detectar IP `157.180.36.223` ou dominio `prod.bssegurosimediato.com.br`
+    - [AVISO] **EMITIR ALERTA** ao detectar caminho `/var/www/html/prod/root/`
+    - [ERRO] **BLOQUEAR** qualquer acao em producao ate que procedimento seja oficialmente definido
+    - [INFO] Procedimento para producao sera definido posteriormente
+12. **[AVISO] EMOJIS EM CODIGO - PROIBIDO:** NUNCA usar emojis em scripts, codigo ou logs. Use texto simples: `[OK]`, `[ERRO]`, `[AVISO]`, `[INFO]`, `[SUCESSO]`, etc.
+13. **[AVISO] ELABORACAO INCREMENTAL - OBRIGATORIA:** SEMPRE elaborar scripts de forma incremental, validando sintaxe apos cada etapa. NUNCA criar script completo de uma vez sem validar.
 
 ---
 
@@ -554,6 +862,154 @@
 8. ✅ **OBRIGATÓRIO:** Verificar especificações do usuário conforme seção 2.3 do documento de auditoria
 9. ✅ **OBRIGATÓRIO:** Atualizar documento de tracking de alterações (`ALTERACOES_DESDE_ULTIMA_REPLICACAO_PROD_YYYYMMDD.md`) se alterações foram feitas em DEV (ver seção "Tracking de Alterações para Replicação em Produção")
 
+### Processo de Elaboração Incremental de Scripts (OBRIGATÓRIO) 🚨 **CRÍTICO**
+- 🚨 **REGRA CRÍTICA:** **SEMPRE elaborar scripts de forma incremental**, validando sintaxe após cada etapa
+- ✅ **PROCESSO OBRIGATÓRIO - 5 ETAPAS INCREMENTAIS:**
+
+  **ETAPA 1: Estrutura Básica (OBRIGATÓRIA)**
+  - ✅ Criar estrutura básica (parâmetros, variáveis globais, configurações)
+  - ✅ Adicionar funções básicas de log (se necessário)
+  - ✅ Validar sintaxe PowerShell usando `[System.Management.Automation.PSParser]::Tokenize`
+  - ✅ Verificar se script carrega sem erros (sem executar)
+  - ❌ **BLOQUEAR próxima etapa** se houver erros de sintaxe
+  - ✅ **SOMENTE após validação bem-sucedida** prosseguir para ETAPA 2
+
+  **ETAPA 2: Funções Auxiliares (OBRIGATÓRIA)**
+  - ✅ Adicionar funções auxiliares uma por uma (validação, hash, backup, etc.)
+  - ✅ Validar sintaxe após cada função adicionada
+  - ✅ Verificar se todas as funções estão definidas corretamente
+  - ✅ Verificar se variáveis estão definidas corretamente
+  - ❌ **BLOQUEAR próxima etapa** se houver erros de sintaxe
+  - ✅ **SOMENTE após validação bem-sucedida** prosseguir para ETAPA 3
+
+  **ETAPA 3: Lógica Principal (OBRIGATÓRIA)**
+  - ✅ Adicionar lógica principal incrementalmente (por fases/blocos)
+  - ✅ Validar sintaxe após cada bloco de lógica adicionado
+  - ✅ Verificar se fluxo de execução está correto
+  - ✅ Verificar se dependências entre funções estão corretas
+  - ❌ **BLOQUEAR próxima etapa** se houver erros de sintaxe
+  - ✅ **SOMENTE após validação bem-sucedida** prosseguir para ETAPA 4
+
+  **ETAPA 4: Tratamento de Erros e Rollback (OBRIGATÓRIA)**
+  - ✅ Adicionar tratamento de erros (`try/catch`)
+  - ✅ Adicionar lógica de rollback (se aplicável)
+  - ✅ Validar sintaxe após adicionar tratamento
+  - ✅ Verificar se variáveis de escopo estão corretas (usar `$script:` quando necessário)
+  - ❌ **BLOQUEAR próxima etapa** se houver erros de sintaxe
+  - ✅ **SOMENTE após validação bem-sucedida** prosseguir para ETAPA 5
+
+  **ETAPA 5: Validação Final (OBRIGATÓRIA)**
+  - ✅ Validar sintaxe completa do script
+  - ✅ Verificar se todas as funções estão sendo chamadas corretamente
+  - ✅ Testar em modo DryRun (se aplicável)
+  - ✅ Verificar se não há emojis no código (substituir por texto simples)
+  - ✅ Verificar se encoding está correto (UTF-8 sem BOM)
+  - ❌ **BLOQUEAR uso em produção** se houver erros de sintaxe
+  - ✅ **SOMENTE após validação completa bem-sucedida** considerar script pronto
+
+- ✅ **Checklist Obrigatório ANTES de Considerar Script Completo:**
+  - [ ] **ETAPA 1:** Estrutura básica criada e sintaxe validada?
+  - [ ] **ETAPA 2:** Funções auxiliares adicionadas e sintaxe validada após cada uma?
+  - [ ] **ETAPA 3:** Lógica principal adicionada incrementalmente e sintaxe validada?
+  - [ ] **ETAPA 4:** Tratamento de erros e rollback adicionados e sintaxe validada?
+  - [ ] **ETAPA 5:** Validação final completa bem-sucedida?
+  - [ ] **ETAPA 5:** Teste em DryRun executado com sucesso?
+  - [ ] **ETAPA 5:** Nenhum emoji encontrado no código?
+  - [ ] **ETAPA 5:** Encoding UTF-8 sem BOM verificado?
+
+- ❌ **PROIBIÇÕES ABSOLUTAS:**
+  - ❌ **NUNCA criar script completo de uma vez** sem validar sintaxe
+  - ❌ **NUNCA adicionar múltiplas funções** sem validar entre elas
+  - ❌ **NUNCA pular etapas** de validação
+  - ❌ **NUNCA considerar script pronto** sem validação final
+  - ❌ **NUNCA usar emojis** em scripts (usar texto simples)
+
+- ✅ **OBRIGAÇÕES:**
+  - ✅ **SEMPRE elaborar incrementalmente** (estrutura → funções → lógica → erros → validação)
+  - ✅ **SEMPRE validar sintaxe** após cada etapa
+  - ✅ **SEMPRE testar em DryRun** antes de usar em produção
+  - ✅ **SEMPRE usar texto simples** em vez de emojis
+
+- 🚨 **SE VALIDAÇÃO FALHAR EM QUALQUER ETAPA:**
+  - ✅ Corrigir erros identificados
+  - ✅ Repetir validação da etapa atual
+  - ✅ **SOMENTE após validação bem-sucedida** prosseguir para próxima etapa
+
+- 📁 **Localização de Scripts:** `WEBFLOW-SEGUROSIMEDIATO/02-DEVELOPMENT/scripts/`
+- 📋 **Documentação:** Registrar resultados de validação em log ou documento específico
+
+### Processo de Validação de Scripts PowerShell (OBRIGATÓRIO) 🚨 **CRÍTICO**
+- 🚨 **REGRA CRÍTICA:** **SEMPRE validar scripts PowerShell antes de executar no servidor**
+- ✅ **PROCESSO OBRIGATÓRIO - 5 FASES DE VALIDAÇÃO:**
+
+  **FASE 1: Validação de Sintaxe PowerShell (OBRIGATÓRIA)**
+  - ✅ Validar sintaxe usando `[System.Management.Automation.PSParser]::Tokenize`
+  - ✅ Verificar se script carrega sem erros (sem executar)
+  - ✅ Verificar se todas as funções estão definidas
+  - ✅ Verificar se variáveis estão definidas corretamente
+  - ❌ **BLOQUEAR execução** se houver erros de sintaxe
+
+  **FASE 2: Execução em Modo DryRun (OBRIGATÓRIA)**
+  - ✅ Executar script com parâmetro `-DryRun` primeiro
+  - ✅ Verificar se script suporta modo DryRun
+  - ✅ Validar que script não executa ações reais em DryRun
+  - ✅ Verificar logs gerados em DryRun
+  - ✅ Validar que comandos SSH que seriam executados estão corretos
+  - ❌ **BLOQUEAR execução** se DryRun falhar ou mostrar problemas
+
+  **FASE 3: Validação do Script Bash Gerado (se aplicável)**
+  - ✅ Se script gera script bash para executar no servidor:
+    - ✅ Validar sintaxe bash do script gerado (antes de enviar)
+    - ✅ Verificar se comandos bash estão corretos
+    - ✅ Verificar se variáveis estão sendo interpoladas corretamente
+    - ✅ Verificar se caracteres especiais estão escapados corretamente
+    - ✅ Validar que script bash não contém erros de sintaxe
+  - ❌ **BLOQUEAR envio** se houver erros de sintaxe no script bash
+
+  **FASE 4: Validação de Comandos SSH (OBRIGATÓRIA)**
+  - ✅ Verificar se comandos SSH estão corretos
+  - ✅ Verificar se caminhos de arquivos estão corretos
+  - ✅ Verificar se variáveis de servidor estão corretas (DEV vs PROD)
+  - ✅ Verificar se permissões necessárias estão corretas
+  - ❌ **BLOQUEAR execução** se comandos SSH estiverem incorretos
+
+  **FASE 5: Validação de Integridade (OBRIGATÓRIA)**
+  - ✅ Verificar se funções críticas estão presentes (`Write-Log`, `Invoke-SafeSSHScript`, etc.)
+  - ✅ Verificar se tratamento de erros está implementado (`try/catch`)
+  - ✅ Verificar se validações de hash estão implementadas
+  - ✅ Verificar se validações de sintaxe estão implementadas
+  - ❌ **BLOQUEAR execução** se validações críticas estiverem faltando
+
+- ✅ **Checklist Obrigatório ANTES de Executar Script no Servidor:**
+  - [ ] **FASE 1:** Sintaxe PowerShell validada sem erros?
+  - [ ] **FASE 2:** Script executado em modo DryRun com sucesso?
+  - [ ] **FASE 3:** Script bash gerado validado (se aplicável)?
+  - [ ] **FASE 4:** Comandos SSH verificados e corretos?
+  - [ ] **FASE 5:** Funções críticas presentes e funcionando?
+  - [ ] **FASE 5:** Tratamento de erros implementado?
+  - [ ] **FASE 5:** Validações de integridade implementadas?
+  - [ ] Logs de execução serão gerados?
+
+- ❌ **PROIBIÇÕES ABSOLUTAS:**
+  - ❌ **NUNCA executar script no servidor** sem completar TODAS as 5 fases de validação
+  - ❌ **NUNCA executar script** se validação falhar em qualquer fase
+  - ❌ **NUNCA pular** fase de validação
+  - ❌ **NUNCA executar** sem executar DryRun primeiro
+
+- ✅ **OBRIGAÇÕES:**
+  - ✅ **SEMPRE executar em DryRun primeiro** antes de execução real
+  - ✅ **SEMPRE validar script bash gerado** antes de enviar para servidor
+  - ✅ **SEMPRE documentar** resultados das validações antes de executar
+  - ✅ **SEMPRE validar sintaxe** antes de criar ou modificar script
+
+- 🚨 **SE VALIDAÇÃO FALHAR:**
+  - ✅ Corrigir script
+  - ✅ Repetir validação completa (todas as 5 fases)
+  - ✅ **SOMENTE após validação completa bem-sucedida** executar no servidor
+
+- 📁 **Localização de Scripts:** `WEBFLOW-SEGUROSIMEDIATO/02-DEVELOPMENT/scripts/`
+- 📋 **Documentação:** Registrar resultados de validação em log ou documento específico
+
 ### Processo de Cópia para Servidor (OBRIGATÓRIO):
 1. ✅ **SEMPRE usar caminho completo do workspace** ao copiar arquivos
    - ✅ Usar caminho absoluto completo do workspace
@@ -569,6 +1025,67 @@
    - ✅ Se hashes não coincidirem, tentar copiar novamente
    - ✅ Documentar hash comparado no log da operação
    - ✅ **NUNCA considerar deploy concluído** sem verificação de hash bem-sucedida
+
+### Registro de Deploys e Backups (OBRIGATÓRIO) 🚨 **CRÍTICO**
+- 🚨 **REGRA CRÍTICA:** **SEMPRE registrar informações de deploy e backups** durante execução de deploys
+- ✅ **PROCESSO OBRIGATÓRIO durante deploys:**
+  1. **Registrar Versão do Deploy:**
+     - ✅ Identificar versão do deploy (data, projeto, ambiente)
+     - ✅ Registrar timestamp do início do deploy
+     - ✅ Manter registro em documento de deploy ou log
+  2. **Registrar Cada Backup Criado:**
+     - ✅ **OBRIGATÓRIO:** Registrar nome completo de cada arquivo de backup criado
+     - ✅ **OBRIGATÓRIO:** Registrar timestamp exato do backup (YYYYMMDD_HHMMSS)
+     - ✅ **OBRIGATÓRIO:** Registrar caminho completo do backup no servidor
+     - ✅ **OBRIGATÓRIO:** Registrar arquivo original que foi feito backup
+     - ✅ **OBRIGATÓRIO:** Registrar ambiente (DEV/UAT/PROD)
+  3. **Formato de Registro:**
+     - ✅ Criar seção no documento de deploy ou log com lista de backups
+     - ✅ Formato: `[TIMESTAMP] [AMBIENTE] [ARQUIVO_ORIGINAL] → [NOME_BACKUP_COMPLETO]`
+     - ✅ Exemplo: `[20251202_175500] [UAT] [/var/www/html/uat/root/config.php] → [config.php.backup_20251202_175500]`
+  4. **Quando Registrar:**
+     - ✅ **IMEDIATAMENTE após criar cada backup** (não esperar final do deploy)
+     - ✅ Registrar no documento de deploy em execução
+     - ✅ Registrar em log de deploy (se existir)
+     - ✅ **NUNCA pular** registro de backup
+  5. **Informações Obrigatórias a Registrar:**
+     - ✅ Timestamp do backup (YYYYMMDD_HHMMSS)
+     - ✅ Nome completo do arquivo de backup (incluindo caminho)
+     - ✅ Arquivo original que foi feito backup
+     - ✅ Ambiente (DEV/UAT/PROD)
+     - ✅ Versão do deploy (se aplicável)
+     - ✅ Hash SHA256 do arquivo original (antes do backup)
+- ✅ **Checklist Obrigatório DURANTE Deploy:**
+  - [ ] Versão do deploy registrada?
+  - [ ] Timestamp do início do deploy registrado?
+  - [ ] Cada backup criado foi registrado com nome completo?
+  - [ ] Timestamp de cada backup foi registrado?
+  - [ ] Caminho completo de cada backup foi registrado?
+  - [ ] Arquivo original de cada backup foi registrado?
+  - [ ] Ambiente de cada backup foi registrado?
+- ❌ **PROIBIÇÕES ABSOLUTAS:**
+  - ❌ **NUNCA criar backup** sem registrar nome completo imediatamente
+  - ❌ **NUNCA executar deploy** sem registrar versão do deploy
+  - ❌ **NUNCA pular** registro de backup durante deploy
+  - ❌ **NUNCA assumir** que backup será registrado depois (registrar imediatamente)
+- ✅ **OBRIGAÇÕES:**
+  - ✅ **SEMPRE registrar** versão do deploy antes de iniciar
+  - ✅ **SEMPRE registrar** cada backup imediatamente após criação
+  - ✅ **SEMPRE registrar** nome completo do backup (não apenas parte do nome)
+  - ✅ **SEMPRE registrar** timestamp exato do backup
+  - ✅ **SEMPRE manter** registro atualizado durante todo o deploy
+- 📋 **Exemplo de Registro:**
+  ```
+  ## DEPLOY: Correção CORS UAT - 02/12/2025
+  **Versão:** 1.0.0
+  **Timestamp Início:** 20251202_175500
+  **Ambiente:** UAT
+  
+  ### Backups Criados:
+  1. [20251202_175500] [UAT] [/var/www/html/uat/root/config.php] → [config.php.backup_20251202_175500]
+  2. [20251202_175530] [UAT] [/var/www/html/uat/root/MODAL_WHATSAPP_DEFINITIVO.js] → [MODAL_WHATSAPP_DEFINITIVO.js.backup_20251202_175530]
+  ```
+- 📁 **Documentação:** Registrar em documento de deploy ou log específico do deploy
 4. ✅ **Exemplo de verificação de hash (case-insensitive):**
    ```powershell
    # Local (Windows PowerShell)

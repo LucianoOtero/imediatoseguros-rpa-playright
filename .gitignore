@@ -114,3 +114,7 @@ php-fpm_*_ORIGINAL.conf
 *_aws_credentials.*
 *_aws_keys.*
 *_ses_credentials.*
+
+# Diretório de credenciais seguras (NUNCA commitar)
+CREDENCIAIS_SEGURAS/
+**/CREDENCIAIS_SEGURAS/**
