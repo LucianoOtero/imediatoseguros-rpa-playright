@@ -1,0 +1,29 @@
+=== COMPARAÃ╬ÃƒO DE ARQUIVOS ===
+Local: C:\Users\Luciano\OneDrive - Imediato SoluÃ§Ãµes em Seguros\Imediato\mdmidia\dev\webhooks\add_travelangels_dev.php
+Servidor: C:\Users\Luciano\OneDrive - Imediato SoluÃ§Ãµes em Seguros\Imediato\mdmidia\dev\webhooks\add_travelangels_servidor_dev.php
+
+Get-Content : Não é possível localizar o caminho 'C:\Users\Luciano\OneDrive - Imediato SoluÃ§Ãµes em 
+Seguros\Imediato\mdmidia\dev\webhooks\add_travelangels_dev.php' porque ele não existe.
+No C:\Users\Luciano\OneDrive - Imediato Soluções em 
+Seguros\Imediato\imediatoseguros-rpa-playwright\compare_files.ps1:10 caractere:13
++ $content1 = Get-Content $file1
++             ~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (C:\Users\Lucian...langels_dev.php:String) [Get-Content], ItemNotFoundEx 
+   ception
+    + FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.GetContentCommand
+ 
+Get-Content : Não é possível localizar o caminho 'C:\Users\Luciano\OneDrive - Imediato SoluÃ§Ãµes em 
+Seguros\Imediato\mdmidia\dev\webhooks\add_travelangels_servidor_dev.php' porque ele não existe.
+No C:\Users\Luciano\OneDrive - Imediato Soluções em 
+Seguros\Imediato\imediatoseguros-rpa-playwright\compare_files.ps1:11 caractere:13
++ $content2 = Get-Content $file2
++             ~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (C:\Users\Lucian...ervidor_dev.php:String) [Get-Content], ItemNotFoundEx 
+   ception
+    + FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.GetContentCommand
+ 
+Local: 0 linhas
+Servidor: 0 linhas
+
+â ?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?â?
+Total de linhas diferentes: 0

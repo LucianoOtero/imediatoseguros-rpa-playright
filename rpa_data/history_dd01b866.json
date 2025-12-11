@@ -1,0 +1,25 @@
+{
+  "session_id": "dd01b866",
+  "timestamp_inicio": "2025-11-25T09:04:58.061592",
+  "timestamp_fim": "2025-11-25T09:04:58.063940",
+  "status_final": "iniciando",
+  "total_etapas": 15,
+  "historico": [
+    {
+      "etapa": "inicio",
+      "timestamp": "2025-11-25T09:04:58.063138",
+      "status": "iniciando",
+      "mensagem": "ProgressTracker inicializado",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 0,
+      "timestamp": "2025-11-25T09:04:58.064278",
+      "status": "iniciando",
+      "mensagem": "Iniciando RPA",
+      "dados_extra": null,
+      "erro": null
+    }
+  ]
+}

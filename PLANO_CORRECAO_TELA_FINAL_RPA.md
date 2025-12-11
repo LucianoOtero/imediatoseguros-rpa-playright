@@ -359,3 +359,8 @@ A implementação garante que quando a tela final não for detectada, o sistema:
 **Impacto**: Alto (melhoria significativa na detecção de falhas)
 
 
+
+
+
+
+

@@ -1,0 +1,141 @@
+[
+  {
+    "Result": {
+      "Identical": false,
+      "DiffLines": [
+        {
+          "Line": 4,
+          "Windows": " * ÚLTIMA ALTERAÇÃO: 02/11/2025 09:42",
+          "Server": " * ÚLTIMA ALTERAÇÃO: 03/11/2025 13:20"
+        },
+        {
+          "Line": 6,
+          "Windows": " * VERSÃO: 1.3_PROD - Versão de Produção",
+          "Server": " * VERSÃO: 1.5.0 - Correção Sistema de Controle de Logs"
+        },
+        {
+          "Line": 13,
+          "Windows": " * ALTERAÇÕES NESTA VERSÃO (PRODUÇÃO):",
+          "Server": " * ALTERAÇÕES VERSÃO 1.5.0:"
+        },
+        {
+          "Line": 14,
+          "Windows": " * - Versão de produção baseada na versão 1.3",
+          "Server": " * - ✅ Correção crítica: window.DEBUG_CONFIG não sobrescreve mais valores do Webflow Footer Code"
+        },
+        {
+          "Line": 15,
+          "Windows": " * - Endpoints atualizados para produção",
+          "Server": " * - ✅ Verificação prioritária movida para primeira linha de logUnified()"
+        },
+        {
+          "Line": 16,
+          "Windows": " * - Credenciais de produção configuradas",
+          "Server": " * - ✅ Bloqueio completo de logs quando enabled === false"
+        },
+        {
+          "Line": 17,
+          "Windows": " * - URLs apontando para bpsegurosimediato.com.br (sem dev)",
+          "Server": " * - ✅ Verificações adicionais em todas as callbacks da função logDebug()"
+        },
+        {
+          "Line": 18,
+          "Windows": " * - Modal WhatsApp apontando para produção",
+          "Server": " * - ✅ Preservação de valores definidos no Webflow Footer Code usando || operator"
+        },
+        {
+          "Line": 19,
+          "Windows": " * ",
+          "Server": " * - ✅ Sistema de logs agora respeita completamente window.DEBUG_CONFIG.enabled"
+        },
+        {
+          "Line": 20,
+          "Windows": " * ALTERAÇÕES VERSÃO 1.3 (DEV):",
+          "Server": " * "
+        }
+      ],
+      "Differences": 2034
+    },
+    "File": "FooterCodeSiteDefinitivoCompleto_prod.js"
+  },
+  {
+    "Result": {
+      "Identical": true,
+      "Differences": 0
+    },
+    "File": "MODAL_WHATSAPP_DEFINITIVO.js"
+  },
+  {
+    "Result": {
+      "Identical": false,
+      "DiffLines": [
+        {
+          "Line": 10,
+          "Windows": " * VERSÃO: 2.1 - Integração de Notificação Email Administradores",
+          "Server": " * VERSÃO: 2.0 - Migração de TravelAngels para FlyingDonkeys"
+        },
+        {
+          "Line": 12,
+          "Windows": " * ALTERAÇÕES VERSÃO 2.1:",
+          "Server": " * ALTERAÇÕES NESTA VERSÃO:"
+        },
+        {
+          "Line": 13,
+          "Windows": " * - ✅ Integração de notificação por email para administradores via Amazon SES",
+          "Server": " * - Removidas todas as chamadas ao endpoint travelangels.com.br"
+        },
+        {
+          "Line": 14,
+          "Windows": " * - ✅ Identificação automática do momento do modal (INITIAL vs UPDATE)",
+          "Server": " * - Atualizado para usar endpoints de produção do FlyingDonkeys"
+        },
+        {
+          "Line": 15,
+          "Windows": " * - ✅ Logs diferenciados com emojis e cores (📞🔵 para INITIAL, ✅🟢 para UPDATE)",
+          "Server": " * - Credenciais de produção do FlyingDonkeys configuradas"
+        },
+        {
+          "Line": 16,
+          "Windows": " * - ✅ Envio de email após criação/atualização bem-sucedida do lead",
+          "Server": " * - CORS configurado para domínios de produção"
+        },
+        {
+          "Line": 17,
+          "Windows": " * - ✅ Tratamento de erros sem bloquear fluxo principal",
+          "Server": " * - Logs apontando para diretório de produção"
+        },
+        {
+          "Line": 18,
+          "Windows": " * ",
+          "Server": " * - Removidas funções de simulação (produção sempre usa CRM real)"
+        },
+        {
+          "Line": 19,
+          "Windows": " * ALTERAÇÕES VERSÃO 2.0:",
+          "Server": " */"
+        },
+        {
+          "Line": 20,
+          "Windows": " * - Removidas todas as chamadas ao endpoint travelangels.com.br",
+          "Server": ""
+        }
+      ],
+      "Differences": 1295
+    },
+    "File": "add_flyingdonkeys_v2.php"
+  },
+  {
+    "Result": {
+      "Identical": true,
+      "Differences": 0
+    },
+    "File": "add_webflow_octa_v2.php"
+  },
+  {
+    "Result": {
+      "Identical": true,
+      "Differences": 0
+    },
+    "File": "send_email_notification_endpoint.php"
+  }
+]

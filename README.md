@@ -38,6 +38,13 @@
 
 ## 📋 **PRÓXIMOS PROJETOS - V6.12.0**
 
+### 🔒 **IMPLEMENTAÇÕES DE SEGURANÇA CRÍTICAS**
+1. **🔐 Proteção de Diretório JS**: Implementar whitelist de IPs para `/js/` (Webflow, IPs autorizados)
+2. **🛡️ Rate Limiting**: Limitar requisições por IP para evitar abuso
+3. **🔑 Autenticação de Origem**: Validar User-Agent e Referer do Webflow
+4. **📊 Logs de Segurança**: Monitorar acessos não autorizados ao diretório JS
+5. **🚫 Bloqueio de Hotlinking**: Impedir uso não autorizado do JavaScript
+
 ### 🔧 **MELHORIAS PENDENTES**
 1. **Verificação de Sucesso**: Verificar se mudanças não impactaram funcionalidade quando tela de resultados aparece
 2. **Error Handler**: Aprimorar o error handler para melhor tratamento de exceções

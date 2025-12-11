@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagrama Tela 15 - Detecção de Valores Finais</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .controls {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .controls button {
+            margin: 5px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007acc;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .controls button:hover {
+            background-color: #005a9e;
+        }
+        .diagram-container {
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            background-color: white;
+            overflow: auto;
+            min-height: 400px;
+        }
+        .diagram {
+            transform-origin: top left;
+            transition: transform 0.3s ease;
+        }
+        .info {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e8f4fd;
+            border-radius: 5px;
+            border-left: 4px solid #007acc;
+        }
+        .info h3 {
+            margin-top: 0;
+            color: #007acc;
+        }
+        .info ul {
+            margin: 10px 0;
+        }
+        .info li {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Diagrama: Detecção da Tela de Valores Finais</h1>
+        
+        <div class="controls">
+            <button onclick="zoomIn()">🔍 Zoom In (+)</button>
+            <button onclick="zoomOut()">🔍 Zoom Out (-)</button>
+            <button onclick="resetZoom()">🔄 Reset Zoom</button>
+            <button onclick="fitToScreen()">📐 Ajustar à Tela</button>
+            <button onclick="downloadSVG()">💾 Download SVG</button>
+        </div>
+        
+        <div class="diagram-container" id="diagramContainer">
+            <div class="diagram" id="diagram">
+                <!-- Diagrama será renderizado aqui -->
+            </div>
+        </div>
+        
+        <div class="info">
+            <h3>🔍 Controles de Zoom:</h3>
+            <ul>
+                <li><strong>Zoom In (+):</strong> Aumenta o tamanho do diagrama</li>
+                <li><strong>Zoom Out (-):</strong> Diminui o tamanho do diagrama</li>
+                <li><strong>Reset Zoom:</strong> Volta ao tamanho original</li>
+                <li><strong>Ajustar à Tela:</strong> Ajusta o diagrama para caber na tela</li>
+                <li><strong>Download SVG:</strong> Baixa o diagrama como arquivo SVG</li>
+            </ul>
+            
+            <h3>🎯 Atalhos de Teclado:</h3>
+            <ul>
+                <li><strong>Ctrl + Scroll:</strong> Zoom com mouse</li>
+                <li><strong>Ctrl + +:</strong> Zoom In</li>
+                <li><strong>Ctrl + -:</strong> Zoom Out</li>
+                <li><strong>Ctrl + 0:</strong> Reset Zoom</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let currentZoom = 1;
+        const minZoom = 0.1;
+        const maxZoom = 5;
+        
+        // Configuração do Mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#e1f5fe',
+                primaryTextColor: '#000000',
+                primaryBorderColor: '#1976d2',
+                lineColor: '#1976d2',
+                secondaryColor: '#c8e6c9',
+                tertiaryColor: '#ffcdd2'
+            }
+        });
+        
+        // Código do diagrama
+        const diagramCode = `
+flowchart TD
+    A[Início Tela 15] --> B[FASE 1: Timer 2:43min]
+    B --> C[FASE 2: Detectar Tela Final]
+    
+    C --> D{Tela de Sucesso Detectada?}
+    D -->|Sim| E{Modal Login Apareceu?}
+    D -->|Não| F{Tela Cotação Manual?}
+    
+    E -->|Sim| G[Fazer Login]
+    E -->|Não| H[Capturar Dados]
+    G --> I{Modal CPF Divergente?}
+    I -->|Sim| J[Clicar Manter Login]
+    I -->|Não| H
+    J --> H
+    
+    H --> K{Dados Capturados Com Sucesso?}
+    K -->|Sim| L[SUCESSO - return True]
+    K -->|Não| M[ERRO - return False]
+    
+    F -->|Sim| N[COTAÇÃO MANUAL - progress_tracker.finalizar error]
+    F -->|Não| O[TELA FINAL NÃO DETECTADA - erro 9004]
+    
+    L --> P[Função Principal: Capturar dados finais]
+    M --> Q[Função Principal: Verificar cotação manual]
+    N --> Q
+    O --> Q
+    
+    style A fill:#e1f5fe,stroke:#1976d2,stroke-width:3px,color:#000
+    style L fill:#c8e6c9,stroke:#388e3c,stroke-width:3px,color:#000
+    style N fill:#ffcdd2,stroke:#d32f2f,stroke-width:3px,color:#000
+    style O fill:#ffcdd2,stroke:#d32f2f,stroke-width:3px,color:#000
+    style M fill:#ffcdd2,stroke:#d32f2f,stroke-width:3px,color:#000
+        `;
+        
+        // Renderizar diagrama
+        function renderDiagram() {
+            const diagramDiv = document.getElementById('diagram');
+            diagramDiv.innerHTML = diagramCode;
+            mermaid.init(undefined, diagramDiv);
+        }
+        
+        // Funções de zoom
+        function zoomIn() {
+            currentZoom = Math.min(currentZoom + 0.2, maxZoom);
+            applyZoom();
+        }
+        
+        function zoomOut() {
+            currentZoom = Math.max(currentZoom - 0.2, minZoom);
+            applyZoom();
+        }
+        
+        function resetZoom() {
+            currentZoom = 1;
+            applyZoom();
+        }
+        
+        function fitToScreen() {
+            const container = document.getElementById('diagramContainer');
+            const diagram = document.getElementById('diagram');
+            const containerWidth = container.clientWidth - 40;
+            const containerHeight = container.clientHeight - 40;
+            
+            // Calcular zoom necessário para caber na tela
+            const diagramWidth = diagram.scrollWidth;
+            const diagramHeight = diagram.scrollHeight;
+            
+            const zoomX = containerWidth / diagramWidth;
+            const zoomY = containerHeight / diagramHeight;
+            
+            currentZoom = Math.min(zoomX, zoomY, 1);
+            applyZoom();
+        }
+        
+        function applyZoom() {
+            const diagram = document.getElementById('diagram');
+            diagram.style.transform = `scale(${currentZoom})`;
+        }
+        
+        function downloadSVG() {
+            const svg = document.querySelector('svg');
+            if (svg) {
+                const svgData = new XMLSerializer().serializeToString(svg);
+                const blob = new Blob([svgData], {type: 'image/svg+xml'});
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'diagrama_tela_15_deteccao_valores_finais.svg';
+                link.click();
+                URL.revokeObjectURL(url);
+            }
+        }
+        
+        // Event listeners para atalhos de teclado
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey) {
+                switch(e.key) {
+                    case '+':
+                    case '=':
+                        e.preventDefault();
+                        zoomIn();
+                        break;
+                    case '-':
+                        e.preventDefault();
+                        zoomOut();
+                        break;
+                    case '0':
+                        e.preventDefault();
+                        resetZoom();
+                        break;
+                }
+            }
+        });
+        
+        // Event listener para scroll com Ctrl
+        document.getElementById('diagramContainer').addEventListener('wheel', function(e) {
+            if (e.ctrlKey) {
+                e.preventDefault();
+                if (e.deltaY < 0) {
+                    zoomIn();
+                } else {
+                    zoomOut();
+                }
+            }
+        });
+        
+        // Renderizar diagrama quando a página carregar
+        window.addEventListener('load', function() {
+            renderDiagram();
+            setTimeout(fitToScreen, 1000); // Ajustar à tela após 1 segundo
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+

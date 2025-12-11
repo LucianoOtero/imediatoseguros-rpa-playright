@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modelo 5 - Wave Loading</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        .wave-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 30px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .wave-loading {
+            display: flex;
+            gap: 5px;
+            align-items: end;
+            height: 100px;
+        }
+
+        .wave-bar {
+            width: 8px;
+            background: linear-gradient(180deg, #ff6b6b, #ff8e8e);
+            border-radius: 4px;
+            animation: wave 1.2s ease-in-out infinite;
+        }
+
+        .wave-bar:nth-child(1) {
+            height: 20px;
+            animation-delay: 0s;
+        }
+
+        .wave-bar:nth-child(2) {
+            height: 40px;
+            animation-delay: 0.1s;
+        }
+
+        .wave-bar:nth-child(3) {
+            height: 60px;
+            animation-delay: 0.2s;
+        }
+
+        .wave-bar:nth-child(4) {
+            height: 80px;
+            animation-delay: 0.3s;
+        }
+
+        .wave-bar:nth-child(5) {
+            height: 100px;
+            animation-delay: 0.4s;
+        }
+
+        .wave-bar:nth-child(6) {
+            height: 80px;
+            animation-delay: 0.5s;
+        }
+
+        .wave-bar:nth-child(7) {
+            height: 60px;
+            animation-delay: 0.6s;
+        }
+
+        .wave-bar:nth-child(8) {
+            height: 40px;
+            animation-delay: 0.7s;
+        }
+
+        .wave-bar:nth-child(9) {
+            height: 20px;
+            animation-delay: 0.8s;
+        }
+
+        @keyframes wave {
+            0%, 100% {
+                transform: scaleY(1);
+                opacity: 0.7;
+            }
+            50% {
+                transform: scaleY(1.5);
+                opacity: 1;
+            }
+        }
+
+        .wave-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .timer-display {
+            font-size: 3em;
+            font-weight: bold;
+            color: #333;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .controls {
+            margin-top: 30px;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .status.running {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.paused {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .status.finished {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b6b, #ff8e8e);
+            border-radius: 4px;
+            transition: width 0.1s ease;
+            width: 0%;
+        }
+
+        .time-input {
+            margin: 20px 0;
+        }
+
+        .time-input input {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            text-align: center;
+            width: 80px;
+            margin: 0 5px;
+        }
+
+        .time-input label {
+            font-weight: bold;
+            color: #666;
+            margin: 0 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌊 Modelo 5 - Wave Loading</h1>
+        
+        <div class="wave-container">
+            <div class="wave-loading" id="waveLoading">
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+            </div>
+            <div class="wave-center" id="waveCenter">⏳</div>
+        </div>
+
+        <div class="timer-display" id="timerDisplay">00:00</div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div class="time-input">
+            <label>Minutos:</label>
+            <input type="number" id="minutesInput" value="3" min="1" max="60">
+            <label>Segundos:</label>
+            <input type="number" id="secondsInput" value="0" min="0" max="59">
+        </div>
+
+        <div class="controls">
+            <button class="btn" id="startBtn">▶️ Iniciar</button>
+            <button class="btn" id="pauseBtn" disabled>⏸️ Pausar</button>
+            <button class="btn" id="resetBtn" disabled>🔄 Resetar</button>
+        </div>
+
+        <div class="status" id="status">Pronto para iniciar</div>
+    </div>
+
+    <script>
+        class WaveLoadingTimer {
+            constructor() {
+                this.totalSeconds = 0;
+                this.remainingSeconds = 0;
+                this.isRunning = false;
+                this.isPaused = false;
+                this.interval = null;
+                
+                this.elements = {
+                    timerDisplay: document.getElementById('timerDisplay'),
+                    waveLoading: document.getElementById('waveLoading'),
+                    waveCenter: document.getElementById('waveCenter'),
+                    progressFill: document.getElementById('progressFill'),
+                    startBtn: document.getElementById('startBtn'),
+                    pauseBtn: document.getElementById('pauseBtn'),
+                    resetBtn: document.getElementById('resetBtn'),
+                    status: document.getElementById('status'),
+                    minutesInput: document.getElementById('minutesInput'),
+                    secondsInput: document.getElementById('secondsInput')
+                };
+
+                this.bindEvents();
+            }
+
+            bindEvents() {
+                this.elements.startBtn.addEventListener('click', () => this.start());
+                this.elements.pauseBtn.addEventListener('click', () => this.pause());
+                this.elements.resetBtn.addEventListener('click', () => this.reset());
+                
+                this.elements.minutesInput.addEventListener('change', () => this.updateTotalTime());
+                this.elements.secondsInput.addEventListener('change', () => this.updateTotalTime());
+            }
+
+            updateTotalTime() {
+                const minutes = parseInt(this.elements.minutesInput.value) || 0;
+                const seconds = parseInt(this.elements.secondsInput.value) || 0;
+                this.totalSeconds = minutes * 60 + seconds;
+                this.remainingSeconds = this.totalSeconds;
+                this.updateDisplay();
+                this.updateWaveLoading();
+            }
+
+            start() {
+                if (this.totalSeconds === 0) {
+                    this.updateTotalTime();
+                }
+                
+                if (this.totalSeconds === 0) {
+                    alert('Por favor, defina um tempo válido!');
+                    return;
+                }
+
+                this.isRunning = true;
+                this.isPaused = false;
+                
+                this.elements.startBtn.disabled = true;
+                this.elements.pauseBtn.disabled = false;
+                this.elements.resetBtn.disabled = false;
+                this.elements.status.textContent = 'Executando...';
+                this.elements.status.className = 'status running';
+                
+                this.interval = setInterval(() => {
+                    this.tick();
+                }, 100);
+            }
+
+            pause() {
+                this.isRunning = false;
+                this.isPaused = true;
+                
+                this.elements.startBtn.disabled = false;
+                this.elements.pauseBtn.disabled = true;
+                this.elements.status.textContent = 'Pausado';
+                this.elements.status.className = 'status paused';
+                
+                clearInterval(this.interval);
+            }
+
+            reset() {
+                this.isRunning = false;
+                this.isPaused = false;
+                
+                this.elements.startBtn.disabled = false;
+                this.elements.pauseBtn.disabled = true;
+                this.elements.resetBtn.disabled = true;
+                this.elements.status.textContent = 'Pronto para iniciar';
+                this.elements.status.className = 'status';
+                
+                clearInterval(this.interval);
+                
+                this.updateTotalTime();
+                this.updateDisplay();
+                this.updateWaveLoading();
+            }
+
+            tick() {
+                this.remainingSeconds -= 0.1;
+                
+                if (this.remainingSeconds <= 0) {
+                    this.finish();
+                    return;
+                }
+                
+                this.updateDisplay();
+                this.updateWaveLoading();
+            }
+
+            finish() {
+                this.isRunning = false;
+                this.isPaused = false;
+                
+                this.elements.startBtn.disabled = false;
+                this.elements.pauseBtn.disabled = true;
+                this.elements.resetBtn.disabled = false;
+                this.elements.status.textContent = 'Tempo esgotado!';
+                this.elements.status.className = 'status finished';
+                
+                clearInterval(this.interval);
+                
+                this.remainingSeconds = 0;
+                this.updateDisplay();
+                this.updateWaveLoading();
+            }
+
+            updateDisplay() {
+                const minutes = Math.floor(this.remainingSeconds / 60);
+                const seconds = Math.floor(this.remainingSeconds % 60);
+                const centiseconds = Math.floor((this.remainingSeconds % 1) * 10);
+                
+                this.elements.timerDisplay.textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${centiseconds}`;
+            }
+
+            updateWaveLoading() {
+                if (this.totalSeconds === 0) return;
+                
+                const progress = this.remainingSeconds / this.totalSeconds;
+                this.elements.progressFill.style.width = `${(1 - progress) * 100}%`;
+                
+                // Controlar animação das ondas
+                if (this.isRunning) {
+                    this.elements.waveLoading.style.animationPlayState = 'running';
+                } else {
+                    this.elements.waveLoading.style.animationPlayState = 'paused';
+                }
+            }
+        }
+
+        // Inicializar o timer quando a página carregar
+        document.addEventListener('DOMContentLoaded', () => {
+            const timer = new WaveLoadingTimer();
+            timer.updateTotalTime();
+        });
+    </script>
+</body>
+</html>
+
+
+

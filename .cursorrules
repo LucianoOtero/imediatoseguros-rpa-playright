@@ -62,6 +62,75 @@
 - ✅ **SEMPRE copiar** arquivos do Windows para o servidor (via scp, scripts de deploy, etc.)
 - ❌ **SEM EXCEÇÕES** - Nunca modificar diretamente no servidor, mesmo quando autorizado
 
+### 4.1. Validação de Comandos SSH Antes de Apresentar (OBRIGATÓRIA) 🚨 **CRÍTICO**
+- 🚨 **REGRA CRÍTICA:** **NUNCA apresentar comandos SSH ao usuário sem validar sintaxe antes**
+- ✅ **PROCESSO OBRIGATÓRIO antes de apresentar QUALQUER comando SSH:**
+  1. **FASE 1: Validação Mental de Sintaxe**
+     - ✅ Verificar se aspas estão balanceadas (simples e duplas)
+     - ✅ Verificar se caracteres especiais estão escapados corretamente
+     - ✅ Verificar se variáveis estão sendo interpoladas corretamente
+     - ✅ Verificar se pipes (`|`), redirecionamentos (`>`, `>>`), e operadores (`&&`, `||`) estão corretos
+     - ✅ Verificar se caminhos de arquivos estão corretos
+     - ✅ Verificar se comandos bash estão corretos (não misturar sintaxe PowerShell com bash)
+     - ❌ **NÃO apresentar** se houver dúvida sobre sintaxe
+  2. **FASE 2: Validação de Contexto**
+     - ✅ Verificar se o comando é apropriado para o ambiente (DEV vs PROD)
+     - ✅ Verificar se caminhos de arquivos existem no servidor
+     - ✅ Verificar se permissões necessárias estão corretas
+     - ✅ Verificar se variáveis de servidor estão corretas (IP, domínio, caminho)
+     - ❌ **NÃO apresentar** se contexto estiver incorreto
+  3. **FASE 3: Simplificação quando Necessário**
+     - ✅ Se comando é complexo, quebrar em comandos menores e mais simples
+     - ✅ Preferir comandos testados e conhecidos
+     - ✅ Apresentar um comando por vez quando possível
+     - ✅ Se necessário, criar script temporário para testar sintaxe antes de apresentar
+     - ❌ **NÃO apresentar** comandos complexos sem validação
+  4. **FASE 4: Validação de Comandos Bash dentro de SSH**
+     - ✅ Se comando SSH contém comandos bash, validar sintaxe bash separadamente
+     - ✅ Verificar se loops, condicionais e funções bash estão corretos
+     - ✅ Verificar se variáveis bash (`$var`, `${var}`) estão corretas
+     - ✅ Verificar se comandos bash são compatíveis com a versão do bash no servidor
+     - ❌ **NÃO apresentar** se sintaxe bash estiver incorreta
+  5. **FASE 5: Teste Mental de Execução**
+     - ✅ Simular mentalmente a execução do comando
+     - ✅ Verificar se o comando produzirá o resultado esperado
+     - ✅ Verificar se há riscos de erro ou efeitos colaterais
+     - ✅ Verificar se o comando é idempotente (pode ser executado múltiplas vezes sem problemas)
+     - ❌ **NÃO apresentar** se houver risco de erro ou efeito colateral inesperado
+- ✅ **Checklist Obrigatório ANTES de Apresentar Comando SSH:**
+  - [ ] Aspas balanceadas e escapadas corretamente?
+  - [ ] Caracteres especiais escapados corretamente?
+  - [ ] Variáveis interpoladas corretamente?
+  - [ ] Caminhos de arquivos corretos?
+  - [ ] Comandos bash válidos (não misturados com PowerShell)?
+  - [ ] Contexto correto (ambiente, servidor, permissões)?
+  - [ ] Comando testado mentalmente?
+  - [ ] Comando é seguro para executar?
+- ❌ **PROIBIÇÕES ABSOLUTAS:**
+  - ❌ **NUNCA apresentar comandos SSH** sem validar sintaxe primeiro
+  - ❌ **NUNCA apresentar comandos** com sintaxe duvidosa
+  - ❌ **NUNCA apresentar comandos** que misturam sintaxe PowerShell com bash
+  - ❌ **NUNCA apresentar comandos** complexos sem quebrar em partes menores
+  - ❌ **NUNCA apresentar comandos** sem testar mentalmente primeiro
+- ✅ **OBRIGAÇÕES:**
+  - ✅ **SEMPRE validar sintaxe** antes de apresentar comando SSH
+  - ✅ **SEMPRE simplificar** comandos complexos quando possível
+  - ✅ **SEMPRE testar mentalmente** a execução do comando
+  - ✅ **SEMPRE verificar** contexto e ambiente antes de apresentar
+  - ✅ **SEMPRE preferir** comandos simples e testados
+- 🚨 **SE HOUVER DÚVIDA SOBRE SINTAXE:**
+  - ✅ Criar script temporário para testar sintaxe
+  - ✅ Consultar documentação ou exemplos conhecidos
+  - ✅ Quebrar comando em partes menores
+  - ✅ **NÃO apresentar** até ter certeza da sintaxe correta
+- 📋 **Exemplos de Comandos Válidos:**
+  - ✅ `ssh root@servidor "comando simples"`
+  - ✅ `ssh root@servidor 'comando com aspas simples'`
+  - ✅ `ssh root@servidor "comando com \$variavel"`
+  - ❌ `ssh root@servidor "comando com "aspas não balanceadas""`
+  - ❌ `ssh root@servidor "comando com $variavel sem escape"`
+  - ❌ `ssh root@servidor "comando | Select-String"` (mistura bash com PowerShell)
+
 ### 5. Arquivos de Configuração de Servidor
 - ❌ **NUNCA criar** arquivos de configuração (Nginx, PHP-FPM, systemd, etc.) diretamente no servidor
 - ✅ **SEMPRE criar** arquivos de configuração localmente primeiro
@@ -74,6 +143,32 @@
   - Scripts de configuração: `*.sh`
 - ❌ **NUNCA usar** heredoc ou comandos inline complexos para criar arquivos no servidor
 - ✅ **SEMPRE usar** arquivo local + SCP para transferir configurações
+- 🚨 **OBRIGATÓRIO - SINCRONIZAÇÃO PHP-FPM (CRÍTICO):**
+  - 🚨 **REGRA CRÍTICA:** **NUNCA confiar nos arquivos PHP-FPM do diretório Windows** - eles podem estar desatualizados
+  - ✅ **PROCESSO OBRIGATÓRIO ao modificar arquivo PHP-FPM:**
+    1. **FASE 1: Copiar do Servidor para Windows (OBRIGATÓRIA)**
+       - ✅ **ANTES de qualquer modificação:** Copiar arquivo PHP-FPM do servidor para Windows
+       - ✅ **Ambiente DEV:** `scp root@65.108.156.14:/etc/php/8.3/fpm/pool.d/www.conf "WEBFLOW-SEGUROSIMEDIATO\06-SERVER-CONFIG\php-fpm_www_conf_DEV.txt"`
+       - ✅ **Ambiente UAT:** `scp root@65.108.156.14:/etc/php/8.3/fpm/pool.d/uat.conf "WEBFLOW-SEGUROSIMEDIATO\06-SERVER-CONFIG\php-fpm_uat_conf.txt"`
+       - ✅ **Ambiente PROD:** `scp root@157.180.36.223:/etc/php/8.3/fpm/pool.d/www.conf "WEBFLOW-SEGUROSIMEDIATO\06-SERVER-CONFIG\php-fpm_www_conf_PROD.txt"` (quando procedimento for definido)
+       - ✅ **OBJETIVO:** Garantir que arquivo local está sincronizado com servidor antes de modificar
+       - ✅ **CRÍTICO:** Isso evita perder variáveis que existem no servidor mas não estão no arquivo local
+    2. **FASE 2: Modificar no Windows**
+       - ✅ Modificar arquivo local sincronizado
+       - ✅ Adicionar/remover variáveis conforme necessário
+    3. **FASE 3: Copiar de Volta para Servidor**
+       - ✅ Copiar arquivo modificado do Windows para servidor
+       - ✅ Validar sintaxe antes de recarregar PHP-FPM
+       - ✅ Recarregar PHP-FPM após validação
+  - ❌ **PROIBIÇÕES ABSOLUTAS:**
+    - ❌ **NUNCA modificar** arquivo PHP-FPM local sem copiar do servidor primeiro
+    - ❌ **NUNCA assumir** que arquivo local está sincronizado com servidor
+    - ❌ **NUNCA pular** a fase de sincronização (copiar do servidor para Windows)
+  - ✅ **OBRIGAÇÕES:**
+    - ✅ **SEMPRE copiar** arquivo do servidor para Windows no início do projeto
+    - ✅ **SEMPRE verificar** que arquivo foi copiado corretamente antes de modificar
+    - ✅ **SEMPRE documentar** que sincronização foi realizada
+  - 🚨 **MOTIVO:** Arquivos PHP-FPM no Windows podem estar desatualizados e não conter variáveis que existem no servidor, causando perda de configurações durante deploy
 - 🚨 **OBRIGATÓRIO - VERIFICAÇÃO ANTES DE MODIFICAR:**
   - ✅ **ANTES de modificar** qualquer arquivo de configuração local que será copiado para o servidor
   - ✅ **SEMPRE verificar** se o arquivo local é idêntico ao arquivo no servidor
@@ -387,11 +482,15 @@
 - ⚠️ **Se teste em DEV falhar:** Parar processo, corrigir em DEV, e repetir a partir da FASE 1
 
 ### Fluxo de Trabalho para Arquivos de Configuração de Servidor
-1. **Criar arquivo localmente** → `WEBFLOW-SEGUROSIMEDIATO/06-SERVER-CONFIG/`
-2. **Verificar sintaxe** (quando possível: `nginx -t`, `php-fpm -t`, etc.)
-3. **Copiar para servidor** via SCP: `scp arquivo.conf root@servidor:/caminho/destino/`
-4. **Aplicar configuração** no servidor (reload/restart do serviço)
-5. **Verificar funcionamento** no servidor
+1. **🚨 CRÍTICO - Para PHP-FPM:** Copiar arquivo do servidor para Windows primeiro (sincronização obrigatória)
+   - ✅ **DEV:** `scp root@65.108.156.14:/etc/php/8.3/fpm/pool.d/www.conf "WEBFLOW-SEGUROSIMEDIATO\06-SERVER-CONFIG\php-fpm_www_conf_DEV.txt"`
+   - ✅ **UAT:** `scp root@65.108.156.14:/etc/php/8.3/fpm/pool.d/uat.conf "WEBFLOW-SEGUROSIMEDIATO\06-SERVER-CONFIG\php-fpm_uat_conf.txt"`
+   - ✅ **PROD:** `scp root@157.180.36.223:/etc/php/8.3/fpm/pool.d/www.conf "WEBFLOW-SEGUROSIMEDIATO\06-SERVER-CONFIG\php-fpm_www_conf_PROD.txt"` (quando procedimento for definido)
+2. **Modificar arquivo localmente** → `WEBFLOW-SEGUROSIMEDIATO/06-SERVER-CONFIG/`
+3. **Verificar sintaxe** (quando possível: `nginx -t`, `php-fpm -t`, etc.)
+4. **Copiar para servidor** via SCP: `scp arquivo.conf root@servidor:/caminho/destino/`
+5. **Aplicar configuração** no servidor (reload/restart do serviço)
+6. **Verificar funcionamento** no servidor
 
 ### Validação de Scripts PowerShell Antes de Execução (OBRIGATÓRIO) 🚨 **CRÍTICO**
 - 🚨 **REGRA CRÍTICA:** **NUNCA executar scripts PowerShell no servidor sem validação prévia completa**

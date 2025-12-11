@@ -1,20 +1,21 @@
-# ARQUITETURA DE INTEGRAÇÃO WEBFLOW - RPA V4
+# ARQUITETURA DE INTEGRAÇÃO WEBFLOW - RPA V6.12.1
 
-**Data:** 01/10/2025  
+**Data:** 18/10/2025  
 **Engenheiro de Software:** Análise e Design da Arquitetura  
-**Status:** ✅ ARQUITETURA DEFINIDA  
+**Status:** ✅ ARQUITETURA IMPLEMENTADA E FUNCIONANDO  
 
 ---
 
 ## 📋 VISÃO GERAL DA SOLUÇÃO
 
 ### Objetivo
-Criar uma solução JavaScript que será injetada no custom code do Webflow para integrar o formulário de cotação com o RPA V4, executando o processamento em background e exibindo o progresso em tempo real através do modal responsivo.
+Sistema JavaScript hospedado no servidor `rpaimediatoseguros.com.br` que é injetado no Webflow via Custom Code, integrando o formulário de cotação com o RPA V6.12.1, executando processamento em background com SpinnerTimer regressivo e exibindo progresso em tempo real através de modal responsivo.
 
 ### Fluxo Principal
 ```
-Usuário preenche formulário → Clica no botão → JavaScript coleta dados → 
-Inicia RPA em background → Monitora progresso → Exibe resultados no modal
+Usuário preenche formulário → Clica no botão → JavaScript intercepta → 
+Coleta dados + GCLID_FLD → Inicia RPA → SpinnerTimer regressivo → 
+Monitora progresso → Exibe resultados → Webhooks executam
 ```
 
 ---
@@ -32,6 +33,7 @@ Inicia RPA em background → Monitora progresso → Exibe resultados no modal
 │  │                FORMULÁRIO DE COTAÇÃO                   │    │
 │  │                                                         │    │
 │  │  [CPF] [Nome] [Placa] [CEP] [Email] [Telefone]         │    │
+│  │  [GCLID_FLD] (invisível)                               │    │
 │  │                                                         │    │
 │  │              [BOTÃO: Solicitar Cotação]                │    │
 │  └─────────────────────────────────────────────────────────┘    │
@@ -39,32 +41,42 @@ Inicia RPA em background → Monitora progresso → Exibe resultados no modal
 │  ┌─────────────────────────────────────────────────────────┐    │
 │  │              CUSTOM CODE (JavaScript)                  │    │
 │  │                                                         │    │
-│  │  • Coleta de dados do formulário                        │    │
-│  │  • Validação de campos                                  │    │
-│  │  • Chamada para API RPA V4                              │    │
-│  │  • Monitoramento de progresso                           │    │
-│  │  • Controle do modal de progresso                       │    │
+│  │  <script src="https://rpaimediatoseguros.com.br/js/     │    │
+│  │           webflow-injection-complete.js" defer>         │    │
+│  │                                                         │    │
+│  │  • Intercepta envio do formulário                      │    │
+│  │  • Coleta dados + GCLID_FLD                            │    │
+│  │  • SpinnerTimer regressivo (3min + 2min)              │    │
+│  │  • Modal com progresso em tempo real                   │    │
+│  │  • Tratamento unificado de erros                       │    │
 │  └─────────────────────────────────────────────────────────┘    │
 └─────────────────────────────────────────────────────────────────┘
                                 │
                                 │ HTTP/HTTPS
                                 ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                    HETZNER CLOUD                               │
-│  IP: 37.27.92.160                                               │
+│                    SERVIDOR RPA                                │
+│  rpaimediatoseguros.com.br (37.27.92.160)                      │
 │                                                                 │
 │  ┌─────────────────────────────────────────────────────────┐    │
 │  │                    NGINX                                │    │
-│  │  Proxy Reverso + SSL/TLS                                │    │
+│  │  Proxy Reverso + SSL/TLS + Proteção /js/               │    │
+│  │                                                         │    │
+│  │  /js/webflow-injection-complete.js (118KB)             │    │
+│  │  • Whitelist de IPs (Webflow, IPs autorizados)         │    │
+│  │  • Rate limiting (10 req/min)                           │    │
+│  │  • Validação de Referer                                │    │
 │  └─────────────────────────────────────────────────────────┘    │
 │                                │                                │
 │                                ▼                                │
 │  ┌─────────────────────────────────────────────────────────┐    │
 │  │                   PHP-FPM                               │    │
-│  │  API REST V4                                            │    │
+│  │  API REST V6.12.1                                       │    │
 │  │                                                         │    │
 │  │  POST /api/rpa/start                                    │    │
 │  │  GET /api/rpa/progress/{session_id}                     │    │
+│  │  • Redis Progress Tracker                              │    │
+│  │  • Substituições: "Tela" → "Processo"                  │    │
 │  └─────────────────────────────────────────────────────────┘    │
 │                                │                                │
 │                                ▼                                │
@@ -73,9 +85,10 @@ Inicia RPA em background → Monitora progresso → Exibe resultados no modal
 │  │  executar_rpa_imediato_playwright.py                   │    │
 │  │                                                         │    │
 │  │  • 15 telas de automação                               │    │
-│  │  • Progress tracker JSON                               │    │
+│  │  • Progress tracker Redis/JSON                         │    │
 │  │  • Estimativas iniciais (Tela 4)                       │    │
 │  │  • Cálculo final (Tela 15)                             │    │
+│  │  • Detecção de cotação manual                          │    │
 │  └─────────────────────────────────────────────────────────┘    │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -96,6 +109,7 @@ Inicia RPA em background → Monitora progresso → Exibe resultados no modal
     <input type="text" id="cep" name="cep" placeholder="CEP" required>
     <input type="email" id="email" name="email" placeholder="E-mail" required>
     <input type="tel" id="telefone" name="telefone" placeholder="Telefone" required>
+    <input type="hidden" id="GCLID_FLD" name="GCLID_FLD" value="">
     
     <button type="submit" id="botao-cotacao" class="botao-cotacao">
         Solicitar Cotação
@@ -103,7 +117,13 @@ Inicia RPA em background → Monitora progresso → Exibe resultados no modal
 </form>
 ```
 
-#### Custom Code JavaScript
+#### Custom Code JavaScript (Injeção Externa)
+```html
+<!-- Webflow Custom Code - Before </body> tag -->
+<script src="https://rpaimediatoseguros.com.br/js/webflow-injection-complete.js" defer></script>
+```
+
+#### Funcionalidades do JavaScript V6.12.1
 ```javascript
 // Código a ser injetado no custom code do Webflow
 class WebflowRPAClient {

@@ -406,3 +406,37 @@ SELECT log_id, session_id, level, message, timestamp FROM debug_logs LIMIT 5;
 SELECT '✅ Banco de dados configurado com sucesso!' as status;
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

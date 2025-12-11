@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Modal WhatsApp Progressivo V2.0 Final</title>
+    
+    <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    
+    <!-- jQuery Mask -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.14.0/dist/sweetalert2.all.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.14.0/dist/sweetalert2.min.css"/>
+    
+    <!-- Titillium Web -->
+    <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Titillium Web', sans-serif;
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #F8F9FA;
+        }
+        
+        .test-button {
+            display: inline-block;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.3);
+        }
+        
+        .info-box {
+            background: #f8f9fa;
+            border-left: 4px solid #0099CC;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        
+        h1 {
+            color: #003366;
+        }
+        
+        .section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .feature-list li:before {
+            content: "✅ ";
+            color: #25D366;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎯 Teste Modal WhatsApp Progressivo V2.0 Final</h1>
+    
+    <div class="section">
+        <h2>📋 Características do Modal</h2>
+        <ul class="feature-list">
+            <li><strong>DIV 1:</strong> Apenas TELEFONE (essencial)</li>
+            <li><strong>DIV 2:</strong> Aparece automaticamente após preencher telefone</li>
+            <li><strong>Campos Opcionais:</strong> CPF + Nome + CEP + Placa</li>
+            <li><strong>Texto Central:</strong> "Dados opcionais para cálculo mais rápido e preciso"</li>
+            <li><strong>Botão:</strong> No final da DIV 2</li>
+            <li><strong>Endereço:</strong> Auto-preenchido se CEP for informado</li>
+        </ul>
+    </div>
+    
+    <div class="section info-box">
+        <strong>🔍 Como Testar:</strong>
+        <ol>
+            <li>Clique no botão abaixo para abrir o modal</li>
+            <li>Preencha o TELEFONE (campo obrigatório)</li>
+            <li>A DIV 2 aparece automaticamente com os campos opcionais</li>
+            <li>Veja a mensagem central explicando que são opcionais</li>
+            <li>Preencha CPF, Nome, CEP e Placa (ou não)</li>
+            <li>CEP pode buscar endereço automaticamente</li>
+            <li>Clique em "IR PARA O WHATSAPP"</li>
+        </ol>
+    </div>
+    
+    <p>
+        <button id="whatsapplink" class="test-button">
+            📱 Abrir Modal WhatsApp Progressivo V2.0
+        </button>
+    </p>
+    
+    <!-- ==================== MOCKS DE FUNÇÕES ==================== -->
+    
+    <script>
+        // Mock: Função para extrair apenas dígitos
+        function onlyDigits(str) { 
+            return (str || '').replace(/\D+/g, ''); 
+        }
+        
+        // Mock: Loading Overlay
+        function showLoading(txt) { 
+            console.log('⏳ Loading:', txt); 
+            Swal.fire({
+                title: txt,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+        }
+        
+        function hideLoading() { 
+            console.log('✅ Loading escondido'); 
+            Swal.close();
+        }
+        
+        // Mock: Flag PH3A
+        const VALIDAR_PH3A = false;
+    </script>
+    
+    <!-- ==================== CÓDIGO DO MODAL ==================== -->
+    
+    <script src="MODAL_WHATSAPP_PROGRESSIVO_V2_FINAL.js"></script>
+    
+    <!-- ==================== TESTE DE GCLID ==================== -->
+    
+    <script>
+        // Simular cookie GCLID para teste
+        document.cookie = 'gclid=test123456789';
+        
+        console.log('🍪 [TESTE] Cookie GCLID definido:', document.cookie);
+        console.log('✅ [TESTE] Modal Progressivo V2.0 Final carregado');
+    </script>
+    
+    <!-- ==================== EXPLICAÇÃO VISUAL ==================== -->
+    
+    <div class="section">
+        <h3>🎨 Estrutura do Modal:</h3>
+        <pre style="background: #f8f9fa; padding: 15px; border-radius: 8px; overflow-x: auto;">
+┌─────────────────────────────────────┐
+│  [X] Fechar                          │
+│  Solicitar Cotação                  │
+│  "Quer uma cotação? Comece pelo     │
+│   seu telefone!"                     │
+├─────────────────────────────────────┤
+│  ┌─────────────────────────────┐    │
+│  │ TELEFONE *                   │    │
+│  │ (11) 99999-9999               │    │
+│  │                               │    │
+│  │ ⚠️ DIV 2 aparece automaticamente│    │
+│  │    quando telefone preenchido  │    │
+│  └─────────────────────────────┘    │
+│  ┌─────────────────────────────┐    │
+│  │ Mensagem Central             │    │
+│  │ "Estes dados são opcionais,  │    │
+│  │  mas tornam o cálculo mais   │    │
+│  │  rápido e preciso"            │    │
+│  └─────────────────────────────┘    │
+│  ┌─────────────────────────────┐    │
+│  │ CPF                          │    │
+│  └─────────────────────────────┘    │
+│  ┌─────────────────────────────┐    │
+│  │ Nome Completo               │    │
+│  └─────────────────────────────┘    │
+│  ┌─────────────┐ ┌─────────────┐   │
+│  │ CEP         │ │ Placa       │   │
+│  └─────────────┘ └─────────────┘   │
+│  ┌─────────────────────────────┐    │
+│  │ [📱 IR PARA O WHATSAPP]    │    │
+│  └─────────────────────────────┘    │
+└─────────────────────────────────────┘
+        </pre>
+    </div>
+    
+</body>
+</html>
+

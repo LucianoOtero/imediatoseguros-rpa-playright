@@ -589,8 +589,70 @@ window.logDebug = logDebug;
   - `Footer Code Site FINAL.js` (35 logs: 28 novos + 7 substituições)
   - `webflow_injection_limpo.js` (164 logs: 10 novos + 154 substituições)
 - **🗄️ Banco de Dados**: MySQL (`debug_logs` table)
-- **⏱️ Tempo Total**: **315 minutos** (5h 15min - incluindo Fase 0 com backup local)
+- **⏱️ Tempo Total**: **375 minutos** (6h 15min - incluindo Fase 0 com backup local, migração completa de endpoints e configuração Cloudflare)
 - **🔍 Cobertura**: 100% do fluxo de execução RPA + todos os console logs existentes
+
+#### **📋 TAREFA 2.8.A.0: Verificar Funcionamento dos Endpoints no mdmidia**
+- **🎯 Objetivo**: Validar funcionamento dos endpoints Collect Chat e OctaDesk no servidor mdmidia
+- **🚨 URGÊNCIA**: API V1 do Webflow foi descontinuada em janeiro de 2025 - verificar se webhooks ainda funcionam
+- **🔄 MIGRAÇÃO PLANEJADA**: Descontinuar endpoints no mdmidia e migrar para bpsegurosimediato.com.br
+- **☁️ CLOUDFLARE**: Implementar Cloudflare para melhor performance, segurança e CDN
+- **🔍 Endpoints Atuais a Verificar**:
+  - **Collect Chat**: `https://mdmidia.com.br/add_travelangels.php`
+  - **OctaDesk**: `https://mdmidia.com.br/add_webflow_octa.php`
+- **🎯 Endpoints Futuros (bpsegurosimediato.com.br + Cloudflare)**:
+  - **Collect Chat**: `https://bpsegurosimediato.com.br/add_travelangels.php`
+  - **OctaDesk**: `https://bpsegurosimediato.com.br/add_webflow_octa.php`
+  - **CDN**: Cache estático via Cloudflare
+  - **SSL**: Certificado SSL automático via Cloudflare
+- **📊 Testes a Realizar**:
+  - **Conectividade**: Verificar se endpoints respondem
+  - **Processamento**: Testar envio de dados de formulário
+  - **Logs**: Verificar se logs são gerados corretamente
+  - **Webhooks**: Confirmar se webhooks são disparados
+  - **API Status**: Verificar se problema é API V1 descontinuada
+  - **Comparação**: Comparar performance mdmidia vs bpsegurosimediato
+  - **Cloudflare**: Testar performance com CDN ativo
+- **🧪 Métodos de Teste**:
+  - **curl**: Teste direto via linha de comando
+  - **Invoke-RestMethod**: Teste via PowerShell
+  - **Browser**: Teste manual via navegador
+  - **Webflow Panel**: Verificar status dos webhooks no painel
+  - **Cloudflare Analytics**: Monitorar performance e cache hits
+- **📁 Arquivos de Log**:
+  - **mdmidia**: `logs_travelangels.txt`, `octa_webflow_webhook.log`
+  - **bpsegurosimediato**: `/var/www/html/logs_travelangels.txt`, `/var/www/html/octa_webflow_webhook.log`
+  - **Cloudflare**: Logs de acesso e performance via dashboard
+- **🔧 Se API V1 com Problema**:
+  - **Migração Urgente**: Para API V2 com validação de signature
+  - **Novos Tokens**: Gerar tokens V2 no painel Webflow
+  - **Validação**: Implementar `x-webflow-signature` e `x-webflow-timestamp`
+- **☁️ Configuração Cloudflare**:
+  - **DNS**: Apontar bpsegurosimediato.com.br para Cloudflare
+  - **SSL/TLS**: Configurar Full (Strict) para máxima segurança
+  - **Cache**: Configurar regras de cache para arquivos estáticos
+  - **Firewall**: Implementar regras de proteção DDoS
+  - **Page Rules**: Otimizar cache para webhooks e APIs
+  - **Analytics**: Monitorar tráfego e performance
+- **🔄 Plano de Migração Completa**:
+  - **Fase 1**: Verificar status atual dos webhooks no mdmidia
+  - **Fase 2**: Confirmar funcionamento dos webhooks no bpsegurosimediato
+  - **Fase 3**: Configurar Cloudflare para bpsegurosimediato.com.br
+  - **Fase 4**: Atualizar URLs no painel Webflow para bpsegurosimediato
+  - **Fase 5**: Implementar API V2 nos webhooks do bpsegurosimediato
+  - **Fase 6**: Testar performance com Cloudflare ativo
+  - **Fase 7**: Descontinuar endpoints no mdmidia
+- **⏱️ Tempo**: 60 minutos (aumentado devido à configuração Cloudflare)
+- **✅ Status**: IMPLEMENTADA
+- **📋 Objetivo**: Garantir que webhooks funcionam antes de implementar sistema de logging completo
+- **🚨 Prioridade**: MÁXIMA - pode explicar por que webhooks não dispararam na sessão anterior
+- **📝 Observação**: Esta será a última verificação dos endpoints no mdmidia antes da migração completa
+- **☁️ Benefícios Cloudflare**:
+  - **Performance**: CDN global para entrega mais rápida
+  - **Segurança**: Proteção DDoS e firewall avançado
+  - **SSL**: Certificados SSL automáticos e renovação
+  - **Analytics**: Monitoramento detalhado de tráfego
+  - **Cache**: Redução de carga no servidor origin
 
 #### **📋 TAREFA 2.8.A: Criar Backups da Versão 2.8**
 - **🎯 Objetivo**: Criar backups antes da implementação dos debugs PHP
@@ -599,7 +661,7 @@ window.logDebug = logDebug;
   - `webflow_injection_limpo.js` → `webflow_injection_limpo backup antes tarefa 2.8.js`
 - **📚 Documentação**: Ver seção "Instalação" em `DOCUMENTACAO_COMPLETA.md`
 - **⏱️ Tempo**: 5 minutos
-- **✅ Status**: PENDENTE
+- **✅ Status**: IMPLEMENTADA
 
 #### **📋 TAREFA 2.8.B: Teste Rápido da Funcionalidade de Log (FASE 0)**
 - **🎯 Objetivo**: Implementar apenas UMA chamada de log para testar a funcionalidade
@@ -612,8 +674,9 @@ window.logDebug = logDebug;
 - **📁 Backup Local**: 
   - `Footer Code Site Definitivo.js` → `Footer Code Site Definitivo backup fase 0.js`
 - **⏱️ Tempo**: 15 minutos (aumentado para incluir backup local)
-- **✅ Status**: PENDENTE
+- **✅ Status**: IMPLEMENTADA E FUNCIONANDO
 - **📋 Objetivo**: Validar conectividade e funcionamento do sistema PHP antes da implementação completa
+- **🎯 Resultado**: Sistema de logging funcionando perfeitamente com logs sendo enviados para o banco de dados MySQL no servidor bpsegurosimediato.com.br
 
 #### **📋 TAREFA 2.8.C: Implementar Função logDebug Completa no Footer Code**
 - **🎯 Objetivo**: Expandir função logDebug para todas as funcionalidades

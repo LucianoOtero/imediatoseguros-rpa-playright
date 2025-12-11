@@ -1997,7 +1997,257 @@
     }
     
     // ========================================
-    // 3. CLASSE PRINCIPAL DA PÁGINA
+    // 3. CLASSE DE VALIDAÇÃO DE FORMULÁRIO
+    // ========================================
+    
+    class FormValidator {
+        constructor() {
+            this.config = {
+                USE_PHONE_API: true,
+                APILAYER_KEY: 'dce92fa84152098a3b5b7b8db24debbc',
+                SAFETY_BASE: 'https://optin.safetymails.com/main/safetyoptin/20a7a1c297e39180bd80428ac13c363e882a531f/9bab7f0c2711c5accfb83588c859dc1103844a94/',
+                VALIDAR_PH3A: false
+            };
+        }
+        
+        // Helper functions
+        onlyDigits(s) {
+            return (s || '').replace(/\D+/g, '');
+        }
+        
+        toUpperNospace(s) {
+            return (s || '').toUpperCase().trim();
+        }
+        
+        // CPF Validation
+        validarCPFFormato(cpf) {
+            const cpfLimpo = this.onlyDigits(cpf);
+            return cpfLimpo.length === 11 && !/^(\d)\1{10}$/.test(cpfLimpo);
+        }
+        
+        validarCPFAlgoritmo(cpf) {
+            cpf = this.onlyDigits(cpf);
+            if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
+            
+            let soma = 0, resto = 0;
+            for (let i = 1; i <= 9; i++) {
+                soma += parseInt(cpf[i-1], 10) * (11 - i);
+            }
+            resto = (soma * 10) % 11;
+            if (resto === 10 || resto === 11) resto = 0;
+            if (resto !== parseInt(cpf[9], 10)) return false;
+            
+            soma = 0;
+            for (let i = 1; i <= 10; i++) {
+                soma += parseInt(cpf[i-1], 10) * (12 - i);
+            }
+            resto = (soma * 10) % 11;
+            if (resto === 10 || resto === 11) resto = 0;
+            return resto === parseInt(cpf[10], 10);
+        }
+        
+        async validateCPF(cpf) {
+            if (!cpf) return { ok: false, reason: 'vazio' };
+            
+            const formatoOk = this.validarCPFFormato(cpf);
+            const algoritmoOk = this.validarCPFAlgoritmo(cpf);
+            
+            return {
+                ok: formatoOk && algoritmoOk,
+                reason: !formatoOk ? 'formato' : (!algoritmoOk ? 'algoritmo' : 'ok')
+            };
+        }
+        
+        // CEP Validation
+        async validateCEP(cep) {
+            const cepLimpo = this.onlyDigits(cep);
+            if (cepLimpo.length !== 8) {
+                return { ok: false, reason: 'formato' };
+            }
+            
+            try {
+                const response = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
+                const data = await response.json();
+                
+                return {
+                    ok: !data.erro,
+                    reason: data.erro ? 'nao_encontrado' : 'ok',
+                    viacep: data
+                };
+            } catch (error) {
+                return { ok: false, reason: 'erro_api' };
+            }
+        }
+        
+        // Placa Validation
+        validarPlacaFormato(p) {
+            const placaLimpa = p.toUpperCase().replace(/[^A-Z0-9]/g, '');
+            const antigo = /^[A-Z]{3}[0-9]{4}$/;
+            const mercosul = /^[A-Z]{3}[0-9][A-Z][0-9]{2}$/;
+            return antigo.test(placaLimpa) || mercosul.test(placaLimpa);
+        }
+        
+        extractVehicleFromPlacaFipe(apiJson) {
+            const r = apiJson && (apiJson.informacoes_veiculo || apiJson);
+            if (!r || typeof r !== 'object') return { marcaTxt: '', anoModelo: '', tipoVeiculo: '' };
+            
+            const fabricante = r.marca || '';
+            const modelo = r.modelo || '';
+            const anoMod = r.ano || r.ano_modelo || '';
+            
+            let tipoVeiculo = '';
+            if (r.segmento) {
+                const segmento = r.segmento.toLowerCase();
+                if (segmento.includes('moto')) {
+                    tipoVeiculo = 'moto';
+                } else if (segmento.includes('auto')) {
+                    tipoVeiculo = 'carro';
+                } else {
+                    const modeloLower = modelo.toLowerCase();
+                    const marcaLower = fabricante.toLowerCase();
+                    
+                    if (marcaLower.includes('honda') || marcaLower.includes('yamaha') || 
+                       marcaLower.includes('suzuki') || marcaLower.includes('kawasaki') ||
+                       modeloLower.includes('cg') || modeloLower.includes('cb') || 
+                       modeloLower.includes('fazer') || modeloLower.includes('ninja')) {
+                        tipoVeiculo = 'moto';
+                    } else {
+                        tipoVeiculo = 'carro';
+                    }
+                }
+            } else {
+                const modeloLower = modelo.toLowerCase();
+                const marcaLower = fabricante.toLowerCase();
+                
+                if (marcaLower.includes('honda') || marcaLower.includes('yamaha') || 
+                   marcaLower.includes('suzuki') || marcaLower.includes('kawasaki') ||
+                   modeloLower.includes('cg') || modeloLower.includes('cb') || 
+                   modeloLower.includes('fazer') || modeloLower.includes('ninja')) {
+                    tipoVeiculo = 'moto';
+                } else {
+                    tipoVeiculo = 'carro';
+                }
+            }
+            
+            return { 
+                marcaTxt: [fabricante, modelo].filter(Boolean).join(' / '), 
+                anoModelo: this.onlyDigits(String(anoMod)).slice(0, 4),
+                tipoVeiculo: tipoVeiculo
+            };
+        }
+        
+        async validatePlaca(placa) {
+            const raw = placa.toUpperCase().replace(/[^A-Z0-9]/g, '');
+            if (!this.validarPlacaFormato(raw)) {
+                return { ok: false, reason: 'formato' };
+            }
+            
+            try {
+                const response = await fetch('https://mdmidia.com.br/placa-validate.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        placa: raw
+                    })
+                });
+                
+                const data = await response.json();
+                const ok = !!data && (data.codigo === 1 || data.success === true);
+                
+                return {
+                    ok,
+                    reason: ok ? 'ok' : 'nao_encontrada',
+                    parsed: ok ? this.extractVehicleFromPlacaFipe(data) : { marcaTxt: '', anoModelo: '', tipoVeiculo: '' }
+                };
+            } catch (error) {
+                return { ok: false, reason: 'erro_api' };
+            }
+        }
+        
+        // Celular Validation
+        validarCelularLocal(ddd, numero) {
+            console.log('🔍 [VALIDACAO] validarCelularLocal - DDD:', ddd, 'Numero:', numero);
+            const d = this.onlyDigits(ddd), n = this.onlyDigits(numero);
+            console.log('🔍 [VALIDACAO] DDD limpo:', d, 'Numero limpo:', n);
+            console.log('🔍 [VALIDACAO] DDD length:', d.length, 'Numero length:', n.length);
+            
+            if (d.length !== 2) {
+                console.log('❌ [VALIDACAO] DDD inválido - length:', d.length);
+                return { ok: false, reason: 'ddd' };
+            }
+            if (n.length !== 9) {
+                console.log('❌ [VALIDACAO] Numero inválido - length:', n.length, 'esperado: 9');
+                return { ok: false, reason: 'len' };
+            }
+            if (n[0] !== '9') {
+                console.log('❌ [VALIDACAO] Numero não começa com 9 - primeiro dígito:', n[0]);
+                return { ok: false, reason: 'pattern' };
+            }
+            console.log('✅ [VALIDACAO] Celular válido - national:', d + n);
+            return { ok: true, national: d + n };
+        }
+        
+        async validarCelularApi(nat) {
+            if (!this.config.USE_PHONE_API) return { ok: true };
+            
+            try {
+                const response = await fetch(`https://apilayer.net/api/validate?access_key=${this.config.APILAYER_KEY}&country_code=BR&number=${nat}`);
+                const data = await response.json();
+                return { ok: !!data?.valid };
+            } catch (error) {
+                return { ok: true }; // falha externa não bloqueia
+            }
+        }
+        
+        async validateCelular(ddd, celular) {
+            console.log('🔍 [VALIDACAO] validateCelular iniciado - DDD:', ddd, 'Celular:', celular);
+            const local = this.validarCelularLocal(ddd, celular);
+            console.log('🔍 [VALIDACAO] Resultado validação local:', local);
+            
+            if (!local.ok) {
+                console.log('❌ [VALIDACAO] Validação local falhou - reason:', local.reason);
+                return { ok: false, reason: local.reason };
+            }
+            
+            console.log('🔍 [VALIDACAO] Validando via API...');
+            const api = await this.validarCelularApi(local.national);
+            console.log('🔍 [VALIDACAO] Resultado validação API:', api);
+            
+            const result = { ok: api.ok };
+            console.log('🔍 [VALIDACAO] Resultado final validateCelular:', result);
+            return result;
+        }
+        
+        // Email Validation
+        validarEmailLocal(v) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i.test((v || '').trim());
+        }
+        
+        async validateEmail(email) {
+            if (!email) return { ok: false, reason: 'vazio' };
+            
+            const localOk = this.validarEmailLocal(email);
+            if (!localOk) return { ok: false, reason: 'formato' };
+            
+            // SafetyMails check (não bloqueante)
+            try {
+                const response = await fetch(this.config.SAFETY_BASE + btoa(email));
+                const data = await response.json();
+                if (data && data.StatusEmail && data.StatusEmail !== 'VALIDO') {
+                    return { ok: false, reason: 'safety_mails' };
+                }
+            } catch (error) {
+                // Silêncio em erro externo
+            }
+            
+            return { ok: true };
+        }
+    }
+    
+    // ========================================
+    // 4. CLASSE PRINCIPAL DA PÁGINA
     // ========================================
     
     class MainPage {
@@ -2090,6 +2340,16 @@
             // Coletar dados do formulário
             for (let [key, value] of formData.entries()) {
                 data[key] = value;
+            }
+            
+            // ✅ CORREÇÃO: Capturar campo GCLID_FLD manualmente
+            const gclidField = document.getElementById('GCLID_FLD');
+            if (gclidField) {
+                data.GCLID_FLD = gclidField.value || 'TesteRPA123';
+                console.log('✅ Campo GCLID_FLD capturado:', data.GCLID_FLD);
+            } else {
+                data.GCLID_FLD = 'TesteRPA123'; // Valor padrão
+                console.log('⚠️ Campo GCLID_FLD não encontrado, usando valor padrão');
             }
             
             // Aplicar conversões específicas
@@ -2385,6 +2645,26 @@
                 // Coletar dados do formulário
                 const formData = this.collectFormData(form);
                 
+                // VALIDAÇÃO COMPLETA (NOVO)
+                console.log('🔍 [MAIN] Iniciando validação de formulário...');
+                console.log('🔍 [MAIN] Dados coletados:', formData);
+                console.log('🔍 [MAIN] Campos específicos - Telefone:', formData.telefone);
+                
+                const validationResult = await this.validateFormData(formData);
+                console.log('🔍 [MAIN] Resultado da validação:', validationResult);
+                
+                // Se inválido, mostrar SweetAlert
+                if (!validationResult.isValid) {
+                    console.log('❌ [MAIN] Validação falhou - bloqueando RPA');
+                    console.log('❌ [MAIN] Erros encontrados:', validationResult.errors);
+                    await this.showValidationAlert(validationResult.errors);
+                    this.updateButtonLoading(false);
+                    console.log('❌ [MAIN] RPA BLOQUEADO - retornando sem executar');
+                    return; // NÃO executar RPA
+                }
+                
+                console.log('✅ [MAIN] Validação passou - prosseguindo com RPA');
+                
                 // Armazenar telefone globalmente para WhatsApp
                 window.rpaData = { telefone: formData.telefone };
                 
@@ -2450,6 +2730,180 @@
                     console.log('🔍 Classes disponíveis:', Object.keys(window).filter(key => key.includes('Modal')));
                 }
             }, 200);
+        }
+        
+        /**
+         * Validar dados do formulário completo
+         */
+        async validateFormData(formData) {
+            console.log('🔍 [VALIDACAO] validateFormData iniciado com dados:', formData);
+            const validator = new FormValidator();
+            
+            console.log('🔍 Validando dados:', formData);
+            
+            // Executar todas as validações em paralelo
+            console.log('🔍 [VALIDACAO] Iniciando validações paralelas...');
+            
+            // ✅ CORREÇÃO: Extrair DDD e celular do telefone concatenado
+            const telefoneCompleto = formData.telefone || '';
+            const ddd = telefoneCompleto.substring(0, 2);
+            const celular = telefoneCompleto.substring(2);
+            console.log('🔍 [VALIDACAO] Telefone extraído - DDD:', ddd, 'Celular:', celular);
+            
+            const [cpfResult, cepResult, placaResult, celularResult, emailResult] = await Promise.all([
+                validator.validateCPF(formData.cpf),
+                validator.validateCEP(formData.cep),
+                validator.validatePlaca(formData.placa),
+                validator.validateCelular(ddd, celular),
+                validator.validateEmail(formData.email)
+            ]);
+            
+            console.log('📊 [VALIDACAO] Resultados das validações:', {
+                cpf: cpfResult,
+                cep: cepResult,
+                placa: placaResult,
+                celular: celularResult,
+                email: emailResult
+            });
+            
+            // Verificar cada resultado individualmente
+            console.log('🔍 [VALIDACAO] Verificando CPF:', cpfResult.ok ? '✅' : '❌', cpfResult);
+            console.log('🔍 [VALIDACAO] Verificando CEP:', cepResult.ok ? '✅' : '❌', cepResult);
+            console.log('🔍 [VALIDACAO] Verificando Placa:', placaResult.ok ? '✅' : '❌', placaResult);
+            console.log('🔍 [VALIDACAO] Verificando Celular:', celularResult.ok ? '✅' : '❌', celularResult);
+            console.log('🔍 [VALIDACAO] Verificando Email:', emailResult.ok ? '✅' : '❌', emailResult);
+            
+            const isValid = cpfResult.ok && cepResult.ok && placaResult.ok && celularResult.ok && emailResult.ok;
+            console.log('🔍 [VALIDACAO] Resultado final isValid:', isValid);
+            
+            // Auto-preenchimento se válido
+            if (placaResult.ok && placaResult.parsed) {
+                console.log('🚗 Auto-preenchendo dados da placa:', placaResult.parsed);
+                this.setFieldValue('MARCA', placaResult.parsed.marcaTxt);
+                this.setFieldValue('ANO', placaResult.parsed.anoModelo);
+                this.setFieldValue('TIPO-DE-VEICULO', placaResult.parsed.tipoVeiculo);
+            }
+            
+            if (cpfResult.ok && cpfResult.parsed && validator.config.VALIDAR_PH3A) {
+                console.log('👤 Auto-preenchendo dados do CPF:', cpfResult.parsed);
+                this.setFieldValue('SEXO', cpfResult.parsed.sexo);
+                this.setFieldValue('DATA-DE-NASCIMENTO', cpfResult.parsed.dataNascimento);
+                this.setFieldValue('ESTADO-CIVIL', cpfResult.parsed.estadoCivil);
+            }
+            
+            const result = {
+                isValid: isValid,
+                errors: {
+                    cpf: cpfResult,
+                    cep: cepResult,
+                    placa: placaResult,
+                    celular: celularResult,
+                    email: emailResult
+                }
+            };
+            
+            console.log('🔍 [VALIDACAO] Retornando resultado final:', result);
+            return result;
+        }
+        
+        /**
+         * Mostrar SweetAlert de validação
+         */
+        async showValidationAlert(errors) {
+            console.log('🚨 [ALERT] showValidationAlert chamado com erros:', errors);
+            
+            let errorLines = "";
+            if (!errors.cpf.ok) {
+                errorLines += "• CPF inválido\n";
+                console.log('🚨 [ALERT] CPF inválido:', errors.cpf);
+            }
+            if (!errors.cep.ok) {
+                errorLines += "• CEP inválido\n";
+                console.log('🚨 [ALERT] CEP inválido:', errors.cep);
+            }
+            if (!errors.placa.ok) {
+                errorLines += "• Placa inválida\n";
+                console.log('🚨 [ALERT] Placa inválida:', errors.placa);
+            }
+            if (!errors.celular.ok) {
+                errorLines += "• Celular inválido\n";
+                console.log('🚨 [ALERT] Celular inválido:', errors.celular);
+            }
+            if (!errors.email.ok) {
+                errorLines += "• E-mail inválido\n";
+                console.log('🚨 [ALERT] Email inválido:', errors.email);
+            }
+            
+            console.log('🚨 [ALERT] Linhas de erro construídas:', errorLines);
+            console.log('🚨 Mostrando SweetAlert de validação:', errorLines);
+            
+            const result = await Swal.fire({
+                icon: 'info',
+                title: 'Atenção!',
+                html: 
+                    "⚠️ Os campos CPF, CEP, PLACA, CELULAR e E-MAIL corretamente preenchidos são necessários para efetuar o cálculo do seguro.\n\n" +
+                    "Campos com problema:\n\n" + errorLines + "\n" +
+                    "Caso decida prosseguir assim mesmo, um especialista entrará em contato para coletar esses dados.",
+                showCancelButton: true,
+                confirmButtonText: 'Prosseguir assim mesmo',
+                cancelButtonText: 'Corrigir',
+                reverseButtons: true,
+                allowOutsideClick: false,
+                allowEscapeKey: true
+            });
+            
+            console.log('🚨 [ALERT] Resultado do SweetAlert:', result);
+            
+            if (result.isConfirmed) {
+                console.log('✅ Usuário escolheu prosseguir, redirecionando...');
+                // NÃO executar RPA - redirecionar para página de sucesso
+                window.location.href = 'https://www.segurosimediato.com.br/sucesso';
+            } else {
+                console.log('🔧 Usuário escolheu corrigir, focando campo com erro...');
+                // Focar no primeiro campo com erro
+                this.focusFirstErrorField(errors);
+            }
+        }
+        
+        /**
+         * Focar no primeiro campo com erro
+         */
+        focusFirstErrorField(errors) {
+            if (!errors.cpf.ok) {
+                const cpfField = document.getElementById('CPF') || document.querySelector('[name="CPF"]');
+                if (cpfField) { cpfField.focus(); return; }
+            }
+            if (!errors.cep.ok) {
+                const cepField = document.getElementById('CEP') || document.querySelector('[name="CEP"]');
+                if (cepField) { cepField.focus(); return; }
+            }
+            if (!errors.placa.ok) {
+                const placaField = document.getElementById('PLACA') || document.querySelector('[name="PLACA"]');
+                if (placaField) { placaField.focus(); return; }
+            }
+            if (!errors.celular.ok) {
+                const celularField = document.getElementById('CELULAR') || document.querySelector('[name="CELULAR"]');
+                if (celularField) { celularField.focus(); return; }
+            }
+            if (!errors.email.ok) {
+                const emailField = document.getElementById('email') || document.querySelector('[name="email"]');
+                if (emailField) { emailField.focus(); return; }
+            }
+        }
+        
+        /**
+         * Definir valor de campo (auto-preenchimento)
+         */
+        setFieldValue(id, val) {
+            const field = document.getElementById(id) || document.querySelector(`[name="${id}"]`);
+            if (field) {
+                field.value = val;
+                field.dispatchEvent(new Event('input', { bubbles: true }));
+                field.dispatchEvent(new Event('change', { bubbles: true }));
+                console.log(`✅ Campo ${id} preenchido com: ${val}`);
+            } else {
+                console.warn(`⚠️ Campo ${id} não encontrado`);
+            }
         }
         
         /**
@@ -2797,8 +3251,11 @@
     // Inicializar aplicação
     const mainPage = new MainPage();
     
-    console.log('🚀 Webflow Injection Complete V6.12.0 carregado com sucesso!');
+    console.log('🚀 Webflow Injection Complete V6.13.0 carregado com sucesso!');
     console.log('📋 SpinnerTimer integrado com ciclo de vida do RPA');
-    console.log('📋 Melhorias de robustez implementadas (try-catch, debounce)');
+    console.log('📋 Validação completa de formulário implementada');
+    console.log('📋 SweetAlert com opção "Prosseguir assim mesmo"');
+    console.log('📋 Auto-preenchimento de campos (MARCA/ANO/TIPO)');
+    console.log('📋 Redirecionamento para página de sucesso em caso de dados inválidos');
     
 })();

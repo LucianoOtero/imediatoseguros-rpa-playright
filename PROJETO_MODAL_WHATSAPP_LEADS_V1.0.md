@@ -791,3 +791,23 @@ O modal WhatsApp é uma alternativa ao Collect Chat que:
 
 **Status**: ✅ PRONTO PARA IMPLEMENTAÇÃO
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

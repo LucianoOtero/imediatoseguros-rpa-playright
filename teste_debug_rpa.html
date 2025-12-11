@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Debug RPA</title>
+</head>
+<body>
+    <h1>Teste de Debug RPA</h1>
+    <form id="test-form">
+        <input type="text" name="test" placeholder="Campo de teste">
+        <button type="submit">Testar Submit</button>
+    </form>
+    
+    <div id="debug-output"></div>
+    
+    <script>
+        // Simular ambiente de teste
+        console.log('🧪 [TEST] Página de teste carregada');
+        
+        // Função para mostrar resultados no DOM
+        function showDebugResults() {
+            const output = document.getElementById('debug-output');
+            output.innerHTML = '<h2>Resultados do Debug:</h2><pre id="console-output"></pre>';
+            
+            // Capturar logs do console
+            const originalLog = console.log;
+            const originalError = console.error;
+            const originalWarn = console.warn;
+            const logs = [];
+            
+            console.log = function(...args) {
+                logs.push('[LOG] ' + args.join(' '));
+                originalLog.apply(console, args);
+            };
+            
+            console.error = function(...args) {
+                logs.push('[ERROR] ' + args.join(' '));
+                originalError.apply(console, args);
+            };
+            
+            console.warn = function(...args) {
+                logs.push('[WARN] ' + args.join(' '));
+                originalWarn.apply(console, args);
+            };
+            
+            setTimeout(() => {
+                document.getElementById('console-output').textContent = logs.join('
+');
+                console.log = originalLog;
+                console.error = originalError;
+                console.warn = originalWarn;
+            }, 3000);
+        }
+        
+        // Executar debug após carregar Footer Code
+        setTimeout(showDebugResults, 1000);
+    </script>
+</body>
+</html>

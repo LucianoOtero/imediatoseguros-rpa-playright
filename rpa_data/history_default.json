@@ -1,0 +1,25 @@
+{
+  "session_id": "default",
+  "timestamp_inicio": "2025-10-18T09:53:38.450556",
+  "timestamp_fim": "2025-10-18T09:53:38.451619",
+  "status_final": "executando",
+  "total_etapas": 15,
+  "historico": [
+    {
+      "etapa": "inicio",
+      "timestamp": "2025-10-18T09:53:38.451169",
+      "status": "iniciando",
+      "mensagem": "ProgressTracker inicializado",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 2,
+      "timestamp": "2025-10-18T09:53:38.451984",
+      "status": "executando",
+      "mensagem": "Tela 2 concluída",
+      "dados_extra": null,
+      "erro": null
+    }
+  ]
+}

@@ -1,16 +1,12 @@
 {
-  "etapa_atual": 5,
+  "etapa_atual": 2,
   "total_etapas": 15,
-  "percentual": 33.33333333333333,
+  "percentual": 13.333333333333334,
   "status": "executando",
-  "mensagem": "Teste",
-  "timestamp_inicio": "2025-09-26T18:38:23.340016",
-  "timestamp_atualizacao": "2025-09-26T18:38:23.341908",
-  "dados_extra": {
-    "estimativas_tela_5": {
-      "teste": "dados"
-    }
-  },
+  "mensagem": "Processo 2 finalizou",
+  "timestamp_inicio": "2025-10-18T09:53:38.450556",
+  "timestamp_atualizacao": "2025-10-18T09:53:38.451619",
+  "dados_extra": {},
   "erros": [],
   "session_id": "default"
 }

@@ -1,0 +1,12 @@
+{
+  "etapa_atual": 2,
+  "total_etapas": 15,
+  "percentual": 13.333333333333334,
+  "status": "executando",
+  "mensagem": "Tela 2 falhou",
+  "timestamp_inicio": "2025-10-10T18:08:14.776540",
+  "timestamp_atualizacao": "2025-10-10T18:08:21.575816",
+  "dados_extra": {},
+  "erros": [],
+  "session_id": "511810cd"
+}

@@ -84,3 +84,8 @@ echo "Limpeza concluída para sessão: $SESSION_ID"
 
 
 
+
+
+
+
+

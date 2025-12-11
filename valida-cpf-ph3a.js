@@ -171,3 +171,8 @@ function validarCPFCompleto(cpf) {
 
 
 
+
+
+
+
+

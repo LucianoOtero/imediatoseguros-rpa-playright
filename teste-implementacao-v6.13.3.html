@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Implementação V6.13.3 - Abordagem Conservadora</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .test-button.danger {
+            background: #dc3545;
+        }
+        .test-button.danger:hover {
+            background: #c82333;
+        }
+        .test-button.success {
+            background: #28a745;
+        }
+        .test-button.success:hover {
+            background: #218838;
+        }
+        .form-test {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .form-test input {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Teste Implementação V6.13.3 - Abordagem Conservadora</h1>
+    
+    <div class="test-container">
+        <h2>📋 Status da Implementação</h2>
+        <div id="statusContainer">
+            <div class="status info">🔄 Aguardando testes...</div>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>🎛️ Controles de Teste</h2>
+        <button class="test-button" onclick="setRPAEnabled(true)">✅ Habilitar RPA (window.rpaEnabled = true)</button>
+        <button class="test-button danger" onclick="setRPAEnabled(false)">❌ Desabilitar RPA (window.rpaEnabled = false)</button>
+        <button class="test-button" onclick="setRPAEnabled(undefined)">❓ Indefinido (window.rpaEnabled = undefined)</button>
+        <button class="test-button success" onclick="checkCurrentStatus()">🔍 Verificar Status Atual</button>
+    </div>
+
+    <div class="test-container">
+        <h2>📝 Formulário de Teste</h2>
+        <form id="testForm" class="form-test">
+            <input type="text" name="NOME" placeholder="Nome" value="João Silva">
+            <input type="text" name="CPF" placeholder="CPF" value="12345678901">
+            <input type="text" name="CEP" placeholder="CEP" value="01234567">
+            <input type="text" name="PLACA" placeholder="Placa" value="ABC1234">
+            <input type="text" name="DDD-CELULAR" placeholder="DDD" value="11">
+            <input type="text" name="CELULAR" placeholder="Celular" value="987654321">
+            <input type="email" name="email" placeholder="Email" value="joao@teste.com">
+            <input type="hidden" name="GCLID_FLD" value="TesteRPA123">
+            <button type="submit" class="test-button">🚀 Testar Submit</button>
+        </form>
+    </div>
+
+    <div class="test-container">
+        <h2>📊 Logs de Teste</h2>
+        <div id="logContainer" style="background: #f8f9fa; padding: 10px; border-radius: 5px; max-height: 300px; overflow-y: auto; font-family: monospace; font-size: 12px;">
+            <div>📋 Aguardando logs...</div>
+        </div>
+        <button class="test-button" onclick="clearLogs()">🗑️ Limpar Logs</button>
+    </div>
+
+    <!-- SweetAlert2 para testes -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.22.4/dist/sweetalert2.all.min.js"></script>
+    
+    <!-- jQuery para compatibilidade -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <!-- JavaScript externo corrigido (simulado) -->
+    <script>
+        // Simular o JavaScript externo corrigido
+        class MockRPAExternal {
+            constructor() {
+                this.isProcessing = false;
+            }
+
+            async processForm(form) {
+                if (this.isProcessing) {
+                    this.log('⚠️ Já processando, ignorando submit');
+                    return;
+                }
+
+                this.isProcessing = true;
+                this.log('🚀 JavaScript externo: Iniciando processo RPA...');
+                
+                try {
+                    const formData = this.collectFormData(form);
+                    this.log('📤 JavaScript externo: Dados coletados:', formData);
+                    
+                    // Simular chamada para API com URL corrigida
+                    const sessionId = await this.startRPA(formData);
+                    this.log('🆔 JavaScript externo: Session ID recebido:', sessionId);
+                    
+                    this.log('✅ JavaScript externo: RPA executado com sucesso!');
+                    
+                } catch (error) {
+                    this.log('❌ JavaScript externo: Erro:', error.message);
+                } finally {
+                    this.isProcessing = false;
+                }
+            }
+
+            collectFormData(form) {
+                const formData = new FormData(form);
+                const data = {};
+                for (let [key, value] of formData.entries()) {
+                    data[key] = value;
+                }
+                return data;
+            }
+
+            async startRPA(formData) {
+                // Simular chamada com URL corrigida
+                this.log('🌐 JavaScript externo: Chamando https://rpaimediatoseguros.com.br/api/rpa/start');
+                
+                // Simular delay da API
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                return 'session_' + Date.now();
+            }
+
+            log(message, data = null) {
+                const timestamp = new Date().toLocaleTimeString();
+                const logMessage = `[${timestamp}] ${message}`;
+                console.log(logMessage, data || '');
+                
+                const logContainer = document.getElementById('logContainer');
+                const logDiv = document.createElement('div');
+                logDiv.textContent = logMessage + (data ? ' ' + JSON.stringify(data) : '');
+                logContainer.appendChild(logDiv);
+                logContainer.scrollTop = logContainer.scrollHeight;
+            }
+        }
+
+        // Instância global do mock
+        window.mockRPA = new MockRPAExternal();
+    </script>
+
+    <!-- Footer Code Site FINAL (simulado) -->
+    <script>
+        // Simular o Footer Code Site FINAL com interceptação condicional
+        $(document).ready(function() {
+            log('📋 Footer Code: Inicializado');
+            
+            // Interceptar submit do formulário
+            $('#testForm').on('submit', function(ev) {
+                log('🔘 Footer Code: Submit interceptado');
+                
+                // ✅ INTERCEPTAÇÃO CONDICIONAL RPA
+                if (window.rpaEnabled === false) {
+                    log('❌ Footer Code: RPA desabilitado - redirect para sucesso');
+                    ev.preventDefault();
+                    window.location.href = 'https://www.segurosimediato.com.br/sucesso';
+                    return false;
+                }
+                
+                if (window.rpaEnabled === true) {
+                    log('✅ Footer Code: RPA habilitado - deixando JavaScript externo processar');
+                    ev.preventDefault();
+                    window.mockRPA.processForm(this);
+                    return false;
+                }
+                
+                // Lógica original do Footer Code (validações)
+                log('📋 Footer Code: Executando validações originais...');
+                ev.preventDefault();
+                
+                // Simular validação
+                setTimeout(() => {
+                    log('✅ Footer Code: Validação passou - redirect para sucesso');
+                    window.location.href = 'https://www.segurosimediato.com.br/sucesso';
+                }, 500);
+            });
+        });
+
+        // Funções de controle
+        function setRPAEnabled(value) {
+            window.rpaEnabled = value;
+            log(`🎛️ Controle: window.rpaEnabled definido como ${value}`);
+            updateStatus();
+        }
+
+        function checkCurrentStatus() {
+            log(`🔍 Status atual: window.rpaEnabled = ${window.rpaEnabled}`);
+            updateStatus();
+        }
+
+        function updateStatus() {
+            const statusContainer = document.getElementById('statusContainer');
+            const value = window.rpaEnabled;
+            
+            let statusClass, statusText, statusIcon;
+            
+            if (value === true) {
+                statusClass = 'success';
+                statusText = 'RPA HABILITADO - JavaScript externo processará o submit';
+                statusIcon = '✅';
+            } else if (value === false) {
+                statusClass = 'error';
+                statusText = 'RPA DESABILITADO - Redirect direto para sucesso';
+                statusIcon = '❌';
+            } else {
+                statusClass = 'info';
+                statusText = 'RPA INDEFINIDO - Footer Code executará validações originais';
+                statusIcon = '❓';
+            }
+            
+            statusContainer.innerHTML = `
+                <div class="status ${statusClass}">
+                    ${statusIcon} ${statusText}
+                </div>
+            `;
+        }
+
+        function log(message, data = null) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logMessage = `[${timestamp}] ${message}`;
+            console.log(logMessage, data || '');
+            
+            const logContainer = document.getElementById('logContainer');
+            const logDiv = document.createElement('div');
+            logDiv.textContent = logMessage + (data ? ' ' + JSON.stringify(data) : '');
+            logContainer.appendChild(logDiv);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        function clearLogs() {
+            document.getElementById('logContainer').innerHTML = '<div>📋 Logs limpos...</div>';
+        }
+
+        // Inicializar
+        log('🚀 Teste V6.13.3 iniciado');
+        updateStatus();
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Footer Code - Tarefa 2.4</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.14.0/dist/sweetalert2.all.min.js"></script>
+</head>
+<body>
+    <h1>Teste da Tarefa 2.4</h1>
+    
+    <form id="test-form">
+        <input type="text" id="CPF" placeholder="CPF" value="12345678901">
+        <input type="text" id="CEP" placeholder="CEP" value="01234567">
+        <input type="text" id="PLACA" placeholder="PLACA" value="ABC1234">
+        <input type="text" id="DDD-CELULAR" placeholder="DDD" value="11">
+        <input type="text" id="CELULAR" placeholder="CELULAR" value="999999999">
+        <input type="email" id="email" placeholder="EMAIL" value="teste@teste.com">
+        <button type="submit" id="submit_button_auto">CALCULE AGORA!</button>
+    </form>
+
+    <script>
+    // Configuração RPA Global
+    window.rpaEnabled = false;
+    console.log('🎯 [CONFIG] RPA habilitado:', window.rpaEnabled);
+
+    // Função para carregar script RPA dinamicamente
+    function loadRPAScript() {
+        return new Promise((resolve, reject) => {
+            if (window.MainPage && window.ProgressModalRPA) {
+                console.log('🎯 Script RPA já carregado');
+                resolve();
+                return;
+            }
+            console.log('🎯 Carregando script RPA...');
+            const script = document.createElement('script');
+            script.src = 'https://mdmidia.com.br/webflow_injection_limpo.js';
+            script.onload = () => {
+                console.log('✅ Script RPA carregado com sucesso');
+                resolve();
+            };
+            script.onerror = () => {
+                console.error('❌ Erro ao carregar script RPA');
+                reject(new Error('Falha ao carregar script RPA'));
+            };
+            document.head.appendChild(script);
+        });
+    }
+    window.loadRPAScript = loadRPAScript;
+
+    // Função nativeSubmit simulada
+    function nativeSubmit($form) {
+        console.log('📋 Processando com Webflow:', $form[0]);
+        alert('Formulário processado com Webflow!');
+    }
+
+    // Simulação da lógica da Tarefa 2.4
+    $(document).ready(function() {
+        $('#test-form').on('submit', function(e) {
+            e.preventDefault();
+            console.log('🔍 [DEBUG] Submit do formulário interceptado');
+            
+            // Simular dados válidos
+            const dadosValidos = true;
+            
+            if (dadosValidos) {
+                console.log('✅ [DEBUG] Dados válidos - verificando RPA');
+                
+                if (window.rpaEnabled === true) {
+                    console.log('🎯 [RPA] RPA habilitado - iniciando processo RPA');
+                    window.loadRPAScript()
+                        .then(() => {
+                            console.log('🎯 [RPA] Script RPA carregado - executando processo');
+                            if (window.MainPage && typeof window.MainPage.prototype.handleFormSubmit === 'function') {
+                                const mainPageInstance = new window.MainPage();
+                                mainPageInstance.handleFormSubmit($(this)[0]);
+                            } else {
+                                console.warn('🎯 [RPA] Função handleFormSubmit não encontrada - usando fallback');
+                                nativeSubmit($(this));
+                            }
+                        })
+                        .catch((error) => {
+                            console.error('🎯 [RPA] Erro ao carregar script RPA:', error);
+                            console.log('🎯 [RPA] Fallback para processamento Webflow');
+                            nativeSubmit($(this));
+                        });
+                } else {
+                    console.log('🎯 [RPA] RPA desabilitado - processando apenas com Webflow');
+                    nativeSubmit($(this));
+                }
+            }
+        });
+    });
+    </script>
+</body>
+</html>
+

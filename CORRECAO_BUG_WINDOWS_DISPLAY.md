@@ -119,3 +119,8 @@ Agora o RPA respeitará corretamente a configuração `modo_silencioso: false` n
 - ✅ Mensagens na tela  
 - ✅ Log gravado
 
+
+
+
+
+

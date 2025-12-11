@@ -251,3 +251,8 @@ O problema não está no ambiente ou no código Python, mas sim na **parsing do 
 
 
 
+
+
+
+
+

@@ -1,0 +1,12 @@
+{
+  "etapa_atual": 0,
+  "total_etapas": 5,
+  "percentual": 0.0,
+  "status": "iniciando",
+  "mensagem": "Iniciando RPA",
+  "timestamp_inicio": "2025-10-10T17:45:11.233310",
+  "timestamp_atualizacao": "2025-10-10T17:45:11.234539",
+  "dados_extra": {},
+  "erros": [],
+  "session_id": "356b17a5"
+}

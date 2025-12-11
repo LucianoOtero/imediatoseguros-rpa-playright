@@ -1,0 +1,57 @@
+{
+  "session_id": "511810cd",
+  "timestamp_inicio": "2025-10-10T18:08:14.776540",
+  "timestamp_fim": "2025-10-10T18:08:21.575816",
+  "status_final": "executando",
+  "total_etapas": 15,
+  "historico": [
+    {
+      "etapa": "inicio",
+      "timestamp": "2025-10-10T18:08:14.777224",
+      "status": "iniciando",
+      "mensagem": "ProgressTracker inicializado",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 0,
+      "timestamp": "2025-10-10T18:08:14.778045",
+      "status": "iniciando",
+      "mensagem": "Iniciando RPA",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 1,
+      "timestamp": "2025-10-10T18:08:15.741157",
+      "status": "executando",
+      "mensagem": "Selecionando Tipo de Veiculo",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 1,
+      "timestamp": "2025-10-10T18:08:16.308386",
+      "status": "executando",
+      "mensagem": "Tela 1 concluída",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 2,
+      "timestamp": "2025-10-10T18:08:16.309370",
+      "status": "executando",
+      "mensagem": "Selecionando veículo com a placa informada",
+      "dados_extra": null,
+      "erro": null
+    },
+    {
+      "etapa": 2,
+      "timestamp": "2025-10-10T18:08:21.576781",
+      "status": "executando",
+      "mensagem": "Tela 2 falhou",
+      "dados_extra": null,
+      "erro": null
+    }
+  ]
+}
