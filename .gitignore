@@ -118,6 +118,13 @@ php-fpm_*_ORIGINAL.conf
 # Diretório de credenciais seguras (NUNCA commitar)
 CREDENCIAIS_SEGURAS/
 **/CREDENCIAIS_SEGURAS/**
+
+# Arquivos com API Keys e secrets do Google
+API Keys Google.txt
+*API*Keys*Google*.txt
+
+# Arquivos de migração com credenciais AWS
+migration/migracao_debug_email_20251104_192051/aws_ses_config.php
 API Keys Google.txt
 
 migration/migracao_debug_email_20251104_192051/aws_ses_config.php
