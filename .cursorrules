@@ -22,6 +22,7 @@
 - ✅ Aguardar autorização explícita antes de iniciar o projeto
 - ✅ **Dentro de um projeto autorizado:** Não é necessário pedir autorização para cada arquivo individual
 - ⚠️ **Projetos isolados:** Sempre perguntar antes de modificar arquivos fora de projetos autorizados
+- 🚨 **COMPROMISSO ATIVO (14/12/2025):** NÃO ALTERAR ambientes Hetzner (DEV e PROD) e Firebase DEV - BLOQUEIO TOTAL (ver `COMPROMISSO_NAO_ALTERAR_AMBIENTES_20251214.md`)
 - 🚨 **CRÍTICO - INTERPRETAÇÃO DE COMANDOS:**
   - ⚠️ **"Faça um projeto"** ou **"Crie um projeto"** = Criar documento do projeto, apresentar ao usuário, e AGUARDAR autorização para executar
   - ❌ **NÃO significa:** Criar E executar imediatamente
@@ -41,7 +42,8 @@
 - ✅ **OBRIGATÓRIO:** Após copiar arquivo para servidor, sempre verificar integridade comparando hash (MD5/SHA256)
 - ✅ **OBRIGATÓRIO:** Comparar hashes ignorando diferenças de maiúsculas/minúsculas (case-insensitive)
 - ✅ **OBRIGATÓRIO:** Sempre usar caminho completo do workspace ao copiar arquivos (não usar caminhos relativos que podem falhar)
-- 🚨 **OBRIGATÓRIO - CACHE CLOUDFLARE:** Após atualizar arquivo `.js` no servidor, **SEMPRE avisar** ao usuário sobre a necessidade de limpar o cache do Cloudflare para que as alterações sejam refletidas imediatamente
+- 🚨 **OBRIGATÓRIO - CACHE CLOUDFLARE (APENAS HETZNER):** Após atualizar arquivo `.js` no servidor Hetzner (não Google Cloud), **SEMPRE avisar** ao usuário sobre a necessidade de limpar o cache do Cloudflare para que as alterações sejam refletidas imediatamente
+- ✅ **Google Cloud Run/Storage:** Não requer limpeza de cache do Cloudflare - alterações são refletidas imediatamente após deploy
 
 ### 3. Modificação de Arquivos PHP
 - ❌ **NUNCA modificar** arquivos `.php` diretamente no servidor
@@ -51,7 +53,8 @@
 - ✅ **OBRIGATÓRIO:** Após copiar arquivo para servidor, sempre verificar integridade comparando hash (MD5/SHA256)
 - ✅ **OBRIGATÓRIO:** Comparar hashes ignorando diferenças de maiúsculas/minúsculas (case-insensitive)
 - ✅ **OBRIGATÓRIO:** Sempre usar caminho completo do workspace ao copiar arquivos (não usar caminhos relativos que podem falhar)
-- 🚨 **OBRIGATÓRIO - CACHE CLOUDFLARE:** Após atualizar arquivo `.php` no servidor, **SEMPRE avisar** ao usuário sobre a necessidade de limpar o cache do Cloudflare para que as alterações sejam refletidas imediatamente
+- 🚨 **OBRIGATÓRIO - CACHE CLOUDFLARE (APENAS HETZNER):** Após atualizar arquivo `.php` no servidor Hetzner (não Google Cloud), **SEMPRE avisar** ao usuário sobre a necessidade de limpar o cache do Cloudflare para que as alterações sejam refletidas imediatamente
+- ✅ **Google Cloud Run:** Não requer limpeza de cache do Cloudflare - alterações são refletidas imediatamente após deploy
 - ❌ **NUNCA modificar** configurações do Nginx e PHP quando estão funcionando
 - ⚠️ Sempre confirmar antes de modificar configurações de infraestrutura
 
@@ -61,6 +64,7 @@
 - ✅ **SEMPRE criar backup** antes de qualquer modificação
 - ✅ **SEMPRE copiar** arquivos do Windows para o servidor (via scp, scripts de deploy, etc.)
 - ❌ **SEM EXCEÇÕES** - Nunca modificar diretamente no servidor, mesmo quando autorizado
+- 🚨 **COMPROMISSO ATIVO (14/12/2025):** BLOQUEIO TOTAL para Hetzner DEV e PROD - NÃO copiar, NÃO modificar, NÃO fazer deploy (ver `COMPROMISSO_NAO_ALTERAR_AMBIENTES_20251214.md`)
 
 ### 4.1. Validação de Comandos SSH Antes de Apresentar (OBRIGATÓRIA) 🚨 **CRÍTICO**
 - 🚨 **REGRA CRÍTICA:** **NUNCA apresentar comandos SSH ao usuário sem validar sintaxe antes**
@@ -249,11 +253,66 @@
   - 📁 **Análise Logs cURL:** `WEBFLOW-SEGUROSIMEDIATO/05-DOCUMENTATION/ANALISE_LOGS_CURL_NGINX_PHP_20251125.md`
   - 📁 **Análise Graylog:** `WEBFLOW-SEGUROSIMEDIATO/05-DOCUMENTATION/ANALISE_GRAYLOG_PARA_LOGS_20251125.md`
 
-### 10. Ambiente Padrão de Trabalho
+### 10. Validação Obrigatória de Componentes Google Cloud/Firebase (OBRIGATÓRIA) 🚨 **CRÍTICO**
+- 🚨 **REGRA CRÍTICA:** **SEMPRE verificar se componentes foram criados ou atualizados corretamente** após qualquer operação no Google Cloud ou Firebase
+- ✅ **PROCESSO OBRIGATÓRIO após criar ou atualizar componentes:**
+  1. **FASE 1: Validação Imediata Após Criação/Atualização**
+     - ✅ **APÓS criar banco de dados:** Verificar se banco existe usando `gcloud sql databases list`
+     - ✅ **APÓS criar tabela:** Verificar se tabela existe usando `gcloud sql connect` ou query SQL
+     - ✅ **APÓS criar usuário SQL:** Verificar se usuário existe usando `gcloud sql users list`
+     - ✅ **APÓS fazer deploy Cloud Run:** Verificar se serviço foi atualizado usando `gcloud run services describe`
+     - ✅ **APÓS atualizar variáveis de ambiente:** Verificar se variáveis foram aplicadas usando `gcloud run services describe`
+     - ✅ **APÓS criar/atualizar Secret Manager:** Verificar se secret existe usando `gcloud secrets versions access`
+     - ✅ **APÓS criar Cloud Storage bucket:** Verificar se bucket existe usando `gsutil ls`
+     - ✅ **APÓS fazer upload arquivo:** Verificar se arquivo existe usando `gsutil ls` ou `gsutil stat`
+     - ✅ **APÓS criar Cloud Function:** Verificar se função existe usando `gcloud functions describe`
+     - ✅ **APÓS criar Cloud SQL instance:** Verificar se instância existe usando `gcloud sql instances describe`
+  2. **FASE 2: Validação Funcional**
+     - ✅ **APÓS deploy Cloud Run:** Testar endpoint para verificar se está funcionando
+     - ✅ **APÓS criar banco/tabela:** Testar conexão e query simples para verificar se está acessível
+     - ✅ **APÓS atualizar variáveis:** Testar funcionalidade que depende das variáveis
+     - ✅ **APÓS criar usuário SQL:** Testar conexão com credenciais do usuário
+  3. **FASE 3: Validação de Estado**
+     - ✅ Verificar status do componente (RUNNABLE, ACTIVE, READY, etc.)
+     - ✅ Verificar logs para erros relacionados ao componente
+     - ✅ Verificar métricas básicas (se disponíveis)
+- ✅ **Checklist Obrigatório APÓS Criar/Atualizar Componente:**
+  - [ ] Componente foi criado/atualizado? (verificar existência)
+  - [ ] Componente está no estado esperado? (verificar status)
+  - [ ] Componente está funcionando? (testar funcionalidade)
+  - [ ] Logs mostram erros? (verificar logs)
+  - [ ] Variáveis/configurações foram aplicadas? (verificar configuração)
+- ❌ **PROIBIÇÕES ABSOLUTAS:**
+  - ❌ **NUNCA assumir** que componente foi criado/atualizado sem verificar
+  - ❌ **NUNCA prosseguir** para próxima etapa sem validar componente anterior
+  - ❌ **NUNCA ignorar** erros de criação/atualização sem investigar
+- ✅ **OBRIGAÇÕES:**
+  - ✅ **SEMPRE verificar** existência do componente após criar/atualizar
+  - ✅ **SEMPRE testar** funcionalidade após criar/atualizar
+  - ✅ **SEMPRE verificar** logs para erros relacionados
+  - ✅ **SEMPRE documentar** resultado da validação
+- 🚨 **SE VALIDAÇÃO FALHAR:**
+  - ✅ Investigar causa raiz do problema
+  - ✅ Corrigir problema antes de prosseguir
+  - ✅ Repetir validação após correção
+  - ✅ **NÃO prosseguir** até validação ser bem-sucedida
+- 📋 **Comandos de Validação Comuns:**
+  - **Bancos de dados:** `gcloud sql databases list --instance=INSTANCE_NAME --project=PROJECT_ID`
+  - **Tabelas:** `gcloud sql connect INSTANCE_NAME --database=DATABASE_NAME --project=PROJECT_ID` → `SHOW TABLES;`
+  - **Cloud Run:** `gcloud run services describe SERVICE_NAME --region=REGION --project=PROJECT_ID`
+  - **Variáveis de ambiente:** `gcloud run services describe SERVICE_NAME --format="value(spec.template.spec.containers[0].env)" --region=REGION --project=PROJECT_ID`
+  - **Secrets:** `gcloud secrets versions access latest --secret=SECRET_NAME --project=PROJECT_ID`
+  - **Cloud Storage:** `gsutil ls gs://BUCKET_NAME/` ou `gsutil stat gs://BUCKET_NAME/FILE_PATH`
+  - **Cloud Functions:** `gcloud functions describe FUNCTION_NAME --region=REGION --project=PROJECT_ID`
+  - **Cloud SQL Instances:** `gcloud sql instances describe INSTANCE_NAME --project=PROJECT_ID`
+- 📁 **Aplicável a:** Google Cloud (Cloud Run, Cloud SQL, Cloud Storage, Secret Manager, Cloud Functions), Firebase (Realtime Database, Cloud Functions, Hosting)
+
+### 11. Ambiente Padrão de Trabalho
 - ✅ **PADRÃO:** Sempre trabalhar apenas no ambiente de **DESENVOLVIMENTO** (DEV)
 - ✅ **Diretório padrão:** `WEBFLOW-SEGUROSIMEDIATO/02-DEVELOPMENT/`
 - ✅ **Servidor padrão:** `dev.bssegurosimediato.com.br` (IP: 65.108.156.14)
 - ✅ **Deploy padrão:** Apenas para `/var/www/html/dev/root/` no servidor DEV
+- 🚨 **COMPROMISSO ATIVO (14/12/2025):** NÃO ALTERAR ambientes Hetzner (DEV e PROD) e Firebase DEV (ver `COMPROMISSO_NAO_ALTERAR_AMBIENTES_20251214.md`)
 - 🚨 **PRODUÇÃO - PROCEDIMENTO NÃO DEFINIDO:**
   - ⚠️ **STATUS:** O procedimento para atualizar o ambiente de produção **será definido posteriormente**
   - 🚨 **VALIDAÇÃO AUTOMÁTICA OBRIGATÓRIA:**
@@ -352,9 +411,10 @@
    - ✅ **OBRIGATÓRIO:** Comparar hashes ignorando diferenças de maiúsculas/minúsculas (case-insensitive)
    - ✅ **OBRIGATÓRIO:** Confirmar que hash coincide antes de considerar deploy concluído
 5. **Verificar funcionamento** no servidor DEV
-6. 🚨 **OBRIGATÓRIO - CACHE CLOUDFLARE:** Após atualizar arquivos `.js` ou `.php` no servidor, **SEMPRE avisar** ao usuário sobre a necessidade de limpar o cache do Cloudflare para que as alterações sejam refletidas imediatamente
-7. **OBRIGATÓRIO: Realizar auditoria pós-implementação** (ver seção "Auditoria Pós-Implementação")
-8. 🚨 **OBRIGATÓRIO: Atualizar documento de tracking** (`ALTERACOES_DESDE_ULTIMA_REPLICACAO_PROD_YYYYMMDD.md`) após deploy em DEV (ver seção "Tracking de Alterações para Replicação em Produção")
+6. 🚨 **OBRIGATÓRIO - CACHE CLOUDFLARE (APENAS HETZNER):** Após atualizar arquivos `.js` ou `.php` no servidor Hetzner (não Google Cloud), **SEMPRE avisar** ao usuário sobre a necessidade de limpar o cache do Cloudflare para que as alterações sejam refletidas imediatamente
+7. ✅ **Google Cloud Run/Storage:** Não requer limpeza de cache do Cloudflare - alterações são refletidas imediatamente após deploy
+8. **OBRIGATÓRIO: Realizar auditoria pós-implementação** (ver seção "Auditoria Pós-Implementação")
+9. 🚨 **OBRIGATÓRIO: Atualizar documento de tracking** (`ALTERACOES_DESDE_ULTIMA_REPLICACAO_PROD_YYYYMMDD.md`) após deploy em DEV (ver seção "Tracking de Alterações para Replicação em Produção")
 
 ### Validação Obrigatória de Modificações Antes de Incluir em Projetos de Deploy (OBRIGATÓRIA) 🚨 **CRÍTICO**
 - 🚨 **REGRA CRÍTICA:** **NUNCA incluir arquivos em projetos de deploy sem verificar se foram realmente modificados pelo projeto atual**
@@ -473,7 +533,8 @@
      - ✅ Testar funcionalidade corrigida no ambiente PROD
      - ✅ Verificar logs do servidor PROD
      - ✅ Confirmar que correção está funcionando em produção
-     - 🚨 **OBRIGATÓRIO - CACHE CLOUDFLARE:** Avisar ao usuário sobre necessidade de limpar cache do Cloudflare
+     - 🚨 **OBRIGATÓRIO - CACHE CLOUDFLARE (APENAS HETZNER):** Avisar ao usuário sobre necessidade de limpar cache do Cloudflare apenas para servidores Hetzner (não Google Cloud)
+     - ✅ **Google Cloud Run/Storage:** Não requer aviso sobre Cloudflare - alterações são imediatas após deploy
 - ❌ **NUNCA pular etapas** do processo sequencial
 - ❌ **NUNCA copiar diretamente** de DEV para servidor PROD sem passar por PROD local
 - ❌ **NUNCA atualizar produção** sem testar em desenvolvimento primeiro
@@ -702,6 +763,128 @@
 - ✅ Tentar resolver problemas sozinho quando possível
 - ⚠️ Se não encontrar informação, informar claramente
 - 🚨 **ESPECIALMENTE para erros de ambiente:** Sempre consultar documentação oficial e do projeto ANTES de tentar corrigir
+- 🚨 **PROIBIÇÃO ABSOLUTA - "Erro Silencioso":**
+  - ❌ **NUNCA citar "erro silencioso"** como causa possível de problemas
+  - ❌ **NUNCA usar** termos como "erro sendo capturado silenciosamente", "erro silenciado", "exceção silenciosa", ou similares
+  - ✅ **SEMPRE investigar** causas concretas e verificáveis (código não deployado, variáveis não configuradas, condições lógicas, etc.)
+  - ✅ **SEMPRE buscar** evidências reais antes de sugerir causas
+  - ✅ **Se não encontrar causa concreta:** Informar claramente que não foi possível identificar a causa, mas NÃO sugerir "erro silencioso"
+- 🚨 **COMPROMISSO OBRIGATÓRIO - Análises Baseadas em Evidências (CRÍTICO):**
+  - 🚨 **REGRA CRÍTICA:** **NUNCA fazer análises baseadas em especulações ou suposições sem evidências concretas**
+  - ✅ **PROCESSO OBRIGATÓRIO ao analisar problemas:**
+    1. **FASE 1: Testar Primeiro (OBRIGATÓRIA)**
+       - ✅ **SEMPRE testar** APIs, endpoints, ou funcionalidades antes de analisar
+       - ✅ **SEMPRE verificar** status real (200, 502, timeout, etc.) antes de concluir
+       - ✅ **SEMPRE executar** comandos de teste antes de especular sobre causas
+       - ❌ **NUNCA assumir** que algo está funcionando ou não funcionando sem testar
+    2. **FASE 2: Coletar Evidências Concretas (OBRIGATÓRIA)**
+       - ✅ **SEMPRE buscar** evidências reais (logs, respostas HTTP, erros concretos)
+       - ✅ **SEMPRE verificar** histórico e documentação antes de assumir mudanças
+       - ✅ **SEMPRE confirmar** fatos antes de apresentar como causa
+       - ❌ **NUNCA especular** sobre mudanças históricas sem evidências
+       - ❌ **NUNCA assumir** que algo mudou sem verificar primeiro
+    3. **FASE 3: Analisar Baseado em Evidências (OBRIGATÓRIA)**
+       - ✅ **SEMPRE basear** análises em evidências coletadas
+       - ✅ **SEMPRE distinguir** entre fatos confirmados e hipóteses
+       - ✅ **SEMPRE indicar** quando algo é hipótese vs fato confirmado
+       - ❌ **NUNCA apresentar** especulações como fatos
+       - ❌ **NUNCA assumir** causas sem evidências que as suportem
+    4. **FASE 4: Reconhecer Limitações (OBRIGATÓRIA)**
+       - ✅ **SEMPRE reconhecer** quando não tenho certeza
+       - ✅ **SEMPRE indicar** quando análise é baseada em hipóteses
+       - ✅ **SEMPRE sugerir** testes adicionais quando necessário
+       - ❌ **NUNCA apresentar** conclusões definitivas sem evidências suficientes
+  - ✅ **Checklist Obrigatório ANTES de Apresentar Análise:**
+    - [ ] Testei a funcionalidade/API/endpoint antes de analisar?
+    - [ ] Tenho evidências concretas (logs, respostas HTTP, erros) para minhas conclusões?
+    - [ ] Verifiquei histórico/documentação antes de assumir mudanças?
+    - [ ] Distingui entre fatos confirmados e hipóteses?
+    - [ ] Indiquei quando algo é hipótese vs fato?
+    - [ ] Reconheci limitações da análise?
+  - ❌ **PROIBIÇÕES ABSOLUTAS:**
+    - ❌ **NUNCA especular** sobre mudanças históricas sem verificar
+    - ❌ **NUNCA assumir** que algo mudou sem evidências
+    - ❌ **NUNCA apresentar** especulações como fatos
+    - ❌ **NUNCA fazer** análises sem testar primeiro
+    - ❌ **NUNCA concluir** sem evidências concretas
+  - ✅ **OBRIGAÇÕES:**
+    - ✅ **SEMPRE testar** antes de analisar
+    - ✅ **SEMPRE buscar** evidências concretas
+    - ✅ **SEMPRE distinguir** fatos de hipóteses
+    - ✅ **SEMPRE reconhecer** limitações
+    - ✅ **SEMPRE indicar** quando não tenho certeza
+  - 🚨 **SE NÃO TENHO EVIDÊNCIAS SUFICIENTES:**
+    - ✅ Informar claramente que não tenho evidências suficientes
+    - ✅ Sugerir testes específicos para coletar evidências
+    - ✅ Apresentar hipóteses como hipóteses (não como fatos)
+    - ✅ Aguardar evidências antes de concluir
+  - 📋 **Exemplo de Análise Correta:**
+    - ❌ **ERRADO:** "O domínio mudou de X para Y, por isso não funciona"
+    - ✅ **CORRETO:** "Testei a API e ela retorna 502. Isso indica que a API está fora do ar, não um problema de CORS ou domínio."
+  - 📋 **Exemplo de Processo Correto:**
+    1. Usuário reporta erro
+    2. **TESTAR primeiro:** Executar teste direto na API/endpoint
+    3. **COLETAR evidências:** Verificar status HTTP, headers, logs
+    4. **ANALISAR baseado em evidências:** Conclusões baseadas nos testes
+    5. **RECONHECER limitações:** Indicar o que foi testado e o que não foi
+- 🚨 **COMPROMISSO OBRIGATÓRIO - Análises Baseadas em Evidências (CRÍTICO):**
+  - 🚨 **REGRA CRÍTICA:** **NUNCA fazer análises baseadas em especulações ou suposições sem evidências concretas**
+  - ✅ **PROCESSO OBRIGATÓRIO ao analisar problemas:**
+    1. **FASE 1: Testar Primeiro (OBRIGATÓRIA)**
+       - ✅ **SEMPRE testar** APIs, endpoints, ou funcionalidades antes de analisar
+       - ✅ **SEMPRE verificar** status real (200, 502, timeout, etc.) antes de concluir
+       - ✅ **SEMPRE executar** comandos de teste antes de especular sobre causas
+       - ❌ **NUNCA assumir** que algo está funcionando ou não funcionando sem testar
+    2. **FASE 2: Coletar Evidências Concretas (OBRIGATÓRIA)**
+       - ✅ **SEMPRE buscar** evidências reais (logs, respostas HTTP, erros concretos)
+       - ✅ **SEMPRE verificar** histórico e documentação antes de assumir mudanças
+       - ✅ **SEMPRE confirmar** fatos antes de apresentar como causa
+       - ❌ **NUNCA especular** sobre mudanças históricas sem evidências
+       - ❌ **NUNCA assumir** que algo mudou sem verificar primeiro
+    3. **FASE 3: Analisar Baseado em Evidências (OBRIGATÓRIA)**
+       - ✅ **SEMPRE basear** análises em evidências coletadas
+       - ✅ **SEMPRE distinguir** entre fatos confirmados e hipóteses
+       - ✅ **SEMPRE indicar** quando algo é hipótese vs fato confirmado
+       - ❌ **NUNCA apresentar** especulações como fatos
+       - ❌ **NUNCA assumir** causas sem evidências que as suportem
+    4. **FASE 4: Reconhecer Limitações (OBRIGATÓRIA)**
+       - ✅ **SEMPRE reconhecer** quando não tenho certeza
+       - ✅ **SEMPRE indicar** quando análise é baseada em hipóteses
+       - ✅ **SEMPRE sugerir** testes adicionais quando necessário
+       - ❌ **NUNCA apresentar** conclusões definitivas sem evidências suficientes
+  - ✅ **Checklist Obrigatório ANTES de Apresentar Análise:**
+    - [ ] Testei a funcionalidade/API/endpoint antes de analisar?
+    - [ ] Tenho evidências concretas (logs, respostas HTTP, erros) para minhas conclusões?
+    - [ ] Verifiquei histórico/documentação antes de assumir mudanças?
+    - [ ] Distingui entre fatos confirmados e hipóteses?
+    - [ ] Indiquei quando algo é hipótese vs fato?
+    - [ ] Reconheci limitações da análise?
+  - ❌ **PROIBIÇÕES ABSOLUTAS:**
+    - ❌ **NUNCA especular** sobre mudanças históricas sem verificar
+    - ❌ **NUNCA assumir** que algo mudou sem evidências
+    - ❌ **NUNCA apresentar** especulações como fatos
+    - ❌ **NUNCA fazer** análises sem testar primeiro
+    - ❌ **NUNCA concluir** sem evidências concretas
+  - ✅ **OBRIGAÇÕES:**
+    - ✅ **SEMPRE testar** antes de analisar
+    - ✅ **SEMPRE buscar** evidências concretas
+    - ✅ **SEMPRE distinguir** fatos de hipóteses
+    - ✅ **SEMPRE reconhecer** limitações
+    - ✅ **SEMPRE indicar** quando não tenho certeza
+  - 🚨 **SE NÃO TENHO EVIDÊNCIAS SUFICIENTES:**
+    - ✅ Informar claramente que não tenho evidências suficientes
+    - ✅ Sugerir testes específicos para coletar evidências
+    - ✅ Apresentar hipóteses como hipóteses (não como fatos)
+    - ✅ Aguardar evidências antes de concluir
+  - 📋 **Exemplo de Análise Correta:**
+    - ❌ **ERRADO:** "O domínio mudou de X para Y, por isso não funciona"
+    - ✅ **CORRETO:** "Testei a API e ela retorna 502. Isso indica que a API está fora do ar, não um problema de CORS ou domínio."
+  - 📋 **Exemplo de Processo Correto:**
+    1. Usuário reporta erro
+    2. **TESTAR primeiro:** Executar teste direto na API/endpoint
+    3. **COLETAR evidências:** Verificar status HTTP, headers, logs
+    4. **ANALISAR baseado em evidências:** Conclusões baseadas nos testes
+    5. **RECONHECER limitações:** Indicar o que foi testado e o que não foi
 
 ### Interpretação de Comandos: Investigar vs Implementar
 - 🚨 **CRÍTICO:** Esta é uma das diretivas mais importantes - violar resulta em modificações não autorizadas
@@ -888,8 +1071,9 @@
 7. **Sistemas Complexos:** Evitar criar sistemas de configuração complexos, preferir soluções simples
 8. **Variáveis de Ambiente:** Sempre usar variáveis do Docker, não criar sistemas alternativos
 9. **Heredoc no SSH:** NUNCA usar heredoc complexo via SSH - SEMPRE criar arquivo local e copiar
-10. **[AVISO] CACHE CLOUDFLARE - OBRIGATORIO:** Apos atualizar arquivos `.js` ou `.php` no servidor, **SEMPRE avisar** ao usuario sobre a necessidade de limpar o cache do Cloudflare. O Cloudflare pode manter versoes antigas em cache, causando erros como uso de credenciais antigas, codigo desatualizado, etc. Avisar explicitamente: "[AVISO] IMPORTANTE: Apos atualizar arquivos no servidor, e necessario limpar o cache do Cloudflare para que as alteracoes sejam refletidas imediatamente."
-11. **[AVISO] PRODUCAO - PROCEDIMENTO NAO DEFINIDO:**
+10. **[AVISO] CACHE CLOUDFLARE - OBRIGATORIO (APENAS HETZNER):** Apos atualizar arquivos `.js` ou `.php` no servidor Hetzner (nao Google Cloud), **SEMPRE avisar** ao usuario sobre a necessidade de limpar o cache do Cloudflare. O Cloudflare pode manter versoes antigas em cache, causando erros como uso de credenciais antigas, codigo desatualizado, etc. Avisar explicitamente: "[AVISO] IMPORTANTE: Apos atualizar arquivos no servidor Hetzner, e necessario limpar o cache do Cloudflare para que as alteracoes sejam refletidas imediatamente."
+11. **[INFO] GOOGLE CLOUD RUN/STORAGE:** Servicos no Google Cloud Run ou arquivos no Google Cloud Storage nao requerem limpeza de cache do Cloudflare - as alteracoes sao refletidas imediatamente apos deploy. Cloudflare e um CDN/proxy que pode estar na frente de sites estaticos ou servicos que passam por ele, mas nao se aplica diretamente a servicos Cloud Run.
+12. **[AVISO] PRODUCAO - PROCEDIMENTO NAO DEFINIDO:**
     - [AVISO] **EMITIR ALERTA** ao detectar qualquer tentativa de acesso ou modificacao no servidor de producao
     - [AVISO] **EMITIR ALERTA** ao detectar IP `157.180.36.223` ou dominio `prod.bssegurosimediato.com.br`
     - [AVISO] **EMITIR ALERTA** ao detectar caminho `/var/www/html/prod/root/`
@@ -1212,4 +1396,59 @@
    - [ ] Hashes coincidem?
    - [ ] Se não coincidem, tentar copiar novamente
    - [ ] Deploy só concluído após hash confirmado
+
+### Metodologia de Deploy Incremental (OBRIGATÓRIA) 🚨 **CRÍTICO**
+- 🚨 **REGRA CRÍTICA:** **SEMPRE usar metodologia incremental** para deploys de múltiplos arquivos
+- ✅ **PROCESSO OBRIGATÓRIO para deploys:**
+  1. **FASE 1: Preparar Comando para Primeiro Arquivo**
+     - ✅ Criar comando de backup para o primeiro arquivo
+     - ✅ Validar sintaxe do comando cuidadosamente
+     - ✅ Testar comando no primeiro arquivo
+     - ✅ Aguardar confirmação do usuário antes de prosseguir
+  2. **FASE 2: Replicar Comando para Demais Arquivos**
+     - ✅ **OBRIGATÓRIO:** Usar exatamente a mesma sintaxe do comando testado
+     - ✅ Apenas substituir nome do arquivo e caminhos
+     - ✅ Manter estrutura, formatação e escape de caracteres idênticos
+     - ✅ **NUNCA modificar sintaxe** ao replicar para outros arquivos
+  3. **FASE 3: Executar Sequencialmente**
+     - ✅ Executar comandos um por vez (ou em lotes pequenos)
+     - ✅ Verificar resultado de cada comando antes de prosseguir
+     - ✅ Se um comando falhar, parar e corrigir antes de continuar
+- ✅ **Benefícios da Metodologia Incremental:**
+  - Detecção precoce de erros de sintaxe
+  - Validação do comando antes de replicar
+  - Facilita identificação de problemas
+  - Reduz retrabalho
+  - Garante consistência entre todos os arquivos
+- ❌ **PROIBIÇÕES ABSOLUTAS:**
+  - ❌ **NUNCA criar comandos para múltiplos arquivos** sem testar primeiro em um arquivo
+  - ❌ **NUNCA modificar sintaxe** ao replicar comando para outros arquivos
+  - ❌ **NUNCA executar todos os comandos de uma vez** sem validar primeiro
+  - ❌ **NUNCA assumir** que comando funcionará para todos sem testar
+- ✅ **OBRIGAÇÕES:**
+  - ✅ **SEMPRE testar comando** no primeiro arquivo antes de replicar
+  - ✅ **SEMPRE usar mesma sintaxe** ao replicar para outros arquivos
+  - ✅ **SEMPRE validar resultado** de cada comando antes de prosseguir
+  - ✅ **SEMPRE aguardar confirmação** do usuário após testar primeiro comando
+- 📋 **Exemplo de Processo Correto:**
+  1. **Backup do primeiro arquivo:**
+     ```powershell
+     ssh root@157.180.36.223 "cp /var/www/html/prod/root/MODAL_WHATSAPP_DEFINITIVO.js /var/www/html/prod/root/MODAL_WHATSAPP_DEFINITIVO.js.backup_20251213_160850 && echo '[OK] Backup criado: MODAL_WHATSAPP_DEFINITIVO.js.backup_20251213_160850'"
+     ```
+  2. **Testar e validar** resultado do primeiro comando
+  3. **Replicar para segundo arquivo** (apenas substituir nome do arquivo):
+     ```powershell
+     ssh root@157.180.36.223 "cp /var/www/html/prod/root/firebase_backup_leads.js /var/www/html/prod/root/firebase_backup_leads.js.backup_20251213_160850 && echo '[OK] Backup criado: firebase_backup_leads.js.backup_20251213_160850'"
+     ```
+  4. **Continuar replicando** para todos os demais arquivos usando mesma sintaxe
+- 📋 **Aplicável a:**
+  - Comandos de backup no servidor
+  - Comandos de cópia (SCP) para servidor
+  - Comandos de verificação de hash
+  - Qualquer operação repetitiva em múltiplos arquivos
+- 🚨 **SE COMANDO FALHAR:**
+  - ✅ Parar imediatamente
+  - ✅ Corrigir sintaxe do comando
+  - ✅ Testar novamente no primeiro arquivo
+  - ✅ **SOMENTE após sucesso** replicar para outros arquivos
 
