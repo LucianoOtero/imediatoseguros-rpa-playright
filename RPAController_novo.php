@@ -113,66 +113,7 @@ class RPAController
             $ph3a_time = microtime(true) - $ph3a_start;
             
             // ========================================
-            // ETAPA 2: CHAMAR WEBHOOKS PRIMEIRO
-            // ========================================
-            $webhooks_start = microtime(true);
-            
-            // Prepare webhook data
-            $webhook_data = [
-                'data' => [
-                    'NOME' => $data['nome'],
-                    'DDD-CELULAR' => $data['ddd_celular'] ?? '11',
-                    'CELULAR' => $data['celular'] ?? substr($data['telefone'], 2),
-                    'Email' => $data['email'],
-                    'CEP' => $data['cep'],
-                    'CPF' => $data['cpf'],
-                    'MARCA' => $data['marca'] ?? '',
-                    'PLACA' => $data['placa'],
-                    'VEICULO' => $data['marca'] ?? '',
-                    'ANO' => $data['ano'] ?? '',
-                    'GCLID_FLD' => $data['gclid'] ?? '',
-                    'SEXO' => $data['sexo'] ?? '',
-                    'DATA-DE-NASCIMENTO' => $data['data_nascimento'] ?? '',
-                    'ESTADO-CIVIL' => $data['estado_civil'] ?? '',
-                    'produto' => $data['produto'] ?? 'seguro-auto',
-                    'landing_url' => $data['landing_url'] ?? '',
-                    'utm_source' => $data['utm_source'] ?? '',
-                    'utm_campaign' => $data['utm_campaign'] ?? ''
-                ],
-                'd' => date('c'),
-                'name' => 'Formulário de Cotação RPA'
-            ];
-            
-            // Call webhooks
-            $webhook_results = [];
-            $webhook_success_count = 0;
-            
-            $this->logger->info('Calling EspoCRM webhook');
-            $travelangels_result = $this->callWebhook('https://mdmidia.com.br/add_travelangels.php', $webhook_data);
-            $webhook_results['travelangels'] = $travelangels_result;
-            
-            if ($travelangels_result['success']) {
-                $webhook_success_count++;
-                $this->logger->info('EspoCRM webhook successful');
-            } else {
-                $this->logger->error('EspoCRM webhook failed', ['error' => $travelangels_result['error']]);
-            }
-            
-            $this->logger->info('Calling Octadesk webhook');
-            $octa_result = $this->callWebhook('https://mdmidia.com.br/add_webflow_octa.php', $webhook_data);
-            $webhook_results['octadesk'] = $octa_result;
-            
-            if ($octa_result['success']) {
-                $webhook_success_count++;
-                $this->logger->info('Octadesk webhook successful');
-            } else {
-                $this->logger->error('Octadesk webhook failed', ['error' => $octa_result['error']]);
-            }
-            
-            $webhooks_time = microtime(true) - $webhooks_start;
-            
-            // ========================================
-            // ETAPA 3: INICIAR RPA (SÍNCRONO - AGUARDA DADOS PH3A)
+            // ETAPA 2: INICIAR RPA (SÍNCRONO - AGUARDA DADOS PH3A)
             // ========================================
             $rpa_start = microtime(true);
             
@@ -192,22 +133,19 @@ class RPAController
             // LOGS E RESPOSTA
             // ========================================
             
-            // Log webhook results
+            // Log RPA results
             $masked_cpf = substr($data['cpf'], -4);
             $log_data = [
                 'session_id' => $session_id ?? 'unknown',
                 'timestamp' => date('c'),
                 'performance' => [
                     'ph3a_time' => round($ph3a_time, 3),
-                    'webhooks_time' => round($webhooks_time, 3),
                     'rpa_time' => round($rpa_time, 3),
                     'total_time' => round($total_time, 3)
                 ],
                 'ph3a_result' => $ph3a_result ?? null,
                 'ph3a_data' => $ph3a_data ?? null,
                 'campos_ph3a_vazios' => $campos_ph3a_vazios ?? [],
-                'webhook_results' => $webhook_results,
-                'webhook_success_count' => $webhook_success_count,
                 'rpa_result' => $rpa_result,
                 'input_data' => [
                     'cpf' => '***' . $masked_cpf,
@@ -229,19 +167,16 @@ class RPAController
                     'session_id' => $result['session_id']
                 ]);
                 
-                // Adicionar dados de webhooks e performance à resposta
+                // Adicionar dados de performance à resposta
                 $result['performance'] = [
                     'ph3a_time' => round($ph3a_time, 3),
-                    'webhooks_time' => round($webhooks_time, 3),
                     'rpa_time' => round($rpa_time, 3),
                     'total_time' => round($total_time, 3)
                 ];
                 $result['ph3a_consulted'] = !empty($campos_ph3a_vazios) && !empty($data['cpf']);
                 $result['ph3a_fields_filled'] = array_diff(['sexo', 'data_nascimento', 'estado_civil'], $campos_ph3a_vazios ?? []);
-                $result['webhook_results'] = $webhook_results;
-                $result['webhook_success_count'] = $webhook_success_count;
                 $result['rpa_result'] = $rpa_result;
-                $result['execution_order'] = 'ph3a_then_webhooks_then_rpa';
+                $result['execution_order'] = 'ph3a_then_rpa';
             } else {
                 $this->logger->error('RPA start failed', [
                     'error' => $result['error'] ?? 'Unknown error'
@@ -263,11 +198,21 @@ class RPAController
     /**
      * Call PH3A API to fill missing fields
      * Timeout otimizado para 5 segundos baseado no teste de performance
+     * Migrado para Google Cloud Run via variável de ambiente CPF_VALIDATE_URL
      */
     private function callPH3AApi(string $cpf): array
     {
+        // Usar variável de ambiente ou fallback para Cloud Run
+        $cpf_validate_url = $_ENV['CPF_VALIDATE_URL'] ?? 'https://cpf-validate-br2qvvxwhq-rj.a.run.app';
+        $url_source = !empty($_ENV['CPF_VALIDATE_URL']) ? 'variável de ambiente' : 'Cloud Run padrão';
+        
+        $this->logger->info('Calling PH3A API', [
+            'url' => $cpf_validate_url,
+            'source' => $url_source
+        ]);
+        
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, 'https://mdmidia.com.br/cpf-validate.php');
+        curl_setopt($ch, CURLOPT_URL, $cpf_validate_url);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['cpf' => $cpf]));
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
@@ -325,21 +270,42 @@ class RPAController
 
     /**
      * Start RPA process (síncrono - aguarda dados PH3A)
+     * Adiciona parâmetro URL via variável de ambiente se não estiver presente nos dados
      */
     private function startRPAProcess(array $data): array
     {
-        $rpa_command = "cd /opt/imediatoseguros-rpa && source venv/bin/activate && python executar_rpa_imediato_playwright.py '" . json_encode($data) . "'";
+        // ✅ ADICIONAR URL via variável de ambiente (prioridade: dados > env > padrão)
+        $url_source = 'padrão';
+        if (!empty($data['url'])) {
+            $url_source = 'dados recebidos';
+        } elseif (!empty($_ENV['RPA_TOSEGURADO_URL'])) {
+            $data['url'] = $_ENV['RPA_TOSEGURADO_URL'];
+            $url_source = 'variável de ambiente';
+        } else {
+            $data['url'] = 'https://app.tosegurado.com.br/imediatosolucoes';
+        }
+        
+        $this->logger->info('Starting RPA process with URL', [
+            'url' => $data['url'],
+            'url_source' => $url_source
+        ]);
+        
+        // ✅ CORREÇÃO: Usar caminho completo do Python (source não funciona em shell_exec)
+        // shell_exec usa /bin/sh, não bash, então 'source' não está disponível
+        // ✅ CORREÇÃO: Adicionar --data antes do JSON (script Python requer argumento nomeado)
+        $rpa_command = "cd /opt/imediatoseguros-rpa && /opt/imediatoseguros-rpa/venv/bin/python executar_rpa_imediato_playwright.py --data '" . addslashes(json_encode($data)) . "' 2>&1";
         $output = shell_exec($rpa_command);
         
         return [
             'success' => !empty($output),
             'output' => $output,
-            'command' => $rpa_command
+            'command' => $rpa_command,
+            'url_source' => $url_source
         ];
     }
 
     /**
-     * Log webhook results with performance metrics
+     * Log RPA results with performance metrics
      */
     private function logWebhookResults(string $sessionId, array $logData): void
     {
@@ -659,9 +625,3 @@ class RPAController
         ];
     }
 }
-
-
-
-
-
-

@@ -811,7 +811,7 @@ Estes campos podem afetar o fluxo:
     "senha_login": "MinhaSenh@123",
     "manter_login_atual": true
   },
-  "url": "https://www.app.tosegurado.com.br/imediatosolucoes",
+  "url": "https://app.tosegurado.com.br/imediatosolucoes",
   "placa": "ABC1234",
   "marca": "TOYOTA",
   "modelo": "COROLLA XEI 1.8/1.8 FLEX 16V MEC",

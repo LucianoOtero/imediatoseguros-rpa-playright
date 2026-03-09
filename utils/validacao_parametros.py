@@ -333,7 +333,7 @@ class ValidadorParametros:
                 "log_rotacao_dias": 90,
                 "log_nivel": "INFO"
             },
-            "url": "https://www.app.tosegurado.com.br/imediatoseguros",
+            "url": "https://app.tosegurado.com.br/imediatoseguros",
             "placa": "ABC1234",
             "marca": "FORD",
             "modelo": "ECOSPORT XLS 1.6 1.6 8V",

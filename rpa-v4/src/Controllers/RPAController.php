@@ -42,6 +42,74 @@ class RPAController
                 return $this->errorResponse('Dados inválidos: ' . implode(', ', $validation->getErrors()));
             }
             
+            // ========================================
+            // ETAPA 1: CONSULTAR API PH3A (SE NECESSÁRIO)
+            // ========================================
+            $ph3a_start = microtime(true);
+            $campos_ph3a_vazios = [];
+            if (empty($data['sexo'])) $campos_ph3a_vazios[] = 'sexo';
+            if (empty($data['data_nascimento'])) $campos_ph3a_vazios[] = 'data_nascimento';
+            if (empty($data['estado_civil'])) $campos_ph3a_vazios[] = 'estado_civil';
+            
+            $ph3a_data = [];
+            $ph3a_result = null;
+            
+            if (!empty($campos_ph3a_vazios) && !empty($data['cpf'])) {
+                $this->logger->info('Consulting PH3A API', ['fields' => $campos_ph3a_vazios]);
+                $ph3a_result = $this->callPH3AApi($data['cpf']);
+                
+                if ($ph3a_result['success']) {
+                    $ph3a_json = json_decode($ph3a_result['response'], true);
+                    
+                    if ($ph3a_json && $ph3a_json['codigo'] == 1 && isset($ph3a_json['data'])) {
+                        $ph3a_data = $ph3a_json['data'];
+                        
+                        // Mapear campos PH3A
+                        if (empty($data['sexo']) && isset($ph3a_data['sexo'])) {
+                            $data['sexo'] = ($ph3a_data['sexo'] == 1) ? 'Masculino' : 'Feminino';
+                        }
+                        
+                        if (empty($data['estado_civil']) && isset($ph3a_data['estado_civil'])) {
+                            $estado_civil_map = [0 => 'Solteiro', 1 => 'Casado', 2 => 'Divorciado', 3 => 'Viúvo'];
+                            $data['estado_civil'] = $estado_civil_map[$ph3a_data['estado_civil']] ?? '';
+                        }
+                        
+                        if (empty($data['data_nascimento']) && isset($ph3a_data['data_nascimento'])) {
+                            try {
+                                $date = new \DateTime($ph3a_data['data_nascimento']);
+                                $data['data_nascimento'] = $date->format('d/m/Y');
+                            } catch (\Exception $e) {
+                                $data['data_nascimento'] = $ph3a_data['data_nascimento'];
+                            }
+                        }
+                        
+                        $this->logger->info('PH3A data filled successfully');
+                    } else {
+                        $this->logger->warning('PH3A: CPF válido mas não encontrado na base');
+                    }
+                } else {
+                    // PH3A falhou - verificar se campos obrigatórios estão vazios
+                    $campos_obrigatorios_vazios = array_intersect($campos_ph3a_vazios, ['sexo', 'data_nascimento', 'estado_civil']);
+                    
+                    if (!empty($campos_obrigatorios_vazios)) {
+                        $this->logger->error('PH3A failed and required fields empty', [
+                            'required_fields' => $campos_obrigatorios_vazios,
+                            'ph3a_error' => $ph3a_result['error']
+                        ]);
+                        
+                        return $this->errorResponse('Não foi possível validar o CPF', 9001);
+                    }
+                    
+                    $this->logger->warning('PH3A failed but continuing', [
+                        'error' => $ph3a_result['error']
+                    ]);
+                }
+            } else {
+                $this->logger->info('PH3A: Campos já preenchidos ou CPF vazio');
+            }
+            
+            $ph3a_time = microtime(true) - $ph3a_start;
+            
             // Criar sessão RPA
             $result = $this->sessionService->create($data);
             
@@ -336,6 +404,49 @@ class RPAController
             
             return $this->errorResponse('Erro interno: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Call PH3A API to get CPF data
+     * 
+     * @param string $cpf CPF to validate
+     * @return array Response from PH3A API
+     */
+    private function callPH3AApi(string $cpf): array
+    {
+        // Usar variável de ambiente ou fallback para Cloud Run
+        $cpf_validate_url = $_ENV['CPF_VALIDATE_URL'] ?? 'https://cpf-validate-br2qvvxwhq-rj.a.run.app';
+        $url_source = !empty($_ENV['CPF_VALIDATE_URL']) ? 'variável de ambiente' : 'Cloud Run padrão';
+        
+        $this->logger->info('Calling PH3A API', [
+            'url' => $cpf_validate_url,
+            'source' => $url_source
+        ]);
+        
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $cpf_validate_url);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['cpf' => $cpf]));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'User-Agent: RPA-API-v6.9.1'
+        ]);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 5);         // 5 segundos (otimizado)
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);   // 2 segundos (otimizado)
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        
+        $response = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $error = curl_error($ch);
+        curl_close($ch);
+        
+        return [
+            'success' => $http_code >= 200 && $http_code < 300,
+            'http_code' => $http_code,
+            'response' => $response,
+            'error' => $error
+        ];
     }
 
     private function successResponse(array $data = []): array
